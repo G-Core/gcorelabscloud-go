@@ -197,7 +197,7 @@ var loadBalancerUpdateSubCommand = cli.Command{
 }
 
 var LoadBalancerCommands = cli.Command{
-	Name:  "loadbalancers",
+	Name:  "loadbalancer",
 	Usage: "GCloud loadbalancers API",
 	Subcommands: []*cli.Command{
 		&loadBalancerListSubCommand,

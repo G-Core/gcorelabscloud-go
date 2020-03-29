@@ -7,6 +7,7 @@ import (
 
 type NodegroupRole string
 type ClusterUpdateOperation string
+type K8sClusterVersion string
 
 const (
 	NodegroupMasterRole           NodegroupRole          = "master"
@@ -14,6 +15,8 @@ const (
 	ClusterUpdateOperationRemove  ClusterUpdateOperation = "remove"
 	ClusterUpdateOperationReplace ClusterUpdateOperation = "replace"
 	ClusterUpdateOperationAdd     ClusterUpdateOperation = "add"
+	K8sClusterVersion117          K8sClusterVersion      = "1.17"
+	K8sClusterVersion114          K8sClusterVersion      = "1.14"
 )
 
 func (ng NodegroupRole) IsValid() error {
@@ -134,4 +137,63 @@ func (co *ClusterUpdateOperation) UnmarshalJSON(data []byte) error {
 // MarshalJSON - implements Marshaler interface
 func (co *ClusterUpdateOperation) MarshalJSON() ([]byte, error) {
 	return json.Marshal(co.String())
+}
+
+func (kv K8sClusterVersion) IsValid() error {
+	switch kv {
+	case K8sClusterVersion114,
+		K8sClusterVersion117:
+		return nil
+	}
+	return fmt.Errorf("invalid K8sClusterVersion type: %v", kv)
+}
+
+func (kv K8sClusterVersion) ValidOrNil() (*K8sClusterVersion, error) {
+	if kv.String() == "" {
+		return nil, nil
+	}
+	err := kv.IsValid()
+	if err != nil {
+		return &kv, err
+	}
+	return &kv, nil
+}
+
+func (kv K8sClusterVersion) String() string {
+	return string(kv)
+}
+
+func (kv K8sClusterVersion) List() []K8sClusterVersion {
+	return []K8sClusterVersion{
+		K8sClusterVersion114,
+		K8sClusterVersion117,
+	}
+}
+
+func (kv K8sClusterVersion) StringList() []string {
+	var s []string
+	for _, v := range kv.List() {
+		s = append(s, v.String())
+	}
+	return s
+}
+
+// UnmarshalJSON - implements Unmarshaler interface
+func (kv *K8sClusterVersion) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	v := K8sClusterVersion(s)
+	err := v.IsValid()
+	if err != nil {
+		return err
+	}
+	*kv = v
+	return nil
+}
+
+// MarshalJSON - implements Marshaler interface
+func (kv *K8sClusterVersion) MarshalJSON() ([]byte, error) {
+	return json.Marshal(kv.String())
 }

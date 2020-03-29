@@ -17,8 +17,9 @@ import (
 )
 
 var (
-	clusterIDText     = "cluster_id is mandatory argument"
-	clusterUpdateOpts = types.ClusterUpdateOperation("").StringList()
+	clusterIDText          = "cluster_id is mandatory argument"
+	clusterUpdateTypes     = types.ClusterUpdateOperation("").StringList()
+	k8sClusterVersionTypes = types.K8sClusterVersion("").StringList()
 )
 
 var clusterListSubCommand = cli.Command{
@@ -242,9 +243,9 @@ var clusterUpdateSubCommand = cli.Command{
 			Name:    "op",
 			Aliases: []string{"o"},
 			Value: &utils.EnumStringSliceValue{
-				Enum: clusterUpdateOpts,
+				Enum: clusterUpdateTypes,
 			},
-			Usage:    fmt.Sprintf("output in %s", strings.Join(clusterUpdateOpts, ", ")),
+			Usage:    fmt.Sprintf("output in %s", strings.Join(clusterUpdateTypes, ", ")),
 			Required: false,
 		},
 	}, flags.WaitCommandFlags...),
@@ -503,6 +504,15 @@ var clusterCreateSubCommand = cli.Command{
 			Usage:    "Enable fixed IP for cluster nodes.",
 			Required: false,
 		},
+		&cli.GenericFlag{
+			Name: "version",
+			Value: &utils.EnumValue{
+				Enum:    k8sClusterVersionTypes,
+				Default: types.K8sClusterVersion117.String(),
+			},
+			Usage:    fmt.Sprintf("output in %s", strings.Join(k8sClusterVersionTypes, ", ")),
+			Required: false,
+		},
 		&cli.IntFlag{
 			Name:     "create-timeout",
 			Usage:    "Heat timeout to create cluster. Seconds",
@@ -522,6 +532,13 @@ var clusterCreateSubCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
+
+		version, err := types.K8sClusterVersion(c.String("version")).ValidOrNil()
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "create")
+			return cli.NewExitError(err, 1)
+		}
+
 		opts := clusters.CreateOpts{
 			Name:              c.String("name"),
 			ClusterTemplateID: c.String("template-id"),
@@ -535,6 +552,7 @@ var clusterCreateSubCommand = cli.Command{
 			FixedSubnet:       utils.StringToPointer(c.String("fixed-subnet")),
 			FloatingIPEnabled: c.Bool("floating-ip-enabled"),
 			CreateTimeout:     utils.IntToPointer(c.Int("create-timeout")),
+			Version:           version,
 		}
 
 		results, err := clusters.Create(client, opts).ExtractTasks()

@@ -13,7 +13,7 @@ import (
 
 const ListResponse = `
 {
-  "count": 0,
+  "count": 1,
   "results": [
     {
       "tenant_id": "fe5cc21270554c0d9d4cdc48ba574987",
