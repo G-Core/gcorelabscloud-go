@@ -248,13 +248,14 @@ var (
 	creatorTaskID       = "d1e1500b-e2be-40aa-9a4b-cc493fa1af30"
 
 	Instance1 = instances.Instance{
-		ID:          instanceID,
-		Name:        instanceName,
-		Description: instanceDescription,
-		CreatedAt:   createdTime,
-		Status:      "ACTIVE",
-		VMState:     "active",
-		TaskState:   nil,
+		ID:               instanceID,
+		Name:             instanceName,
+		Description:      instanceDescription,
+		CreatedAt:        createdTime,
+		Status:           "ACTIVE",
+		VMState:          "active",
+		TaskState:        nil,
+		AvailabilityZone: instances.DefaultAvailabilityZone,
 		Flavor: flavors.Flavor{
 			FlavorID:   "g1s-shared-1-0.5",
 			FlavorName: "g1s-shared-1-0.5",

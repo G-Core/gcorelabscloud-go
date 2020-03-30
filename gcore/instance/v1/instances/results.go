@@ -1,6 +1,7 @@
 package instances
 
 import (
+	"encoding/json"
 	"net"
 
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/instance/v1/types"
@@ -9,6 +10,8 @@ import (
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/flavor/v1/flavors"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/pagination"
 )
+
+const DefaultAvailabilityZone = "nova"
 
 type commonResult struct {
 	gcorecloud.Result
@@ -62,23 +65,24 @@ type InstanceAddress struct {
 
 // Instance represents a instance structure.
 type Instance struct {
-	ID             string                       `json:"instance_id"`
-	Name           string                       `json:"instance_name"`
-	Description    string                       `json:"instance_description"`
-	CreatedAt      gcorecloud.JSONRFC3339ZZ     `json:"instance_created"`
-	Status         string                       `json:"status"`
-	VMState        string                       `json:"vm_state"`
-	TaskState      *string                      `json:"task_state"`
-	Flavor         flavors.Flavor               `json:"flavor"`
-	Metadata       map[string]interface{}       `json:"metadata"`
-	Volumes        []InstanceVolume             `json:"volumes"`
-	Addresses      map[string][]InstanceAddress `json:"addresses"`
-	SecurityGroups []types.ItemName             `json:"security_groups"`
-	CreatorTaskID  *string                      `json:"creator_task_id"`
-	TaskID         *string                      `json:"task_id"`
-	ProjectID      int                          `json:"project_id"`
-	RegionID       int                          `json:"region_id"`
-	Region         string                       `json:"region"`
+	ID               string                       `json:"instance_id"`
+	Name             string                       `json:"instance_name"`
+	Description      string                       `json:"instance_description"`
+	CreatedAt        gcorecloud.JSONRFC3339ZZ     `json:"instance_created"`
+	Status           string                       `json:"status"`
+	VMState          string                       `json:"vm_state"`
+	TaskState        *string                      `json:"task_state"`
+	Flavor           flavors.Flavor               `json:"flavor"`
+	Metadata         map[string]interface{}       `json:"metadata"`
+	Volumes          []InstanceVolume             `json:"volumes"`
+	Addresses        map[string][]InstanceAddress `json:"addresses"`
+	SecurityGroups   []types.ItemName             `json:"security_groups"`
+	CreatorTaskID    *string                      `json:"creator_task_id"`
+	TaskID           *string                      `json:"task_id"`
+	ProjectID        int                          `json:"project_id"`
+	RegionID         int                          `json:"region_id"`
+	Region           string                       `json:"region"`
+	AvailabilityZone string                       `json:"availability_zone"`
 }
 
 // Interface represents a instance port interface.
@@ -223,4 +227,15 @@ func ExtractInstanceInterfaces(r pagination.Page) ([]Interface, error) {
 
 func ExtractInstancesInto(r pagination.Page, v interface{}) error {
 	return r.(InstancePage).Result.ExtractIntoSlicePtr(v, "results")
+}
+
+// UnmarshalJSON - implements Unmarshaler interface
+func (i *Instance) UnmarshalJSON(data []byte) error {
+	i.AvailabilityZone = DefaultAvailabilityZone
+	type Alias Instance
+	tmp := (*Alias)(i)
+	if err := json.Unmarshal(data, &tmp); err != nil {
+		return err
+	}
+	return nil
 }
