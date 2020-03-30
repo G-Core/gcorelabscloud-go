@@ -54,8 +54,10 @@ type InstanceVolume struct {
 }
 
 type InstanceAddress struct {
-	Type    types.AddressType `json:"type"`
-	Address net.IP            `json:"addr"`
+	Type       types.AddressType `json:"type"`
+	Address    net.IP            `json:"addr"`
+	SubnetID   *string           `json:"subnet_id,omitempty"`
+	SubnetName *string           `json:"subnet_name,omitempty"`
 }
 
 // Instance represents a instance structure.
