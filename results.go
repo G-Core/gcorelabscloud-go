@@ -640,10 +640,44 @@ func (c Currency) MarshalJSON() ([]byte, error) {
 	return json.Marshal(c.String())
 }
 
-type UUIDIDType string
-
 type GcoreErrorType struct {
 	ExceptionClass string `json:"exception_class"`
 	Message        string `json:"message"`
 	Traceback      string `json:"traceback"`
+}
+
+type MAC struct {
+	net.HardwareAddr
+}
+
+func ParseMacString(s string) (*MAC, error) {
+	mac, err := net.ParseMAC(s)
+	if err != nil {
+		return nil, err
+	}
+	return &MAC{HardwareAddr: mac}, nil
+}
+
+// UnmarshalJSON - implements Unmarshaler interface for MAC
+func (m *MAC) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	mc, err := ParseMacString(s)
+	if err != nil {
+		return err
+	}
+	*m = *mc
+	return nil
+}
+
+// MarshalJSON - implements Marshaler interface for MAC
+func (m MAC) MarshalJSON() ([]byte, error) {
+	return json.Marshal(m.String())
+}
+
+// String - implements Stringer
+func (m MAC) String() string {
+	return m.HardwareAddr.String()
 }

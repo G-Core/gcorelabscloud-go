@@ -25,8 +25,16 @@ func prepareGetTestURLParams(projectID int, regionID int, id string) string {
 	return fmt.Sprintf("/v1/instances/%d/%d/%s", projectID, regionID, id)
 }
 
+func prepareGetActionTestURLParams(projectID int, regionID int, id string, action string) string {
+	return fmt.Sprintf("/v1/instances/%d/%d/%s/%s", projectID, regionID, id, action)
+}
+
 func prepareListTestURL() string {
 	return prepareListTestURLParams(fake.ProjectID, fake.RegionID)
+}
+
+func prepareListInterfacesTestURL(id string) string {
+	return prepareGetActionTestURLParams(fake.ProjectID, fake.RegionID, id, "interfaces")
 }
 
 func prepareGetTestURL(id string) string {
@@ -98,4 +106,29 @@ func TestGet(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, Instance1, *ct)
 
+}
+
+func TestListAllInterfaces(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareListInterfacesTestURL(Instance1.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, InterfacesResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("instances", "v1")
+	interfaces, err := instances.ListInterfacesAll(client, instanceID)
+
+	require.NoError(t, err)
+	require.Len(t, interfaces, 1)
+	require.Equal(t, PortID, interfaces[0].PortID)
+	require.Equal(t, ExpectedInstanceInterfacesSlice, interfaces)
 }

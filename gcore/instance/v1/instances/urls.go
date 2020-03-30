@@ -20,16 +20,10 @@ func listURL(c *gcorecloud.ServiceClient) string {
 	return rootURL(c)
 }
 
-/*
-func createURL(c *gcorecloud.ServiceClient) string {
-	return rootURL(c)
+func resourceActionURL(c *gcorecloud.ServiceClient, id string, action string) string {
+	return c.ServiceURL(id, action)
 }
 
-func updateURL(c *gcorecloud.ServiceClient, id string) string {
-	return resourceURL(c, id)
+func interfacesListURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "interfaces")
 }
-
-func deleteURL(c *gcorecloud.ServiceClient, id string) string {
-	return resourceURL(c, id)
-}
-*/

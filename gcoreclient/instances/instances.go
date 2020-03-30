@@ -55,6 +55,31 @@ var instanceListCommand = cli.Command{
 	},
 }
 
+var instanceListInterfacesCommand = cli.Command{
+	Name:      "interfaces",
+	Usage:     "List instance interfaces",
+	ArgsUsage: "<instance_id>",
+	Category:  "instance",
+	Action: func(c *cli.Context) error {
+		instanceID, err := flags.GetFirstArg(c, instanceIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "show")
+			return err
+		}
+		client, err := utils.BuildClient(c, "instances", "")
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+		results, err := instances.ListInterfacesAll(client, instanceID)
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		utils.ShowResults(results, c.String("format"))
+		return nil
+	},
+}
+
 var instanceGetCommand = cli.Command{
 	Name:      "show",
 	Usage:     "Get instance information",
@@ -86,5 +111,6 @@ var InstanceCommands = cli.Command{
 	Subcommands: []*cli.Command{
 		&instanceGetCommand,
 		&instanceListCommand,
+		&instanceListInterfacesCommand,
 	},
 }

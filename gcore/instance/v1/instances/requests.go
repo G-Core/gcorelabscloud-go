@@ -45,3 +45,43 @@ func Get(c *gcorecloud.ServiceClient, id string) (r GetResult) {
 	_, r.Err = c.Get(url, &r.Body, nil)
 	return
 }
+
+// ListInterfaces retrieves network interfaces for instance
+func ListInterfaces(c *gcorecloud.ServiceClient, id string) pagination.Pager {
+	url := interfacesListURL(c, id)
+	return pagination.NewPager(c, url, func(r pagination.PageResult) pagination.Page {
+		return InstancePage{pagination.LinkedPageBase{PageResult: r}}
+	})
+}
+
+// ListAll is a convenience function that returns all instances.
+func ListAll(client *gcorecloud.ServiceClient, opts ListOptsBuilder) ([]Instance, error) {
+	pages, err := List(client, opts).AllPages()
+	if err != nil {
+		return nil, err
+	}
+
+	all, err := ExtractInstances(pages)
+	if err != nil {
+		return nil, err
+	}
+
+	return all, nil
+
+}
+
+// ListInterfacesAll is a convenience function that returns all instance interfaces.
+func ListInterfacesAll(client *gcorecloud.ServiceClient, id string) ([]Interface, error) {
+	pages, err := ListInterfaces(client, id).AllPages()
+	if err != nil {
+		return nil, err
+	}
+
+	all, err := ExtractInstanceInterfaces(pages)
+	if err != nil {
+		return nil, err
+	}
+
+	return all, nil
+
+}

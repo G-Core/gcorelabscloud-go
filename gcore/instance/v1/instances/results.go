@@ -79,9 +79,85 @@ type Instance struct {
 	Region         string                       `json:"region"`
 }
 
+// Interface represents a instance port interface.
+type Interface struct {
+	PortID            string         `json:"port_id"`
+	MacAddress        gcorecloud.MAC `json:"mac_address"`
+	NetworkID         string         `json:"network_id"`
+	IPAssignments     []PortIP       `json:"ip_assignments"`
+	NetworkDetails    NetworkDetail  `json:"network_details"`
+	FloatingIPDetails []FloatingIP   `json:"floatingip_details"`
+}
+
+// PortIP
+type PortIP struct {
+	IPAddress net.IP `json:"ip_address"`
+	SubnetID  string `json:"subnet_id"`
+}
+
+// FloatingIP represents a floating ip of instance port.
+type FloatingIP struct {
+	FloatingIPAddress net.IP                   `json:"floating_ip_address"`
+	RouterID          string                   `json:"router_id"`
+	SubnetID          string                   `json:"subnet_id"`
+	Status            string                   `json:"status"`
+	ID                string                   `json:"id"`
+	PortID            string                   `json:"port_id"`
+	DNSDomain         string                   `json:"dns_domain"`
+	DNSName           string                   `json:"dns_name"`
+	FixedIPAddress    net.IP                   `json:"fixed_ip_address"`
+	UpdatedAt         *gcorecloud.JSONRFC3339Z `json:"updated_at"`
+	CreatedAt         gcorecloud.JSONRFC3339Z  `json:"created_at"`
+	CreatorTaskID     *string                  `json:"creator_task_id"`
+	ProjectID         int                      `json:"project_id"`
+	RegionID          int                      `json:"region_id"`
+	Region            string                   `json:"region"`
+}
+
+// Subnet port subnet
+type Subnet struct {
+	ID            string                   `json:"id"`
+	Name          string                   `json:"name"`
+	IPVersion     gcorecloud.IPVersion     `json:"ip_version"`
+	EnableDHCP    bool                     `json:"enable_dhcp"`
+	Cidr          gcorecloud.CIDR          `json:"cidr"`
+	CreatedAt     gcorecloud.JSONRFC3339Z  `json:"created_at"`
+	UpdatedAt     *gcorecloud.JSONRFC3339Z `json:"updated_at"`
+	NetworkID     string                   `json:"network_id"`
+	TaskID        *string                  `json:"task_id"`
+	CreatorTaskID *string                  `json:"creator_task_id"`
+	ProjectID     int                      `json:"project_id"`
+	RegionID      int                      `json:"region_id"`
+	Region        string                   `json:"region"`
+}
+
+// NetworkDetail represents a NetworkDetails of instance port.
+type NetworkDetail struct {
+	Mtu           int                      `json:"mtu"`
+	UpdatedAt     *gcorecloud.JSONRFC3339Z `json:"updated_at"`
+	CreatedAt     gcorecloud.JSONRFC3339Z  `json:"created_at"`
+	ID            string                   `json:"id"`
+	External      bool                     `json:"external"`
+	Default       bool                     `json:"default"`
+	Name          string                   `json:"name"`
+	Shared        bool                     `json:"shared"`
+	Subnets       []Subnet                 `json:"subnets"`
+	ProjectID     int                      `json:"project_id"`
+	RegionID      int                      `json:"region_id"`
+	Region        string                   `json:"region"`
+	TaskID        *string                  `json:"task_id"`
+	CreatorTaskID *string                  `json:"creator_task_id"`
+}
+
 // InstancePage is the page returned by a pager when traversing over a
 // collection of instances.
 type InstancePage struct {
+	pagination.LinkedPageBase
+}
+
+// InstanceInterfacePage is the page returned by a pager when traversing over a
+// collection of instance interfaces.
+type InstanceInterfacePage struct {
 	pagination.LinkedPageBase
 }
 
@@ -99,17 +175,46 @@ func (r InstancePage) NextPageURL() (string, error) {
 	return gcorecloud.ExtractNextURL(s.Links)
 }
 
+// InstanceInterfacePage is invoked when a paginated collection of instance interfaces has reached
+// the end of a page and the pager seeks to traverse over a new one. In order
+// to do this, it needs to construct the next page's URL.
+func (r InstanceInterfacePage) NextPageURL() (string, error) {
+	var s struct {
+		Links []gcorecloud.Link `json:"links"`
+	}
+	err := r.ExtractInto(&s)
+	if err != nil {
+		return "", err
+	}
+	return gcorecloud.ExtractNextURL(s.Links)
+}
+
 // IsEmpty checks whether a InstancePage struct is empty.
 func (r InstancePage) IsEmpty() (bool, error) {
 	is, err := ExtractInstances(r)
 	return len(is) == 0, err
 }
 
-// ExtractInstance accepts a Page struct, specifically a InstancePage struct,
+// IsEmpty checks whether a InstancePage struct is empty.
+func (r InstanceInterfacePage) IsEmpty() (bool, error) {
+	is, err := ExtractInstanceInterfaces(r)
+	return len(is) == 0, err
+}
+
+// ExtractInstances accepts a Page struct, specifically a InstancePage struct,
 // and extracts the elements into a slice of Instance structs. In other words,
 // a generic collection is mapped into a relevant slice.
 func ExtractInstances(r pagination.Page) ([]Instance, error) {
 	var s []Instance
+	err := ExtractInstancesInto(r, &s)
+	return s, err
+}
+
+// ExtractInstanceInterfaces accepts a Page struct, specifically a InstancePage struct,
+// and extracts the elements into a slice of Instance structs. In other words,
+// a generic collection is mapped into a relevant slice.
+func ExtractInstanceInterfaces(r pagination.Page) ([]Interface, error) {
+	var s []Interface
 	err := ExtractInstancesInto(r, &s)
 	return s, err
 }
