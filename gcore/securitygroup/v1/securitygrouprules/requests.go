@@ -5,9 +5,9 @@ import (
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/securitygroup/v1/securitygroups"
 )
 
-// Replace accepts a CreateOpts struct and creates a new security group using the values provided.
+// Replace accepts a CreateOpts struct and creates a new security group rule using the values provided.
 func Replace(c *gcorecloud.ServiceClient, ruleID string, opts securitygroups.CreateRuleOptsBuilder) (r securitygroups.CreateRuleResult) {
-	b, err := opts.ToSecurityGroupRuleCreateMap()
+	b, err := opts.ToFloatingIPCreateMap()
 	if err != nil {
 		r.Err = err
 		return

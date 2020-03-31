@@ -4,23 +4,20 @@ import (
 	"fmt"
 	"os"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/securitygroups/securitygrouprules"
-
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/securitygroups/securitygroups"
-
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/heat"
-
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/flags"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/flavors"
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/floatingips/floatingips"
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/heat"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/instances"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/keypairs"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/loadbalancers/loadbalancers"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/magnum"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/networks"
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/securitygroups/securitygrouprules"
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/securitygroups/securitygroups"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/subnets"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/tasks"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/volumes"
-
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
@@ -38,6 +35,7 @@ var commands = []*cli.Command{
 	&heat.HeatsCommand,
 	&securitygroups.SecurityGroupCommands,
 	&securitygrouprules.SecurityGroupRuleCommands,
+	&floatingips.FloatingIPCommands,
 }
 
 func main() {

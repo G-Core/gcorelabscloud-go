@@ -7,7 +7,7 @@ import (
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/loadbalancer/v1/loadbalancers"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/flags"
-	lbpools "bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/loadbalancers/lbpools"
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/loadbalancers/lbpools"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/loadbalancers/listeners"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/utils"
 
