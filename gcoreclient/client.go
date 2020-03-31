@@ -4,6 +4,10 @@ import (
 	"fmt"
 	"os"
 
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/securitygroups/securitygrouprules"
+
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/securitygroups/securitygroups"
+
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/heat"
 
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/flags"
@@ -32,6 +36,8 @@ var commands = []*cli.Command{
 	&instances.InstanceCommands,
 	&magnum.MagnumsCommand,
 	&heat.HeatsCommand,
+	&securitygroups.SecurityGroupCommands,
+	&securitygrouprules.SecurityGroupRuleCommands,
 }
 
 func main() {
