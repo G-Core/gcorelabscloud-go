@@ -95,3 +95,31 @@ func TestGet(t *testing.T) {
 	require.Equal(t, createdTime, ct.CreatedOn)
 	require.Nil(t, ct.UpdatedOn)
 }
+
+func TestWaitTask(t *testing.T) {
+
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareGetTestURL(Task1.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, FinishedTaskResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("tasks", "v1")
+
+	err := tasks.WaitTaskAndProcessResult(client, tasks.TaskID(Task1.ID), true, 600, func(task tasks.TaskID) error {
+		require.Equal(t, Task1.ID, string(task))
+		return nil
+	})
+
+	require.NoError(t, err)
+}
