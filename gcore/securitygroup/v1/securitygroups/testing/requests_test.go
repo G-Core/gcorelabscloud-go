@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"testing"
 
+	instancestesting "bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/instance/v1/instances/testing"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/securitygroup/v1/securitygroups"
 	fake "bitbucket.gcore.lu/gcloud/gcorecloud-go/testhelper/client"
 
@@ -38,6 +39,10 @@ func prepareGetTestURL(id string) string {
 
 func prepareAddRuleTestURL(id string) string {
 	return prepareActionTestURLParams(fake.ProjectID, fake.RegionID, id, "rules")
+}
+
+func prepareListInstancesTestURL(id string) string {
+	return prepareActionTestURLParams(fake.ProjectID, fake.RegionID, id, "instances")
 }
 
 func TestList(t *testing.T) {
@@ -251,4 +256,30 @@ func TestCreateRule(t *testing.T) {
 	rule, err := securitygroups.AddRule(client, SecurityGroup1.ID, options).Extract()
 	require.NoError(t, err)
 	require.Equal(t, securityGroupRule1, *rule)
+}
+
+func TestListAllInstances(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareListInstancesTestURL(SecurityGroup1.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, instancestesting.ListResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("securitygroups", "v1")
+
+	results, err := securitygroups.ListAllInstances(client, SecurityGroup1.ID)
+	require.NoError(t, err)
+	instance := results[0]
+	require.Equal(t, instancestesting.Instance1, instance)
+	require.Equal(t, instancestesting.ExpectedInstancesSlice, results)
+
 }

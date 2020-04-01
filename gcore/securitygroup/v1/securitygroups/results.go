@@ -2,6 +2,7 @@ package securitygroups
 
 import (
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/instance/v1/instances"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/securitygroup/v1/types"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/pagination"
 )
@@ -94,10 +95,30 @@ type SecurityGroupPage struct {
 	pagination.LinkedPageBase
 }
 
+// SecurityGroupInstancesPage is the page returned by a pager when traversing over a
+// collection of security group instances.
+type SecurityGroupInstancesPage struct {
+	pagination.LinkedPageBase
+}
+
 // NextPageURL is invoked when a paginated collection of security groups has reached
 // the end of a page and the pager seeks to traverse over a new one. In order
 // to do this, it needs to construct the next page's URL.
 func (r SecurityGroupPage) NextPageURL() (string, error) {
+	var s struct {
+		Links []gcorecloud.Link `json:"links"`
+	}
+	err := r.ExtractInto(&s)
+	if err != nil {
+		return "", err
+	}
+	return gcorecloud.ExtractNextURL(s.Links)
+}
+
+// NextPageURL is invoked when a paginated collection of security group instances has reached
+// the end of a page and the pager seeks to traverse over a new one. In order
+// to do this, it needs to construct the next page's URL.
+func (r SecurityGroupInstancesPage) NextPageURL() (string, error) {
 	var s struct {
 		Links []gcorecloud.Link `json:"links"`
 	}
@@ -114,6 +135,12 @@ func (r SecurityGroupPage) IsEmpty() (bool, error) {
 	return len(is) == 0, err
 }
 
+// IsEmpty checks whether a SecurityGroupInstancesPage struct is empty.
+func (r SecurityGroupInstancesPage) IsEmpty() (bool, error) {
+	is, err := ExtractSecurityGroupInstances(r)
+	return len(is) == 0, err
+}
+
 // ExtractSecurityGroup accepts a Page struct, specifically a SecurityGroupPage struct,
 // and extracts the elements into a slice of SecurityGroup structs. In other words,
 // a generic collection is mapped into a relevant slice.
@@ -123,6 +150,19 @@ func ExtractSecurityGroups(r pagination.Page) ([]SecurityGroup, error) {
 	return s, err
 }
 
+// ExtractSecurityGroupInstances accepts a Page struct, specifically a SecurityGroupInstancesPage struct,
+// and extracts the elements into a slice of Instance structs. In other words,
+// a generic collection is mapped into a relevant slice.
+func ExtractSecurityGroupInstances(r pagination.Page) ([]instances.Instance, error) {
+	var s []instances.Instance
+	err := ExtractSecurityGroupInstancesInto(r, &s)
+	return s, err
+}
+
 func ExtractSecurityGroupsInto(r pagination.Page, v interface{}) error {
 	return r.(SecurityGroupPage).Result.ExtractIntoSlicePtr(v, "results")
+}
+
+func ExtractSecurityGroupInstancesInto(r pagination.Page, v interface{}) error {
+	return r.(SecurityGroupInstancesPage).Result.ExtractIntoSlicePtr(v, "results")
 }

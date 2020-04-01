@@ -2,6 +2,7 @@ package securitygroups
 
 import (
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/instance/v1/instances"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/securitygroup/v1/types"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/pagination"
 )
@@ -130,4 +131,21 @@ func AddRule(c *gcorecloud.ServiceClient, securityGroupID string, opts CreateRul
 	}
 	_, r.Err = c.Post(addRulesURL(c, securityGroupID), b, &r.Body, nil)
 	return
+}
+
+// ListInstances returns page of instances for SG
+func ListInstances(c *gcorecloud.ServiceClient, securityGroupID string) pagination.Pager {
+	url := listInstancesURL(c, securityGroupID)
+	return pagination.NewPager(c, url, func(r pagination.PageResult) pagination.Page {
+		return SecurityGroupInstancesPage{pagination.LinkedPageBase{PageResult: r}}
+	})
+}
+
+// ListAllInstances returns all instances for SG
+func ListAllInstances(c *gcorecloud.ServiceClient, securityGroupID string) ([]instances.Instance, error) {
+	page, err := ListInstances(c, securityGroupID).AllPages()
+	if err != nil {
+		return nil, err
+	}
+	return ExtractSecurityGroupInstances(page)
 }

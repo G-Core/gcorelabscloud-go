@@ -39,3 +39,7 @@ func deleteURL(c *gcorecloud.ServiceClient, id string) string {
 func addRulesURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceActionURL(c, id, "rules")
 }
+
+func listInstancesURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "instances")
+}

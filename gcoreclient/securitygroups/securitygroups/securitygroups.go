@@ -265,6 +265,31 @@ var securityGroupGetSubCommand = cli.Command{
 	},
 }
 
+var securityGroupListInstancesSubCommand = cli.Command{
+	Name:      "list",
+	Usage:     "securitygroup group instances list",
+	ArgsUsage: "<securitygroup_id>",
+	Category:  "securitygroup",
+	Action: func(c *cli.Context) error {
+		securityGroupID, err := flags.GetFirstArg(c, securityGroupIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "list")
+			return err
+		}
+		client, err := utils.BuildClient(c, "securitygroups", "")
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+		result, err := securitygroups.ListAllInstances(client, securityGroupID)
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		utils.ShowResults(result, c.String("format"))
+		return nil
+	},
+}
+
 var securityGroupDeleteSubCommand = cli.Command{
 	Name:      "delete",
 	Usage:     "Delete security group",
@@ -429,5 +454,12 @@ var SecurityGroupCommands = cli.Command{
 		&securityGroupDeleteSubCommand,
 		&securityGroupCreateSubCommand,
 		&securityGroupAddRuleSubCommand,
+		{
+			Name:  "instance",
+			Usage: "Security group instances",
+			Subcommands: []*cli.Command{
+				&securityGroupListInstancesSubCommand,
+			},
+		},
 	},
 }
