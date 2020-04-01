@@ -35,16 +35,14 @@ func WaitForStatus(client *gcorecloud.ServiceClient, id string, status TaskState
 	})
 }
 
-// WaitTaskAndSetResult periodically check status state and return changed object when task is finished
-func WaitTaskAndSetResult(
-	client *gcorecloud.ServiceClient, task TaskID, stopOnTaskError bool,
-	waitSeconds int, infoRetriever RetrieveAndSetTaskResult, result interface{}) error {
-
+// WaitTaskAndProcessResult periodically check status state and invoke taskProcessor when when task is finished
+func WaitTaskAndProcessResult(
+	client *gcorecloud.ServiceClient, task TaskID, stopOnTaskError bool, waitSeconds int, taskProcessor CheckTaskResult) error {
 	err := WaitForStatus(client, string(task), TaskStateFinished, waitSeconds, stopOnTaskError)
 	if err != nil {
 		return err
 	}
-	err = infoRetriever(task, result)
+	err = taskProcessor(task)
 	if err != nil {
 		return err
 	}
@@ -54,13 +52,13 @@ func WaitTaskAndSetResult(
 // WaitTaskAndReturnResult periodically check status state and return changed object when task is finished
 func WaitTaskAndReturnResult(
 	client *gcorecloud.ServiceClient, task TaskID, stopOnTaskError bool,
-	waitSeconds int, infoRetriever RetrieveTaskResult) (interface{}, error) {
+	waitSeconds int, taskProcessor RetrieveTaskResult) (interface{}, error) {
 
 	err := WaitForStatus(client, string(task), TaskStateFinished, waitSeconds, stopOnTaskError)
 	if err != nil {
 		return nil, err
 	}
-	result, err := infoRetriever(task)
+	result, err := taskProcessor(task)
 	if err != nil {
 		return nil, err
 	}
@@ -68,4 +66,4 @@ func WaitTaskAndReturnResult(
 }
 
 type RetrieveTaskResult func(task TaskID) (interface{}, error)
-type RetrieveAndSetTaskResult func(task TaskID, result interface{}) error
+type CheckTaskResult func(task TaskID) error
