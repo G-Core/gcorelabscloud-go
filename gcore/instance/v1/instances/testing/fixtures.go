@@ -314,7 +314,7 @@ var (
 				Address: ip3,
 			}},
 		},
-		SecurityGroups: []gcorecloud.ItemIDName{{
+		SecurityGroups: []gcorecloud.ItemName{{
 			Name: "default",
 		}},
 		CreatorTaskID: &creatorTaskID,

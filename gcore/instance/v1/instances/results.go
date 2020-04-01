@@ -81,7 +81,7 @@ type Instance struct {
 	Metadata         map[string]interface{}       `json:"metadata"`
 	Volumes          []InstanceVolume             `json:"volumes"`
 	Addresses        map[string][]InstanceAddress `json:"addresses"`
-	SecurityGroups   []gcorecloud.ItemIDName      `json:"security_groups"`
+	SecurityGroups   []gcorecloud.ItemName        `json:"security_groups"`
 	CreatorTaskID    *string                      `json:"creator_task_id"`
 	TaskID           *string                      `json:"task_id"`
 	ProjectID        int                          `json:"project_id"`

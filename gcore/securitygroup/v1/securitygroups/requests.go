@@ -149,3 +149,31 @@ func ListAllInstances(c *gcorecloud.ServiceClient, securityGroupID string) ([]in
 	}
 	return ExtractSecurityGroupInstances(page)
 }
+
+// IDFromName is a convenience function that returns a security group's ID,
+// given its name.
+func IDFromName(client *gcorecloud.ServiceClient, name string) (string, error) {
+	count := 0
+	id := ""
+
+	sgs, err := ListAll(client)
+	if err != nil {
+		return "", err
+	}
+
+	for _, s := range sgs {
+		if s.Name == name {
+			count++
+			id = s.ID
+		}
+	}
+
+	switch count {
+	case 0:
+		return "", gcorecloud.ErrResourceNotFound{Name: name, ResourceType: "security group"}
+	case 1:
+		return id, nil
+	default:
+		return "", gcorecloud.ErrMultipleResourcesFound{Name: name, Count: count, ResourceType: "security group"}
+	}
+}

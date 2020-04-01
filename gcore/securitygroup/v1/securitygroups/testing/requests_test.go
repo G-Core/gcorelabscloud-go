@@ -283,3 +283,27 @@ func TestListAllInstances(t *testing.T) {
 	require.Equal(t, instancestesting.ExpectedInstancesSlice, results)
 
 }
+
+func TestIDFromName(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareListTestURL(), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, ListResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("securitygroups", "v1")
+
+	groupID, err := securitygroups.IDFromName(client, SecurityGroup1.Name)
+	require.NoError(t, err)
+	require.Equal(t, SecurityGroup1.ID, groupID)
+
+}
