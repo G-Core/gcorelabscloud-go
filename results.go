@@ -681,3 +681,16 @@ func (m MAC) MarshalJSON() ([]byte, error) {
 func (m MAC) String() string {
 	return m.HardwareAddr.String()
 }
+
+type ItemName struct {
+	Name string `json:"name"`
+}
+
+type ItemIDName struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+type ItemID struct {
+	ID string `json:"id"`
+}

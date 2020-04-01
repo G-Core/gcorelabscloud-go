@@ -7,10 +7,6 @@ import (
 
 type AddressType string
 
-type ItemName struct {
-	Name string `json:"name"`
-}
-
 const (
 	AddressTypeFixed    AddressType = "fixed"
 	AddressTypeFloating AddressType = "floating"

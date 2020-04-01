@@ -42,11 +42,7 @@ var instanceListCommand = cli.Command{
 			ExcludeSecGroup:   utils.StringToPointer(c.String("exclude-secgroup")),
 			AvailableFloating: utils.StringToPointer(availableFloating),
 		}
-		pages, err := instances.List(client, opts).AllPages()
-		if err != nil {
-			return cli.NewExitError(err, 1)
-		}
-		results, err := instances.ExtractInstances(pages)
+		results, err := instances.ListAll(client, opts)
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -76,6 +72,101 @@ var instanceListInterfacesCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 		utils.ShowResults(results, c.String("format"))
+		return nil
+	},
+}
+
+var instanceListSecurityGroupsCommand = cli.Command{
+	Name:      "list",
+	Usage:     "List instance security groups",
+	ArgsUsage: "<instance_id>",
+	Category:  "instance",
+	Action: func(c *cli.Context) error {
+		instanceID, err := flags.GetFirstArg(c, instanceIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "list")
+			return err
+		}
+		client, err := utils.BuildClient(c, "instances", "")
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+		results, err := instances.ListSecurityGroupsAll(client, instanceID)
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		utils.ShowResults(results, c.String("format"))
+		return nil
+	},
+}
+
+var instanceAssignSecurityGroupsCommand = cli.Command{
+	Name:      "add",
+	Usage:     "Add instance security group",
+	ArgsUsage: "<instance_id>",
+	Category:  "instance",
+	Flags: []cli.Flag{
+		&cli.StringFlag{
+			Name:     "name",
+			Aliases:  []string{"n"},
+			Usage:    "security group name",
+			Required: true,
+		},
+	},
+	Action: func(c *cli.Context) error {
+		instanceID, err := flags.GetFirstArg(c, instanceIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "add")
+			return err
+		}
+		client, err := utils.BuildClient(c, "instances", "")
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		opts := instances.SecurityGroupOpts{Name: c.String("name")}
+
+		err = instances.AssignSecurityGroup(client, instanceID, opts).ExtractErr()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		return nil
+	},
+}
+
+var instanceUnAssignSecurityGroupsCommand = cli.Command{
+	Name:      "delete",
+	Usage:     "Add instance security group",
+	ArgsUsage: "<instance_id>",
+	Category:  "instance",
+	Flags: []cli.Flag{
+		&cli.StringFlag{
+			Name:     "name",
+			Aliases:  []string{"n"},
+			Usage:    "security group name",
+			Required: true,
+		},
+	},
+	Action: func(c *cli.Context) error {
+		instanceID, err := flags.GetFirstArg(c, instanceIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "delete")
+			return err
+		}
+		client, err := utils.BuildClient(c, "instances", "")
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		opts := instances.SecurityGroupOpts{Name: c.String("name")}
+
+		err = instances.UnAssignSecurityGroup(client, instanceID, opts).ExtractErr()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
 		return nil
 	},
 }
@@ -112,5 +203,14 @@ var InstanceCommands = cli.Command{
 		&instanceGetCommand,
 		&instanceListCommand,
 		&instanceListInterfacesCommand,
+		{
+			Name:  "securitygroup",
+			Usage: "Instance security groups",
+			Subcommands: []*cli.Command{
+				&instanceListSecurityGroupsCommand,
+				&instanceAssignSecurityGroupsCommand,
+				&instanceUnAssignSecurityGroupsCommand,
+			},
+		},
 	},
 }

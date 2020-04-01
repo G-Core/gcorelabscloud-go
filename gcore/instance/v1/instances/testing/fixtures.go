@@ -235,6 +235,30 @@ const InterfacesResponse = `
 }
 `
 
+const SecurityGroupsListResponse = `
+{
+  "count": 1,
+  "results": [
+    {
+      "name": "Test",
+      "id": "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c"
+    }
+  ]
+}
+`
+
+const AssignSecurityGroupsRequest = `
+{
+  "name": "Test"
+}
+`
+
+const UnAssignSecurityGroupsRequest = `
+{
+  "name": "Test"
+}
+`
+
 var (
 	ip1                 = net.ParseIP("10.0.0.17")
 	ip2                 = net.ParseIP("92.38.157.215")
@@ -290,7 +314,7 @@ var (
 				Address: ip3,
 			}},
 		},
-		SecurityGroups: []types.ItemName{{
+		SecurityGroups: []gcorecloud.ItemIDName{{
 			Name: "default",
 		}},
 		CreatorTaskID: &creatorTaskID,
@@ -323,7 +347,11 @@ var (
 	PortFloatingIP2CreatorTaskID   = "d1c1fd65-6eef-4e64-96cb-705cbbdbc90b"
 	NetworkDetailsCreatorTask      = "a10dd116-07f5-4225-abb7-f42da5cb78fb"
 	NetworkDetailsTask             = "a10dd116-07f5-4225-abb7-f42da5cb78fc"
-	InstanceInterface1             = instances.Interface{
+	SecurityGroup1                 = gcorecloud.ItemIDName{
+		ID:   "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c",
+		Name: "Test",
+	}
+	InstanceInterface1 = instances.Interface{
 		PortID:     PortID,
 		MacAddress: *PortMac,
 		NetworkID:  "bc688791-f1b0-44eb-97d4-07697294b1e1",
@@ -404,4 +432,5 @@ var (
 	}
 	ExpectedInstancesSlice          = []instances.Instance{Instance1}
 	ExpectedInstanceInterfacesSlice = []instances.Interface{InstanceInterface1}
+	ExpectedSecurityGroupsSlice     = []gcorecloud.ItemIDName{SecurityGroup1}
 )

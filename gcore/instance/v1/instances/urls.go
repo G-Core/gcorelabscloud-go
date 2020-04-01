@@ -27,3 +27,15 @@ func resourceActionURL(c *gcorecloud.ServiceClient, id string, action string) st
 func interfacesListURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceActionURL(c, id, "interfaces")
 }
+
+func securityGroupsListURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "securitygroups")
+}
+
+func addSecurityGroupsURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "addsecuritygroup")
+}
+
+func deleteSecurityGroupsURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "delsecuritygroup")
+}

@@ -51,6 +51,11 @@ type DeleteResult struct {
 	gcorecloud.ErrResult
 }
 
+// SecurityGroupActionResult represents the result of a actions operation(no content)
+type SecurityGroupActionResult struct {
+	gcorecloud.ErrResult
+}
+
 type InstanceVolume struct {
 	ID                  string `json:"id"`
 	DeleteOnTermination bool   `json:"delete_on_termination"`
@@ -76,7 +81,7 @@ type Instance struct {
 	Metadata         map[string]interface{}       `json:"metadata"`
 	Volumes          []InstanceVolume             `json:"volumes"`
 	Addresses        map[string][]InstanceAddress `json:"addresses"`
-	SecurityGroups   []types.ItemName             `json:"security_groups"`
+	SecurityGroups   []gcorecloud.ItemIDName      `json:"security_groups"`
 	CreatorTaskID    *string                      `json:"creator_task_id"`
 	TaskID           *string                      `json:"task_id"`
 	ProjectID        int                          `json:"project_id"`
@@ -167,6 +172,12 @@ type InstanceInterfacePage struct {
 	pagination.LinkedPageBase
 }
 
+// InstanceSecurityGroupPage is the page returned by a pager when traversing over a
+// collection of instance security groups.
+type InstanceSecurityGroupPage struct {
+	pagination.LinkedPageBase
+}
+
 // NextPageURL is invoked when a paginated collection of instances has reached
 // the end of a page and the pager seeks to traverse over a new one. In order
 // to do this, it needs to construct the next page's URL.
@@ -181,10 +192,24 @@ func (r InstancePage) NextPageURL() (string, error) {
 	return gcorecloud.ExtractNextURL(s.Links)
 }
 
-// InstanceInterfacePage is invoked when a paginated collection of instance interfaces has reached
+// NextPageURL is invoked when a paginated collection of instance interfaces has reached
 // the end of a page and the pager seeks to traverse over a new one. In order
 // to do this, it needs to construct the next page's URL.
 func (r InstanceInterfacePage) NextPageURL() (string, error) {
+	var s struct {
+		Links []gcorecloud.Link `json:"links"`
+	}
+	err := r.ExtractInto(&s)
+	if err != nil {
+		return "", err
+	}
+	return gcorecloud.ExtractNextURL(s.Links)
+}
+
+// NextPageURL is invoked when a paginated collection of instance security groups has reached
+// the end of a page and the pager seeks to traverse over a new one. In order
+// to do this, it needs to construct the next page's URL.
+func (r InstanceSecurityGroupPage) NextPageURL() (string, error) {
 	var s struct {
 		Links []gcorecloud.Link `json:"links"`
 	}
@@ -201,14 +226,20 @@ func (r InstancePage) IsEmpty() (bool, error) {
 	return len(is) == 0, err
 }
 
-// IsEmpty checks whether a InstancePage struct is empty.
+// IsEmpty checks whether a InstanceInterfacePage struct is empty.
 func (r InstanceInterfacePage) IsEmpty() (bool, error) {
 	is, err := ExtractInstanceInterfaces(r)
 	return len(is) == 0, err
 }
 
+// IsEmpty checks whether a InstanceSecurityGroupPage struct is empty.
+func (r InstanceSecurityGroupPage) IsEmpty() (bool, error) {
+	is, err := ExtractInstanceSecurityGroups(r)
+	return len(is) == 0, err
+}
+
 // ExtractInstances accepts a Page struct, specifically a InstancePage struct,
-// and extracts the elements into a slice of Instance structs. In other words,
+// and extracts the elements into a slice of instance structs. In other words,
 // a generic collection is mapped into a relevant slice.
 func ExtractInstances(r pagination.Page) ([]Instance, error) {
 	var s []Instance
@@ -216,17 +247,34 @@ func ExtractInstances(r pagination.Page) ([]Instance, error) {
 	return s, err
 }
 
-// ExtractInstanceInterfaces accepts a Page struct, specifically a InstancePage struct,
-// and extracts the elements into a slice of Instance structs. In other words,
+// ExtractInstanceInterfaces accepts a Page struct, specifically a InstanceInterfacePage struct,
+// and extracts the elements into a slice of instance interface structs. In other words,
 // a generic collection is mapped into a relevant slice.
 func ExtractInstanceInterfaces(r pagination.Page) ([]Interface, error) {
 	var s []Interface
-	err := ExtractInstancesInto(r, &s)
+	err := ExtractInstanceInterfacesInto(r, &s)
+	return s, err
+}
+
+// ExtractInstanceSecurityGroups accepts a Page struct, specifically a InstanceSecurityGroupPage struct,
+// and extracts the elements into a slice of instance security group structs. In other words,
+// a generic collection is mapped into a relevant slice.
+func ExtractInstanceSecurityGroups(r pagination.Page) ([]gcorecloud.ItemIDName, error) {
+	var s []gcorecloud.ItemIDName
+	err := ExtractInstanceSecurityGroupInto(r, &s)
 	return s, err
 }
 
 func ExtractInstancesInto(r pagination.Page, v interface{}) error {
 	return r.(InstancePage).Result.ExtractIntoSlicePtr(v, "results")
+}
+
+func ExtractInstanceInterfacesInto(r pagination.Page, v interface{}) error {
+	return r.(InstanceInterfacePage).Result.ExtractIntoSlicePtr(v, "results")
+}
+
+func ExtractInstanceSecurityGroupInto(r pagination.Page, v interface{}) error {
+	return r.(InstanceSecurityGroupPage).Result.ExtractIntoSlicePtr(v, "results")
 }
 
 // UnmarshalJSON - implements Unmarshaler interface

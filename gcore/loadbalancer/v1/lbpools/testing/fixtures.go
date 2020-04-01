@@ -3,6 +3,8 @@ package testing
 import (
 	"net"
 
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
+
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/loadbalancer/v1/lbpools"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/loadbalancer/v1/types"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
@@ -176,10 +178,10 @@ var (
 		ProtocolPort: &protocolPort,
 	}
 	LBPool1 = lbpools.Pool{
-		LoadBalancers: []types.ItemID{
+		LoadBalancers: []gcorecloud.ItemID{
 			{ID: LoadBalancerID},
 		},
-		Listeners: []types.ItemID{
+		Listeners: []gcorecloud.ItemID{
 			{ID: ListenerID},
 		},
 		SessionPersistence:    nil,

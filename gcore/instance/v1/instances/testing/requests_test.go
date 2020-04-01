@@ -25,8 +25,8 @@ func prepareGetTestURLParams(projectID int, regionID int, id string) string {
 	return fmt.Sprintf("/v1/instances/%d/%d/%s", projectID, regionID, id)
 }
 
-func prepareGetActionTestURLParams(projectID int, regionID int, id string, action string) string {
-	return fmt.Sprintf("/v1/instances/%d/%d/%s/%s", projectID, regionID, id, action)
+func prepareGetActionTestURLParams(id string, action string) string {
+	return fmt.Sprintf("/v1/instances/%d/%d/%s/%s", fake.ProjectID, fake.RegionID, id, action)
 }
 
 func prepareListTestURL() string {
@@ -34,7 +34,19 @@ func prepareListTestURL() string {
 }
 
 func prepareListInterfacesTestURL(id string) string {
-	return prepareGetActionTestURLParams(fake.ProjectID, fake.RegionID, id, "interfaces")
+	return prepareGetActionTestURLParams(id, "interfaces")
+}
+
+func prepareListSecurityGroupsTestURL(id string) string {
+	return prepareGetActionTestURLParams(id, "securitygroups")
+}
+
+func prepareAssignSecurityGroupsTestURL(id string) string {
+	return prepareGetActionTestURLParams(id, "addsecuritygroup")
+}
+
+func prepareUnAssignSecurityGroupsTestURL(id string) string {
+	return prepareGetActionTestURLParams(id, "delsecuritygroup")
 }
 
 func prepareGetTestURL(id string) string {
@@ -131,4 +143,75 @@ func TestListAllInterfaces(t *testing.T) {
 	require.Len(t, interfaces, 1)
 	require.Equal(t, PortID, interfaces[0].PortID)
 	require.Equal(t, ExpectedInstanceInterfacesSlice, interfaces)
+}
+
+func TestListAllSecurityGroups(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareListSecurityGroupsTestURL(Instance1.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, SecurityGroupsListResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("instances", "v1")
+	sgs, err := instances.ListSecurityGroupsAll(client, instanceID)
+
+	require.NoError(t, err)
+	require.Len(t, sgs, 1)
+	require.Equal(t, SecurityGroup1, sgs[0])
+	require.Equal(t, ExpectedSecurityGroupsSlice, sgs)
+}
+
+func TestUnAssignSecurityGroups(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareUnAssignSecurityGroupsTestURL(Instance1.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestJSONRequest(t, r, UnAssignSecurityGroupsRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	client := fake.ServiceTokenClient("instances", "v1")
+
+	opts := instances.SecurityGroupOpts{
+		Name: "Test",
+	}
+
+	err := instances.UnAssignSecurityGroup(client, instanceID, opts).ExtractErr()
+
+	require.NoError(t, err)
+}
+
+func TestAssignSecurityGroups(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareAssignSecurityGroupsTestURL(Instance1.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestJSONRequest(t, r, AssignSecurityGroupsRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	client := fake.ServiceTokenClient("instances", "v1")
+
+	opts := instances.SecurityGroupOpts{
+		Name: "Test",
+	}
+
+	err := instances.AssignSecurityGroup(client, instanceID, opts).ExtractErr()
+
+	require.NoError(t, err)
 }

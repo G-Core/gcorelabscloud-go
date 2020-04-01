@@ -13,10 +13,6 @@ type ProtocolType string
 type HealthMonitorType string
 type HTTPMethod string
 
-type ItemID struct {
-	ID string `json:"id"`
-}
-
 const (
 	ProvisioningStatusActive              ProvisioningStatus    = "ACTIVE"
 	ProvisioningStatusDeleted             ProvisioningStatus    = "DELETED"

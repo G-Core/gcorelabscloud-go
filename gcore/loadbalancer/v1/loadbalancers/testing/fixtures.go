@@ -140,7 +140,7 @@ var (
 		ProvisioningStatus: types.ProvisioningStatusActive,
 		OperationStatus:    types.OperatingStatusOnline,
 		VipAddress:         net.ParseIP("5.5.5.5"),
-		Listeners: []types.ItemID{{
+		Listeners: []gcorecloud.ItemID{{
 			ID: "43658ea9-54bd-4807-90b1-925921c9a0d1",
 		}},
 		CreatorTaskID: &creatorTaskID,

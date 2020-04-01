@@ -74,8 +74,8 @@ type PoolMember struct {
 
 // Pool represents a pool structure.
 type Pool struct {
-	LoadBalancers         []types.ItemID              `json:"loadbalancers"`
-	Listeners             []types.ItemID              `json:"listeners"`
+	LoadBalancers         []gcorecloud.ItemID         `json:"loadbalancers"`
+	Listeners             []gcorecloud.ItemID         `json:"listeners"`
 	SessionPersistence    *SessionPersistence         `json:"session_persistence"`
 	LoadBalancerAlgorithm types.LoadBalancerAlgorithm `json:"lb_algorithm"`
 	Name                  string                      `json:"name"`
