@@ -21,7 +21,7 @@ var (
 
 var listenerListSubCommand = cli.Command{
 	Name:     "list",
-	Usage:    "Listeners list",
+	Usage:    "loadbalancer listeners list",
 	Category: "listener",
 	Flags: []cli.Flag{
 		&cli.StringFlag{
@@ -56,7 +56,7 @@ var listenerListSubCommand = cli.Command{
 
 var listenerCreateSubCommand = cli.Command{
 	Name:     "create",
-	Usage:    "Create listener",
+	Usage:    "create loadbalancer listener",
 	Category: "listener",
 	Flags: append([]cli.Flag{
 		&cli.StringFlag{
@@ -132,7 +132,7 @@ var listenerCreateSubCommand = cli.Command{
 
 var listenerGetSubCommand = cli.Command{
 	Name:      "show",
-	Usage:     "Show listener",
+	Usage:     "show loadbalancer listener",
 	ArgsUsage: "<listener_id>",
 	Category:  "listener",
 	Action: func(c *cli.Context) error {
@@ -157,7 +157,7 @@ var listenerGetSubCommand = cli.Command{
 
 var listenerDeleteSubCommand = cli.Command{
 	Name:      "delete",
-	Usage:     "Show listener",
+	Usage:     "delete loadbalancer listener",
 	ArgsUsage: "<listener_id>",
 	Category:  "listener",
 	Flags:     flags.WaitCommandFlags,
@@ -196,7 +196,7 @@ var listenerDeleteSubCommand = cli.Command{
 
 var listenerUpdateSubCommand = cli.Command{
 	Name:      "update",
-	Usage:     "Update listener",
+	Usage:     "update loadbalancer listener",
 	ArgsUsage: "<listener_id>",
 	Category:  "listener",
 	Flags: []cli.Flag{
@@ -235,7 +235,7 @@ var listenerUpdateSubCommand = cli.Command{
 
 var ListenerCommands = cli.Command{
 	Name:  "listener",
-	Usage: "GCloud listeners API",
+	Usage: "GCloud loadbalancer listeners API",
 	Subcommands: []*cli.Command{
 		&listenerListSubCommand,
 		&listenerGetSubCommand,

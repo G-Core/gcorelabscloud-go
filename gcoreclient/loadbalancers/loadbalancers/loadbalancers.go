@@ -18,7 +18,7 @@ var loadBalancerIDText = "loadbalancer_id is mandatory argument"
 
 var loadBalancerListSubCommand = cli.Command{
 	Name:     "list",
-	Usage:    "Loadbalancers list",
+	Usage:    "loadbalancers list",
 	Category: "loadbalancer",
 	Action: func(c *cli.Context) error {
 		client, err := utils.BuildClient(c, "loadbalancers", "")
@@ -41,7 +41,7 @@ var loadBalancerListSubCommand = cli.Command{
 
 var loadBalancerCreateSubCommand = cli.Command{
 	Name:     "create",
-	Usage:    "Create loadbalancer",
+	Usage:    "create loadbalancer",
 	Category: "loadbalancer",
 	Flags: append([]cli.Flag{
 		&cli.StringFlag{
@@ -95,7 +95,7 @@ var loadBalancerCreateSubCommand = cli.Command{
 
 var loadBalancerGetSubCommand = cli.Command{
 	Name:      "show",
-	Usage:     "Show loadbalancer",
+	Usage:     "show loadbalancer",
 	ArgsUsage: "<loadbalancer_id>",
 	Category:  "loadbalancer",
 	Action: func(c *cli.Context) error {
@@ -120,7 +120,7 @@ var loadBalancerGetSubCommand = cli.Command{
 
 var loadBalancerDeleteSubCommand = cli.Command{
 	Name:      "delete",
-	Usage:     "Show loadbalancer",
+	Usage:     "delete loadbalancer",
 	ArgsUsage: "<loadbalancer_id>",
 	Category:  "loadbalancer",
 	Flags:     flags.WaitCommandFlags,
@@ -159,7 +159,7 @@ var loadBalancerDeleteSubCommand = cli.Command{
 
 var loadBalancerUpdateSubCommand = cli.Command{
 	Name:      "update",
-	Usage:     "Update loadbalancer",
+	Usage:     "update loadbalancer",
 	ArgsUsage: "<loadbalancer_id>",
 	Category:  "loadbalancer",
 	Flags: []cli.Flag{

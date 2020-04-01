@@ -196,9 +196,9 @@ var lbpoolListSubCommand = cli.Command{
 
 var lbpoolGetSubCommand = cli.Command{
 	Name:      "show",
-	Usage:     "Show lbpool",
+	Usage:     "show loadbalancer pool",
 	ArgsUsage: "<lbpool_id>",
-	Category:  "lbpool",
+	Category:  "pool",
 	Action: func(c *cli.Context) error {
 		clusterID, err := flags.GetFirstArg(c, lbpoolIDText)
 		if err != nil {
@@ -221,9 +221,9 @@ var lbpoolGetSubCommand = cli.Command{
 
 var lbpoolDeleteSubCommand = cli.Command{
 	Name:      "delete",
-	Usage:     "Show lbpool",
+	Usage:     "delete loadbalancer pool",
 	ArgsUsage: "<lbpool_id>",
-	Category:  "lbpool",
+	Category:  "pool",
 	Flags:     flags.WaitCommandFlags,
 	Action: func(c *cli.Context) error {
 		lbpoolID, err := flags.GetFirstArg(c, lbpoolIDText)
@@ -260,8 +260,8 @@ var lbpoolDeleteSubCommand = cli.Command{
 
 var lbpoolCreateSubCommand = cli.Command{
 	Name:     "create",
-	Usage:    "Create lbpool",
-	Category: "lbpool",
+	Usage:    "create loadbalancer pool",
+	Category: "pool",
 	Flags: append([]cli.Flag{
 		&cli.StringFlag{
 			Name:     "name",
@@ -487,9 +487,9 @@ var lbpoolCreateSubCommand = cli.Command{
 
 var lbpoolUpdateSubCommand = cli.Command{
 	Name:      "update",
-	Usage:     "Update lbpool",
+	Usage:     "update loadbalancer pool",
 	ArgsUsage: "<lbpool_id>",
-	Category:  "lbpool",
+	Category:  "pool",
 	Flags: append([]cli.Flag{
 		&cli.StringFlag{
 			Name:     "name",
@@ -675,7 +675,7 @@ var lbpoolUpdateSubCommand = cli.Command{
 
 var PoolCommands = cli.Command{
 	Name:  "pool",
-	Usage: "GCloud lbpools API",
+	Usage: "GCloud loadbalancer pools API",
 	Subcommands: []*cli.Command{
 		&lbpoolListSubCommand,
 		&lbpoolGetSubCommand,
