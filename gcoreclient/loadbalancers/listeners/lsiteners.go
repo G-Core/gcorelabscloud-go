@@ -234,7 +234,7 @@ var listenerUpdateSubCommand = cli.Command{
 }
 
 var ListenerCommands = cli.Command{
-	Name:  "listeners",
+	Name:  "listener",
 	Usage: "GCloud listeners API",
 	Subcommands: []*cli.Command{
 		&listenerListSubCommand,

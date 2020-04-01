@@ -72,6 +72,36 @@ func TestList(t *testing.T) {
 	}
 }
 
+func TestListAll(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareListTestURL(), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, ListResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("subnets", "v1")
+
+	opts := subnets.ListOpts{
+		NetworkID: Subnet1.NetworkID,
+	}
+
+	results, err := subnets.ListAll(client, opts)
+	require.NoError(t, err)
+	ct := results[0]
+	require.Equal(t, Subnet1, ct)
+	require.Equal(t, ExpectedSubnetSlice, results)
+
+}
+
 func TestGet(t *testing.T) {
 
 	th.SetupHTTP()

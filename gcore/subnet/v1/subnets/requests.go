@@ -115,6 +115,15 @@ func Delete(c *gcorecloud.ServiceClient, subnetID string) (r DeleteResult) {
 	return
 }
 
+// ListAll returns all SGs
+func ListAll(c *gcorecloud.ServiceClient, opts ListOptsBuilder) ([]Subnet, error) {
+	page, err := List(c, opts).AllPages()
+	if err != nil {
+		return nil, err
+	}
+	return ExtractSubnets(page)
+}
+
 // IDFromName is a convenience function that returns a subnet ID, given its name.
 func IDFromName(client *gcorecloud.ServiceClient, name string) (string, error) {
 	count := 0

@@ -674,7 +674,7 @@ var lbpoolUpdateSubCommand = cli.Command{
 }
 
 var PoolCommands = cli.Command{
-	Name:  "pools",
+	Name:  "pool",
 	Usage: "GCloud lbpools API",
 	Subcommands: []*cli.Command{
 		&lbpoolListSubCommand,

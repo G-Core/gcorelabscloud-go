@@ -52,7 +52,7 @@ func (opts ListOpts) ToListenerListQuery() (string, error) {
 	return q.String(), err
 }
 
-// CreatePoolOpts represents options used to create a listener pool.
+// CreateOpts represents options used to create a listener pool.
 type CreateOpts struct {
 	Name           string             `json:"name" required:"true"`
 	Protocol       types.ProtocolType `json:"protocol" required:"true"`
