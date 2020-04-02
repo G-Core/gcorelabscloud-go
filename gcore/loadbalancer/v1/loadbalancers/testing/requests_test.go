@@ -70,6 +70,31 @@ func TestList(t *testing.T) {
 	}
 }
 
+func TestListAll(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareListTestURL(), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, ListResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("loadbalancers", "v1")
+
+	lbs, err := loadbalancers.ListAll(client)
+	require.NoError(t, err)
+	lb := lbs[0]
+	require.Equal(t, LoadBalancer1, lb)
+	require.Equal(t, ExpectedLoadBalancerSlice, lbs)
+}
+
 func TestGet(t *testing.T) {
 
 	th.SetupHTTP()

@@ -135,3 +135,12 @@ func Delete(c *gcorecloud.ServiceClient, loadbalancerID string) (r DeleteResult)
 	_, r.Err = c.DeleteWithResponse(deleteURL(c, loadbalancerID), &r.Body, nil)
 	return
 }
+
+// ListAll returns all LBs
+func ListAll(c *gcorecloud.ServiceClient) ([]LoadBalancer, error) {
+	page, err := List(c).AllPages()
+	if err != nil {
+		return nil, err
+	}
+	return ExtractLoadBalancers(page)
+}
