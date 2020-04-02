@@ -53,14 +53,14 @@ var networkGetCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		task, err := networks.Get(client, networkID).Extract()
+		network, err := networks.Get(client, networkID).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
-		if task == nil {
+		if network == nil {
 			return cli.NewExitError(err, 1)
 		}
-		utils.ShowResults(task, c.String("format"))
+		utils.ShowResults(network, c.String("format"))
 		return nil
 	},
 }

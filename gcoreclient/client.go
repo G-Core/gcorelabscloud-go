@@ -36,6 +36,7 @@ var commands = []*cli.Command{
 	&securitygroups.SecurityGroupCommands,
 	&securitygrouprules.SecurityGroupRuleCommands,
 	&floatingips.FloatingIPCommands,
+	&networks.ExtensionCommands,
 }
 
 func main() {
