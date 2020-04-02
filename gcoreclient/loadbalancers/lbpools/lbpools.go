@@ -17,6 +17,7 @@ import (
 
 var (
 	lbpoolIDText           = "pool_id is mandatory argument"
+	memberIDText           = "member_id is mandatory argument"
 	protocolTypes          = types.ProtocolType("").StringList()
 	loadBalancerAlgorithms = types.LoadBalancerAlgorithm("").StringList()
 	healthMonitorTypes     = types.HealthMonitorType("").StringList()
@@ -95,6 +96,7 @@ func getPoolMembers(c *cli.Context) ([]lbpools.CreatePoolMemberOpts, error) {
 		return nil, fmt.Errorf("number of --member-address should be equal --member-port")
 	}
 	memberWeights := c.IntSlice("member-weight")
+	memberSubnetIDs := c.StringSlice("member-subnet-id")
 	memberInstanceIDs := c.StringSlice("member-instance-id")
 	var members []lbpools.CreatePoolMemberOpts
 
@@ -125,6 +127,12 @@ func getPoolMembers(c *cli.Context) ([]lbpools.CreatePoolMemberOpts, error) {
 				}
 				return nil
 			}(idx),
+			SubnetID: func(idx int) *string {
+				if idx < len(memberSubnetIDs) {
+					return &memberInstanceIDs[idx]
+				}
+				return nil
+			}(idx),
 		}
 		members = append(members, member)
 		mp[addressPortPair{
@@ -135,7 +143,7 @@ func getPoolMembers(c *cli.Context) ([]lbpools.CreatePoolMemberOpts, error) {
 
 	for key, value := range mp {
 		if value > 1 {
-			return nil, fmt.Errorf("address and port %s:%d supplied %d times", key.ip, key.port, value)
+			return nil, fmt.Errorf("same address and port %s:%d have been set %d times", key.ip, key.port, value)
 		}
 	}
 
@@ -193,7 +201,7 @@ var lbpoolListSubCommand = cli.Command{
 var lbpoolGetSubCommand = cli.Command{
 	Name:      "show",
 	Usage:     "show loadbalancer pool",
-	ArgsUsage: "<lbpool_id>",
+	ArgsUsage: "<pool_id>",
 	Category:  "pool",
 	Action: func(c *cli.Context) error {
 		clusterID, err := flags.GetFirstArg(c, lbpoolIDText)
@@ -218,7 +226,7 @@ var lbpoolGetSubCommand = cli.Command{
 var lbpoolDeleteSubCommand = cli.Command{
 	Name:      "delete",
 	Usage:     "delete loadbalancer pool",
-	ArgsUsage: "<lbpool_id>",
+	ArgsUsage: "<pool_id>",
 	Category:  "pool",
 	Flags:     flags.WaitCommandFlags,
 	Action: func(c *cli.Context) error {
@@ -392,6 +400,12 @@ var lbpoolCreateSubCommand = cli.Command{
 			Required: false,
 		},
 		&cli.StringSliceFlag{
+			Name:     "member-subnet-id",
+			Aliases:  []string{"ms"},
+			Usage:    "pool subnet ID",
+			Required: false,
+		},
+		&cli.StringSliceFlag{
 			Name:     "member-instance-id",
 			Aliases:  []string{"mi"},
 			Usage:    "pool instance ID",
@@ -481,10 +495,140 @@ var lbpoolCreateSubCommand = cli.Command{
 	},
 }
 
+var lbpoolCreateMemberSubCommand = cli.Command{
+	Name:      "create",
+	Usage:     "create loadbalancer pool member",
+	ArgsUsage: "<pool_id>",
+	Category:  "pool",
+	Flags: append([]cli.Flag{
+		&cli.StringFlag{
+			Name:     "address",
+			Aliases:  []string{"a"},
+			Usage:    "pool member address",
+			Required: true,
+		},
+		&cli.IntFlag{
+			Name:     "port",
+			Aliases:  []string{"p"},
+			Usage:    "pool member port",
+			Required: true,
+		},
+		&cli.IntFlag{
+			Name:     "weight",
+			Aliases:  []string{"mw"},
+			Usage:    "pool member weight",
+			Required: false,
+		},
+		&cli.StringFlag{
+			Name:     "subnet-id",
+			Aliases:  []string{"s"},
+			Usage:    "pool subnet ID",
+			Required: false,
+		},
+		&cli.StringFlag{
+			Name:     "instance-id",
+			Aliases:  []string{"i"},
+			Usage:    "pool instance ID",
+			Required: false,
+		},
+	}, flags.WaitCommandFlags...),
+	Action: func(c *cli.Context) error {
+		lbpoolID, err := flags.GetFirstArg(c, lbpoolIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "create")
+			return err
+		}
+		client, err := utils.BuildClient(c, "lbpools", "")
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		address := net.ParseIP(c.String("address"))
+		if address == nil {
+			return cli.NewExitError(fmt.Errorf("malformed address %s", c.String("address")), 1)
+		}
+
+		opts := lbpools.CreatePoolMemberOpts{
+			Address:      address,
+			ProtocolPort: c.Int("port"),
+			Weight:       utils.IntToPointer(c.Int("weight")),
+			SubnetID:     utils.StringToPointer(c.String("subnet-id")),
+			InstanceID:   utils.StringToPointer(c.String("instance-id")),
+		}
+
+		results, err := lbpools.CreateMember(client, lbpoolID, opts).ExtractTasks()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		return utils.WaitTaskAndShowResult(c, client, results, true, func(task tasks.TaskID) (interface{}, error) {
+			taskInfo, err := tasks.Get(client, string(task)).Extract()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
+			}
+			memberID, err := lbpools.ExtractPoolMemberIDFromTask(taskInfo)
+			if err != nil {
+				return nil, fmt.Errorf("cannot retrieve lbpool member ID from task info: %w", err)
+			}
+			lbpool, err := lbpools.Get(client, lbpoolID).Extract()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get lbpool with ID: %s. Error: %w", memberID, err)
+			}
+			utils.ShowResults(lbpool, c.String("format"))
+			return nil, nil
+		})
+	},
+}
+
+var lbpoolDeleteMemberSubCommand = cli.Command{
+	Name:      "delete",
+	Usage:     "delete loadbalancer pool",
+	ArgsUsage: "<member_id>",
+	Category:  "pool",
+	Flags: append([]cli.Flag{
+		&cli.StringFlag{
+			Name:     "pool-id",
+			Aliases:  []string{"p"},
+			Usage:    "pool ID",
+			Required: true,
+		},
+	}, flags.WaitCommandFlags...),
+	Action: func(c *cli.Context) error {
+		memberID, err := flags.GetFirstArg(c, memberIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "delete")
+			return err
+		}
+		client, err := utils.BuildClient(c, "lbpools", "")
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+		lbpoolID := c.String("pool-id")
+		results, err := lbpools.DeleteMember(client, lbpoolID, memberID).ExtractTasks()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		return utils.WaitTaskAndShowResult(c, client, results, false, func(task tasks.TaskID) (interface{}, error) {
+			lbpool, err := lbpools.Get(client, lbpoolID).Extract()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get loadbalancer pool with ID: %s", lbpoolID)
+			}
+			members := lbpool.Members
+			for _, m := range members {
+				if m.ID == memberID {
+					return nil, fmt.Errorf("cannot delete loadbalancer pool member with ID: %s", memberID)
+				}
+			}
+			return nil, nil
+		})
+	},
+}
+
 var lbpoolUpdateSubCommand = cli.Command{
 	Name:      "update",
 	Usage:     "update loadbalancer pool",
-	ArgsUsage: "<lbpool_id>",
+	ArgsUsage: "<pool_id>",
 	Category:  "pool",
 	Flags: append([]cli.Flag{
 		&cli.StringFlag{
@@ -678,5 +822,13 @@ var PoolCommands = cli.Command{
 		&lbpoolUpdateSubCommand,
 		&lbpoolDeleteSubCommand,
 		&lbpoolCreateSubCommand,
+		{
+			Name:  "member",
+			Usage: "GCloud loadbalancer pool members API",
+			Subcommands: []*cli.Command{
+				&lbpoolCreateMemberSubCommand,
+				&lbpoolDeleteMemberSubCommand,
+			},
+		},
 	},
 }

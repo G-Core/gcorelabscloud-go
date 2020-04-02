@@ -156,6 +156,10 @@ type PoolTaskResult struct {
 	Pools []string `json:"pools"`
 }
 
+type PoolMemberTaskResult struct {
+	Members []string `json:"members"`
+}
+
 func ExtractPoolIDFromTask(task *tasks.Task) (string, error) {
 	var result PoolTaskResult
 	err := gcorecloud.NativeMapToStruct(task.CreatedResources, &result)
@@ -166,4 +170,16 @@ func ExtractPoolIDFromTask(task *tasks.Task) (string, error) {
 		return "", fmt.Errorf("cannot decode pool information in task structure: %w", err)
 	}
 	return result.Pools[0], nil
+}
+
+func ExtractPoolMemberIDFromTask(task *tasks.Task) (string, error) {
+	var result PoolMemberTaskResult
+	err := gcorecloud.NativeMapToStruct(task.CreatedResources, &result)
+	if err != nil {
+		return "", fmt.Errorf("cannot decode pool member information in task structure: %w", err)
+	}
+	if len(result.Members) == 0 {
+		return "", fmt.Errorf("cannot decode pool member information in task structure: %w", err)
+	}
+	return result.Members[0], nil
 }

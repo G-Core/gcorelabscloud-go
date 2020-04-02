@@ -32,6 +32,22 @@ func prepareGetTestURL(id string) string {
 	return prepareGetTestURLParams(fake.ProjectID, fake.RegionID, id)
 }
 
+func prepareActionTestURL(projectID int, regionID int, id string, action string) string {
+	return fmt.Sprintf("/v1/lbpools/%d/%d/%s/%s", projectID, regionID, id, action)
+}
+
+func prepareActionDetailTestURL(projectID int, regionID int, id string, action string, actionID string) string {
+	return fmt.Sprintf("/v1/lbpools/%d/%d/%s/%s/%s", projectID, regionID, id, action, actionID)
+}
+
+func prepareCreateMemberURL(id string) string {
+	return prepareActionTestURL(fake.ProjectID, fake.RegionID, id, "member")
+}
+
+func prepareDeleteMemberURL(id string, memberID string) string {
+	return prepareActionDetailTestURL(fake.ProjectID, fake.RegionID, id, "member", memberID)
+}
+
 func TestList(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
@@ -59,7 +75,7 @@ func TestList(t *testing.T) {
 		require.NoError(t, err)
 		pool := pools[0]
 		require.Equal(t, LBPool1, pool)
-		require.Equal(t, ExpectedLBPoolsSlice, pool)
+		require.Equal(t, ExpectedLBPoolsSlice, pools)
 		return true, nil
 	})
 
@@ -233,4 +249,60 @@ func TestUpdate(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 
+}
+
+func TestDeleteMember(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	memberID := LBPool1.Members[0].ID
+
+	th.Mux.HandleFunc(prepareDeleteMemberURL(LBPool1.ID, memberID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "DELETE")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, DeleteMemberResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("lbpools", "v1")
+	tasks, err := lbpools.DeleteMember(client, LBPool1.ID, memberID).ExtractTasks()
+	require.NoError(t, err)
+	require.Equal(t, Tasks1, *tasks)
+
+}
+
+func TestCreateMember(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareCreateMemberURL(LBPool1.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestJSONRequest(t, r, CreatePoolMemberRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+
+		_, err := fmt.Fprint(w, CreateResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	options := lbpools.CreatePoolMemberOpts{
+		Address:      *Member1.Address,
+		ProtocolPort: *Member1.ProtocolPort,
+		Weight:       Member1.Weight,
+		SubnetID:     Member1.SubnetID,
+		InstanceID:   Member1.InstanceID,
+	}
+
+	client := fake.ServiceTokenClient("lbpools", "v1")
+	tasks, err := lbpools.CreateMember(client, LBPool1.ID, options).ExtractTasks()
+	require.NoError(t, err)
+	require.Equal(t, Tasks1, *tasks)
 }

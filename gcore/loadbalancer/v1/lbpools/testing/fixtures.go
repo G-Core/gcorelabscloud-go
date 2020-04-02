@@ -113,12 +113,10 @@ const CreateRequest = `
 
 const CreatePoolMemberRequest = `
 {
-  "id": "string",
-  "address": "string",
-  "protocol_port": 0,
-  "weight": 0,
-  "subnet_id": "string",
-  "instance_id": "string"
+  "address": "192.168.13.9",
+  "protocol_port": 80,
+  "weight": 1,
+  "subnet_id": "c864873b-8d9b-4d29-8cce-bf0bdfdaa74d"
 }
 `
 
@@ -136,7 +134,23 @@ const CreateResponse = `
 }
 `
 
+const CreateMemberResponse = `
+{
+  "tasks": [
+    "50f53a35-42ed-40c4-82b2-5a37fb3e00bc"
+  ]
+}
+`
+
 const DeleteResponse = `
+{
+  "tasks": [
+    "50f53a35-42ed-40c4-82b2-5a37fb3e00bc"
+  ]
+}
+`
+
+const DeleteMemberResponse = `
 {
   "tasks": [
     "50f53a35-42ed-40c4-82b2-5a37fb3e00bc"

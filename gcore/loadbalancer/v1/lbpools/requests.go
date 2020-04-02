@@ -50,10 +50,14 @@ func (opts ListOpts) ToLBPoolListQuery() (string, error) {
 	return q.String(), err
 }
 
-// CreateOptsBuilder allows extensions to add additional parameters to the
-// Create request.
+// CreateOptsBuilder allows extensions to add parameters to the Create request.
 type CreateOptsBuilder interface {
 	ToLBPoolCreateMap() (map[string]interface{}, error)
+}
+
+// CreateMemberOptsBuilder allows extensions to add parameters to the CreateMember request.
+type CreateMemberOptsBuilder interface {
+	ToLBPoolMemberCreateMap() (map[string]interface{}, error)
 }
 
 // CreateSessionPersistenceOpts represents options used to create a lbpool listener pool session persistence rules.
@@ -98,6 +102,11 @@ type CreateOpts struct {
 
 // ToLBPoolCreateMap builds a request body from CreateOpts.
 func (opts CreateOpts) ToLBPoolCreateMap() (map[string]interface{}, error) {
+	return gcorecloud.BuildRequestBody(opts, "")
+}
+
+// ToLBPoolMemberCreateMap builds a request body from CreatePoolMemberOpts.
+func (opts CreatePoolMemberOpts) ToLBPoolMemberCreateMap() (map[string]interface{}, error) {
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
@@ -158,4 +167,21 @@ func ListAll(c *gcorecloud.ServiceClient, opts ListOptsBuilder) ([]Pool, error) 
 		return nil, err
 	}
 	return ExtractPools(page)
+}
+
+// CreateMember creates LB pool member
+func CreateMember(c *gcorecloud.ServiceClient, lbpoolID string, opts CreateMemberOptsBuilder) (r CreateResult) {
+	b, err := opts.ToLBPoolMemberCreateMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = c.Post(createMemberURL(c, lbpoolID), b, &r.Body, nil)
+	return
+}
+
+// DeleteMember accepts a unique pool and member ID and deletes pool member.
+func DeleteMember(c *gcorecloud.ServiceClient, lbpoolID string, memberID string) (r DeleteResult) {
+	_, r.Err = c.DeleteWithResponse(deleteMemberURL(c, lbpoolID, memberID), &r.Body, nil)
+	return
 }
