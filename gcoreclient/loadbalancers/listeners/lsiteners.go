@@ -41,11 +41,7 @@ var listenerListSubCommand = cli.Command{
 
 		opts := listeners.ListOpts{LoadBalancerID: utils.StringToPointer(c.String("loadbalancer-id"))}
 
-		pages, err := listeners.List(client, opts).AllPages()
-		if err != nil {
-			return cli.NewExitError(err, 1)
-		}
-		results, err := listeners.ExtractListeners(pages)
+		results, err := listeners.ListAll(client, opts)
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}

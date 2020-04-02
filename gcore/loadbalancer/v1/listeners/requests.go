@@ -110,3 +110,12 @@ func Delete(c *gcorecloud.ServiceClient, listenerID string) (r DeleteResult) {
 	_, r.Err = c.DeleteWithResponse(deleteURL(c, listenerID), &r.Body, nil)
 	return
 }
+
+// ListAll returns all LBs
+func ListAll(c *gcorecloud.ServiceClient, opts ListOptsBuilder) ([]Listener, error) {
+	page, err := List(c, opts).AllPages()
+	if err != nil {
+		return nil, err
+	}
+	return ExtractListeners(page)
+}
