@@ -40,9 +40,9 @@ func getHealthMonitor(c *cli.Context) (*lbpools.CreateHealthMonitorOpts, error) 
 	if healthMonitorMaxRetires == 0 {
 		return nil, fmt.Errorf("--healthmonitor-max-retries should be set for health monitor %s", healthMonitorType)
 	}
-	healthMonitorTimeout := c.Int("healthmonitor-max-timeout")
+	healthMonitorTimeout := c.Int("healthmonitor-timeout")
 	if healthMonitorTimeout == 0 {
-		return nil, fmt.Errorf("--healthmonitor-timeut should be set for health monitor %s", healthMonitorType)
+		return nil, fmt.Errorf("--healthmonitor-timeout should be set for health monitor %s", healthMonitorType)
 	}
 	hm := lbpools.CreateHealthMonitorOpts{
 		Type:           *healthMonitorType,
