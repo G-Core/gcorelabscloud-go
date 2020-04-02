@@ -150,3 +150,12 @@ func Delete(c *gcorecloud.ServiceClient, lbpoolID string) (r DeleteResult) {
 	_, r.Err = c.DeleteWithResponse(deleteURL(c, lbpoolID), &r.Body, nil)
 	return
 }
+
+// ListAll returns all LB pools
+func ListAll(c *gcorecloud.ServiceClient, opts ListOptsBuilder) ([]Pool, error) {
+	page, err := List(c, opts).AllPages()
+	if err != nil {
+		return nil, err
+	}
+	return ExtractPools(page)
+}

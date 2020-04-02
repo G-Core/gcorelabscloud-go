@@ -55,11 +55,11 @@ func TestList(t *testing.T) {
 
 	err := lbpools.List(client, opts).EachPage(func(page pagination.Page) (bool, error) {
 		count++
-		actual, err := lbpools.ExtractPools(page)
+		pools, err := lbpools.ExtractPools(page)
 		require.NoError(t, err)
-		ct := actual[0]
-		require.Equal(t, LBPool1, ct)
-		require.Equal(t, ExpectedLBPoolsSlice, actual)
+		pool := pools[0]
+		require.Equal(t, LBPool1, pool)
+		require.Equal(t, ExpectedLBPoolsSlice, pool)
 		return true, nil
 	})
 
@@ -68,6 +68,34 @@ func TestList(t *testing.T) {
 	if count != 1 {
 		t.Errorf("Expected 1 page, got %d", count)
 	}
+}
+
+func TestListAll(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareListTestURL(), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, ListResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("lbpools", "v1")
+
+	opts := lbpools.ListOpts{LoadBalancerID: &LBPool1.ID}
+
+	pools, err := lbpools.ListAll(client, opts)
+	require.NoError(t, err)
+	pool := pools[0]
+	require.Equal(t, LBPool1, pool)
+	require.Equal(t, ExpectedLBPoolsSlice, pools)
+
 }
 
 func TestGet(t *testing.T) {

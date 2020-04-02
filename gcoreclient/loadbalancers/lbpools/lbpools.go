@@ -181,11 +181,7 @@ var lbpoolListSubCommand = cli.Command{
 			MemberDetails:  utils.BoolToPointer(c.Bool("details")),
 		}
 
-		pages, err := lbpools.List(client, opts).AllPages()
-		if err != nil {
-			return cli.NewExitError(err, 1)
-		}
-		results, err := lbpools.ExtractPools(pages)
+		results, err := lbpools.ListAll(client, opts)
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
