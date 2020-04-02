@@ -9,6 +9,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http/httputil"
+	"os"
 
 	log "github.com/sirupsen/logrus"
 
@@ -304,7 +305,9 @@ func (client *ProviderClient) debugRequest(request *http.Request) {
 		if err != nil {
 			log.Error(err)
 		} else {
+			log.SetOutput(os.Stderr)
 			log.Debug(string(dump))
+			log.SetOutput(os.Stdout)
 		}
 	}
 }
@@ -315,7 +318,9 @@ func (client *ProviderClient) debugResponse(response *http.Response) {
 		if err != nil {
 			log.Error(err)
 		} else {
+			log.SetOutput(os.Stderr)
 			log.Debug(string(dump))
+			log.SetOutput(os.Stdout)
 		}
 	}
 }
