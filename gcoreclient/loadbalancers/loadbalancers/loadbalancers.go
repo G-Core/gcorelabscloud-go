@@ -26,11 +26,7 @@ var loadBalancerListSubCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		pages, err := loadbalancers.List(client).AllPages()
-		if err != nil {
-			return cli.NewExitError(err, 1)
-		}
-		results, err := loadbalancers.ExtractLoadBalancers(pages)
+		results, err := loadbalancers.ListAll(client)
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
