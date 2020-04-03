@@ -52,14 +52,14 @@ var instanceListCommand = cli.Command{
 }
 
 var instanceListInterfacesCommand = cli.Command{
-	Name:      "interfaces",
+	Name:      "list",
 	Usage:     "List instance interfaces",
 	ArgsUsage: "<instance_id>",
 	Category:  "instance",
 	Action: func(c *cli.Context) error {
 		instanceID, err := flags.GetFirstArg(c, instanceIDText)
 		if err != nil {
-			_ = cli.ShowCommandHelp(c, "show")
+			_ = cli.ShowCommandHelp(c, "list")
 			return err
 		}
 		client, err := utils.BuildClient(c, "instances", "")
@@ -202,7 +202,13 @@ var InstanceCommands = cli.Command{
 	Subcommands: []*cli.Command{
 		&instanceGetCommand,
 		&instanceListCommand,
-		&instanceListInterfacesCommand,
+		{
+			Name:  "interface",
+			Usage: "Instance interfaces",
+			Subcommands: []*cli.Command{
+				&instanceListInterfacesCommand,
+			},
+		},
 		{
 			Name:  "securitygroup",
 			Usage: "Instance security groups",
