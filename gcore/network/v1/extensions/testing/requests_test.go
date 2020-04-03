@@ -18,11 +18,11 @@ import (
 )
 
 func prepareListTestURLParams(projectID int, regionID int) string {
-	return fmt.Sprintf("/v1/extensions/%d/%d", projectID, regionID)
+	return fmt.Sprintf("/v1/networks/%d/%d/extensions", projectID, regionID)
 }
 
 func prepareGetTestURLParams(projectID int, regionID int, id string) string {
-	return fmt.Sprintf("/v1/extensions/%d/%d/%s", projectID, regionID, id)
+	return fmt.Sprintf("/v1/networks/%d/%d/extensions/%s", projectID, regionID, id)
 }
 
 func prepareListTestURL() string {
@@ -49,7 +49,7 @@ func TestList(t *testing.T) {
 		}
 	})
 
-	client := fake.ServiceTokenClient("extensions", "v1")
+	client := fake.ServiceTokenClient("networks", "v1")
 	count := 0
 
 	err := extensions.List(client).EachPage(func(page pagination.Page) (bool, error) {
@@ -85,7 +85,7 @@ func TestListAll(t *testing.T) {
 		}
 	})
 
-	client := fake.ServiceTokenClient("extensions", "v1")
+	client := fake.ServiceTokenClient("networks", "v1")
 
 	exts, err := extensions.ListAll(client)
 	require.NoError(t, err)
@@ -114,7 +114,7 @@ func TestGet(t *testing.T) {
 		}
 	})
 
-	client := fake.ServiceTokenClient("extensions", "v1")
+	client := fake.ServiceTokenClient("networks", "v1")
 
 	ct, err := extensions.Get(client, Extension1.Alias).Extract()
 

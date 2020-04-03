@@ -5,11 +5,11 @@ import (
 )
 
 func resourceURL(c *gcorecloud.ServiceClient, id string) string {
-	return c.ServiceURL(id)
+	return c.ServiceURL("extensions", id)
 }
 
 func rootURL(c *gcorecloud.ServiceClient) string {
-	return c.ServiceURL()
+	return c.ServiceURL("extensions")
 }
 
 func getURL(c *gcorecloud.ServiceClient, id string) string {

@@ -16,7 +16,7 @@ var extensionListCommand = cli.Command{
 	Usage:    "List extensions",
 	Category: "extension",
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "extensions", "")
+		client, err := utils.BuildClient(c, "networks", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -41,7 +41,7 @@ var extensionGetCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
 		}
-		client, err := utils.BuildClient(c, "extensions", "")
+		client, err := utils.BuildClient(c, "networks", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -55,7 +55,7 @@ var extensionGetCommand = cli.Command{
 	},
 }
 
-var ExtensionCommands = cli.Command{
+var extensionCommands = cli.Command{
 	Name:  "extension",
 	Usage: "GCloud neutron extensions API",
 	Subcommands: []*cli.Command{

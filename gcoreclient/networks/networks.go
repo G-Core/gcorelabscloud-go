@@ -218,5 +218,6 @@ var NetworkCommands = cli.Command{
 		&networkDeleteCommand,
 		&networkCreateCommand,
 		&networkUpdateCommand,
+		&extensionCommands,
 	},
 }
