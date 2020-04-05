@@ -83,6 +83,22 @@ func Delete(c *gcorecloud.ServiceClient, networkID string) (r DeleteResult) {
 	return
 }
 
+// ListAll is a convenience function that returns all networks.
+func ListAll(client *gcorecloud.ServiceClient) ([]Network, error) {
+	pages, err := List(client).AllPages()
+	if err != nil {
+		return nil, err
+	}
+
+	all, err := ExtractNetworks(pages)
+	if err != nil {
+		return nil, err
+	}
+
+	return all, nil
+
+}
+
 // IDFromName is a convenience function that returns a network ID, given its name.
 func IDFromName(client *gcorecloud.ServiceClient, name string) (string, error) {
 	count := 0
