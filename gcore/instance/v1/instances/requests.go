@@ -269,7 +269,7 @@ func Create(client *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r CreateR
 		return
 	}
 	var resp *http.Response
-	resp, r.Err = client.Post(createURL(client, "v2"), b, &r.Body, nil)
+	resp, r.Err = client.Post(createURL(client), b, &r.Body, nil)
 	defer func() {
 		_ = resp.Body.Close()
 	}()

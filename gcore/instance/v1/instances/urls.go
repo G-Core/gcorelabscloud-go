@@ -44,6 +44,6 @@ func deleteSecurityGroupsURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceActionURL(c, id, "delsecuritygroup")
 }
 
-func createURL(c *gcorecloud.ServiceClient, _ string) string {
+func createURL(c *gcorecloud.ServiceClient) string {
 	return rootURL(c)
 }

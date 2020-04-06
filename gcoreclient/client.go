@@ -10,6 +10,7 @@ import (
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/flavors"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/floatingips/floatingips"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/heat"
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/images"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/instances"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/keypairs"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/loadbalancers/loadbalancers"
@@ -39,6 +40,7 @@ var commands = []*cli.Command{
 	&securitygrouprules.SecurityGroupRuleCommands,
 	&floatingips.FloatingIPCommands,
 	&snapshots.SnapshotCommands,
+	&images.ImageCommands,
 }
 
 func main() {

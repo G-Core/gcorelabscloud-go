@@ -295,7 +295,7 @@ var instanceUnAssignSecurityGroupsCommand = cli.Command{
 
 var instanceCreateCommandV2 = cli.Command{
 	Name:     "create",
-	Usage:    "Create instance",
+	Usage:    "Create instance. Example: gcoreclient token instance create --flavor g1-standard-1-2 --name test1 --keypair keypair --volume-source image --volume-type standard --volume-image-id --interface-type subnet --interface-network-id 95ea2073-c5eb-448a-aed5-78045f88f24a --interface-subnet-id b7fd6e0a-36a5-4f6a-9dc4-90a39eb9833f --volume-size 2 --metadata one=two -d -w",
 	Category: "instance",
 	Flags: append([]cli.Flag{
 		&cli.StringSliceFlag{
@@ -498,18 +498,18 @@ var instanceCreateCommandV2 = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
-		return utils.WaitTaskAndShowResult(c, clientV2, results, true, func(task tasks.TaskID) (interface{}, error) {
+		return utils.WaitTaskAndShowResult(c, clientV1, results, true, func(task tasks.TaskID) (interface{}, error) {
 			taskInfo, err := tasks.Get(clientV1, string(task)).Extract()
 			if err != nil {
 				return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
 			}
 			instanceID, err := instances.ExtractInstanceIDFromTask(taskInfo)
 			if err != nil {
-				return nil, fmt.Errorf("cannot retrieve volume ID from task info: %w", err)
+				return nil, fmt.Errorf("cannot retrieve image ID from task info: %w", err)
 			}
-			instance, err := volumes.Get(clientV2, instanceID).Extract()
+			instance, err := instances.Get(clientV2, instanceID).Extract()
 			if err != nil {
-				return nil, fmt.Errorf("cannot get volume with ID: %s. Error: %w", instanceID, err)
+				return nil, fmt.Errorf("cannot get image with ID: %s. Error: %w", instanceID, err)
 			}
 			return instance, nil
 		})
@@ -592,7 +592,7 @@ var instanceDeleteCommand = cli.Command{
 		}
 
 		return utils.WaitTaskAndShowResult(c, client, results, false, func(task tasks.TaskID) (interface{}, error) {
-			_, err := volumes.Get(client, instanceID).Extract()
+			_, err := instances.Get(client, instanceID).Extract()
 			if err == nil {
 				return nil, fmt.Errorf("cannot delete instance with ID: %s", instanceID)
 			}
