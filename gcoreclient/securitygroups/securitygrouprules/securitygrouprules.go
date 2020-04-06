@@ -32,7 +32,7 @@ var securityGroupRuleDeleteSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
 		}
-		client, err := utils.BuildClient(c, "securitygrouprules", "")
+		client, err := utils.BuildClient(c, "securitygrouprules", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -115,7 +115,7 @@ var securityGroupRuleUpdateSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "add-rule")
 			return err
 		}
-		client, err := utils.BuildClient(c, "securitygrouprules", "")
+		client, err := utils.BuildClient(c, "securitygrouprules", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)

@@ -27,7 +27,7 @@ var subnetListCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "subnets", "")
+		client, err := utils.BuildClient(c, "subnets", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -60,7 +60,7 @@ var subnetGetCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
 		}
-		client, err := utils.BuildClient(c, "subnets", "")
+		client, err := utils.BuildClient(c, "subnets", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -89,7 +89,7 @@ var subnetDeleteCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
 		}
-		client, err := utils.BuildClient(c, "subnets", "")
+		client, err := utils.BuildClient(c, "subnets", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -137,7 +137,7 @@ var subnetUpdateCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
 		}
-		client, err := utils.BuildClient(c, "subnets", "")
+		client, err := utils.BuildClient(c, "subnets", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -196,7 +196,7 @@ var subnetCreateCommand = cli.Command{
 	}, flags.WaitCommandFlags...,
 	),
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "subnets", "")
+		client, err := utils.BuildClient(c, "subnets", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)

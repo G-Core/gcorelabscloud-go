@@ -16,6 +16,10 @@ func getURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceURL(c, id)
 }
 
+func deleteURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceURL(c, id)
+}
+
 func listURL(c *gcorecloud.ServiceClient) string {
 	return rootURL(c)
 }
@@ -38,4 +42,8 @@ func addSecurityGroupsURL(c *gcorecloud.ServiceClient, id string) string {
 
 func deleteSecurityGroupsURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceActionURL(c, id, "delsecuritygroup")
+}
+
+func createURL(c *gcorecloud.ServiceClient, _ string) string {
+	return rootURL(c)
 }

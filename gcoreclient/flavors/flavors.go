@@ -20,7 +20,7 @@ var flavorListCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "flavors", "")
+		client, err := utils.BuildClient(c, "flavors", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)

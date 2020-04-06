@@ -16,7 +16,7 @@ var taskListCommand = cli.Command{
 	Usage:    "List active tasks",
 	Category: "task",
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "tasks", "")
+		client, err := utils.BuildClient(c, "tasks", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -45,7 +45,7 @@ var taskGetCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "show")
 			return cli.NewExitError(fmt.Errorf(taskIDText), 1)
 		}
-		client, err := utils.BuildClient(c, "tasks", "")
+		client, err := utils.BuildClient(c, "tasks", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)

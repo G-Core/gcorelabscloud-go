@@ -17,7 +17,7 @@ var keypairListCommand = cli.Command{
 	Usage:    "List keypairs",
 	Category: "keypair",
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "keypairs", "")
+		client, err := utils.BuildClient(c, "keypairs", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -46,7 +46,7 @@ var keypairGetCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
 		}
-		client, err := utils.BuildClient(c, "keypairs", "")
+		client, err := utils.BuildClient(c, "keypairs", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -72,7 +72,7 @@ var keypairDeleteCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
 		}
-		client, err := utils.BuildClient(c, "keypairs", "")
+		client, err := utils.BuildClient(c, "keypairs", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -104,7 +104,7 @@ var keypairCreateCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "keypairs", "")
+		client, err := utils.BuildClient(c, "keypairs", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)

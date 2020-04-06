@@ -27,7 +27,7 @@ var clusterListSubCommand = cli.Command{
 	Usage:    "Magnum list clusters",
 	Category: "cluster",
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "magnum", "")
+		client, err := utils.BuildClient(c, "magnum", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -57,7 +57,7 @@ var clusterDeleteSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
 		}
-		client, err := utils.BuildClient(c, "magnum", "")
+		client, err := utils.BuildClient(c, "magnum", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -113,7 +113,7 @@ var clusterResizeSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "resize")
 			return err
 		}
-		client, err := utils.BuildClient(c, "magnum", "")
+		client, err := utils.BuildClient(c, "magnum", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -184,7 +184,7 @@ var clusterUpgradeSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "resize")
 			return err
 		}
-		client, err := utils.BuildClient(c, "magnum", "")
+		client, err := utils.BuildClient(c, "magnum", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -255,7 +255,7 @@ var clusterUpdateSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "update")
 			return cli.NewExitError(err, 1)
 		}
-		client, err := utils.BuildClient(c, "magnum", "")
+		client, err := utils.BuildClient(c, "magnum", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -328,7 +328,7 @@ var clusterGetSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
 		}
-		client, err := utils.BuildClient(c, "magnum", "")
+		client, err := utils.BuildClient(c, "magnum", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -379,7 +379,7 @@ var clusterConfigSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "config")
 			return err
 		}
-		client, err := utils.BuildClient(c, "magnum", "")
+		client, err := utils.BuildClient(c, "magnum", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -522,14 +522,14 @@ var clusterCreateSubCommand = cli.Command{
 	}, flags.WaitCommandFlags...,
 	),
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "magnum", "")
+		client, err := utils.BuildClient(c, "magnum", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
 		labels, err := utils.StringSliceToMap(c.StringSlice("labels"))
 		if err != nil {
-			_ = cli.ShowAppHelp(c)
+			_ = cli.ShowCommandHelp(c, "create")
 			return cli.NewExitError(err, 1)
 		}
 

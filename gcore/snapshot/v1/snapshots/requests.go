@@ -46,8 +46,7 @@ func Get(c *gcorecloud.ServiceClient, id string) (r GetResult) {
 	return
 }
 
-// CreateOptsBuilder allows extensions to add additional parameters to the
-// Create request.
+// CreateOptsBuilder allows extensions to add additional parameters to the Create request.
 type CreateOptsBuilder interface {
 	ToSnapshotCreateMap() (map[string]interface{}, error)
 }

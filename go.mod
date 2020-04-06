@@ -4,6 +4,9 @@ go 1.14
 
 require (
 	github.com/fatih/structs v1.1.0
+	github.com/go-playground/locales v0.13.0
+	github.com/go-playground/universal-translator v0.17.0
+	github.com/go-playground/validator/v10 v10.2.0
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/ladydascalie/currency v1.5.0
 	github.com/mitchellh/go-homedir v1.1.0

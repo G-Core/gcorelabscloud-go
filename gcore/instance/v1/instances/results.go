@@ -2,7 +2,10 @@ package instances
 
 import (
 	"encoding/json"
+	"fmt"
 	"net"
+
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
 
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/instance/v1/types"
 
@@ -28,6 +31,13 @@ func (r commonResult) ExtractInto(v interface{}) error {
 	return r.Result.ExtractIntoStructPtr(v, "")
 }
 
+// ExtractTasks is a function that accepts a result and extracts a instance creation task resource.
+func (r commonResult) ExtractTasks() (*tasks.TaskResults, error) {
+	var t tasks.TaskResults
+	err := r.ExtractInto(&t)
+	return &t, err
+}
+
 // CreateResult represents the result of a create operation. Call its Extract
 // method to interpret it as a Instance.
 type CreateResult struct {
@@ -48,7 +58,7 @@ type UpdateResult struct {
 
 // DeleteResult represents the result of a delete operation
 type DeleteResult struct {
-	gcorecloud.ErrResult
+	commonResult
 }
 
 // SecurityGroupActionResult represents the result of a actions operation(no content)
@@ -286,4 +296,23 @@ func (i *Instance) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+type InstanceTaskResult struct {
+	Instances   []string `json:"instances"`
+	Volumes     []string `json:"volumes"`
+	FloatingIPs []string `json:"floating_ips"`
+	Ports       []string `json:"ports"`
+}
+
+func ExtractInstanceIDFromTask(task *tasks.Task) (string, error) {
+	var result InstanceTaskResult
+	err := gcorecloud.NativeMapToStruct(task.CreatedResources, &result)
+	if err != nil {
+		return "", fmt.Errorf("cannot decode instance information in task structure: %w", err)
+	}
+	if len(result.Instances) == 0 {
+		return "", fmt.Errorf("cannot decode instance information in task structure: %w", err)
+	}
+	return result.Instances[0], nil
 }

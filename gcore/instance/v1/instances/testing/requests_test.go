@@ -5,6 +5,11 @@ import (
 	"net/http"
 	"testing"
 
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
+
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/instance/v1/types"
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/volume/v1/volumes"
+
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/instance/v1/instances"
 
 	fake "bitbucket.gcore.lu/gcloud/gcorecloud-go/testhelper/client"
@@ -17,40 +22,48 @@ import (
 	th "bitbucket.gcore.lu/gcloud/gcorecloud-go/testhelper"
 )
 
-func prepareListTestURLParams(projectID int, regionID int) string {
-	return fmt.Sprintf("/v1/instances/%d/%d", projectID, regionID)
+func prepareListTestURLParams(version string, projectID int, regionID int) string {
+	return fmt.Sprintf("/%s/instances/%d/%d", version, projectID, regionID)
 }
 
-func prepareGetTestURLParams(projectID int, regionID int, id string) string {
-	return fmt.Sprintf("/v1/instances/%d/%d/%s", projectID, regionID, id)
+func prepareGetTestURLParams(version string, projectID int, regionID int, id string) string {
+	return fmt.Sprintf("/%s/instances/%d/%d/%s", version, projectID, regionID, id)
 }
 
-func prepareGetActionTestURLParams(id string, action string) string {
-	return fmt.Sprintf("/v1/instances/%d/%d/%s/%s", fake.ProjectID, fake.RegionID, id, action)
+func prepareGetActionTestURLParams(version string, id string, action string) string { // nolint
+	return fmt.Sprintf("/%s/instances/%d/%d/%s/%s", version, fake.ProjectID, fake.RegionID, id, action)
 }
 
 func prepareListTestURL() string {
-	return prepareListTestURLParams(fake.ProjectID, fake.RegionID)
+	return prepareListTestURLParams("v1", fake.ProjectID, fake.RegionID)
 }
 
 func prepareListInterfacesTestURL(id string) string {
-	return prepareGetActionTestURLParams(id, "interfaces")
+	return prepareGetActionTestURLParams("v1", id, "interfaces")
 }
 
 func prepareListSecurityGroupsTestURL(id string) string {
-	return prepareGetActionTestURLParams(id, "securitygroups")
+	return prepareGetActionTestURLParams("v1", id, "securitygroups")
 }
 
 func prepareAssignSecurityGroupsTestURL(id string) string {
-	return prepareGetActionTestURLParams(id, "addsecuritygroup")
+	return prepareGetActionTestURLParams("v1", id, "addsecuritygroup")
 }
 
 func prepareUnAssignSecurityGroupsTestURL(id string) string {
-	return prepareGetActionTestURLParams(id, "delsecuritygroup")
+	return prepareGetActionTestURLParams("v1", id, "delsecuritygroup")
 }
 
 func prepareGetTestURL(id string) string {
-	return prepareGetTestURLParams(fake.ProjectID, fake.RegionID, id)
+	return prepareGetTestURLParams("v1", fake.ProjectID, fake.RegionID, id)
+}
+
+func prepareDeleteTestURL(id string) string {
+	return prepareGetTestURLParams("v1", fake.ProjectID, fake.RegionID, id)
+}
+
+func prepareCreateTestURLV2() string {
+	return prepareListTestURLParams("v2", fake.ProjectID, fake.RegionID)
 }
 
 func TestList(t *testing.T) {
@@ -60,7 +73,6 @@ func TestList(t *testing.T) {
 	th.Mux.HandleFunc(prepareListTestURL(), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "GET")
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
-
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		_, err := fmt.Fprint(w, ListResponse)
@@ -89,6 +101,33 @@ func TestList(t *testing.T) {
 	if count != 1 {
 		t.Errorf("Expected 1 page, got %d", count)
 	}
+}
+
+func TestListAll(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareListTestURL(), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, ListResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("instances", "v1")
+
+	opts := instances.ListOpts{}
+
+	actual, err := instances.ListAll(client, opts)
+	require.NoError(t, err)
+	ct := actual[0]
+	require.Equal(t, Instance1, ct)
+	require.Equal(t, ExpectedInstancesSlice, actual)
 }
 
 func TestGet(t *testing.T) {
@@ -214,4 +253,96 @@ func TestAssignSecurityGroups(t *testing.T) {
 	err := instances.AssignSecurityGroup(client, instanceID, opts).ExtractErr()
 
 	require.NoError(t, err)
+}
+
+func TestCreate(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareCreateTestURLV2(), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestJSONRequest(t, r, CreateRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+
+		_, err := fmt.Fprint(w, CreateResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	options := instances.CreateOpts{
+		Flavor:        "g1-standard-1-2",
+		Names:         []string{"name"},
+		NameTemplates: nil,
+		Volumes: []instances.CreateVolumeOpts{{
+			Source:     types.NewVolume,
+			BootIndex:  0,
+			Size:       10,
+			TypeName:   volumes.Standard,
+			Name:       "name",
+			ImageID:    "",
+			SnapshotID: "",
+			VolumeID:   "",
+		}},
+		SecurityGroups: []gcorecloud.ItemID{{
+			ID: "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c",
+		}},
+		Interfaces: []instances.CreateInterfaceOpts{{
+			Type:      types.SubnetInterfaceType,
+			NetworkID: "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c",
+			SubnetID:  "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c",
+			FloatingIP: &instances.CreateNewInterfaceFloatingIPOpts{
+				Source:             types.ExistingFloatingIP,
+				ExistingFloatingID: "127.0.0.1",
+			},
+		}},
+		Keypair:  "keypair",
+		Password: "password",
+		Username: "username",
+		UserData: "",
+	}
+
+	err := options.Validate()
+	require.NoError(t, err)
+
+	client := fake.ServiceTokenClient("instances", "v2")
+	tasks, err := instances.Create(client, options).ExtractTasks()
+	require.NoError(t, err)
+	require.Equal(t, Tasks1, *tasks)
+}
+
+func TestDelete(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareDeleteTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "DELETE")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Accept", "application/json")
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, DeleteResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	options := instances.DeleteOpts{
+		Volumes:         nil,
+		DeleteFloatings: true,
+		FloatingIPs:     nil,
+	}
+
+	err := options.Validate()
+	require.NoError(t, err)
+	client := fake.ServiceTokenClient("instances", "v1")
+	tasks, err := instances.Delete(client, instanceID, options).ExtractTasks()
+	require.NoError(t, err)
+	require.Equal(t, Tasks1, *tasks)
+
 }

@@ -41,13 +41,17 @@ type ListOpts struct {
 
 // CreateOpts represents options used to create a volume.
 type CreateOpts struct {
-	Source               VolumeSource `json:"source" required:"true"`
-	Name                 string       `json:"name" required:"true"`
-	Size                 *int         `json:"size,omitempty"`
-	TypeName             *VolumeType  `json:"type_name,omitempty"`
-	ImageID              *string      `json:"image_id,omitempty"`
-	SnapshotID           *string      `json:"snapshot_id,omitempty"`
-	InstanceIDToAttachTo *string      `json:"instance_id_to_attach_to,omitempty"`
+	Source               VolumeSource `json:"source" required:"true" validate:"required"`
+	Name                 string       `json:"name" required:"true" validate:"required"`
+	Size                 int          `json:"size,omitempty" validate:"rfe=Source:image;new-volume"`
+	TypeName             VolumeType   `json:"type_name" required:"true" validate:"required"`
+	ImageID              string       `json:"image_id,omitempty" validate:"rfe=Source:image,omitempty,uuid4"`
+	SnapshotID           string       `json:"snapshot_id,omitempty" validate:"rfe=Source:snapshot,omitempty,uuid4"`
+	InstanceIDToAttachTo string       `json:"instance_id_to_attach_to,omitempty" validate:"omitempty,uuid4"`
+}
+
+func (opts *CreateOpts) Validate() error {
+	return gcorecloud.Validate.Struct(opts)
 }
 
 // DeleteOpts allows set additional parameters during volume deletion.

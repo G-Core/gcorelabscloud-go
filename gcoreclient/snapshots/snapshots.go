@@ -33,7 +33,7 @@ var snapshotListCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "snapshots", "")
+		client, err := utils.BuildClient(c, "snapshots", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -62,7 +62,7 @@ var snapshotGetCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
 		}
-		client, err := utils.BuildClient(c, "snapshots", "")
+		client, err := utils.BuildClient(c, "snapshots", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -91,7 +91,7 @@ var snapshotDeleteCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
 		}
-		client, err := utils.BuildClient(c, "snapshots", "")
+		client, err := utils.BuildClient(c, "snapshots", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -145,7 +145,7 @@ var snapshotCreateCommand = cli.Command{
 	}, flags.WaitCommandFlags...,
 	),
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "snapshots", "")
+		client, err := utils.BuildClient(c, "snapshots", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)

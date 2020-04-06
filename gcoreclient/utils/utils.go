@@ -95,7 +95,7 @@ func GetEnumStringSliceValue(c *cli.Context, name string) []string {
 	return c.Value(name).(EnumStringSliceValue).Value()
 }
 
-func BuildTokenClient(c *cli.Context, endpointName, endpointType string) (*gcorecloud.ServiceClient, error) {
+func BuildTokenClient(c *cli.Context, endpointName, endpointType string, version string) (*gcorecloud.ServiceClient, error) {
 	settings, err := gcore.NewGCloudTokenAPISettingsFromEnv()
 	if err != nil {
 		return nil, err
@@ -111,7 +111,9 @@ func BuildTokenClient(c *cli.Context, endpointName, endpointType string) (*gcore
 		settings.RefreshToken = refreshToken
 	}
 
-	version := c.String("api-version")
+	if version == "" {
+		version = c.String("api-version")
+	}
 	if version != "" {
 		settings.Version = version
 	}
@@ -154,7 +156,7 @@ func BuildTokenClient(c *cli.Context, endpointName, endpointType string) (*gcore
 	return client, err
 }
 
-func BuildPasswordClient(c *cli.Context, endpointName, endpointType string) (*gcorecloud.ServiceClient, error) {
+func BuildPasswordClient(c *cli.Context, endpointName, endpointType string, version string) (*gcorecloud.ServiceClient, error) {
 	settings, err := gcore.NewGCloudPasswordAPISettingsFromEnv()
 	if err != nil {
 		return nil, err
@@ -170,7 +172,9 @@ func BuildPasswordClient(c *cli.Context, endpointName, endpointType string) (*gc
 		settings.Password = password
 	}
 
-	version := c.String("api-version")
+	if version == "" {
+		version = c.String("api-version")
+	}
 	if version != "" {
 		settings.Version = version
 	}
@@ -214,12 +218,12 @@ func BuildPasswordClient(c *cli.Context, endpointName, endpointType string) (*gc
 	return client, err
 }
 
-func BuildClient(c *cli.Context, endpointName, endpointType string) (*gcorecloud.ServiceClient, error) {
+func BuildClient(c *cli.Context, endpointName, endpointType string, version string) (*gcorecloud.ServiceClient, error) {
 	clientType := c.String("client-type")
 	if clientType == "token" {
-		return BuildTokenClient(c, endpointName, endpointType)
+		return BuildTokenClient(c, endpointName, endpointType, version)
 	}
-	return BuildPasswordClient(c, endpointName, endpointType)
+	return BuildPasswordClient(c, endpointName, endpointType, version)
 }
 
 func tableHeaderFromStruct(m interface{}) []string {
@@ -311,16 +315,6 @@ func StringToPointer(s string) *string {
 	return &s
 }
 
-func StringSliceToPointer(s []string) *[]string {
-	if s == nil {
-		return nil
-	}
-	if len(s) == 0 {
-		return nil
-	}
-	return &s
-}
-
 func IntToPointer(i int) *int {
 	if i == 0 {
 		return nil
@@ -333,6 +327,20 @@ func BoolToPointer(b bool) *bool {
 		return nil
 	}
 	return &b
+}
+
+func StringFromIndex(content []string, idx int, defaultValue string) string {
+	if idx < len(content) {
+		return content[idx]
+	}
+	return defaultValue
+}
+
+func IntFromIndex(content []int, idx int, defaultValue int) int {
+	if idx < len(content) {
+		return content[idx]
+	}
+	return defaultValue
 }
 
 func StringSliceToMap(slice []string) (map[string]string, error) {
@@ -402,6 +410,14 @@ func WriteToFile(filename string, content []byte) error {
 	}
 	err = ioutil.WriteFile(path, content, 0644)
 	return err
+}
+
+func ReadFile(filename string) ([]byte, error) {
+	path, err := getAbsPath(filename)
+	if err != nil {
+		return nil, err
+	}
+	return ioutil.ReadFile(path)
 }
 
 func MergeKubeconfigFile(filename string, content []byte) error {

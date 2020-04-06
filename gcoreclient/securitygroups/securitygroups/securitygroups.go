@@ -24,7 +24,7 @@ var securityGroupListSubCommand = cli.Command{
 	Usage:    "Security groups list",
 	Category: "securitygroup",
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "securitygroups", "")
+		client, err := utils.BuildClient(c, "securitygroups", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -114,7 +114,7 @@ var securityGroupCreateSubCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "securitygroups", "")
+		client, err := utils.BuildClient(c, "securitygroups", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -251,7 +251,7 @@ var securityGroupGetSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
 		}
-		client, err := utils.BuildClient(c, "securitygroups", "")
+		client, err := utils.BuildClient(c, "securitygroups", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -276,7 +276,7 @@ var securityGroupListInstancesSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "list")
 			return err
 		}
-		client, err := utils.BuildClient(c, "securitygroups", "")
+		client, err := utils.BuildClient(c, "securitygroups", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -301,7 +301,7 @@ var securityGroupDeleteSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
 		}
-		client, err := utils.BuildClient(c, "securitygroups", "")
+		client, err := utils.BuildClient(c, "securitygroups", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -333,7 +333,7 @@ var securityGroupUpdateSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "update")
 			return err
 		}
-		client, err := utils.BuildClient(c, "securitygroups", "")
+		client, err := utils.BuildClient(c, "securitygroups", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -418,7 +418,7 @@ var securityGroupAddRuleSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "add-rule")
 			return err
 		}
-		client, err := utils.BuildClient(c, "securitygroups", "")
+		client, err := utils.BuildClient(c, "securitygroups", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)

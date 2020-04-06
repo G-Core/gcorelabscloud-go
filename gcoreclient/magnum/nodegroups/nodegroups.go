@@ -32,7 +32,7 @@ var nodegroupListSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "list")
 			return cli.NewExitError(err, 1)
 		}
-		client, err := utils.BuildClient(c, "magnum", "")
+		client, err := utils.BuildClient(c, "magnum", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -70,7 +70,7 @@ var nodegroupDeleteSubCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 		clusterID := c.String("cluster-id")
-		client, err := utils.BuildClient(c, "magnum", "")
+		client, err := utils.BuildClient(c, "magnum", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -130,7 +130,7 @@ var nodegroupUpdateSubCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 		clusterID := c.String("cluster-id")
-		client, err := utils.BuildClient(c, "magnum", "")
+		client, err := utils.BuildClient(c, "magnum", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -169,7 +169,7 @@ var nodegroupGetSubCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 		clusterID := c.String("cluster-id")
-		client, err := utils.BuildClient(c, "magnum", "")
+		client, err := utils.BuildClient(c, "magnum", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -253,7 +253,7 @@ var nodegroupCreateSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "create")
 			return cli.NewExitError(err, 1)
 		}
-		client, err := utils.BuildClient(c, "magnum", "")
+		client, err := utils.BuildClient(c, "magnum", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)

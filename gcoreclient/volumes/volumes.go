@@ -33,7 +33,7 @@ var volumeListCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "volumes", "")
+		client, err := utils.BuildClient(c, "volumes", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -65,7 +65,7 @@ var volumeGetCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
 		}
-		client, err := utils.BuildClient(c, "volumes", "")
+		client, err := utils.BuildClient(c, "volumes", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -104,7 +104,7 @@ var volumeDeleteCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
 		}
-		client, err := utils.BuildClient(c, "volumes", "")
+		client, err := utils.BuildClient(c, "volumes", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -195,7 +195,7 @@ var volumeCreateCommand = cli.Command{
 	}, flags.WaitCommandFlags...,
 	),
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "volumes", "")
+		client, err := utils.BuildClient(c, "volumes", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -204,19 +204,25 @@ var volumeCreateCommand = cli.Command{
 		if err = source.IsValid(); err != nil {
 			return cli.NewExitError(err, 1)
 		}
-		volumeType, err := volumes.VolumeType(c.String("type")).ValidOrNil()
-		if err != nil {
+		volumeType := volumes.VolumeType(c.String("type"))
+		if err = volumeType.IsValid(); err != nil {
 			return cli.NewExitError(err, 1)
 		}
 		opts := volumes.CreateOpts{
 			Source:               source,
 			Name:                 c.String("name"),
-			Size:                 utils.IntToPointer(c.Int("size")),
+			Size:                 c.Int("size"),
 			TypeName:             volumeType,
-			ImageID:              utils.StringToPointer(c.String("image-id")),
-			SnapshotID:           utils.StringToPointer(c.String("snapshot-id")),
-			InstanceIDToAttachTo: utils.StringToPointer(c.String("instance-id")),
+			ImageID:              c.String("image-id"),
+			SnapshotID:           c.String("snapshot-id"),
+			InstanceIDToAttachTo: c.String("instance-id"),
 		}
+
+		err = gcorecloud.TranslateValidationError(opts.Validate())
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+
 		results, err := volumes.Create(client, opts).ExtractTasks()
 		if err != nil {
 			return cli.NewExitError(err, 1)
@@ -262,7 +268,7 @@ var volumeAttachCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "attach")
 			return err
 		}
-		client, err := utils.BuildClient(c, "volumes", "")
+		client, err := utils.BuildClient(c, "volumes", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -298,7 +304,7 @@ var volumeDetachCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "detach")
 			return err
 		}
-		client, err := utils.BuildClient(c, "volumes", "")
+		client, err := utils.BuildClient(c, "volumes", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -338,7 +344,7 @@ var volumeRetypeCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "retype")
 			return err
 		}
-		client, err := utils.BuildClient(c, "volumes", "")
+		client, err := utils.BuildClient(c, "volumes", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -381,7 +387,7 @@ var volumeExtendCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "extend")
 			return err
 		}
-		client, err := utils.BuildClient(c, "volumes", "")
+		client, err := utils.BuildClient(c, "volumes", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)

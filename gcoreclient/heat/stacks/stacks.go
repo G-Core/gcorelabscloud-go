@@ -15,7 +15,7 @@ var stackListSubCommand = cli.Command{
 	Usage:    "Heat stacks list",
 	Category: "stack",
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "heat", "")
+		client, err := utils.BuildClient(c, "heat", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -44,7 +44,7 @@ var stackGetSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
 		}
-		client, err := utils.BuildClient(c, "heat", "")
+		client, err := utils.BuildClient(c, "heat", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)

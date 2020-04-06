@@ -21,7 +21,7 @@ var loadBalancerListSubCommand = cli.Command{
 	Usage:    "loadbalancers list",
 	Category: "loadbalancer",
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "loadbalancers", "")
+		client, err := utils.BuildClient(c, "loadbalancers", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -54,7 +54,7 @@ var loadBalancerCreateSubCommand = cli.Command{
 		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "loadbalancers", "")
+		client, err := utils.BuildClient(c, "loadbalancers", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -100,7 +100,7 @@ var loadBalancerGetSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
 		}
-		client, err := utils.BuildClient(c, "loadbalancers", "")
+		client, err := utils.BuildClient(c, "loadbalancers", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -126,7 +126,7 @@ var loadBalancerDeleteSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
 		}
-		client, err := utils.BuildClient(c, "loadbalancers", "")
+		client, err := utils.BuildClient(c, "loadbalancers", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -172,7 +172,7 @@ var loadBalancerUpdateSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "update")
 			return err
 		}
-		client, err := utils.BuildClient(c, "loadbalancers", "")
+		client, err := utils.BuildClient(c, "loadbalancers", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)

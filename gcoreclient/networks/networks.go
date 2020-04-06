@@ -19,7 +19,7 @@ var networkListCommand = cli.Command{
 	Usage:    "List networks",
 	Category: "network",
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "networks", "")
+		client, err := utils.BuildClient(c, "networks", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -48,7 +48,7 @@ var networkGetCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
 		}
-		client, err := utils.BuildClient(c, "networks", "")
+		client, err := utils.BuildClient(c, "networks", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -77,7 +77,7 @@ var networkDeleteCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
 		}
-		client, err := utils.BuildClient(c, "networks", "")
+		client, err := utils.BuildClient(c, "networks", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -125,7 +125,7 @@ var networkUpdateCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
 		}
-		client, err := utils.BuildClient(c, "networks", "")
+		client, err := utils.BuildClient(c, "networks", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -173,7 +173,7 @@ var networkCreateCommand = cli.Command{
 	}, flags.WaitCommandFlags...,
 	),
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "networks", "")
+		client, err := utils.BuildClient(c, "networks", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)

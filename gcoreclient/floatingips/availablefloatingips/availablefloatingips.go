@@ -11,7 +11,7 @@ var availableFloatingIPListSubCommand = cli.Command{
 	Usage:    "Available floating ips list",
 	Category: "availablefloatingip",
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "availablefloatingips", "")
+		client, err := utils.BuildClient(c, "availablefloatingips", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)

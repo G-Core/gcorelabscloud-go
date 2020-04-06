@@ -64,7 +64,7 @@ var clusterTemplateCreateSubCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "magnum", "")
+		client, err := utils.BuildClient(c, "magnum", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -98,7 +98,7 @@ var clusterTemplateListSubCommand = cli.Command{
 	Usage:    "Magnum list cluster templates",
 	Category: "clustertemplate",
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "magnum", "")
+		client, err := utils.BuildClient(c, "magnum", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -127,7 +127,7 @@ var clusterTemplateDeleteDubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
 		}
-		client, err := utils.BuildClient(c, "magnum", "")
+		client, err := utils.BuildClient(c, "magnum", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -151,7 +151,7 @@ var clusterTemplateGetSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
 		}
-		client, err := utils.BuildClient(c, "magnum", "")
+		client, err := utils.BuildClient(c, "magnum", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)

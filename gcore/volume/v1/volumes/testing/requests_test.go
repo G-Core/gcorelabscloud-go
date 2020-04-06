@@ -147,13 +147,15 @@ func TestCreate(t *testing.T) {
 	options := volumes.CreateOpts{
 		Source:               "new-volume",
 		Name:                 "TestVM5 Ubuntu volume",
-		Size:                 &size,
-		TypeName:             &typeName,
-		ImageID:              nil,
-		SnapshotID:           nil,
-		InstanceIDToAttachTo: &instanceIDToAttachTo,
+		Size:                 size,
+		TypeName:             typeName,
+		ImageID:              "",
+		SnapshotID:           "",
+		InstanceIDToAttachTo: instanceIDToAttachTo,
 	}
 
+	err := options.Validate()
+	require.NoError(t, err)
 	client := fake.ServiceTokenClient("volumes", "v1")
 	tasks, err := volumes.Create(client, options).ExtractTasks()
 	require.NoError(t, err)

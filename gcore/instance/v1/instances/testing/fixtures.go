@@ -4,6 +4,8 @@ import (
 	"net"
 	"time"
 
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
+
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/instance/v1/types"
 
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
@@ -235,6 +237,44 @@ const InterfacesResponse = `
 }
 `
 
+const CreateRequest = `
+{
+  "flavor": "g1-standard-1-2",
+  "interfaces": [
+	{
+	  "floating_ip": {
+		"existing_floating_id": "127.0.0.1",
+		"source": "existing"
+	  },
+	  "network_id": "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c",
+	  "subnet_id": "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c",
+	  "type": "subnet"
+	}
+  ],
+  "keypair_name": "keypair",
+  "names": [
+	"name"
+  ],
+  "password": "password",
+  "security_groups": [
+    {
+      "id": "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c"
+    }
+  ],
+  "user_data": "",
+  "username": "username",
+  "volumes": [
+	{
+	  "boot_index": 0,
+	  "name": "name",
+	  "size": 10,
+	  "source": "new-volume",
+	  "type_name": "standard"
+	}
+  ]
+}
+`
+
 const SecurityGroupsListResponse = `
 {
   "count": 1,
@@ -256,6 +296,22 @@ const AssignSecurityGroupsRequest = `
 const UnAssignSecurityGroupsRequest = `
 {
   "name": "Test"
+}
+`
+
+const CreateResponse = `
+{
+  "tasks": [
+    "50f53a35-42ed-40c4-82b2-5a37fb3e00bc"
+  ]
+}
+`
+
+const DeleteResponse = `
+{
+  "tasks": [
+    "50f53a35-42ed-40c4-82b2-5a37fb3e00bc"
+  ]
 }
 `
 
@@ -433,4 +489,7 @@ var (
 	ExpectedInstancesSlice          = []instances.Instance{Instance1}
 	ExpectedInstanceInterfacesSlice = []instances.Interface{InstanceInterface1}
 	ExpectedSecurityGroupsSlice     = []gcorecloud.ItemIDName{SecurityGroup1}
+	Tasks1                          = tasks.TaskResults{
+		Tasks: []tasks.TaskID{"50f53a35-42ed-40c4-82b2-5a37fb3e00bc"},
+	}
 )

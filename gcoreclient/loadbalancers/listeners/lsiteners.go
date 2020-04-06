@@ -33,7 +33,7 @@ var listenerListSubCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "lblisteners", "")
+		client, err := utils.BuildClient(c, "lblisteners", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -85,7 +85,7 @@ var listenerCreateSubCommand = cli.Command{
 		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "lblisteners", "")
+		client, err := utils.BuildClient(c, "lblisteners", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -137,7 +137,7 @@ var listenerGetSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
 		}
-		client, err := utils.BuildClient(c, "lblisteners", "")
+		client, err := utils.BuildClient(c, "lblisteners", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -163,7 +163,7 @@ var listenerDeleteSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
 		}
-		client, err := utils.BuildClient(c, "lblisteners", "")
+		client, err := utils.BuildClient(c, "lblisteners", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -209,7 +209,7 @@ var listenerUpdateSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "update")
 			return err
 		}
-		client, err := utils.BuildClient(c, "lblisteners", "")
+		client, err := utils.BuildClient(c, "lblisteners", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)

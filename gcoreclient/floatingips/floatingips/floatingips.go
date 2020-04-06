@@ -26,7 +26,7 @@ var floatingIPListSubCommand = cli.Command{
 	Usage:    "Floating ips list",
 	Category: "floatingip",
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "floatingips", "")
+		client, err := utils.BuildClient(c, "floatingips", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -59,7 +59,7 @@ var floatingIPCreateSubCommand = cli.Command{
 		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "floatingips", "")
+		client, err := utils.BuildClient(c, "floatingips", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -113,7 +113,7 @@ var floatingIPGetSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
 		}
-		client, err := utils.BuildClient(c, "floatingips", "")
+		client, err := utils.BuildClient(c, "floatingips", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -138,7 +138,7 @@ var floatingIPDeleteSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
 		}
-		client, err := utils.BuildClient(c, "floatingips", "")
+		client, err := utils.BuildClient(c, "floatingips", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -189,7 +189,7 @@ var floatingIPAssignSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "update")
 			return err
 		}
-		client, err := utils.BuildClient(c, "floatingips", "")
+		client, err := utils.BuildClient(c, "floatingips", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -227,7 +227,7 @@ var floatingIPUnAssignSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "update")
 			return err
 		}
-		client, err := utils.BuildClient(c, "floatingips", "")
+		client, err := utils.BuildClient(c, "floatingips", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)

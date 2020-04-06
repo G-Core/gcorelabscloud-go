@@ -39,7 +39,7 @@ var resourceMetadataSubCommand = cli.Command{
 			return err
 		}
 
-		client, err := utils.BuildClient(c, "heat", "")
+		client, err := utils.BuildClient(c, "heat", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -78,7 +78,7 @@ var resourceSignalSubCommand = cli.Command{
 			return err
 		}
 
-		client, err := utils.BuildClient(c, "heat", "")
+		client, err := utils.BuildClient(c, "heat", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -112,7 +112,7 @@ var resourceGetSubCommand = cli.Command{
 			return err
 		}
 
-		client, err := utils.BuildClient(c, "heat", "")
+		client, err := utils.BuildClient(c, "heat", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -188,7 +188,7 @@ var resourceListSubCommand = cli.Command{
 			return err
 		}
 
-		client, err := utils.BuildClient(c, "heat", "")
+		client, err := utils.BuildClient(c, "heat", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)

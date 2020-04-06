@@ -177,7 +177,7 @@ var lbpoolListSubCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "lbpools", "")
+		client, err := utils.BuildClient(c, "lbpools", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -209,7 +209,7 @@ var lbpoolGetSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
 		}
-		client, err := utils.BuildClient(c, "lbpools", "")
+		client, err := utils.BuildClient(c, "lbpools", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -235,7 +235,7 @@ var lbpoolDeleteSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
 		}
-		client, err := utils.BuildClient(c, "lbpools", "")
+		client, err := utils.BuildClient(c, "lbpools", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -413,7 +413,7 @@ var lbpoolCreateSubCommand = cli.Command{
 		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "lbpools", "")
+		client, err := utils.BuildClient(c, "lbpools", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -538,7 +538,7 @@ var lbpoolCreateMemberSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "create")
 			return err
 		}
-		client, err := utils.BuildClient(c, "lbpools", "")
+		client, err := utils.BuildClient(c, "lbpools", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -599,7 +599,7 @@ var lbpoolDeleteMemberSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
 		}
-		client, err := utils.BuildClient(c, "lbpools", "")
+		client, err := utils.BuildClient(c, "lbpools", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -753,7 +753,7 @@ var lbpoolUpdateSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "update")
 			return err
 		}
-		client, err := utils.BuildClient(c, "lbpools", "")
+		client, err := utils.BuildClient(c, "lbpools", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)

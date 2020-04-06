@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -132,4 +134,19 @@ func NativeMapToStruct(nativeMap interface{}, obj interface{}) error {
 		return err
 	}
 	return nil
+}
+
+func FailOnErrorF(err error, msg string, args ...interface{}) {
+	if err != nil {
+		log.Fatalf("%s: %+v", fmt.Sprintf(msg, args...), err)
+	}
+}
+
+func ContainsString(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }
