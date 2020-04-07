@@ -181,7 +181,7 @@ var clusterUpgradeSubCommand = cli.Command{
 	Action: func(c *cli.Context) error {
 		clusterID, err := flags.GetFirstArg(c, clusterIDText)
 		if err != nil {
-			_ = cli.ShowCommandHelp(c, "resize")
+			_ = cli.ShowCommandHelp(c, "upgrade")
 			return err
 		}
 		client, err := utils.BuildClient(c, "magnum", "", "")

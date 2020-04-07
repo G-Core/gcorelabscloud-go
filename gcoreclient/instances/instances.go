@@ -554,11 +554,11 @@ var instanceGetCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		task, err := instances.Get(client, instanceID).Extract()
+		instance, err := instances.Get(client, instanceID).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
-		utils.ShowResults(task, c.String("format"))
+		utils.ShowResults(instance, c.String("format"))
 		return nil
 	},
 }
@@ -628,6 +628,202 @@ var instanceDeleteCommand = cli.Command{
 	},
 }
 
+var instanceStartCommand = cli.Command{
+	Name:      "start",
+	Usage:     "Start instance",
+	ArgsUsage: "<instance_id>",
+	Category:  "instance",
+	Action: func(c *cli.Context) error {
+		instanceID, err := flags.GetFirstArg(c, instanceIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "start")
+			return err
+		}
+		client, err := utils.BuildClient(c, "instances", "", "")
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		instance, err := instances.Start(client, instanceID).Extract()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		utils.ShowResults(instance, c.String("format"))
+		return nil
+	},
+}
+
+var instanceStopCommand = cli.Command{
+	Name:      "stop",
+	Usage:     "Stop instance",
+	ArgsUsage: "<instance_id>",
+	Category:  "instance",
+	Action: func(c *cli.Context) error {
+		instanceID, err := flags.GetFirstArg(c, instanceIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "stop")
+			return err
+		}
+		client, err := utils.BuildClient(c, "instances", "", "")
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		instance, err := instances.Stop(client, instanceID).Extract()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		utils.ShowResults(instance, c.String("format"))
+		return nil
+	},
+}
+
+var instancePowerCycleCommand = cli.Command{
+	Name:      "powercycle",
+	Usage:     "Stop and start instance. Aka hard reboot",
+	ArgsUsage: "<instance_id>",
+	Category:  "instance",
+	Action: func(c *cli.Context) error {
+		instanceID, err := flags.GetFirstArg(c, instanceIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "powercycle")
+			return err
+		}
+		client, err := utils.BuildClient(c, "instances", "", "")
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		instance, err := instances.PowerCycle(client, instanceID).Extract()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		utils.ShowResults(instance, c.String("format"))
+		return nil
+	},
+}
+
+var instanceRebootCommand = cli.Command{
+	Name:      "reboot",
+	Usage:     "Reboot instance",
+	ArgsUsage: "<instance_id>",
+	Category:  "instance",
+	Action: func(c *cli.Context) error {
+		instanceID, err := flags.GetFirstArg(c, instanceIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "reboot")
+			return err
+		}
+		client, err := utils.BuildClient(c, "instances", "", "")
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		instance, err := instances.Reboot(client, instanceID).Extract()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		utils.ShowResults(instance, c.String("format"))
+		return nil
+	},
+}
+
+var instanceSuspendCommand = cli.Command{
+	Name:      "suspend",
+	Usage:     "Suspend instance",
+	ArgsUsage: "<instance_id>",
+	Category:  "instance",
+	Action: func(c *cli.Context) error {
+		instanceID, err := flags.GetFirstArg(c, instanceIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "suspend")
+			return err
+		}
+		client, err := utils.BuildClient(c, "instances", "", "")
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		instance, err := instances.Suspend(client, instanceID).Extract()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		utils.ShowResults(instance, c.String("format"))
+		return nil
+	},
+}
+
+var instanceResumeCommand = cli.Command{
+	Name:      "resume",
+	Usage:     "Resume instance",
+	ArgsUsage: "<instance_id>",
+	Category:  "instance",
+	Action: func(c *cli.Context) error {
+		instanceID, err := flags.GetFirstArg(c, instanceIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "resume")
+			return err
+		}
+		client, err := utils.BuildClient(c, "instances", "", "")
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		instance, err := instances.Resume(client, instanceID).Extract()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		utils.ShowResults(instance, c.String("format"))
+		return nil
+	},
+}
+
+var instanceResizeCommand = cli.Command{
+	Name:      "resize",
+	Usage:     "Resize instance",
+	ArgsUsage: "<instance_id>",
+	Category:  "instance",
+	Flags: append([]cli.Flag{
+		&cli.StringSliceFlag{
+			Name:     "flavor",
+			Usage:    "instance flavor id",
+			Required: true,
+		},
+	}, flags.WaitCommandFlags...),
+	Action: func(c *cli.Context) error {
+		instanceID, err := flags.GetFirstArg(c, instanceIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "resize")
+			return err
+		}
+		client, err := utils.BuildClient(c, "instances", "", "")
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		opts := instances.ChangeFlavorOpts{FlavorID: c.String("flavor")}
+
+		results, err := instances.Resize(client, instanceID, opts).Extract()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		return utils.WaitTaskAndShowResult(c, client, results, true, func(task tasks.TaskID) (interface{}, error) {
+			instance, err := instances.Get(client, instanceID).Extract()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get instance with ID: %s. Error: %w", instanceID, err)
+			}
+			return instance, nil
+		})
+	},
+}
+
 var InstanceCommands = cli.Command{
 	Name:  "instance",
 	Usage: "GCloud instances API",
@@ -636,6 +832,13 @@ var InstanceCommands = cli.Command{
 		&instanceListCommand,
 		&instanceCreateCommandV2,
 		&instanceDeleteCommand,
+		&instanceStartCommand,
+		&instanceStopCommand,
+		&instancePowerCycleCommand,
+		&instanceRebootCommand,
+		&instanceSuspendCommand,
+		&instanceResumeCommand,
+		&instanceResizeCommand,
 		{
 			Name:  "interface",
 			Usage: "Instance interfaces",

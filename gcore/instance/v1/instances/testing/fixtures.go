@@ -307,6 +307,14 @@ const CreateResponse = `
 }
 `
 
+const ResizeResponse = `
+{
+  "tasks": [
+    "50f53a35-42ed-40c4-82b2-5a37fb3e00bc"
+  ]
+}
+`
+
 const DeleteResponse = `
 {
   "tasks": [

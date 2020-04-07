@@ -138,6 +138,20 @@ func (opts SecurityGroupOpts) ToSecurityGroupActionMap() (map[string]interface{}
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
+// ChangeFlavorOptsBuilder builds parameters or change flavor request.
+type ChangeFlavorOptsBuilder interface {
+	ToChangeFlavorActionMap() (map[string]interface{}, error)
+}
+
+type ChangeFlavorOpts struct {
+	FlavorID string `json:"flavor_id" required:"true"`
+}
+
+// ToChangeFlavorActionMap builds a request body from ChangeFlavorOpts.
+func (opts ChangeFlavorOpts) ToChangeFlavorActionMap() (map[string]interface{}, error) {
+	return gcorecloud.BuildRequestBody(opts, "")
+}
+
 func List(client *gcorecloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
 	url := listURL(client)
 	if opts != nil {
@@ -262,7 +276,7 @@ func UnAssignSecurityGroup(client *gcorecloud.ServiceClient, id string, opts Sec
 }
 
 // Create creates an instance.
-func Create(client *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r CreateResult) {
+func Create(client *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r TasksResult) {
 	b, err := opts.ToInstanceCreateMap()
 	if err != nil {
 		r.Err = err
@@ -276,7 +290,7 @@ func Create(client *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r CreateR
 	return
 }
 
-func Delete(client *gcorecloud.ServiceClient, instanceID string, opts DeleteOptsBuilder) (r DeleteResult) {
+func Delete(client *gcorecloud.ServiceClient, instanceID string, opts DeleteOptsBuilder) (r TasksResult) {
 	url := deleteURL(client, instanceID)
 	if opts != nil {
 		query, err := opts.ToInstanceDeleteQuery()
@@ -288,6 +302,81 @@ func Delete(client *gcorecloud.ServiceClient, instanceID string, opts DeleteOpts
 	}
 	var resp *http.Response
 	resp, r.Err = client.DeleteWithResponse(url, &r.Body, nil)
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+	return
+}
+
+// Start instance.
+func Start(client *gcorecloud.ServiceClient, id string) (r UpdateResult) {
+	var resp *http.Response
+	resp, r.Err = client.Post(startInstanceURL(client, id), nil, &r.Body, nil)
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+	return
+}
+
+// Stop instance.
+func Stop(client *gcorecloud.ServiceClient, id string) (r UpdateResult) {
+	var resp *http.Response
+	resp, r.Err = client.Post(stopInstanceURL(client, id), nil, &r.Body, nil)
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+	return
+}
+
+// PowerCycle instance.
+func PowerCycle(client *gcorecloud.ServiceClient, id string) (r UpdateResult) {
+	var resp *http.Response
+	resp, r.Err = client.Post(powerCycleInstanceURL(client, id), nil, &r.Body, nil)
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+	return
+}
+
+// Reboot instance.
+func Reboot(client *gcorecloud.ServiceClient, id string) (r UpdateResult) {
+	var resp *http.Response
+	resp, r.Err = client.Post(rebootInstanceURL(client, id), nil, &r.Body, nil)
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+	return
+}
+
+// Suspend instance.
+func Suspend(client *gcorecloud.ServiceClient, id string) (r UpdateResult) {
+	var resp *http.Response
+	resp, r.Err = client.Post(suspendInstanceURL(client, id), nil, &r.Body, nil)
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+	return
+}
+
+// Resume instance.
+func Resume(client *gcorecloud.ServiceClient, id string) (r UpdateResult) {
+	var resp *http.Response
+	resp, r.Err = client.Post(resumeInstanceURL(client, id), nil, &r.Body, nil)
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+	return
+}
+
+// Resize instance.
+func Resize(client *gcorecloud.ServiceClient, id string, opts ChangeFlavorOptsBuilder) (r TasksResult) {
+	b, err := opts.ToChangeFlavorActionMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	var resp *http.Response
+	resp, r.Err = client.Post(changeFlavorInstanceURL(client, id), b, &r.Body, nil)
 	defer func() {
 		_ = resp.Body.Close()
 	}()

@@ -54,6 +54,34 @@ func prepareUnAssignSecurityGroupsTestURL(id string) string {
 	return prepareGetActionTestURLParams("v1", id, "delsecuritygroup")
 }
 
+func prepareStartTestURL(id string) string {
+	return prepareGetActionTestURLParams("v1", id, "start")
+}
+
+func prepareStopTestURL(id string) string {
+	return prepareGetActionTestURLParams("v1", id, "stop")
+}
+
+func preparePowerCycleTestURL(id string) string {
+	return prepareGetActionTestURLParams("v1", id, "powercycle")
+}
+
+func prepareRebootTestURL(id string) string {
+	return prepareGetActionTestURLParams("v1", id, "reboot")
+}
+
+func prepareSuspendTestURL(id string) string {
+	return prepareGetActionTestURLParams("v1", id, "suspend")
+}
+
+func prepareResumeTestURL(id string) string {
+	return prepareGetActionTestURLParams("v1", id, "resume")
+}
+
+func prepareChangeFlavorTestURL(id string) string {
+	return prepareGetActionTestURLParams("v1", id, "changeflavor")
+}
+
 func prepareGetTestURL(id string) string {
 	return prepareGetTestURLParams("v1", fake.ProjectID, fake.RegionID, id)
 }
@@ -345,4 +373,167 @@ func TestDelete(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 
+}
+
+func TestStart(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareStartTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Accept", "application/json")
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, GetResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("instances", "v1")
+	instance, err := instances.Start(client, instanceID).Extract()
+	require.NoError(t, err)
+	require.Equal(t, Instance1, *instance)
+}
+
+func TestStop(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareStopTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Accept", "application/json")
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, GetResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("instances", "v1")
+	instance, err := instances.Stop(client, instanceID).Extract()
+	require.NoError(t, err)
+	require.Equal(t, Instance1, *instance)
+}
+
+func TestPowerCycle(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(preparePowerCycleTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Accept", "application/json")
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, GetResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("instances", "v1")
+	instance, err := instances.PowerCycle(client, instanceID).Extract()
+	require.NoError(t, err)
+	require.Equal(t, Instance1, *instance)
+}
+
+func TestReboot(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareRebootTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Accept", "application/json")
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, GetResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("instances", "v1")
+	instance, err := instances.Reboot(client, instanceID).Extract()
+	require.NoError(t, err)
+	require.Equal(t, Instance1, *instance)
+}
+
+func TestSuspend(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareSuspendTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Accept", "application/json")
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, GetResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("instances", "v1")
+	instance, err := instances.Suspend(client, instanceID).Extract()
+	require.NoError(t, err)
+	require.Equal(t, Instance1, *instance)
+}
+
+func TestResume(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareResumeTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Accept", "application/json")
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, GetResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("instances", "v1")
+	instance, err := instances.Resume(client, instanceID).Extract()
+	require.NoError(t, err)
+	require.Equal(t, Instance1, *instance)
+}
+
+func TestResize(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareChangeFlavorTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Accept", "application/json")
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, ResizeResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	opts := instances.ChangeFlavorOpts{FlavorID: Instance1.Flavor.FlavorID}
+
+	client := fake.ServiceTokenClient("instances", "v1")
+	tasks, err := instances.Resize(client, instanceID, opts).Extract()
+	require.NoError(t, err)
+	require.Equal(t, Tasks1, *tasks)
 }

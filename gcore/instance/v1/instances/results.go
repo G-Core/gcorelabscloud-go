@@ -61,6 +61,18 @@ type DeleteResult struct {
 	commonResult
 }
 
+// TasksResult represents the operation result that returns tasks
+type TasksResult struct {
+	commonResult
+}
+
+// Extract is a function that accepts a result and extracts a task resource.
+func (r TasksResult) Extract() (*tasks.TaskResults, error) {
+	var t tasks.TaskResults
+	err := r.ExtractInto(&t)
+	return &t, err
+}
+
 // SecurityGroupActionResult represents the result of a actions operation(no content)
 type SecurityGroupActionResult struct {
 	gcorecloud.ErrResult

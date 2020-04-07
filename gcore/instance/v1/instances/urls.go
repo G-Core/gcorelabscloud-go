@@ -44,6 +44,34 @@ func deleteSecurityGroupsURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceActionURL(c, id, "delsecuritygroup")
 }
 
+func startInstanceURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "start")
+}
+
+func stopInstanceURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "stop")
+}
+
+func powerCycleInstanceURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "powercycle")
+}
+
+func rebootInstanceURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "reboot")
+}
+
+func suspendInstanceURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "suspend")
+}
+
+func resumeInstanceURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "resume")
+}
+
+func changeFlavorInstanceURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "changeflavor")
+}
+
 func createURL(c *gcorecloud.ServiceClient) string {
 	return rootURL(c)
 }
