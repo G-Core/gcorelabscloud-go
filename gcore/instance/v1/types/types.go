@@ -50,6 +50,14 @@ func (vs VolumeSource) List() []VolumeSource {
 	return []VolumeSource{NewVolume, Image, Snapshot}
 }
 
+func (vs VolumeSource) Bootable() bool {
+	switch vs {
+	case Image, Snapshot:
+		return true
+	}
+	return false
+}
+
 func (vs VolumeSource) StringList() []string {
 	var s []string
 	for _, v := range vs.List() {

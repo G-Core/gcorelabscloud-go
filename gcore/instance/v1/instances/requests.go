@@ -79,7 +79,7 @@ func (opts *CreateVolumeOpts) Validate() error {
 
 type CreateNewInterfaceFloatingIPOpts struct {
 	Source             types.FloatingIPSource `json:"source" validate:"required,floating-ip-source"`
-	ExistingFloatingID string                 `json:"existing_floating_id" validate:"rfe=Source:existing,omitempty,ip"`
+	ExistingFloatingID string                 `json:"existing_floating_id" validate:"rfe=Source:existing,sfe=Source:new,omitempty,ip"`
 }
 
 // Validate

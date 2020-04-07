@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io/ioutil"
+	"sort"
 	"strings"
 
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
@@ -55,9 +56,14 @@ func getInstanceVolumes(c *cli.Context) ([]instances.CreateVolumeOpts, error) {
 	res := make([]instances.CreateVolumeOpts, 0, len(volumeSources))
 
 	for idx, s := range volumeSources {
+		source := types.VolumeSource(s)
+		bootIndex := utils.IntFromIndex(volumeBootIndexes, idx, 0)
+		if !source.Bootable() {
+			bootIndex = -1
+		}
 		opts := instances.CreateVolumeOpts{
-			Source:    types.VolumeSource(s),
-			BootIndex: utils.IntFromIndex(volumeBootIndexes, idx, 0),
+			Source:    source,
+			BootIndex: bootIndex,
 			Size:      utils.IntFromIndex(volumeSizes, idx, 0),
 			TypeName: func(idx int) volumes.VolumeType {
 				if idx < len(volumeTypes) {
@@ -78,6 +84,23 @@ func getInstanceVolumes(c *cli.Context) ([]instances.CreateVolumeOpts, error) {
 
 		res = append(res, opts)
 
+	}
+
+	// adjust boot order
+	sort.Slice(res, func(i, j int) bool {
+		return res[i].BootIndex < res[j].BootIndex
+	})
+
+	minOrder := 0
+
+	for _, opts := range res {
+		if opts.BootIndex < 0 {
+			continue
+		}
+		if opts.BootIndex > minOrder {
+			opts.BootIndex = minOrder
+		}
+		minOrder++
 	}
 
 	return res, nil
@@ -420,7 +443,7 @@ var instanceCreateCommandV2 = cli.Command{
 		},
 		&cli.StringSliceFlag{
 			Name:     "interface-floating-ip",
-			Usage:    "instance interface existing floating ip",
+			Usage:    "instance interface existing floating ip. Required when --interface-floating-source set as `existing`",
 			Required: false,
 		},
 		&cli.StringSliceFlag{
@@ -429,10 +452,9 @@ var instanceCreateCommandV2 = cli.Command{
 			Required: false,
 		},
 		&cli.StringSliceFlag{
-			Name:        "metadata",
-			Usage:       "instance metadata. --metadata one=two --metadata three=four",
-			DefaultText: "nil",
-			Required:    false,
+			Name:     "metadata",
+			Usage:    "instance metadata. Example: --metadata one=two --metadata three=four",
+			Required: false,
 		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
@@ -505,11 +527,11 @@ var instanceCreateCommandV2 = cli.Command{
 			}
 			instanceID, err := instances.ExtractInstanceIDFromTask(taskInfo)
 			if err != nil {
-				return nil, fmt.Errorf("cannot retrieve image ID from task info: %w", err)
+				return nil, fmt.Errorf("cannot retrieve instance ID from task info: %w", err)
 			}
-			instance, err := instances.Get(clientV2, instanceID).Extract()
+			instance, err := instances.Get(clientV1, instanceID).Extract()
 			if err != nil {
-				return nil, fmt.Errorf("cannot get image with ID: %s. Error: %w", instanceID, err)
+				return nil, fmt.Errorf("cannot get instance with ID: %s. Error: %w", instanceID, err)
 			}
 			return instance, nil
 		})
