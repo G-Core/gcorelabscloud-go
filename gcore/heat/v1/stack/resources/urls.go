@@ -31,3 +31,7 @@ func listURL(c *gcorecloud.ServiceClient, stackID string) string {
 func getURL(c *gcorecloud.ServiceClient, stackID, resourceName string) string {
 	return resourceURL(c, stackID, resourceName)
 }
+
+func markUnhealthyURL(c *gcorecloud.ServiceClient, stackID, resourceName string) string {
+	return resourceURL(c, stackID, resourceName)
+}

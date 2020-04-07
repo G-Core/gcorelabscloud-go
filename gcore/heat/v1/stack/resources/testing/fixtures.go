@@ -65,6 +65,12 @@ var GetResponse = `
 }
 `
 
+var MarkUnhealthyRequest = `
+{
+	"mark_unhealthy": true
+}
+`
+
 var (
 	Metadata = map[string]interface{}{
 		"some_key":       "some_value",

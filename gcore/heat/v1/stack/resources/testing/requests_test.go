@@ -44,6 +44,10 @@ func prepareGetResourceTestURL(stackID, resourceName string) string {
 	return prepareResourceTestURLParams(fake.ProjectID, fake.RegionID, stackID, resourceName)
 }
 
+func prepareMarkUnhealthyResourceTestURL(stackID, resourceName string) string {
+	return prepareResourceTestURLParams(fake.ProjectID, fake.RegionID, stackID, resourceName)
+}
+
 func prepareListResourcesTestURL(stackID string) string {
 	return prepareResourcesTestURLParams(fake.ProjectID, fake.RegionID, stackID)
 }
@@ -173,4 +177,32 @@ func TestListAll(t *testing.T) {
 	require.Equal(t, ExpectedStackResourceList1, actual)
 	th.AssertNoErr(t, err)
 
+}
+
+func TestMarkUnhealthyResource(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareMarkUnhealthyResourceTestURL(stackID, resourceName), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "PATCH")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		w.Header().Add("Content-Type", "application/json")
+		th.TestJSONRequest(t, r, MarkUnhealthyRequest)
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, GetResponse)
+		if err != nil {
+			log.Error(err)
+		}
+
+	})
+
+	opts := resources.MarkUnhealthyOpts{
+		MarkUnhealthy:        true,
+		ResourceStatusReason: "",
+	}
+
+	client := fake.ServiceTokenClient("heat", "v1")
+	err := resources.MarkUnhealthy(client, stackID, resourceName, opts).ExtractErr()
+	require.NoError(t, err)
 }

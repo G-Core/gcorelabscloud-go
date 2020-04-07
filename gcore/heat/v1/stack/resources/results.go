@@ -38,6 +38,11 @@ type SignalResult struct {
 	gcorecloud.ErrResult
 }
 
+// MarkUnhealthyResult represents the result of a mark unhealthy operation.
+type MarkUnhealthyResult struct {
+	gcorecloud.ErrResult
+}
+
 // Extract is a function that accepts a result and extracts a heat resource metadata.
 func (r MetadataResult) Extract() (map[string]interface{}, error) {
 	var s map[string]interface{}

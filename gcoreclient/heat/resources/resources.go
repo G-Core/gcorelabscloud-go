@@ -126,6 +126,57 @@ var resourceGetSubCommand = cli.Command{
 	},
 }
 
+var resourceMarkUnhealthySubCommand = cli.Command{
+	Name:      "unhealthy",
+	Usage:     "Stack resource mark unhealthy",
+	ArgsUsage: "<resource_name>",
+	Category:  "heat",
+	Flags: []cli.Flag{
+		&cli.StringFlag{
+			Name:     "stack",
+			Aliases:  []string{"s"},
+			Usage:    "Stack ID",
+			Required: true,
+		},
+		&cli.BoolFlag{
+			Name:     "mark-unhealthy",
+			Aliases:  []string{"m"},
+			Usage:    "Either mark stack resource as unhealthy or not",
+			Required: false,
+		},
+		&cli.StringFlag{
+			Name:     "resource-status-reason",
+			Aliases:  []string{"r"},
+			Usage:    "Stack resource change status reason",
+			Required: false,
+		},
+	},
+	Action: func(c *cli.Context) error {
+		resourceName, err := flags.GetFirstArg(c, resourceNameText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "unhealthy")
+			return err
+		}
+
+		client, err := utils.BuildClient(c, "heat", "", "")
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		opts := resources.MarkUnhealthyOpts{
+			MarkUnhealthy:        c.Bool("mark-unhealthy"),
+			ResourceStatusReason: c.String("resource-status-reason"),
+		}
+
+		err = resources.MarkUnhealthy(client, c.String("stack"), resourceName, opts).ExtractErr()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		return nil
+	},
+}
+
 var resourceListSubCommand = cli.Command{
 	Name:      "list",
 	Usage:     "Stack resources",
@@ -232,5 +283,6 @@ var ResourceCommands = cli.Command{
 		&resourceSignalSubCommand,
 		&resourceGetSubCommand,
 		&resourceListSubCommand,
+		&resourceMarkUnhealthySubCommand,
 	},
 }
