@@ -23,7 +23,7 @@ var resourceMetadataSubCommand = cli.Command{
 	Name:      "metadata",
 	Usage:     "Get stack resource metadata",
 	ArgsUsage: "<resource_name>",
-	Category:  "heat",
+	Category:  "resource",
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:     "stack",
@@ -57,7 +57,7 @@ var resourceSignalSubCommand = cli.Command{
 	Name:      "signal",
 	Usage:     "Send stack resource signal",
 	ArgsUsage: "<resource_name>",
-	Category:  "heat",
+	Category:  "resource",
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:     "stack",
@@ -96,7 +96,7 @@ var resourceGetSubCommand = cli.Command{
 	Name:      "show",
 	Usage:     "Stack resource",
 	ArgsUsage: "<resource_name>",
-	Category:  "heat",
+	Category:  "resource",
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:     "stack",
@@ -130,7 +130,7 @@ var resourceMarkUnhealthySubCommand = cli.Command{
 	Name:      "unhealthy",
 	Usage:     "Stack resource mark unhealthy",
 	ArgsUsage: "<resource_name>",
-	Category:  "heat",
+	Category:  "resource",
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:     "stack",
@@ -181,7 +181,7 @@ var resourceListSubCommand = cli.Command{
 	Name:      "list",
 	Usage:     "Stack resources",
 	ArgsUsage: "<stack_id>",
-	Category:  "heat",
+	Category:  "resource",
 	Flags: []cli.Flag{
 		&cli.StringSliceFlag{
 			Name:     "type",

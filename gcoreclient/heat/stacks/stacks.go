@@ -1,30 +1,118 @@
 package stacks
 
 import (
+	"fmt"
+	"strings"
+
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/heat/v1/stack/stacks"
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/heat/v1/stack/stacks/types"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/flags"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/utils"
 
 	"github.com/urfave/cli/v2"
 )
 
-var stackIDText = "stack_id is mandatory argument"
+var (
+	stackIDText = "stack_id is mandatory argument"
+	sortKeyList = types.SortKey("").StringList()
+	sortDirList = types.SortDir("").StringList()
+)
 
 var stackListSubCommand = cli.Command{
 	Name:     "list",
 	Usage:    "Heat stacks list",
 	Category: "stack",
+	Flags: []cli.Flag{
+		&cli.StringFlag{
+			Name:     "id",
+			Usage:    "stack id",
+			Required: false,
+		},
+		&cli.StringFlag{
+			Name:     "status",
+			Usage:    "stack status",
+			Required: false,
+		},
+		&cli.StringFlag{
+			Name:     "name",
+			Usage:    "stack name",
+			Required: false,
+		},
+		&cli.StringFlag{
+			Name:     "tags",
+			Usage:    "filter stack by tags. comma separated. AND boolean",
+			Required: false,
+		},
+		&cli.StringFlag{
+			Name:     "tags-any",
+			Usage:    "filter stack by tags. comma separated. OR boolean",
+			Required: false,
+		},
+		&cli.StringFlag{
+			Name:     "not-tags",
+			Usage:    "filter stack by tags. excluding. comma separated. AND boolean",
+			Required: false,
+		},
+		&cli.StringFlag{
+			Name:     "not-tags-any",
+			Usage:    "filter stack by tags. excluding. comma separated. OR boolean",
+			Required: false,
+		},
+		&cli.BoolFlag{
+			Name:     "show-deleted",
+			Usage:    "show deleted stacks",
+			Required: false,
+		},
+		&cli.BoolFlag{
+			Name:     "show-nested",
+			Usage:    "show nested stacks",
+			Required: false,
+		},
+		&cli.BoolFlag{
+			Name:     "all-tenants",
+			Usage:    "show stacks for all tenants",
+			Required: false,
+		},
+		&cli.GenericFlag{
+			Name: "sort-key",
+			Value: &utils.EnumValue{
+				Enum: sortKeyList,
+			},
+			Usage:    fmt.Sprintf("output in %s", strings.Join(sortKeyList, ", ")),
+			Required: false,
+		},
+		&cli.GenericFlag{
+			Name: "sort-dir",
+			Value: &utils.EnumValue{
+				Enum: sortDirList,
+			},
+			Usage:    fmt.Sprintf("output in %s", strings.Join(sortDirList, ", ")),
+			Required: false,
+		},
+	},
 	Action: func(c *cli.Context) error {
 		client, err := utils.BuildClient(c, "heat", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		pages, err := stacks.List(client).AllPages()
-		if err != nil {
-			return cli.NewExitError(err, 1)
+
+		opts := stacks.ListOpts{
+			ID:          c.String("id"),
+			Status:      c.String("status"),
+			Name:        c.String("name"),
+			SortKey:     types.SortKey(c.String("sort-key")),
+			SortDir:     types.SortDir(c.String("sort-dir")),
+			AllTenants:  c.Bool("show-tenants"),
+			ShowDeleted: c.Bool("show-deleted"),
+			ShowNested:  c.Bool("show-nested"),
+			Tags:        c.String("tags"),
+			TagsAny:     c.String("tags-any"),
+			NotTags:     c.String("not-tags"),
+			NotTagsAny:  c.String("not-tags-any"),
 		}
-		results, err := stacks.ExtractStacks(pages)
+
+		results, err := stacks.ListAll(client, opts)
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -35,7 +123,7 @@ var stackListSubCommand = cli.Command{
 
 var stackGetSubCommand = cli.Command{
 	Name:      "show",
-	Usage:     "Show heat stacks",
+	Usage:     "Show heat stack",
 	ArgsUsage: "<stack_id>",
 	Category:  "stack",
 	Action: func(c *cli.Context) error {
