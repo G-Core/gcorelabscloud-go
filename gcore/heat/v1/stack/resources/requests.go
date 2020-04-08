@@ -36,14 +36,14 @@ type ListOptsBuilder interface {
 
 // ListOpts allows the filtering and sorting of paginated collections through the API.
 type ListOpts struct {
-	Type               []string                    `q:"type"`
-	Name               []string                    `q:"name"`
-	Status             []types.StackResourceStatus `q:"status"`
-	Action             []types.StackResourceAction `q:"name"`
-	LogicalResourceID  []string                    `q:"id"`
-	PhysicalResourceID []string                    `q:"physical_resource_id"`
-	NestedDepth        int                         `q:"nested_depth"`
-	WithDetail         bool                        `q:"with_detail"`
+	Type               string                    `q:"type"`
+	Name               string                    `q:"name"`
+	Status             types.StackResourceStatus `q:"status"`
+	Action             types.StackResourceAction `q:"name"`
+	LogicalResourceID  string                    `q:"id"`
+	PhysicalResourceID string                    `q:"physical_resource_id"`
+	NestedDepth        int                       `q:"nested_depth"`
+	WithDetail         bool                      `q:"with_detail"`
 }
 
 // ToListenerListQuery formats a ListOpts into a query string.

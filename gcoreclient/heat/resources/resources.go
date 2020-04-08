@@ -183,31 +183,31 @@ var resourceListSubCommand = cli.Command{
 	ArgsUsage: "<stack_id>",
 	Category:  "resource",
 	Flags: []cli.Flag{
-		&cli.StringSliceFlag{
+		&cli.StringFlag{
 			Name:     "type",
 			Aliases:  []string{"t"},
 			Usage:    "Stack resource type",
 			Required: false,
 		},
-		&cli.StringSliceFlag{
+		&cli.StringFlag{
 			Name:     "name",
 			Aliases:  []string{"n"},
 			Usage:    "Stack resource name",
 			Required: false,
 		},
-		&cli.StringSliceFlag{
+		&cli.StringFlag{
 			Name:     "physical-resource-id",
 			Usage:    "Stack physical resource id",
 			Required: false,
 		},
-		&cli.StringSliceFlag{
+		&cli.StringFlag{
 			Name:     "logical-resource-id",
 			Usage:    "Stack logical resource id",
 			Required: false,
 		},
 		&cli.GenericFlag{
 			Name: "status",
-			Value: &utils.EnumStringSliceValue{
+			Value: &utils.EnumValue{
 				Enum: stackResourceStatuses,
 			},
 			Usage:    fmt.Sprintf("output in %s", strings.Join(stackResourceStatuses, ", ")),
@@ -215,7 +215,7 @@ var resourceListSubCommand = cli.Command{
 		},
 		&cli.GenericFlag{
 			Name: "action",
-			Value: &utils.EnumStringSliceValue{
+			Value: &utils.EnumValue{
 				Enum: stackResourceActions,
 			},
 			Usage:    fmt.Sprintf("output in %s", strings.Join(stackResourceActions, ", ")),
@@ -245,23 +245,13 @@ var resourceListSubCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
-		var statuses []types.StackResourceStatus
-		var actions []types.StackResourceAction
-
-		for _, s := range utils.GetEnumStringSliceValue(c, "status") {
-			statuses = append(statuses, types.StackResourceStatus(s))
-		}
-		for _, a := range utils.GetEnumStringSliceValue(c, "action") {
-			actions = append(actions, types.StackResourceAction(a))
-		}
-
 		opts := resources.ListOpts{
-			Type:               c.StringSlice("type"),
-			Name:               c.StringSlice("name"),
-			Status:             statuses,
-			Action:             actions,
-			LogicalResourceID:  c.StringSlice("logical-resource-id"),
-			PhysicalResourceID: c.StringSlice("physical-resource-id"),
+			Type:               c.String("type"),
+			Name:               c.String("name"),
+			Status:             types.StackResourceStatus(c.String("status")),
+			Action:             types.StackResourceAction(c.String("action")),
+			LogicalResourceID:  c.String("logical-resource-id"),
+			PhysicalResourceID: c.String("physical-resource-id"),
 			NestedDepth:        c.Int("nested-depth"),
 			WithDetail:         c.Bool("with-detail"),
 		}
