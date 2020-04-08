@@ -39,8 +39,8 @@ type DeleteOptsBuilder interface {
 // DeleteOpts. Set parameters for delete operation
 type DeleteOpts struct {
 	Volumes         []string `q:"volumes" validate:"omitempty,dive,uuid4" delimiter:"comma"`
-	DeleteFloatings bool     `q:"delete_floatings" validate:"omitempty,allowed_without=FloatingIPs"`
-	FloatingIPs     []string `q:"floatings" validate:"omitempty,allowed_without=DeleteFloatings,dive,uuid4" delimiter:"comma"`
+	DeleteFloatings bool     `q:"delete_floatings" validate:"omitempty,allowed-without=FloatingIPs"`
+	FloatingIPs     []string `q:"floatings" validate:"omitempty,allowed-without=DeleteFloatings,dive,uuid4" delimiter:"comma"`
 }
 
 // ToInstanceDeleteQuery formats a DeleteOpts into a query string.

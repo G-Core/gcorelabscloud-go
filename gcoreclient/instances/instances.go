@@ -600,7 +600,7 @@ var instanceDeleteCommand = cli.Command{
 		opts := instances.DeleteOpts{
 			Volumes:         c.StringSlice("volume-id"),
 			DeleteFloatings: c.Bool("delete-floating-ips"),
-			FloatingIPs:     c.StringSlice("volume-id"),
+			FloatingIPs:     c.StringSlice("floating-ip"),
 		}
 
 		err = gcorecloud.TranslateValidationError(opts.Validate())

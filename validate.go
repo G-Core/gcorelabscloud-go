@@ -93,16 +93,6 @@ func init() { // nolint
 	})
 	FailOnErrorF(err, "Cannot register translation for tag: %s", "interface-type")
 
-	err = Validate.RegisterValidation("floating-ip-source", func(fl validator.FieldLevel) bool {
-		return ContainsString(floatingIPSources, fl.Field().String())
-	})
-	FailOnErrorF(err, "Cannot register custom validator tag: %v", "floating-api-source")
-
-	err = Validate.RegisterValidation("interface-type", func(fl validator.FieldLevel) bool {
-		return ContainsString(interfaceTypes, fl.Field().String())
-	})
-	FailOnErrorF(err, "Cannot register custom validator tag: %v", "interface-type")
-
 	Validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
 		name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
 		if name == "-" {
@@ -136,19 +126,28 @@ func init() { // nolint
 	})
 
 	Validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
-		name := strings.SplitN(fld.Tag.Get("allowed_without"), ",", 2)[0]
+		name := strings.SplitN(fld.Tag.Get("allowed-without"), ",", 2)[0]
 		if name == "-" {
 			return ""
 		}
 		return name
 	})
 
+	err = Validate.RegisterValidation("floating-ip-source", func(fl validator.FieldLevel) bool {
+		return ContainsString(floatingIPSources, fl.Field().String())
+	})
+	FailOnErrorF(err, "Cannot register custom validator tag: %v", "floating-api-source")
+
+	err = Validate.RegisterValidation("interface-type", func(fl validator.FieldLevel) bool {
+		return ContainsString(interfaceTypes, fl.Field().String())
+	})
+	FailOnErrorF(err, "Cannot register custom validator tag: %v", "interface-type")
 	err = Validate.RegisterValidation(`rfe`, rfe)
 	FailOnErrorF(err, "Cannot register custom validation tag: %s", "rfe")
 	err = Validate.RegisterValidation(`sfe`, sfe)
 	FailOnErrorF(err, "Cannot register custom validation tag: %s", "sfe")
-	err = Validate.RegisterValidation(`allowed_without`, allowedWithout)
-	FailOnErrorF(err, "Cannot register custom validation tag: %s", "allowed_without")
+	err = Validate.RegisterValidation(`allowed-without`, allowedWithout)
+	FailOnErrorF(err, "Cannot register custom validation tag: %s", "allowed-without")
 	err = Validate.RegisterValidation(`regex`, regex)
 	FailOnErrorF(err, "Cannot register custom validation tag: %s", "regex")
 
