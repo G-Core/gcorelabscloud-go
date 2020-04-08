@@ -262,8 +262,8 @@ var resourceListSubCommand = cli.Command{
 			Action:             actions,
 			LogicalResourceID:  c.StringSlice("logical-resource-id"),
 			PhysicalResourceID: c.StringSlice("physical-resource-id"),
-			NestedDepth:        utils.IntToPointer(c.Int("nested-depth")),
-			WithDetail:         utils.BoolToPointer(c.Bool("with-detail")),
+			NestedDepth:        c.Int("nested-depth"),
+			WithDetail:         c.Bool("with-detail"),
 		}
 
 		result, err := resources.ListAll(client, stackID, opts)

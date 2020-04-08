@@ -53,18 +53,19 @@ func (r commonResult) ExtractInto(v interface{}) error {
 
 // Stack struct
 type StackList struct {
-	CreationTime       time.Time  `json:"creation_time"`
-	DeletionTime       *time.Time `json:"deletion_time"`
-	UpdatedTime        *time.Time `json:"updated_time"`
-	Description        string     `json:"description"`
-	ID                 string     `json:"id"`
-	Parent             *string    `json:"parent"`
-	StackName          string     `json:"stack_name"`
-	StackOwner         *string    `json:"stack_owner"`
-	StackStatus        string     `json:"stack_status"`
-	StackStatusReason  *string    `json:"stack_status_reason"`
-	StackUserProjectID string     `json:"stack_user_project_id"`
-	Tags               []string   `json:"tags"`
+	CreationTime       time.Time         `json:"creation_time"`
+	DeletionTime       *time.Time        `json:"deletion_time"`
+	UpdatedTime        *time.Time        `json:"updated_time"`
+	Description        string            `json:"description"`
+	ID                 string            `json:"id"`
+	Links              []gcorecloud.Link `json:"links"`
+	Parent             *string           `json:"parent"`
+	StackName          string            `json:"stack_name"`
+	StackOwner         *string           `json:"stack_owner"`
+	StackStatus        string            `json:"stack_status"`
+	StackStatusReason  *string           `json:"stack_status_reason"`
+	StackUserProjectID string            `json:"stack_user_project_id"`
+	Tags               []string          `json:"tags"`
 }
 
 // Stack struct

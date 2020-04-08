@@ -42,8 +42,8 @@ type ListOpts struct {
 	Action             []types.StackResourceAction `q:"name"`
 	LogicalResourceID  []string                    `q:"id"`
 	PhysicalResourceID []string                    `q:"physical_resource_id"`
-	NestedDepth        *int                        `q:"nested_depth"`
-	WithDetail         *bool                       `q:"with_detail"`
+	NestedDepth        int                         `q:"nested_depth"`
+	WithDetail         bool                        `q:"with_detail"`
 }
 
 // ToListenerListQuery formats a ListOpts into a query string.

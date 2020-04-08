@@ -51,15 +51,16 @@ func (r MetadataResult) Extract() (map[string]interface{}, error) {
 }
 
 type ResourceList struct {
-	CreationTime         time.Time  `json:"creation_time"`
-	UpdatedTime          *time.Time `json:"updated_time"`
-	LogicalResourceID    string     `json:"logical_resource_id"`
-	PhysicalResourceID   string     `json:"physical_resource_id"`
-	RequiredBy           []string   `json:"required_by"`
-	ResourceName         string     `json:"resource_name"`
-	ResourceStatus       string     `json:"resource_status"`
-	ResourceStatusReason *string    `json:"resource_status_reason"`
-	ResourceType         string     `json:"resource_type"`
+	CreationTime         time.Time         `json:"creation_time"`
+	UpdatedTime          *time.Time        `json:"updated_time"`
+	LogicalResourceID    string            `json:"logical_resource_id"`
+	PhysicalResourceID   string            `json:"physical_resource_id"`
+	Links                []gcorecloud.Link `json:"links"`
+	RequiredBy           []string          `json:"required_by"`
+	ResourceName         string            `json:"resource_name"`
+	ResourceStatus       string            `json:"resource_status"`
+	ResourceStatusReason *string           `json:"resource_status_reason"`
+	ResourceType         string            `json:"resource_type"`
 }
 
 type Resource struct {
