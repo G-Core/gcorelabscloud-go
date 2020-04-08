@@ -66,20 +66,20 @@ type CreateOptsBuilder interface {
 
 // CreateOpts represents options used to create a cluster.
 type CreateOpts struct {
-	Name              string                   `json:"name" required:"true"`
-	ClusterTemplateID string                   `json:"cluster_template_id" required:"true"`
-	NodeCount         int                      `json:"node_count" required:"true"`
-	MasterCount       int                      `json:"master_count" required:"true"`
-	KeyPair           *string                  `json:"keypair,omitempty"`
-	FlavorID          *string                  `json:"flavor_id,omitempty"`
-	MasterFlavorID    *string                  `json:"master_flavor_id,omitempty"`
-	DiscoveryURL      *string                  `json:"discovery_url,omitempty"`
-	CreateTimeout     *int                     `json:"create_timeout,omitempty"`
-	Labels            *map[string]string       `json:"labels,omitempty"`
-	FixedNetwork      *string                  `json:"fixed_cluster,omitempty"`
-	FixedSubnet       *string                  `json:"fixed_subnet,omitempty"`
-	FloatingIPEnabled bool                     `json:"floating_ip_enabled"`
-	Version           *types.K8sClusterVersion `json:"version,omitempty"`
+	Name              string                  `json:"name" required:"true"`
+	ClusterTemplateID string                  `json:"cluster_template_id" required:"true"`
+	NodeCount         int                     `json:"node_count" required:"true"`
+	MasterCount       int                     `json:"master_count" required:"true"`
+	KeyPair           string                  `json:"keypair,omitempty"`
+	FlavorID          string                  `json:"flavor_id,omitempty"`
+	MasterFlavorID    string                  `json:"master_flavor_id,omitempty"`
+	DiscoveryURL      string                  `json:"discovery_url,omitempty"`
+	CreateTimeout     int                     `json:"create_timeout,omitempty"`
+	Labels            *map[string]string      `json:"labels,omitempty"`
+	FixedNetwork      string                  `json:"fixed_cluster,omitempty"`
+	FixedSubnet       string                  `json:"fixed_subnet,omitempty"`
+	FloatingIPEnabled bool                    `json:"floating_ip_enabled"`
+	Version           types.K8sClusterVersion `json:"version,omitempty"`
 }
 
 // ToClusterCreateMap builds a request body from CreateOpts.

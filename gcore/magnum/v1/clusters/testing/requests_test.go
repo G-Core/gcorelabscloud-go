@@ -149,13 +149,11 @@ func TestCreate(t *testing.T) {
 		ClusterTemplateID: Cluster1.ClusterTemplateID,
 		NodeCount:         1,
 		MasterCount:       1,
-		KeyPair:           &keypair,
-		FlavorID:          &Cluster1.FlavorID,
-		DiscoveryURL:      nil,
-		CreateTimeout:     &timeout,
-		MasterFlavorID:    &Cluster1.MasterFlavorID,
+		KeyPair:           keypair,
+		FlavorID:          Cluster1.FlavorID,
+		CreateTimeout:     timeout,
+		MasterFlavorID:    Cluster1.MasterFlavorID,
 		Labels:            &map[string]string{},
-		FixedSubnet:       nil,
 	}
 
 	client := fake.ServiceTokenClient("magnum", "v1")
@@ -309,5 +307,36 @@ func TestUpdate(t *testing.T) {
 	tasks, err := clusters.Update(client, Cluster1.UUID, options).ExtractTasks()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
+
+}
+
+func TestCreateOptions(t *testing.T) {
+	options := clusters.CreateOpts{
+		Name:              Cluster1.Name,
+		ClusterTemplateID: Cluster1.ClusterTemplateID,
+		NodeCount:         1,
+		MasterCount:       1,
+		KeyPair:           "",
+		FlavorID:          Cluster1.FlavorID,
+		MasterFlavorID:    Cluster1.MasterFlavorID,
+		CreateTimeout:     0,
+		Labels:            nil,
+		FixedNetwork:      "",
+		FixedSubnet:       "",
+		FloatingIPEnabled: false,
+		Version:           "",
+	}
+
+	mp, err := options.ToClusterCreateMap()
+	require.NoError(t, err)
+
+	for _, field := range []string{"create_timeout", "keypair", "version", "version", "labels"} {
+		_, ok := mp[field]
+		require.Falsef(t, ok, "field %s should not be in map: %#v", field, mp)
+	}
+	for _, field := range []string{"name"} {
+		_, ok := mp[field]
+		require.True(t, ok)
+	}
 
 }

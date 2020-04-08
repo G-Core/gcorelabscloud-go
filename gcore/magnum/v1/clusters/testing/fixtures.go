@@ -255,7 +255,7 @@ var (
 			MasterFlavorID: "g1-standard-1-2",
 			FlavorID:       "g1-standard-1-2",
 			Name:           "fokgkcytgg",
-			Labels: &map[string]string{
+			Labels: map[string]string{
 				"gcloud_project_id":    "12",
 				"gcloud_region_id":     "1",
 				"gcloud_access_token":  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNTg4MzM1NjM3LCJqdGkiOiJhYTE2ODhmODdmNDc1YjhmNDk3NTY5MmI5MTkyZDdmYiIsInVzZXJfdHlwZSI6ImNvbW1vbiIsInVzZXJfZ3JvdXBzIjpbIlVzZXJzIl0sImNsaWVudF9pZCI6LTIwMDMwMjEyMjAzNzUzNTI3NiwicmVnaW9uX2lkIjoxLCJwcm9qZWN0X2lkIjoxMiwidXNlcl9pZCI6MSwiaXNfYWRtaW4iOmZhbHNlfQ.jdPEAMuZOEqT9Ns1eW0IOZmo33WZsMEIs8NFXuF29iU",
@@ -304,7 +304,7 @@ var (
 		NodeCount:         1,
 		MasterCount:       1,
 		DockerVolumeSize:  5,
-		Labels: &map[string]string{
+		Labels: map[string]string{
 			"gcloud_project_id":    "12",
 			"gcloud_region_id":     "1",
 			"gcloud_access_token":  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNTg4MzM1NjM3LCJqdGkiOiJhYTE2ODhmODdmNDc1YjhmNDk3NTY5MmI5MTkyZDdmYiIsInVzZXJfdHlwZSI6ImNvbW1vbiIsInVzZXJfZ3JvdXBzIjpbIlVzZXJzIl0sImNsaWVudF9pZCI6LTIwMDMwMjEyMjAzNzUzNTI3NiwicmVnaW9uX2lkIjoxLCJwcm9qZWN0X2lkIjoxMiwidXNlcl9pZCI6MSwiaXNfYWRtaW4iOmZhbHNlfQ.jdPEAMuZOEqT9Ns1eW0IOZmo33WZsMEIs8NFXuF29iU",

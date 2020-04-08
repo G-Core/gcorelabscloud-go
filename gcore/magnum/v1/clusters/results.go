@@ -103,21 +103,21 @@ type Config struct {
 
 // Cluster represents a cluster structure in list response.
 type ClusterList struct {
-	UUID              string             `json:"uuid"`
-	Name              string             `json:"name"`
-	ClusterTemplateID string             `json:"cluster_template_id"`
-	KeyPair           string             `json:"keypair"`
-	NodeCount         int                `json:"node_count"`
-	MasterCount       int                `json:"master_count"`
-	DockerVolumeSize  int                `json:"docker_volume_size"`
-	Labels            *map[string]string `json:"labels,,omitempty"`
-	MasterFlavorID    string             `json:"master_flavor_id"`
-	FlavorID          string             `json:"flavor_id"`
-	CreateTimeout     int                `json:"create_timeout"`
-	Links             []gcorecloud.Link  `json:"links"`
-	StackID           string             `json:"stack_id"`
-	Status            string             `json:"status"`
-	HealthStatus      *string            `json:"health_status,omitempty"`
+	UUID              string            `json:"uuid"`
+	Name              string            `json:"name"`
+	ClusterTemplateID string            `json:"cluster_template_id"`
+	KeyPair           string            `json:"keypair"`
+	NodeCount         int               `json:"node_count"`
+	MasterCount       int               `json:"master_count"`
+	DockerVolumeSize  int               `json:"docker_volume_size"`
+	Labels            map[string]string `json:"labels"`
+	MasterFlavorID    string            `json:"master_flavor_id"`
+	FlavorID          string            `json:"flavor_id"`
+	CreateTimeout     int               `json:"create_timeout"`
+	Links             []gcorecloud.Link `json:"links"`
+	StackID           string            `json:"stack_id"`
+	Status            string            `json:"status"`
+	HealthStatus      *string           `json:"health_status,omitempty"`
 }
 
 // ClusterPage is the page returned by a pager when traversing over a

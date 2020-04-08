@@ -533,26 +533,20 @@ var clusterCreateSubCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
-		version, err := types.K8sClusterVersion(c.String("version")).ValidOrNil()
-		if err != nil {
-			_ = cli.ShowCommandHelp(c, "create")
-			return cli.NewExitError(err, 1)
-		}
-
 		opts := clusters.CreateOpts{
 			Name:              c.String("name"),
 			ClusterTemplateID: c.String("template-id"),
 			NodeCount:         c.Int("node-count"),
 			MasterCount:       c.Int("master-node-count"),
-			KeyPair:           utils.StringToPointer(c.String("keypair")),
-			FlavorID:          utils.StringToPointer(c.String("flavor")),
-			MasterFlavorID:    utils.StringToPointer(c.String("master-flavor")),
+			KeyPair:           c.String("keypair"),
+			FlavorID:          c.String("flavor"),
+			MasterFlavorID:    c.String("master-flavor"),
 			Labels:            &labels,
-			FixedNetwork:      utils.StringToPointer(c.String("fixed-network")),
-			FixedSubnet:       utils.StringToPointer(c.String("fixed-subnet")),
+			FixedNetwork:      c.String("fixed-network"),
+			FixedSubnet:       c.String("fixed-subnet"),
 			FloatingIPEnabled: c.Bool("floating-ip-enabled"),
-			CreateTimeout:     utils.IntToPointer(c.Int("create-timeout")),
-			Version:           version,
+			CreateTimeout:     c.Int("create-timeout"),
+			Version:           types.K8sClusterVersion(c.String("version")),
 		}
 
 		results, err := clusters.Create(client, opts).ExtractTasks()
