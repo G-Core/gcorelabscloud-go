@@ -355,6 +355,18 @@ func StringSliceToMap(slice []string) (map[string]string, error) {
 	return m, nil
 }
 
+func StringSliceToMapInterface(slice []string) (map[string]interface{}, error) {
+	m := make(map[string]interface{})
+	for _, s := range slice {
+		parts := strings.SplitN(s, "=", 2)
+		if len(parts) != 2 {
+			return nil, fmt.Errorf("wrong label format: %s", s)
+		}
+		m[parts[0]] = parts[1]
+	}
+	return m, nil
+}
+
 func WaitTaskAndShowResult(
 	c *cli.Context,
 	client *gcorecloud.ServiceClient,
@@ -418,6 +430,19 @@ func ReadFile(filename string) ([]byte, error) {
 		return nil, err
 	}
 	return ioutil.ReadFile(path)
+}
+
+func CheckYamlFile(filename string) (content []byte, err error) {
+	content, err = ReadFile(filename)
+	if err != nil {
+		return
+	}
+	out := make(map[string]interface{})
+	err = yaml.Unmarshal(content, out)
+	if err != nil {
+		return
+	}
+	return
 }
 
 func MergeKubeconfigFile(filename string, content []byte) error {

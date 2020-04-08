@@ -3,6 +3,8 @@ package testing
 import (
 	"time"
 
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
+
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/heat/v1/stack/stacks"
 )
 
@@ -80,6 +82,30 @@ const GetResponse = `
   "stack_status": "UPDATE_COMPLETE"
 }
 `
+
+// CreateResponse represents the response body from a Create request.
+const CreateResponse = `
+{
+  "stack": {
+    "id": "16ef0584-4458-41eb-87c8-0dc8d5f66c87",
+    "links": [
+    {
+      "href": "http://168.28.170.117:8004/v1/98606384f58drad0bhdb7d02779549ac/stacks/stackcreated/16ef0584-4458-41eb-87c8-0dc8d5f66c87",
+      "rel": "self"
+    }
+    ]
+  }
+}`
+
+var CreateExpected = &stacks.CreatedStack{
+	ID: "16ef0584-4458-41eb-87c8-0dc8d5f66c87",
+	Links: []gcorecloud.Link{
+		{
+			Href: "http://168.28.170.117:8004/v1/98606384f58drad0bhdb7d02779549ac/stacks/stackcreated/16ef0584-4458-41eb-87c8-0dc8d5f66c87",
+			Rel:  "self",
+		},
+	},
+}
 
 var (
 	creationTime, _     = time.Parse(time.RFC3339, "2020-03-17T21:59:54+00:00")

@@ -189,7 +189,7 @@ func TestMarkUnhealthyResource(t *testing.T) {
 		th.TestHeader(t, r, "Content-Type", "application/json")
 		w.Header().Add("Content-Type", "application/json")
 		th.TestJSONRequest(t, r, MarkUnhealthyRequest)
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusAccepted)
 		_, err := fmt.Fprint(w, GetResponse)
 		if err != nil {
 			log.Error(err)

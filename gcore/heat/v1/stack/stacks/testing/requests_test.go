@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"testing"
 
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
+
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/heat/v1/stack/stacks"
 
 	fake "bitbucket.gcore.lu/gcloud/gcorecloud-go/testhelper/client"
@@ -33,6 +35,81 @@ func prepareGetTestURL(id string) string {
 	return prepareGetTestURLParams(fake.ProjectID, fake.RegionID, id)
 }
 
+func prepareUpdateTestURL(id string) string {
+	return prepareGetTestURLParams(fake.ProjectID, fake.RegionID, id)
+}
+
+func TestCreate(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	url := prepareListTestURL()
+	th.Mux.HandleFunc(url, func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, CreateResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	template := new(stacks.Template)
+	template.Bin = []byte(`
+		{
+			"heat_template_version": "2013-05-23",
+			"description": "Simple template to test heat commands",
+			"parameters": {
+				"flavor": {
+					"default": "m1.tiny",
+					"type": "string"
+				}
+			}
+		}`)
+
+	client := fake.ServiceTokenClient("heat", "v1")
+
+	createOpts := stacks.CreateOpts{
+		Name:            "stackcreated",
+		Timeout:         60,
+		TemplateOpts:    template,
+		DisableRollback: gcorecloud.Disabled,
+	}
+	actual, err := stacks.Create(client, createOpts).Extract()
+	require.NoError(t, err)
+	expected := CreateExpected
+	require.Equal(t, expected, actual)
+}
+
+func TestCreateStackMissingRequiredInOpts(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	template := new(stacks.Template)
+	template.Bin = []byte(`
+		{
+			"heat_template_version": "2013-05-23",
+			"description": "Simple template to test heat commands",
+			"parameters": {
+				"flavor": {
+					"default": "m1.tiny",
+					"type": "string"
+				}
+			}
+		}`)
+
+	client := fake.ServiceTokenClient("heat", "v1")
+
+	createOpts := stacks.CreateOpts{
+		DisableRollback: gcorecloud.Disabled,
+	}
+	r := stacks.Create(client, createOpts)
+	th.AssertEquals(t, "Missing input for argument [Name]", r.Err.Error())
+}
+
 func TestList(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
@@ -40,7 +117,7 @@ func TestList(t *testing.T) {
 	th.Mux.HandleFunc(url, func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "GET")
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
-
+		th.TestHeader(t, r, "Accept", "application/json")
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		_, err := fmt.Fprint(w, ListResponse)
@@ -78,7 +155,7 @@ func TestListAll(t *testing.T) {
 	th.Mux.HandleFunc(url, func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "GET")
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
-
+		th.TestHeader(t, r, "Accept", "application/json")
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		_, err := fmt.Fprint(w, ListResponse)
@@ -106,7 +183,7 @@ func TestGet(t *testing.T) {
 	th.Mux.HandleFunc(testURL, func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "GET")
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
-
+		th.TestHeader(t, r, "Accept", "application/json")
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 
@@ -124,5 +201,102 @@ func TestGet(t *testing.T) {
 	require.Equal(t, Stack1, *ct)
 	require.Equal(t, creationTime, ct.CreationTime)
 	require.Equal(t, updatedTime, *ct.UpdatedTime)
+
+}
+
+func TestUpdate(t *testing.T) {
+
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	testURL := prepareUpdateTestURL(Stack1.ID)
+
+	th.Mux.HandleFunc(testURL, func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "PUT")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusAccepted)
+	})
+
+	template := new(stacks.Template)
+	template.Bin = []byte(`
+		{
+			"heat_template_version": "2013-05-23",
+			"description": "Simple template to test heat commands",
+			"parameters": {
+				"flavor": {
+					"default": "m1.tiny",
+					"type": "string"
+				}
+			}
+		}`)
+
+	updateOpts := &stacks.UpdateOpts{
+		TemplateOpts: template,
+	}
+
+	client := fake.ServiceTokenClient("heat", "v1")
+
+	err := stacks.Update(client, Stack1.ID, updateOpts).ExtractErr()
+	require.NoError(t, err)
+
+}
+
+func TestUpdateStackNoTemplate(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	testURL := prepareUpdateTestURL(Stack1.ID)
+
+	th.Mux.HandleFunc(testURL, func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "PUT")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusAccepted)
+	})
+
+	parameters := make(map[string]interface{})
+	parameters["flavor"] = "m1.tiny"
+
+	updateOpts := &stacks.UpdateOpts{
+		Parameters: parameters,
+	}
+	expected := stacks.ErrTemplateRequired{}
+
+	err := stacks.Update(fake.ServiceClient(), Stack1.ID, updateOpts).ExtractErr()
+	th.AssertEquals(t, expected, err)
+}
+
+func TestUpdatePatch(t *testing.T) {
+
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	testURL := prepareUpdateTestURL(Stack1.ID)
+
+	th.Mux.HandleFunc(testURL, func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "PATCH")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestHeader(t, r, "Accept", "application/json")
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusAccepted)
+	})
+
+	client := fake.ServiceTokenClient("heat", "v1")
+
+	parameters := make(map[string]interface{})
+	parameters["flavor"] = "m1.tiny"
+
+	updateOpts := &stacks.UpdateOpts{
+		Parameters: parameters,
+	}
+
+	err := stacks.UpdatePatch(client, Stack1.ID, updateOpts).ExtractErr()
+	require.NoError(t, err)
 
 }

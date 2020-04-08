@@ -11,6 +11,26 @@ type commonResult struct {
 	gcorecloud.Result
 }
 
+// CreateResult represents the result of a Create operation.
+type CreateResult struct {
+	gcorecloud.Result
+}
+
+// UpdateResult represents the result of a Update operation.
+type UpdateResult struct {
+	gcorecloud.ErrResult
+}
+
+// DeleteResult represents the result of a Delete operation.
+type DeleteResult struct {
+	gcorecloud.ErrResult
+}
+
+// GetResult represents the result of a get operation. Call its Extract method to interpret it as a Heat stack.
+type GetResult struct {
+	commonResult
+}
+
 // Extract is a function that accepts a result and extracts a heat stack.
 func (r commonResult) Extract() (*Stack, error) {
 	var s Stack
@@ -18,13 +38,17 @@ func (r commonResult) Extract() (*Stack, error) {
 	return &s, err
 }
 
-func (r commonResult) ExtractInto(v interface{}) error {
-	return r.Result.ExtractIntoStructPtr(v, "")
+// Extract is a function that accepts a result and extracts a heat stack.
+func (r CreateResult) Extract() (*CreatedStack, error) {
+	var s struct {
+		CreatedStack *CreatedStack `json:"stack"`
+	}
+	err := r.ExtractInto(&s)
+	return s.CreatedStack, err
 }
 
-// GetResult represents the result of a get operation. Call its Extract method to interpret it as a Heat stack.
-type GetResult struct {
-	commonResult
+func (r commonResult) ExtractInto(v interface{}) error {
+	return r.Result.ExtractIntoStructPtr(v, "")
 }
 
 // Stack struct
@@ -53,6 +77,12 @@ type Stack struct {
 	TimeoutMinutes      int                      `json:"timeout_mins"`
 	Outputs             []map[string]interface{} `json:"outputs"`
 	Parameters          map[string]interface{}   `json:"parameters"`
+}
+
+// CreatedStack represents the object extracted from a Create operation.
+type CreatedStack struct {
+	ID    string            `json:"id"`
+	Links []gcorecloud.Link `json:"links"`
 }
 
 // StackPage is the page returned by a pager when traversing over a
