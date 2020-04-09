@@ -202,6 +202,15 @@ func Extend(c *gcorecloud.ServiceClient, volumeID string, opts PropertiesOperati
 	return
 }
 
+// ListAll is a convenience function that returns all volumes.
+func ListAll(client *gcorecloud.ServiceClient, opts ListOpts) ([]Volume, error) {
+	pages, err := List(client, opts).AllPages()
+	if err != nil {
+		return nil, err
+	}
+	return ExtractVolumes(pages)
+}
+
 // IDFromName is a convenience function that returns a volume ID, given its name.
 func IDFromName(client *gcorecloud.ServiceClient, name string) (string, error) {
 	count := 0

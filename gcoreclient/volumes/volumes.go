@@ -41,11 +41,7 @@ var volumeListCommand = cli.Command{
 		opts := volumes.ListOpts{
 			InstanceID: utils.StringToPointer(c.String("instance-id")),
 		}
-		pages, err := volumes.List(client, opts).AllPages()
-		if err != nil {
-			return cli.NewExitError(err, 1)
-		}
-		results, err := volumes.ExtractVolumes(pages)
+		results, err := volumes.ListAll(client, opts)
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
