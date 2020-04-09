@@ -93,7 +93,7 @@ func TokenClient(options gcorecloud.TokenOptions) (*gcorecloud.ProviderClient, e
 
 // Authenticate or re-authenticate against the most recent identity service supported at the provided endpoint.
 func Authenticate(client *gcorecloud.ProviderClient, options gcorecloud.AuthOptions) error {
-	return auth(client, "", options, gcorecloud.EndpointOpts{})
+	return auth(client, options.AuthURL, options, gcorecloud.EndpointOpts{})
 }
 
 func auth(client *gcorecloud.ProviderClient, endpoint string, options gcorecloud.AuthOptions, eo gcorecloud.EndpointOpts) error {
@@ -104,7 +104,7 @@ func auth(client *gcorecloud.ProviderClient, endpoint string, options gcorecloud
 	}
 
 	if endpoint != "" {
-		identityClient.Endpoint = endpoint
+		identityClient.Endpoint = gcorecloud.NormalizeURL(endpoint)
 	}
 
 	result := tokens.Create(identityClient, options)
