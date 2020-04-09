@@ -197,8 +197,9 @@ func Delete(c *gcorecloud.ServiceClient, clusterID string) (r DeleteResult) {
 	return
 }
 
-// Config accepts a unique ID and get cluster config.
+// Config accepts a unique ID and get cluster k8s config.
 func GetConfig(c *gcorecloud.ServiceClient, clusterID string) (r ConfigResult) {
-	_, r.Err = c.Get(configURL(c, clusterID), &r.Body, nil)
+	url := configURL(c, clusterID)
+	_, r.Err = c.Get(url, &r.Body, nil)
 	return
 }

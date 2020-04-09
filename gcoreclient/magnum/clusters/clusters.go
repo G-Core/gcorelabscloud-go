@@ -384,6 +384,7 @@ var clusterConfigSubCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
+
 		result, err := clusters.GetConfig(client, clusterID).ExtractConfig()
 		if err != nil {
 			return cli.NewExitError(err, 1)

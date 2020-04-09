@@ -466,13 +466,14 @@ func BuildQueryString(opts interface{}) (*url.URL, error) {
 			v := optsValue.Field(i)
 			f := optsType.Field(i)
 			qTag := f.Tag.Get("q")
-
+			requiredTag := f.Tag.Get("required")
+			zeroTag := f.Tag.Get("zero")
 			// if the field has a 'q' tag, it goes in the query string
 			if qTag != "" {
 				tags := strings.Split(qTag, ",")
 
 				// if the field is set, add it to the slice of query pieces
-				if !isZero(v) {
+				if zeroTag == trueTag || !isZero(v) {
 				loop:
 					switch v.Kind() {
 					case reflect.Ptr:
@@ -499,7 +500,7 @@ func BuildQueryString(opts interface{}) (*url.URL, error) {
 					}
 				} else { // nolint: gocritic
 					// if the field has a 'required' tag, it can't have a zero-value
-					if requiredTag := f.Tag.Get("required"); requiredTag == trueTag {
+					if requiredTag == trueTag {
 						return &url.URL{}, fmt.Errorf("required query parameter [%s] not set", f.Name)
 					}
 				}

@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
 	th "bitbucket.gcore.lu/gcloud/gcorecloud-go/testhelper"
 )
@@ -289,4 +291,26 @@ func TestBuildRequestBody(t *testing.T) {
 	th.AssertNoErr(t, err)
 	th.AssertDeepEquals(t, expectedComplexFields, actual)
 
+}
+
+func TestZeroQueryOpts(t *testing.T) {
+
+	type Opts struct {
+		Value bool `q:"value" zero:"true"`
+	}
+
+	opts := Opts{
+		Value: true,
+	}
+	res, err := gcorecloud.BuildQueryString(opts)
+	require.NoError(t, err)
+	require.Equal(t, res.String(), "?value=true")
+
+	opts = Opts{
+		Value: false,
+	}
+
+	res, err = gcorecloud.BuildQueryString(opts)
+	require.NoError(t, err)
+	require.Equal(t, res.String(), "?value=false")
 }
