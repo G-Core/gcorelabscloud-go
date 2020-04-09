@@ -104,7 +104,11 @@ func auth(client *gcorecloud.ProviderClient, endpoint string, options gcorecloud
 	}
 
 	if endpoint != "" {
-		identityClient.Endpoint = gcorecloud.NormalizeURL(endpoint)
+		base, err := utils.BaseRootEndpoint(endpoint)
+		if err != nil {
+			return err
+		}
+		identityClient.Endpoint = gcorecloud.NormalizeURL(base)
 	}
 
 	result := tokens.Create(identityClient, options)
@@ -152,7 +156,11 @@ func refreshPlatform(client *gcorecloud.ProviderClient, endpoint string, tokenOp
 	}
 
 	if endpoint != "" {
-		identityClient.Endpoint = gcorecloud.NormalizeURL(endpoint)
+		base, err := utils.BaseRootEndpoint(endpoint)
+		if err != nil {
+			return err
+		}
+		identityClient.Endpoint = gcorecloud.NormalizeURL(base)
 	}
 
 	result := tokens.RefreshPlatform(identityClient, tokenOptions)
@@ -198,7 +206,11 @@ func refreshGCloud(client *gcorecloud.ProviderClient, endpoint string, options g
 	}
 
 	if endpoint != "" {
-		identityClient.Endpoint = gcorecloud.NormalizeURL(endpoint)
+		base, err := utils.BaseRootEndpoint(endpoint)
+		if err != nil {
+			return err
+		}
+		identityClient.Endpoint = gcorecloud.NormalizeURL(base)
 	}
 
 	result := tokens.RefreshGCloud(identityClient, options)
