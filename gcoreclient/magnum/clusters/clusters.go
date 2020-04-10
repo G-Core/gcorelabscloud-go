@@ -32,11 +32,7 @@ var clusterListSubCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		pages, err := clusters.List(client, clusters.ListOpts{}).AllPages()
-		if err != nil {
-			return cli.NewExitError(err, 1)
-		}
-		results, err := clusters.ExtractClusters(pages)
+		results, err := clusters.ListAll(client, clusters.ListOpts{})
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}

@@ -50,6 +50,15 @@ func List(c *gcorecloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
 	})
 }
 
+// ListAll returns all cluster templates
+func ListAll(c *gcorecloud.ServiceClient, opts ListOptsBuilder) ([]ClusterTemplate, error) {
+	page, err := List(c, opts).AllPages()
+	if err != nil {
+		return nil, err
+	}
+	return ExtractClusterTemplates(page)
+}
+
 // Get retrieves a specific cluster template based on its unique ID.
 func Get(c *gcorecloud.ServiceClient, id string) (r GetResult) {
 	_, r.Err = c.Get(getURL(c, id), &r.Body, nil)

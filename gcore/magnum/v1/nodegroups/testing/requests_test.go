@@ -70,7 +70,7 @@ func TestList(t *testing.T) {
 	}
 }
 
-func TestAll(t *testing.T) {
+func TestLisAll(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
 

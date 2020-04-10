@@ -13,7 +13,7 @@ var clusterTemplateIDText = "clustertemplate_id is mandatory argument"
 var clusterTemplateCreateSubCommand = cli.Command{
 	Name:     "create",
 	Usage:    "Magnum create cluster template",
-	Category: "clustertemplate",
+	Category: "template",
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:     "image",
@@ -96,18 +96,14 @@ var clusterTemplateCreateSubCommand = cli.Command{
 var clusterTemplateListSubCommand = cli.Command{
 	Name:     "list",
 	Usage:    "Magnum list cluster templates",
-	Category: "clustertemplate",
+	Category: "template",
 	Action: func(c *cli.Context) error {
 		client, err := utils.BuildClient(c, "magnum", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		pages, err := clustertemplates.List(client, clustertemplates.ListOpts{}).AllPages()
-		if err != nil {
-			return cli.NewExitError(err, 1)
-		}
-		results, err := clustertemplates.ExtractClusterTemplates(pages)
+		results, err := clustertemplates.ListAll(client, clustertemplates.ListOpts{})
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -119,8 +115,8 @@ var clusterTemplateListSubCommand = cli.Command{
 var clusterTemplateDeleteDubCommand = cli.Command{
 	Name:      "delete",
 	Usage:     "Magnum delete cluster template",
-	ArgsUsage: "<clustertemplate_id>",
-	Category:  "clustertemplate",
+	ArgsUsage: "<template_id>",
+	Category:  "template",
 	Action: func(c *cli.Context) error {
 		clusterTemplateID, err := flags.GetFirstArg(c, clusterTemplateIDText)
 		if err != nil {
@@ -143,8 +139,8 @@ var clusterTemplateDeleteDubCommand = cli.Command{
 var clusterTemplateGetSubCommand = cli.Command{
 	Name:      "show",
 	Usage:     "Magnum get cluster template",
-	ArgsUsage: "<clustertemplate_id>",
-	Category:  "clustertemplate",
+	ArgsUsage: "<template_id>",
+	Category:  "template",
 	Action: func(c *cli.Context) error {
 		clusterTemplateID, err := flags.GetFirstArg(c, clusterTemplateIDText)
 		if err != nil {
@@ -166,7 +162,7 @@ var clusterTemplateGetSubCommand = cli.Command{
 }
 
 var ClusterTemplatesCommands = cli.Command{
-	Name:  "clustertemplate",
+	Name:  "template",
 	Usage: "Magnum cluster template commands",
 	Subcommands: []*cli.Command{
 		&clusterTemplateCreateSubCommand,

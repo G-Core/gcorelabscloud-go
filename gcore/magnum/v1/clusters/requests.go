@@ -203,3 +203,12 @@ func GetConfig(c *gcorecloud.ServiceClient, clusterID string) (r ConfigResult) {
 	_, r.Err = c.Get(url, &r.Body, nil)
 	return
 }
+
+// List returns all magnum clusters.
+func ListAll(c *gcorecloud.ServiceClient, opts ListOptsBuilder) ([]ClusterList, error) {
+	page, err := List(c, opts).AllPages()
+	if err != nil {
+		return nil, err
+	}
+	return ExtractClusters(page)
+}
