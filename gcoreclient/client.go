@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/regions"
+
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/snapshots"
 
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/flags"
@@ -41,6 +43,7 @@ var commands = []*cli.Command{
 	&floatingips.FloatingIPCommands,
 	&snapshots.SnapshotCommands,
 	&images.ImageCommands,
+	&regions.RegionCommands,
 }
 
 func main() {

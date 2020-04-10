@@ -78,7 +78,7 @@ func (opts *CreateVolumeOpts) Validate() error {
 }
 
 type CreateNewInterfaceFloatingIPOpts struct {
-	Source             types.FloatingIPSource `json:"source" validate:"required,floating-ip-source"`
+	Source             types.FloatingIPSource `json:"source" validate:"required,enum"`
 	ExistingFloatingID string                 `json:"existing_floating_id" validate:"rfe=Source:existing,sfe=Source:new,omitempty,ip"`
 }
 
@@ -88,7 +88,7 @@ func (opts CreateNewInterfaceFloatingIPOpts) Validate() error {
 }
 
 type CreateInterfaceOpts struct {
-	Type       types.InterfaceType               `json:"type" required:"true" validate:"required,interface-type"`
+	Type       types.InterfaceType               `json:"type" required:"true" validate:"required,enum"`
 	NetworkID  string                            `json:"network_id,omitempty" validate:"rfe=Type:subnet,sfe=Type:external,omitempty,uuid4"`
 	SubnetID   string                            `json:"subnet_id,omitempty" validate:"rfe=Type:subnet,sfe=Type:external,omitempty,uuid4"`
 	FloatingIP *CreateNewInterfaceFloatingIPOpts `json:"floating_ip,omitempty" validate:"omitempty,sfe=Type:external,dive"`

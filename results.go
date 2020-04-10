@@ -7,6 +7,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"net/url"
 	"reflect"
 	"strconv"
 	"time"
@@ -680,6 +681,49 @@ func (m MAC) MarshalJSON() ([]byte, error) {
 // String - implements Stringer
 func (m MAC) String() string {
 	return m.HardwareAddr.String()
+}
+
+type URL struct {
+	*url.URL
+}
+
+func ParseURL(s string) (*URL, error) {
+	u, err := url.Parse(s)
+	if err != nil {
+		return nil, err
+	}
+	return &URL{URL: u}, nil
+}
+
+func ParseURLNonMandatory(s string) (*URL, error) {
+	if s == "" {
+		return nil, nil
+	}
+	return ParseURL(s)
+}
+
+// UnmarshalJSON - implements Unmarshaler interface
+func (u *URL) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	ur, err := ParseURL(s)
+	if err != nil {
+		return err
+	}
+	*u = *ur
+	return nil
+}
+
+// MarshalJSON - implements Marshaler interface
+func (u URL) MarshalJSON() ([]byte, error) {
+	return json.Marshal(u.String())
+}
+
+// String - implements Stringer
+func (u URL) String() string {
+	return u.URL.String()
 }
 
 type ItemName struct {

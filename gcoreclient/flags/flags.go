@@ -2,6 +2,7 @@ package flags
 
 import (
 	"fmt"
+	"strconv"
 
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/utils"
 
@@ -185,4 +186,16 @@ func GetFirstArg(c *cli.Context, errorText string) (string, error) {
 		return "", cli.NewExitError(fmt.Errorf(errorText), 1)
 	}
 	return arg, nil
+}
+
+func GetFirstIntArg(c *cli.Context, errorText string) (int, error) {
+	arg := c.Args().First()
+	if arg == "" {
+		return 0, cli.NewExitError(fmt.Errorf(errorText), 1)
+	}
+	res, err := strconv.Atoi(arg)
+	if err != nil {
+		return 0, cli.NewExitError(err, 1)
+	}
+	return res, nil
 }

@@ -8,8 +8,6 @@ import (
 	"strconv"
 	"strings"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/instance/v1/types"
-
 	"github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
@@ -17,11 +15,14 @@ import (
 )
 
 var (
-	Validate          *validator.Validate
-	Trans             ut.Translator
-	interfaceTypes    = types.InterfaceType("").StringList()
-	floatingIPSources = types.FloatingIPSource("").StringList()
+	Validate *validator.Validate
+	Trans    ut.Translator
 )
+
+type EnumValidator interface {
+	IsValid() error
+	StringList() []string
+}
 
 func init() { // nolint
 	Validate = validator.New()
@@ -69,29 +70,21 @@ func init() { // nolint
 	})
 	FailOnErrorF(err, "Cannot register translation for tag: %s", "sfe")
 
-	err = Validate.RegisterTranslation("floating-ip-source", Trans, func(ut ut.Translator) error {
-		return ut.Add(
-			"floating-ip-source",
-			fmt.Sprintf("{0} should be one of: %v", floatingIPSources),
-			true,
-		)
+	err = Validate.RegisterTranslation("enum", Trans, func(ut ut.Translator) error {
+		return nil
 	}, func(ut ut.Translator, fe validator.FieldError) string {
-		t, _ := ut.T("floating-ip-source", fe.Field())
-		return t
-	})
-	FailOnErrorF(err, "Cannot register translation for tag: %s", "floating-api-source")
-
-	err = Validate.RegisterTranslation("interface-type", Trans, func(ut ut.Translator) error {
-		return ut.Add(
-			"interface-type",
-			fmt.Sprintf("{0} should be one of: %v", interfaceTypes),
-			true,
+		v, ok := fe.Value().(EnumValidator)
+		if !ok {
+			return fmt.Sprintf("Field %s is not valid: %v", fe.StructField(), fe.Value())
+		}
+		return fmt.Sprintf(
+			"%s is not valid: %v. Valid values: %s",
+			fe.StructField(),
+			fe.Value(),
+			strings.Join(v.StringList(), ", "),
 		)
-	}, func(ut ut.Translator, fe validator.FieldError) string {
-		t, _ := ut.T("interface-type", fe.Field())
-		return t
 	})
-	FailOnErrorF(err, "Cannot register translation for tag: %s", "interface-type")
+	FailOnErrorF(err, "Cannot register translation for tag: %s", "enum")
 
 	Validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
 		name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
@@ -133,18 +126,19 @@ func init() { // nolint
 		return name
 	})
 
-	err = Validate.RegisterValidation("floating-ip-source", func(fl validator.FieldLevel) bool {
-		return ContainsString(floatingIPSources, fl.Field().String())
+	Validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
+		name := strings.SplitN(fld.Tag.Get("enum"), ",", 2)[0]
+		if name == "-" {
+			return ""
+		}
+		return name
 	})
-	FailOnErrorF(err, "Cannot register custom validator tag: %v", "floating-api-source")
 
-	err = Validate.RegisterValidation("interface-type", func(fl validator.FieldLevel) bool {
-		return ContainsString(interfaceTypes, fl.Field().String())
-	})
-	FailOnErrorF(err, "Cannot register custom validator tag: %v", "interface-type")
-	err = Validate.RegisterValidation(`rfe`, rfe)
+	err = Validate.RegisterValidation("enum", enum)
+	FailOnErrorF(err, "Cannot register custom validator tag: %v", "enum")
+	err = Validate.RegisterValidation(`rfe`, requiredIfFieldEqual)
 	FailOnErrorF(err, "Cannot register custom validation tag: %s", "rfe")
-	err = Validate.RegisterValidation(`sfe`, sfe)
+	err = Validate.RegisterValidation(`sfe`, suppressedIfFieldEqual)
 	FailOnErrorF(err, "Cannot register custom validation tag: %s", "sfe")
 	err = Validate.RegisterValidation(`allowed-without`, allowedWithout)
 	FailOnErrorF(err, "Cannot register custom validation tag: %s", "allowed-without")
@@ -159,7 +153,7 @@ func allowedWithout(fl validator.FieldLevel) bool {
 	return requiredField && hasValue(fl)
 }
 
-func rfe(fl validator.FieldLevel) bool {
+func requiredIfFieldEqual(fl validator.FieldLevel) bool {
 	param := strings.Split(fl.Param(), `:`)
 	paramField := param[0]
 	paramValue := param[1]
@@ -194,7 +188,15 @@ func rfe(fl validator.FieldLevel) bool {
 	return hasValue(fl)
 }
 
-func sfe(fl validator.FieldLevel) bool {
+func enum(fl validator.FieldLevel) bool {
+	v, ok := fl.Field().Interface().(EnumValidator)
+	if !ok {
+		return false
+	}
+	return v.IsValid() == nil
+}
+
+func suppressedIfFieldEqual(fl validator.FieldLevel) bool {
 	param := strings.Split(fl.Param(), `:`)
 	paramField := param[0]
 	paramValue := param[1]
