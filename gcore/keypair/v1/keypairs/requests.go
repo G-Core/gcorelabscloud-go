@@ -26,8 +26,8 @@ type CreateOptsBuilder interface {
 
 // CreateOpts represents options used to create a keypair.
 type CreateOpts struct {
-	Name      string `json:"sshkey_name"`
-	PublicKey string `json:"public_key"`
+	Name      string `json:"sshkey_name" required:"true"`
+	PublicKey string `json:"public_key" required:"true"`
 }
 
 // ToKeyPairCreateMap builds a request body from CreateOpts.

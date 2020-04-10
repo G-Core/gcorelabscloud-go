@@ -1,8 +1,6 @@
 package keypairs
 
 import (
-	"io/ioutil"
-
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/keypair/v1/keypairs"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/flags"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/utils"
@@ -98,8 +96,8 @@ var keypairCreateCommand = cli.Command{
 		},
 		&cli.StringFlag{
 			Name:     "ssh-public-key",
-			Usage:    "Keypair SSH public key",
-			Aliases:  []string{"f"},
+			Usage:    "Keypair SSH public key file",
+			Aliases:  []string{"k"},
 			Required: true,
 		},
 	},
@@ -109,8 +107,7 @@ var keypairCreateCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		fileName := c.String("ssh-public-key")
-		data, err := ioutil.ReadFile(fileName)
+		data, err := utils.ReadFile(c.String("ssh-public-key"))
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "create")
 			return cli.NewExitError(err, 1)
