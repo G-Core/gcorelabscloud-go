@@ -38,9 +38,10 @@ type CreateOptsBuilder interface {
 
 // CreateOpts represents options used to create a image.
 type CreateOpts struct {
-	URL       string `json:"url" required:"true" validate:"required,url"`
-	Name      string `json:"name" required:"true" validate:"required"`
-	CowFormat bool   `json:"cow_format"`
+	URL        string             `json:"url" required:"true" validate:"required,url"`
+	Name       string             `json:"name" required:"true" validate:"required"`
+	CowFormat  bool               `json:"cow_format,omitempty"`
+	Properties *map[string]string `json:"properties,omitempty"`
 }
 
 // Validate

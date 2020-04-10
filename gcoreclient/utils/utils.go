@@ -355,6 +355,17 @@ func StringSliceToMap(slice []string) (map[string]string, error) {
 	return m, nil
 }
 
+func StringSliceToMapNil(slice []string) (*map[string]string, error) {
+	if len(slice) == 0 {
+		return nil, nil
+	}
+	m, err := StringSliceToMap(slice)
+	if err != nil {
+		return nil, err
+	}
+	return &m, nil
+}
+
 func StringSliceToMapInterface(slice []string) (map[string]interface{}, error) {
 	m := make(map[string]interface{})
 	for _, s := range slice {

@@ -65,7 +65,7 @@ var imageCreateCommand = cli.Command{
 	Name:     "create",
 	Usage:    "Create image",
 	Category: "image",
-	Flags: []cli.Flag{
+	Flags: append([]cli.Flag{
 		&cli.StringFlag{
 			Name:     "url",
 			Aliases:  []string{"u"},
@@ -84,18 +84,30 @@ var imageCreateCommand = cli.Command{
 			Usage:    "image with cow format",
 			Required: true,
 		},
-	},
+		&cli.StringSliceFlag{
+			Name:        "property",
+			Usage:       "Image properties. Example: --property os_distro=coreos",
+			DefaultText: "nil",
+			Required:    false,
+		},
+	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
 		client, err := utils.BuildClient(c, "downloadimage", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
+		properties, err := utils.StringSliceToMapNil(c.StringSlice("property"))
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
 
 		opts := images.CreateOpts{
-			URL:       c.String("url"),
-			Name:      c.String("name"),
-			CowFormat: c.Bool("cow-format"),
+			URL:        c.String("url"),
+			Name:       c.String("name"),
+			CowFormat:  c.Bool("cow-format"),
+			Properties: properties,
 		}
 
 		results, err := images.Create(client, opts).Extract()
@@ -151,6 +163,7 @@ var imageDeleteCommand = cli.Command{
 	Usage:     "Delete image",
 	Category:  "image",
 	ArgsUsage: "<image_id>",
+	Flags:     flags.WaitCommandFlags,
 	Action: func(c *cli.Context) error {
 		imageID, err := flags.GetFirstArg(c, imageIDText)
 		if err != nil {

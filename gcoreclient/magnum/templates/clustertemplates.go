@@ -57,8 +57,8 @@ var clusterTemplateCreateSubCommand = cli.Command{
 			Required: true,
 		},
 		&cli.StringSliceFlag{
-			Name:        "labels",
-			Usage:       "Arbitrary labels. The accepted keys and valid values are defined in the cluster drivers. --labels one=two --labels three=four ",
+			Name:        "label",
+			Usage:       "Arbitrary labels. The accepted keys and valid values are defined in the cluster drivers. --label one=two --label three=four ",
 			DefaultText: "nil",
 			Required:    false,
 		},
@@ -69,7 +69,7 @@ var clusterTemplateCreateSubCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		labels, err := utils.StringSliceToMap(c.StringSlice("labels"))
+		labels, err := utils.StringSliceToMap(c.StringSlice("label"))
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
