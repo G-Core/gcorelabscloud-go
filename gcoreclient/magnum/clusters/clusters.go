@@ -58,7 +58,7 @@ var clusterDeleteSubCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		results, err := clusters.Delete(client, clusterID).ExtractTasks()
+		results, err := clusters.Delete(client, clusterID).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -126,7 +126,7 @@ var clusterResizeSubCommand = cli.Command{
 			NodeGroup:     utils.StringToPointer(c.String("nodegroup")),
 		}
 
-		results, err := clusters.Resize(client, clusterID, opts).ExtractTasks()
+		results, err := clusters.Resize(client, clusterID, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -192,7 +192,7 @@ var clusterUpgradeSubCommand = cli.Command{
 			NodeGroup:       utils.StringToPointer(c.String("nodegroup")),
 		}
 
-		results, err := clusters.Upgrade(client, clusterID, opts).ExtractTasks()
+		results, err := clusters.Upgrade(client, clusterID, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -288,7 +288,7 @@ var clusterUpdateSubCommand = cli.Command{
 			opts = append(opts, el)
 		}
 
-		results, err := clusters.Update(client, clusterID, opts).ExtractTasks()
+		results, err := clusters.Update(client, clusterID, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -546,7 +546,7 @@ var clusterCreateSubCommand = cli.Command{
 			Version:           types.K8sClusterVersion(c.String("version")),
 		}
 
-		results, err := clusters.Create(client, opts).ExtractTasks()
+		results, err := clusters.Create(client, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}

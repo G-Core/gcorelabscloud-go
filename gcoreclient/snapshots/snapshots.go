@@ -96,7 +96,7 @@ var snapshotDeleteCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		results, err := snapshots.Delete(client, snapshotID).ExtractTasks()
+		results, err := snapshots.Delete(client, snapshotID).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -155,7 +155,7 @@ var snapshotCreateCommand = cli.Command{
 			Name:        c.String("name"),
 			Description: c.String("description"),
 		}
-		results, err := snapshots.Create(client, opts).ExtractTasks()
+		results, err := snapshots.Create(client, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}

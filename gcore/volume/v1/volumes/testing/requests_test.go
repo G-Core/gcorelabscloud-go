@@ -183,7 +183,7 @@ func TestCreate(t *testing.T) {
 	err := options.Validate()
 	require.NoError(t, err)
 	client := fake.ServiceTokenClient("volumes", "v1")
-	tasks, err := volumes.Create(client, options).ExtractTasks()
+	tasks, err := volumes.Create(client, options).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 }
@@ -206,7 +206,7 @@ func TestDelete(t *testing.T) {
 
 	opts := volumes.DeleteOpts{Snapshots: []string{"x", "y"}}
 
-	tasks, err := volumes.Delete(client, Volume1.ID, opts).ExtractTasks()
+	tasks, err := volumes.Delete(client, Volume1.ID, opts).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 }
@@ -318,7 +318,7 @@ func TestExtend(t *testing.T) {
 	client := fake.ServiceTokenClient("volumes", "v1")
 	opts := volumes.SizePropertyOperationOpts{Size: 16}
 
-	tasks, err := volumes.Extend(client, Volume1.ID, opts).ExtractTasks()
+	tasks, err := volumes.Extend(client, Volume1.ID, opts).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 }

@@ -189,7 +189,7 @@ func TestCreate(t *testing.T) {
 	}
 
 	client := fake.ServiceTokenClient("lbpools", "v1")
-	tasks, err := lbpools.Create(client, options).ExtractTasks()
+	tasks, err := lbpools.Create(client, options).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 }
@@ -209,7 +209,7 @@ func TestDelete(t *testing.T) {
 	})
 
 	client := fake.ServiceTokenClient("lbpools", "v1")
-	tasks, err := lbpools.Delete(client, LBPool1.ID).ExtractTasks()
+	tasks, err := lbpools.Delete(client, LBPool1.ID).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 
@@ -243,7 +243,7 @@ func TestUpdate(t *testing.T) {
 		Name: &LBPool1.Name,
 	}
 
-	tasks, err := lbpools.Update(client, LBPool1.ID, opts).ExtractTasks()
+	tasks, err := lbpools.Update(client, LBPool1.ID, opts).Extract()
 
 	require.NoError(t, err)
 	require.NoError(t, err)
@@ -268,7 +268,7 @@ func TestDeleteMember(t *testing.T) {
 	})
 
 	client := fake.ServiceTokenClient("lbpools", "v1")
-	tasks, err := lbpools.DeleteMember(client, LBPool1.ID, memberID).ExtractTasks()
+	tasks, err := lbpools.DeleteMember(client, LBPool1.ID, memberID).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 
@@ -302,7 +302,7 @@ func TestCreateMember(t *testing.T) {
 	}
 
 	client := fake.ServiceTokenClient("lbpools", "v1")
-	tasks, err := lbpools.CreateMember(client, LBPool1.ID, options).ExtractTasks()
+	tasks, err := lbpools.CreateMember(client, LBPool1.ID, options).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 }

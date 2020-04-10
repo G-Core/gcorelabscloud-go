@@ -182,7 +182,7 @@ func TestCreate(t *testing.T) {
 	}
 
 	client := fake.ServiceTokenClient("magnum", "v1")
-	tasks, err := clusters.Create(client, options).ExtractTasks()
+	tasks, err := clusters.Create(client, options).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 }
@@ -202,7 +202,7 @@ func TestDelete(t *testing.T) {
 	})
 
 	client := fake.ServiceTokenClient("magnum", "v1")
-	tasks, err := clusters.Delete(client, Cluster1.UUID).ExtractTasks()
+	tasks, err := clusters.Delete(client, Cluster1.UUID).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 }
@@ -235,7 +235,7 @@ func TestResize(t *testing.T) {
 	}
 
 	client := fake.ServiceTokenClient("magnum", "v1")
-	tasks, err := clusters.Resize(client, Cluster1.UUID, options).ExtractTasks()
+	tasks, err := clusters.Resize(client, Cluster1.UUID, options).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 
@@ -297,7 +297,7 @@ func TestUpgrade(t *testing.T) {
 	}
 
 	client := fake.ServiceTokenClient("magnum", "v1")
-	tasks, err := clusters.Upgrade(client, Cluster1.UUID, options).ExtractTasks()
+	tasks, err := clusters.Upgrade(client, Cluster1.UUID, options).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 
@@ -329,7 +329,7 @@ func TestUpdate(t *testing.T) {
 	}}
 
 	client := fake.ServiceTokenClient("magnum", "v1")
-	tasks, err := clusters.Update(client, Cluster1.UUID, options).ExtractTasks()
+	tasks, err := clusters.Update(client, Cluster1.UUID, options).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 

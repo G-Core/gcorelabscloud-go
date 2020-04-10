@@ -20,21 +20,8 @@ func (r commonResult) Extract() (*Listener, error) {
 	return &s, err
 }
 
-// ExtractTasks is a function that accepts a result and extracts a listener creation task resource.
-func (r commonResult) ExtractTasks() (*tasks.TaskResults, error) {
-	var t tasks.TaskResults
-	err := r.ExtractInto(&t)
-	return &t, err
-}
-
 func (r commonResult) ExtractInto(v interface{}) error {
 	return r.Result.ExtractIntoStructPtr(v, "")
-}
-
-// CreateResult represents the result of a create operation. Call its Extract
-// method to interpret it as a Listener.
-type CreateResult struct {
-	commonResult
 }
 
 // GetResult represents the result of a get operation. Call its Extract
@@ -46,11 +33,6 @@ type GetResult struct {
 // UpdateResult represents the result of an update operation. Call its Extract
 // method to interpret it as a Listener.
 type UpdateResult struct {
-	commonResult
-}
-
-// DeleteResult represents the result of a delete operation
-type DeleteResult struct {
 	commonResult
 }
 

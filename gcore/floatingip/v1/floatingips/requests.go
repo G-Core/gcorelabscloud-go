@@ -3,6 +3,8 @@ package floatingips
 import (
 	"net"
 
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
+
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/pagination"
 )
@@ -38,7 +40,7 @@ func (opts CreateOpts) ToFloatingIPCreateMap() (map[string]interface{}, error) {
 }
 
 // Create accepts a CreateOpts struct and creates a new floating ip using the values provided.
-func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r CreateResult) {
+func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r tasks.Result) {
 	b, err := opts.ToFloatingIPCreateMap()
 	if err != nil {
 		r.Err = err
@@ -54,7 +56,7 @@ type UpdateOptsBuilder interface {
 }
 
 // Delete accepts a unique ID and deletes the floating ip associated with it.
-func Delete(c *gcorecloud.ServiceClient, floatingID string) (r DeleteResult) {
+func Delete(c *gcorecloud.ServiceClient, floatingID string) (r tasks.Result) {
 	_, r.Err = c.DeleteWithResponse(deleteURL(c, floatingID), &r.Body, nil)
 	return
 }

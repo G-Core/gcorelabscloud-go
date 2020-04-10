@@ -37,21 +37,9 @@ type UpdateResult struct {
 	commonResult
 }
 
-// ExtractTasks is a function that accepts a result and extracts a operation tasks.
-func (r commonResult) ExtractTasks() (*tasks.TaskResults, error) {
-	var s tasks.TaskResults
-	err := r.ExtractInto(&s)
-	return &s, err
-}
-
 // GetResult represents the result of a get operation. Call its Extract
 // method to interpret it as a FloatingIP.
 type GetResult struct {
-	commonResult
-}
-
-// DeleteResult represents the result of a delete operation
-type DeleteResult struct {
 	commonResult
 }
 

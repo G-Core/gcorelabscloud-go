@@ -9,18 +9,23 @@ type commonResult struct {
 	gcorecloud.Result
 }
 
+// Result represents the operation result that returns tasks
+type Result struct {
+	gcorecloud.Result
+}
+
+// Extract is a function that accepts a result and extracts a task resource.
+func (r Result) Extract() (*TaskResults, error) {
+	var t TaskResults
+	err := r.ExtractInto(&t)
+	return &t, err
+}
+
 // Extract is a function that accepts a result and extracts a task resource.
 func (r commonResult) Extract() (*Task, error) {
 	var s Task
 	err := r.ExtractInto(&s)
 	return &s, err
-}
-
-// ExtractTasks is a function that accepts a result and extracts a task resource.
-func (r commonResult) ExtractTasks() (*Tasks, error) {
-	var t Tasks
-	err := r.ExtractInto(&t)
-	return &t, err
 }
 
 func (r commonResult) ExtractInto(v interface{}) error {

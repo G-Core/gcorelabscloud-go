@@ -31,13 +31,6 @@ func (r commonResult) ExtractInto(v interface{}) error {
 	return r.Result.ExtractIntoStructPtr(v, "")
 }
 
-// ExtractTasks is a function that accepts a result and extracts a instance creation task resource.
-func (r commonResult) ExtractTasks() (*tasks.TaskResults, error) {
-	var t tasks.TaskResults
-	err := r.ExtractInto(&t)
-	return &t, err
-}
-
 // CreateResult represents the result of a create operation. Call its Extract
 // method to interpret it as a Instance.
 type CreateResult struct {
@@ -59,18 +52,6 @@ type UpdateResult struct {
 // DeleteResult represents the result of a delete operation
 type DeleteResult struct {
 	commonResult
-}
-
-// TasksResult represents the operation result that returns tasks
-type TasksResult struct {
-	commonResult
-}
-
-// Extract is a function that accepts a result and extracts a task resource.
-func (r TasksResult) Extract() (*tasks.TaskResults, error) {
-	var t tasks.TaskResults
-	err := r.ExtractInto(&t)
-	return &t, err
 }
 
 // SecurityGroupActionResult represents the result of a actions operation(no content)

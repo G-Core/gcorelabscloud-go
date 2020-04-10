@@ -195,7 +195,7 @@ func TestCreate(t *testing.T) {
 	}
 
 	client := fake.ServiceTokenClient("loadbalancers", "v1")
-	tasks, err := loadbalancers.Create(client, options).ExtractTasks()
+	tasks, err := loadbalancers.Create(client, options).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 }
@@ -215,7 +215,7 @@ func TestDelete(t *testing.T) {
 	})
 
 	client := fake.ServiceTokenClient("loadbalancers", "v1")
-	tasks, err := loadbalancers.Delete(client, LoadBalancer1.ID).ExtractTasks()
+	tasks, err := loadbalancers.Delete(client, LoadBalancer1.ID).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 

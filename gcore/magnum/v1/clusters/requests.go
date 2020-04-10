@@ -3,6 +3,7 @@ package clusters
 import (
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/magnum/v1/types"
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/pagination"
 )
 
@@ -88,7 +89,7 @@ func (opts CreateOpts) ToClusterCreateMap() (map[string]interface{}, error) {
 }
 
 // Create accepts a CreateOpts struct and creates a new cluster using the values provided.
-func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r CreateResult) {
+func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r tasks.Result) {
 	b, err := opts.ToClusterCreateMap()
 	if err != nil {
 		r.Err = err
@@ -116,7 +117,7 @@ func (opts ResizeOpts) ToClusterResizeMap() (map[string]interface{}, error) {
 }
 
 // Resize accepts a ResizeOpts struct and updates an existing cluster using the values provided.
-func Resize(c *gcorecloud.ServiceClient, clusterID string, opts ResizeOptsBuilder) (r ResizeResult) {
+func Resize(c *gcorecloud.ServiceClient, clusterID string, opts ResizeOptsBuilder) (r tasks.Result) {
 	b, err := opts.ToClusterResizeMap()
 	if err != nil {
 		r.Err = err
@@ -146,7 +147,7 @@ func (opts UpgradeOpts) ToClusterUpgradeMap() (map[string]interface{}, error) {
 }
 
 // Upgrade accepts a UpgradeOpts struct and upgrades an existing cluster using the values provided.
-func Upgrade(c *gcorecloud.ServiceClient, clusterID string, opts UpgradeOptsBuilder) (r UpgradeResult) {
+func Upgrade(c *gcorecloud.ServiceClient, clusterID string, opts UpgradeOptsBuilder) (r tasks.Result) {
 	b, err := opts.ToClusterUpgradeMap()
 	if err != nil {
 		r.Err = err
@@ -174,7 +175,7 @@ type UpdateOptsElem struct {
 }
 
 // Update accepts a struct and updates an existing cluster using the values provided.
-func Update(c *gcorecloud.ServiceClient, clusterID string, opts UpdateOptsBuilder) (r UpdateResult) {
+func Update(c *gcorecloud.ServiceClient, clusterID string, opts UpdateOptsBuilder) (r tasks.Result) {
 	b, err := opts.ToClusterUpdateMap()
 	if err != nil {
 		r.Err = err
@@ -192,7 +193,7 @@ func (opts UpdateOpts) ToClusterUpdateMap() ([]map[string]interface{}, error) {
 }
 
 // Delete accepts a unique ID and deletes the cluster associated with it.
-func Delete(c *gcorecloud.ServiceClient, clusterID string) (r DeleteResult) {
+func Delete(c *gcorecloud.ServiceClient, clusterID string) (r tasks.Result) {
 	_, r.Err = c.DeleteWithResponse(deleteURL(c, clusterID), &r.Body, nil)
 	return
 }

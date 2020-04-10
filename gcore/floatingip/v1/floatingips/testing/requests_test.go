@@ -163,7 +163,7 @@ func TestCreate(t *testing.T) {
 	}
 
 	client := fake.ServiceTokenClient("floatingips", "v1")
-	tasks, err := floatingips.Create(client, options).ExtractTasks()
+	tasks, err := floatingips.Create(client, options).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 }
@@ -184,7 +184,7 @@ func TestDelete(t *testing.T) {
 	})
 
 	client := fake.ServiceTokenClient("floatingips", "v1")
-	tasks, err := floatingips.Delete(client, floatingIP.ID).ExtractTasks()
+	tasks, err := floatingips.Delete(client, floatingIP.ID).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 

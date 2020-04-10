@@ -515,7 +515,7 @@ var instanceCreateCommandV2 = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
-		results, err := instances.Create(clientV2, opts).ExtractTasks()
+		results, err := instances.Create(clientV2, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -608,7 +608,7 @@ var instanceDeleteCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
-		results, err := instances.Delete(client, instanceID, opts).ExtractTasks()
+		results, err := instances.Delete(client, instanceID, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}

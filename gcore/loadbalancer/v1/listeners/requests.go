@@ -3,6 +3,7 @@ package listeners
 import (
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/loadbalancer/v1/types"
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/pagination"
 )
 
@@ -66,7 +67,7 @@ func (opts CreateOpts) ToListenerCreateMap() (map[string]interface{}, error) {
 }
 
 // Create accepts a CreateOpts struct and creates a new listener using the values provided.
-func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r CreateResult) {
+func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r tasks.Result) {
 	b, err := opts.ToListenerCreateMap()
 	if err != nil {
 		r.Err = err
@@ -106,7 +107,7 @@ func Update(c *gcorecloud.ServiceClient, listenerID string, opts UpdateOptsBuild
 }
 
 // Delete accepts a unique ID and deletes the listener associated with it.
-func Delete(c *gcorecloud.ServiceClient, listenerID string) (r DeleteResult) {
+func Delete(c *gcorecloud.ServiceClient, listenerID string) (r tasks.Result) {
 	_, r.Err = c.DeleteWithResponse(deleteURL(c, listenerID), &r.Body, nil)
 	return
 }

@@ -77,7 +77,7 @@ var floatingIPCreateSubCommand = cli.Command{
 			FixedIPAddress: ip,
 		}
 
-		results, err := floatingips.Create(client, opts).ExtractTasks()
+		results, err := floatingips.Create(client, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -143,7 +143,7 @@ var floatingIPDeleteSubCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		results, err := floatingips.Delete(client, floatingIPID).ExtractTasks()
+		results, err := floatingips.Delete(client, floatingIPID).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}

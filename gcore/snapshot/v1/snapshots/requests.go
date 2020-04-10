@@ -2,6 +2,7 @@ package snapshots
 
 import (
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/pagination"
 )
 
@@ -64,7 +65,7 @@ func (opts CreateOpts) ToSnapshotCreateMap() (map[string]interface{}, error) {
 }
 
 // Create accepts a CreateOpts struct and creates a new snapshot using the values provided.
-func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r CreateResult) {
+func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r tasks.Result) {
 	b, err := opts.ToSnapshotCreateMap()
 	if err != nil {
 		r.Err = err
@@ -90,7 +91,7 @@ func (opts UpdateOpts) ToSnapshotUpdateMap() (map[string]interface{}, error) {
 }
 
 // Delete accepts a unique ID and deletes the snapshot associated with it.
-func Delete(c *gcorecloud.ServiceClient, snapshotID string) (r DeleteResult) {
+func Delete(c *gcorecloud.ServiceClient, snapshotID string) (r tasks.Result) {
 	_, r.Err = c.DeleteWithResponse(deleteURL(c, snapshotID), &r.Body, nil)
 	return
 }

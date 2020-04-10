@@ -66,7 +66,7 @@ var loadBalancerCreateSubCommand = cli.Command{
 			VipNetworkID: utils.StringToPointer(c.String("vip-network-id")),
 		}
 
-		results, err := loadbalancers.Create(client, opts).ExtractTasks()
+		results, err := loadbalancers.Create(client, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -131,7 +131,7 @@ var loadBalancerDeleteSubCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		results, err := loadbalancers.Delete(client, loadBalancerID).ExtractTasks()
+		results, err := loadbalancers.Delete(client, loadBalancerID).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}

@@ -3,6 +3,8 @@ package instances
 import (
 	"net/http"
 
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
+
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/instance/v1/types"
 
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/volume/v1/volumes"
@@ -276,7 +278,7 @@ func UnAssignSecurityGroup(client *gcorecloud.ServiceClient, id string, opts Sec
 }
 
 // Create creates an instance.
-func Create(client *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r TasksResult) {
+func Create(client *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r tasks.Result) {
 	b, err := opts.ToInstanceCreateMap()
 	if err != nil {
 		r.Err = err
@@ -290,7 +292,7 @@ func Create(client *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r TasksRe
 	return
 }
 
-func Delete(client *gcorecloud.ServiceClient, instanceID string, opts DeleteOptsBuilder) (r TasksResult) {
+func Delete(client *gcorecloud.ServiceClient, instanceID string, opts DeleteOptsBuilder) (r tasks.Result) {
 	url := deleteURL(client, instanceID)
 	if opts != nil {
 		query, err := opts.ToInstanceDeleteQuery()
@@ -369,7 +371,7 @@ func Resume(client *gcorecloud.ServiceClient, id string) (r UpdateResult) {
 }
 
 // Resize instance.
-func Resize(client *gcorecloud.ServiceClient, id string, opts ChangeFlavorOptsBuilder) (r TasksResult) {
+func Resize(client *gcorecloud.ServiceClient, id string, opts ChangeFlavorOptsBuilder) (r tasks.Result) {
 	b, err := opts.ToChangeFlavorActionMap()
 	if err != nil {
 		r.Err = err

@@ -20,28 +20,15 @@ func (r commonResult) Extract() (*Cluster, error) {
 	return &s, err
 }
 
-// Extract is a function that accepts a result and extracts a cluster resource.
-func (r commonResult) ExtractConfig() (*Config, error) {
+// ExtractConfig is a function that accepts a result and extracts a cluster config.
+func (r ConfigResult) ExtractConfig() (*Config, error) {
 	var c Config
 	err := r.ExtractInto(&c)
 	return &c, err
 }
 
-// ExtractTasks is a function that accepts a result and extracts a cluster creation task resource.
-func (r commonResult) ExtractTasks() (*tasks.TaskResults, error) {
-	var t tasks.TaskResults
-	err := r.ExtractInto(&t)
-	return &t, err
-}
-
 func (r commonResult) ExtractInto(v interface{}) error {
 	return r.Result.ExtractIntoStructPtr(v, "")
-}
-
-// CreateResult represents the result of a create operation. Call its Extract
-// method to interpret it as a Cluster.
-type CreateResult struct {
-	commonResult
 }
 
 // GetResult represents the result of a get operation. Call its Extract
@@ -50,29 +37,9 @@ type GetResult struct {
 	commonResult
 }
 
-// UpdateResult represents the result of an update operation. Call its Extract method to interpret it as a Cluster.
-type UpdateResult struct {
-	commonResult
-}
-
-// UpgradeResult represents the result of an upgrade operation. Call its ExtractTasks method to interpret it as a Tasks.
-type UpgradeResult struct {
-	commonResult
-}
-
-// ResizeResult represents the result of an resizing operation. Call its Extract method to interpret it as a Cluster.
-type ResizeResult struct {
-	commonResult
-}
-
-// DeleteResult represents the result of a delete operation
-type DeleteResult struct {
-	commonResult
-}
-
 // ConfigResult represents the result of kubernetes config
 type ConfigResult struct {
-	commonResult
+	gcorecloud.Result
 }
 
 // Cluster represents a cluster structure.

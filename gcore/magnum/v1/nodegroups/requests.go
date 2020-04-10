@@ -3,6 +3,7 @@ package nodegroups
 import (
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/magnum/v1/types"
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/pagination"
 )
 
@@ -82,7 +83,7 @@ func (opts CreateOpts) ToClusterNodeGroupCreateMap() (map[string]interface{}, er
 
 // Create accepts a CreateOpts struct and creates a new cluster nodegroup using the values
 // provided. This operation does not actually require a request body, i.e. the CreateOpts struct argument can be empty.
-func Create(c *gcorecloud.ServiceClient, clusterID string, opts CreateOptsBuilder) (r CreateResult) {
+func Create(c *gcorecloud.ServiceClient, clusterID string, opts CreateOptsBuilder) (r tasks.Result) {
 	b, err := opts.ToClusterNodeGroupCreateMap()
 	if err != nil {
 		r.Err = err
@@ -122,7 +123,7 @@ func Update(c *gcorecloud.ServiceClient, clusterID, nodeGroupID string, opts Upd
 }
 
 // Delete accepts a unique ID and deletes the cluster nodegroup associated with it.
-func Delete(c *gcorecloud.ServiceClient, clusterID, nodeGroupID string) (r DeleteResult) {
+func Delete(c *gcorecloud.ServiceClient, clusterID, nodeGroupID string) (r tasks.Result) {
 	url := deleteURL(c, clusterID, nodeGroupID)
 	_, r.Err = c.DeleteWithResponse(url, &r.Body, nil)
 	return

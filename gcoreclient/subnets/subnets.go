@@ -94,7 +94,7 @@ var subnetDeleteCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		results, err := subnets.Delete(client, subnetID).ExtractTasks()
+		results, err := subnets.Delete(client, subnetID).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -212,7 +212,7 @@ var subnetCreateCommand = cli.Command{
 			NetworkID:              c.String("network-id"),
 			ConnectToNetworkRouter: c.Bool("connect-to-router"),
 		}
-		results, err := subnets.Create(client, opts).ExtractTasks()
+		results, err := subnets.Create(client, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}

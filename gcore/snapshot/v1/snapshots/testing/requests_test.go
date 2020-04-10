@@ -186,7 +186,7 @@ func TestCreate(t *testing.T) {
 	}
 
 	client := fake.ServiceTokenClient("snapshots", "v1")
-	tasks, err := snapshots.Create(client, options).ExtractTasks()
+	tasks, err := snapshots.Create(client, options).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 }
@@ -206,7 +206,7 @@ func TestDelete(t *testing.T) {
 	})
 
 	client := fake.ServiceTokenClient("snapshots", "v1")
-	tasks, err := snapshots.Delete(client, Snapshot1.ID).ExtractTasks()
+	tasks, err := snapshots.Delete(client, Snapshot1.ID).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 

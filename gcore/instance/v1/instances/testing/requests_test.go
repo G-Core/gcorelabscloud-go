@@ -338,7 +338,7 @@ func TestCreate(t *testing.T) {
 	require.NoError(t, err)
 
 	client := fake.ServiceTokenClient("instances", "v2")
-	tasks, err := instances.Create(client, options).ExtractTasks()
+	tasks, err := instances.Create(client, options).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 }
@@ -369,7 +369,7 @@ func TestDelete(t *testing.T) {
 	err := options.Validate()
 	require.NoError(t, err)
 	client := fake.ServiceTokenClient("instances", "v1")
-	tasks, err := instances.Delete(client, instanceID, options).ExtractTasks()
+	tasks, err := instances.Delete(client, instanceID, options).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 

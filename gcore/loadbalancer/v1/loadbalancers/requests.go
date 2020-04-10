@@ -3,6 +3,8 @@ package loadbalancers
 import (
 	"net"
 
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
+
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/loadbalancer/v1/types"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/pagination"
@@ -91,7 +93,7 @@ func (opts CreateOpts) ToLoadBalancerCreateMap() (map[string]interface{}, error)
 }
 
 // Create accepts a CreateOpts struct and creates a new loadbalancer using the values provided.
-func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r CreateResult) {
+func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r tasks.Result) {
 	b, err := opts.ToLoadBalancerCreateMap()
 	if err != nil {
 		r.Err = err
@@ -131,7 +133,7 @@ func Update(c *gcorecloud.ServiceClient, loadbalancerID string, opts UpdateOptsB
 }
 
 // Delete accepts a unique ID and deletes the loadbalancer associated with it.
-func Delete(c *gcorecloud.ServiceClient, loadbalancerID string) (r DeleteResult) {
+func Delete(c *gcorecloud.ServiceClient, loadbalancerID string) (r tasks.Result) {
 	_, r.Err = c.DeleteWithResponse(deleteURL(c, loadbalancerID), &r.Body, nil)
 	return
 }

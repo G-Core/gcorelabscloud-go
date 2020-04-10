@@ -98,7 +98,7 @@ var imageCreateCommand = cli.Command{
 			CowFormat: c.Bool("cow-format"),
 		}
 
-		results, err := images.Create(client, opts).ExtractTasks()
+		results, err := images.Create(client, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -163,7 +163,7 @@ var imageDeleteCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
-		results, err := images.Delete(client, imageID).ExtractTasks()
+		results, err := images.Delete(client, imageID).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}

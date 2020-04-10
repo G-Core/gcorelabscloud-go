@@ -154,7 +154,7 @@ func TestCreate(t *testing.T) {
 	}
 
 	client := fake.ServiceTokenClient("networks", "v1")
-	tasks, err := networks.Create(client, options).ExtractTasks()
+	tasks, err := networks.Create(client, options).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 }
@@ -174,7 +174,7 @@ func TestDelete(t *testing.T) {
 	})
 
 	client := fake.ServiceTokenClient("networks", "v1")
-	tasks, err := networks.Delete(client, Network1.ID).ExtractTasks()
+	tasks, err := networks.Delete(client, Network1.ID).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 

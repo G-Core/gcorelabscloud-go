@@ -3,6 +3,8 @@ package lbpools
 import (
 	"net"
 
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
+
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/loadbalancer/v1/types"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/pagination"
@@ -111,7 +113,7 @@ func (opts CreatePoolMemberOpts) ToLBPoolMemberCreateMap() (map[string]interface
 }
 
 // Create accepts a CreateOpts struct and creates a new lbpool using the values provided.
-func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r CreateResult) {
+func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r tasks.Result) {
 	b, err := opts.ToLBPoolCreateMap()
 	if err != nil {
 		r.Err = err
@@ -142,7 +144,7 @@ func (opts UpdateOpts) ToLBPoolUpdateMap() (map[string]interface{}, error) {
 
 // Update accepts a UpdateOpts struct and updates an existing lbpool using the
 // values provided. For more information, see the Create function.
-func Update(c *gcorecloud.ServiceClient, lbpoolID string, opts UpdateOptsBuilder) (r UpdateResult) {
+func Update(c *gcorecloud.ServiceClient, lbpoolID string, opts UpdateOptsBuilder) (r tasks.Result) {
 	b, err := opts.ToLBPoolUpdateMap()
 	if err != nil {
 		r.Err = err
@@ -155,7 +157,7 @@ func Update(c *gcorecloud.ServiceClient, lbpoolID string, opts UpdateOptsBuilder
 }
 
 // Delete accepts a unique ID and deletes the lbpool associated with it.
-func Delete(c *gcorecloud.ServiceClient, lbpoolID string) (r DeleteResult) {
+func Delete(c *gcorecloud.ServiceClient, lbpoolID string) (r tasks.Result) {
 	_, r.Err = c.DeleteWithResponse(deleteURL(c, lbpoolID), &r.Body, nil)
 	return
 }
@@ -170,7 +172,7 @@ func ListAll(c *gcorecloud.ServiceClient, opts ListOptsBuilder) ([]Pool, error) 
 }
 
 // CreateMember creates LB pool member
-func CreateMember(c *gcorecloud.ServiceClient, lbpoolID string, opts CreateMemberOptsBuilder) (r CreateResult) {
+func CreateMember(c *gcorecloud.ServiceClient, lbpoolID string, opts CreateMemberOptsBuilder) (r tasks.Result) {
 	b, err := opts.ToLBPoolMemberCreateMap()
 	if err != nil {
 		r.Err = err
@@ -181,7 +183,7 @@ func CreateMember(c *gcorecloud.ServiceClient, lbpoolID string, opts CreateMembe
 }
 
 // DeleteMember accepts a unique pool and member ID and deletes pool member.
-func DeleteMember(c *gcorecloud.ServiceClient, lbpoolID string, memberID string) (r DeleteResult) {
+func DeleteMember(c *gcorecloud.ServiceClient, lbpoolID string, memberID string) (r tasks.Result) {
 	_, r.Err = c.DeleteWithResponse(deleteMemberURL(c, lbpoolID, memberID), &r.Body, nil)
 	return
 }

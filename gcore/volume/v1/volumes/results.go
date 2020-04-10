@@ -19,13 +19,6 @@ func (r commonResult) Extract() (*Volume, error) {
 	return &s, err
 }
 
-// ExtractTasks is a function that accepts a result and extracts a volume creation task resource.
-func (r commonResult) ExtractTasks() (*tasks.TaskResults, error) {
-	var t tasks.TaskResults
-	err := r.ExtractInto(&t)
-	return &t, err
-}
-
 func (r commonResult) ExtractInto(v interface{}) error {
 	return r.Result.ExtractIntoStructPtr(v, "")
 }
@@ -45,11 +38,6 @@ type GetResult struct {
 // UpdateResult represents the result of an update operation. Call its Extract
 // method to interpret it as a Volume.
 type UpdateResult struct {
-	commonResult
-}
-
-// TasksResult represents the result of an operation. Call its ExtractTasks method to interpret it as a tasks.Tasks.
-type TasksResult struct {
 	commonResult
 }
 

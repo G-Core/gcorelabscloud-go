@@ -167,7 +167,7 @@ func TestCreate(t *testing.T) {
 	require.NoError(t, err)
 
 	client := fake.ServiceTokenClient("downloadimage", "v1")
-	tasks, err := images.Create(client, options).ExtractTasks()
+	tasks, err := images.Create(client, options).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 }
@@ -190,7 +190,7 @@ func TestDelete(t *testing.T) {
 	})
 
 	client := fake.ServiceTokenClient("images", "v1")
-	tasks, err := images.Delete(client, Image1.ID).ExtractTasks()
+	tasks, err := images.Delete(client, Image1.ID).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 

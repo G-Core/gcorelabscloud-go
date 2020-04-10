@@ -2,6 +2,7 @@ package volumes
 
 import (
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/pagination"
 )
 
@@ -133,7 +134,7 @@ func Get(c *gcorecloud.ServiceClient, id string) (r GetResult) {
 }
 
 // Create accepts a CreateOpts struct and creates a new volume using the values provided.
-func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r TasksResult) {
+func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r tasks.Result) {
 	b, err := opts.ToVolumeCreateMap()
 	if err != nil {
 		r.Err = err
@@ -144,7 +145,7 @@ func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r TasksResult)
 }
 
 // Delete accepts a unique ID and deletes the volume associated with it.
-func Delete(c *gcorecloud.ServiceClient, volumeID string, opts DeleteOptsBuilder) (r TasksResult) {
+func Delete(c *gcorecloud.ServiceClient, volumeID string, opts DeleteOptsBuilder) (r tasks.Result) {
 	url := deleteURL(c, volumeID)
 	if opts != nil {
 		query, err := opts.ToVolumeDeleteQuery()
@@ -192,7 +193,7 @@ func Retype(c *gcorecloud.ServiceClient, volumeID string, opts PropertiesOperati
 }
 
 // Extend accepts a VolumeTypePropertyOperationOpts struct and extend volume.
-func Extend(c *gcorecloud.ServiceClient, volumeID string, opts PropertiesOperationOptsBuilder) (r TasksResult) {
+func Extend(c *gcorecloud.ServiceClient, volumeID string, opts PropertiesOperationOptsBuilder) (r tasks.Result) {
 	b, err := opts.ToVolumePropertiesOperationMap()
 	if err != nil {
 		r.Err = err
@@ -203,7 +204,7 @@ func Extend(c *gcorecloud.ServiceClient, volumeID string, opts PropertiesOperati
 }
 
 // ListAll is a convenience function that returns all volumes.
-func ListAll(client *gcorecloud.ServiceClient, opts ListOpts) ([]Volume, error) {
+func ListAll(client *gcorecloud.ServiceClient, opts ListOptsBuilder) ([]Volume, error) {
 	pages, err := List(client, opts).AllPages()
 	if err != nil {
 		return nil, err

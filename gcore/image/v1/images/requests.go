@@ -3,6 +3,8 @@ package images
 import (
 	"net/http"
 
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
+
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/image/v1/images/types"
 
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
@@ -91,8 +93,8 @@ func ListAll(client *gcorecloud.ServiceClient, opts ListOptsBuilder) ([]Image, e
 
 }
 
-// Create creates an image.
-func Create(client *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r CreateResult) {
+// Create an image.
+func Create(client *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r tasks.Result) {
 	b, err := opts.ToImageCreateMap()
 	if err != nil {
 		r.Err = err
@@ -106,7 +108,8 @@ func Create(client *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r CreateR
 	return
 }
 
-func Delete(client *gcorecloud.ServiceClient, imageID string) (r DeleteResult) {
+// Delete an image.
+func Delete(client *gcorecloud.ServiceClient, imageID string) (r tasks.Result) {
 	url := deleteURL(client, imageID)
 	var resp *http.Response
 	resp, r.Err = client.DeleteWithResponse(url, &r.Body, nil)

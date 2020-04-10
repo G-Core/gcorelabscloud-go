@@ -82,7 +82,7 @@ var networkDeleteCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		results, err := networks.Delete(client, networkID).ExtractTasks()
+		results, err := networks.Delete(client, networkID).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -183,7 +183,7 @@ var networkCreateCommand = cli.Command{
 			Mtu:          utils.IntToPointer(c.Int("mtu")),
 			CreateRouter: utils.BoolToPointer(c.Bool("create-router")),
 		}
-		results, err := networks.Create(client, opts).ExtractTasks()
+		results, err := networks.Create(client, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}

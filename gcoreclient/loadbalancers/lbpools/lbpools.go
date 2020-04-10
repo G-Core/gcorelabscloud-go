@@ -240,7 +240,7 @@ var lbpoolDeleteSubCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		results, err := lbpools.Delete(client, lbpoolID).ExtractTasks()
+		results, err := lbpools.Delete(client, lbpoolID).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -472,7 +472,7 @@ var lbpoolCreateSubCommand = cli.Command{
 			SessionPersistence: sp,
 		}
 
-		results, err := lbpools.Create(client, opts).ExtractTasks()
+		results, err := lbpools.Create(client, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -557,7 +557,7 @@ var lbpoolCreateMemberSubCommand = cli.Command{
 			InstanceID:   utils.StringToPointer(c.String("instance-id")),
 		}
 
-		results, err := lbpools.CreateMember(client, lbpoolID, opts).ExtractTasks()
+		results, err := lbpools.CreateMember(client, lbpoolID, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -605,7 +605,7 @@ var lbpoolDeleteMemberSubCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 		lbpoolID := c.String("pool-id")
-		results, err := lbpools.DeleteMember(client, lbpoolID, memberID).ExtractTasks()
+		results, err := lbpools.DeleteMember(client, lbpoolID, memberID).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -791,7 +791,7 @@ var lbpoolUpdateSubCommand = cli.Command{
 			SessionPersistence: sp,
 		}
 
-		results, err := lbpools.Update(client, lbPoolID, opts).ExtractTasks()
+		results, err := lbpools.Update(client, lbPoolID, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}

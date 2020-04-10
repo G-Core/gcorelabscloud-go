@@ -108,7 +108,7 @@ var volumeDeleteCommand = cli.Command{
 		opts := volumes.DeleteOpts{
 			Snapshots: c.StringSlice("snapshot"),
 		}
-		results, err := volumes.Delete(client, volumeID, opts).ExtractTasks()
+		results, err := volumes.Delete(client, volumeID, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -219,7 +219,7 @@ var volumeCreateCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
-		results, err := volumes.Create(client, opts).ExtractTasks()
+		results, err := volumes.Create(client, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -392,7 +392,7 @@ var volumeExtendCommand = cli.Command{
 		opts := volumes.SizePropertyOperationOpts{
 			Size: size,
 		}
-		results, err := volumes.Extend(client, volumeID, opts).ExtractTasks()
+		results, err := volumes.Extend(client, volumeID, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}

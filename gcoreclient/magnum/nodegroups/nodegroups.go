@@ -75,7 +75,7 @@ var nodegroupDeleteSubCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		results, err := nodegroups.Delete(client, clusterID, nodeGroupID).ExtractTasks()
+		results, err := nodegroups.Delete(client, clusterID, nodeGroupID).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -280,7 +280,7 @@ var nodegroupCreateSubCommand = cli.Command{
 			MaxNodeCount:     utils.IntToPointer(c.Int("max-node-count")),
 		}
 
-		results, err := nodegroups.Create(client, clusterID, opts).ExtractTasks()
+		results, err := nodegroups.Create(client, clusterID, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}

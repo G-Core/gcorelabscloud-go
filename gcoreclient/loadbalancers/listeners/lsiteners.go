@@ -103,7 +103,7 @@ var listenerCreateSubCommand = cli.Command{
 			LoadBalancerID: c.String("loadbalancer-id"),
 		}
 
-		results, err := listeners.Create(client, opts).ExtractTasks()
+		results, err := listeners.Create(client, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -168,7 +168,7 @@ var listenerDeleteSubCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		results, err := listeners.Delete(client, listenerID).ExtractTasks()
+		results, err := listeners.Delete(client, listenerID).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}

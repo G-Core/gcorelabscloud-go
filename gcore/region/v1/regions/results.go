@@ -4,7 +4,6 @@ import (
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/region/v1/types"
 
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/pagination"
 )
 
@@ -17,13 +16,6 @@ func (r commonResult) Extract() (*Region, error) {
 	var s Region
 	err := r.ExtractInto(&s)
 	return &s, err
-}
-
-// ExtractTasks is a function that accepts a result and extracts a region creation task resource.
-func (r commonResult) ExtractTasks() (*tasks.TaskResults, error) {
-	var t tasks.TaskResults
-	err := r.ExtractInto(&t)
-	return &t, err
 }
 
 func (r commonResult) ExtractInto(v interface{}) error {

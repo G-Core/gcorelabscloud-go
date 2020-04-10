@@ -183,7 +183,7 @@ func TestCreate(t *testing.T) {
 	}
 
 	client := fake.ServiceTokenClient("magnum", "v1")
-	tasks, err := nodegroups.Create(client, NodeGroup1.ClusterID, options).ExtractTasks()
+	tasks, err := nodegroups.Create(client, NodeGroup1.ClusterID, options).Extract()
 
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
@@ -205,7 +205,7 @@ func TestDelete(t *testing.T) {
 	})
 
 	client := fake.ServiceTokenClient("magnum", "v1")
-	tasks, err := nodegroups.Delete(client, NodeGroup1.ClusterID, NodeGroup1.UUID).ExtractTasks()
+	tasks, err := nodegroups.Delete(client, NodeGroup1.ClusterID, NodeGroup1.UUID).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 
