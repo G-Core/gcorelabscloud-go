@@ -60,8 +60,7 @@ const GetResponse = `
 const CreateRequest = `
 {
   "url": "http://mirror.noris.net/cirros/0.4.0/cirros-0.4.0-x86_64-disk.img",
-  "name": "image_name",
-  "cow_format": false
+  "name": "image_name"
 }
 `
 

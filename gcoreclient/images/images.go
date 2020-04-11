@@ -19,6 +19,40 @@ var (
 	visibilityTypes = types.Visibility("").StringList()
 )
 
+func listImages(c *cli.Context) error {
+	client, err := utils.BuildClient(c, "images", "", "")
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.NewExitError(err, 1)
+	}
+
+	opts := images.ListOpts{
+		Private:    c.Bool("private"),
+		Visibility: types.Visibility(c.String("visibility")),
+	}
+
+	results, err := images.ListAll(client, opts)
+	if err != nil {
+		return cli.NewExitError(err, 1)
+	}
+	utils.ShowResults(results, c.String("format"))
+	return nil
+}
+
+func listProjectImages(c *cli.Context) error {
+	client, err := utils.BuildClient(c, "projectimages", "", "")
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.NewExitError(err, 1)
+	}
+	results, err := images.ListAll(client, nil)
+	if err != nil {
+		return cli.NewExitError(err, 1)
+	}
+	utils.ShowResults(results, c.String("format"))
+	return nil
+}
+
 var imageListCommand = cli.Command{
 	Name:     "list",
 	Usage:    "List images",
@@ -28,6 +62,12 @@ var imageListCommand = cli.Command{
 			Name:     "private",
 			Aliases:  []string{"p"},
 			Usage:    "only private images",
+			Required: false,
+		},
+		&cli.BoolFlag{
+			Name:     "owner",
+			Aliases:  []string{"o"},
+			Usage:    "only current project images",
 			Required: false,
 		},
 		&cli.GenericFlag{
@@ -41,24 +81,18 @@ var imageListCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		client, err := utils.BuildClient(c, "images", "", "")
-		if err != nil {
-			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
+		if c.Bool("owner") {
+			return listProjectImages(c)
 		}
-
-		opts := images.ListOpts{
-			Private:    c.Bool("private"),
-			Visibility: types.Visibility(c.String("visibility")),
-		}
-
-		results, err := images.ListAll(client, opts)
-		if err != nil {
-			return cli.NewExitError(err, 1)
-		}
-		utils.ShowResults(results, c.String("format"))
-		return nil
+		return listImages(c)
 	},
+}
+
+var imageProjectListCommand = cli.Command{
+	Name:     "list",
+	Usage:    "List project images",
+	Category: "image",
+	Action:   listProjectImages,
 }
 
 var imageCreateCommand = cli.Command{
@@ -82,7 +116,7 @@ var imageCreateCommand = cli.Command{
 			Name:     "cow-format",
 			Aliases:  []string{"c"},
 			Usage:    "image with cow format",
-			Required: true,
+			Required: false,
 		},
 		&cli.StringSliceFlag{
 			Name:        "property",
@@ -122,6 +156,10 @@ var imageCreateCommand = cli.Command{
 			instanceID, err := images.ExtractImageIDFromTask(taskInfo)
 			if err != nil {
 				return nil, fmt.Errorf("cannot retrieve image ID from task info: %w", err)
+			}
+			client, err = utils.BuildClient(c, "images", "", "")
+			if err != nil {
+				return nil, err
 			}
 			instance, err := images.Get(client, instanceID).Extract()
 			if err != nil {
@@ -203,5 +241,12 @@ var ImageCommands = cli.Command{
 		&imageShowCommand,
 		&imageDeleteCommand,
 		&imageCreateCommand,
+		{
+			Name:  "project",
+			Usage: "GCloud project images API",
+			Subcommands: []*cli.Command{
+				&imageProjectListCommand,
+			},
+		},
 	},
 }
