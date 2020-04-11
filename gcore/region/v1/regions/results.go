@@ -1,6 +1,7 @@
 package regions
 
 import (
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/keystone/v1/keystones"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/region/v1/types"
 
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
@@ -40,21 +41,6 @@ type UpdateResult struct {
 	commonResult
 }
 
-// DeleteResult represents the result of a delete operation
-type DeleteResult struct {
-	commonResult
-}
-
-// Keystone represents a keystone structure.
-type Keystone struct {
-	ID                        int                       `json:"id"`
-	URL                       gcorecloud.URL            `json:"url"`
-	State                     types.KeystoneState       `json:"state"`
-	KeystoneFederatedDomainID string                    `json:"keystone_federated_domain_id"`
-	CreatedOn                 gcorecloud.JSONRFC3339NoZ `json:"created_on"`
-	AdminPassword             string                    `json:"admin_password"`
-}
-
 // Region represents a region structure.
 type Region struct {
 	ID                int                       `json:"id"`
@@ -67,7 +53,7 @@ type Region struct {
 	SpiceProxyURL     gcorecloud.URL            `json:"spice_proxy_url"`
 	CreatedOn         gcorecloud.JSONRFC3339NoZ `json:"created_on"`
 	KeystoneID        int                       `json:"keystone_id"`
-	Keystone          Keystone                  `json:"keystone"`
+	Keystone          keystones.Keystone        `json:"keystone"`
 }
 
 // RegionPage is the page returned by a pager when traversing over a

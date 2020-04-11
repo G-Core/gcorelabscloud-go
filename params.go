@@ -33,7 +33,11 @@ fits within the request process as a whole rather than use it directly as shown
 above.
 */
 
-var trueTag = "true"
+var (
+	trueTag    = "true"
+	typeOfCIDR = reflect.TypeOf(CIDR{})
+	typeOfURL  = reflect.TypeOf(URL{})
+)
 
 func BuildSliceRequestBody(opts interface{}) ([]map[string]interface{}, error) { // nolint: gocyclo
 	optsValue := reflect.ValueOf(opts)
@@ -81,6 +85,18 @@ func BuildSliceRequestBody(opts interface{}) ([]map[string]interface{}, error) {
 
 }
 
+func skipCustomStructs(v reflect.Value, typeof ...reflect.Type) bool {
+	if isZero(v) {
+		return false
+	}
+	for _, tp := range typeof {
+		if v.Type() == tp || (v.Kind() == reflect.Ptr && v.Elem().Type() == tp) {
+			return true
+		}
+	}
+	return false
+}
+
 func BuildRequestBody(opts interface{}, parent string) (map[string]interface{}, error) { // nolint: gocyclo
 
 	optsValue := reflect.ValueOf(opts)
@@ -106,7 +122,7 @@ func BuildRequestBody(opts interface{}, parent string) (map[string]interface{}, 
 			}
 
 			// pass to marshall process and do not process this type as struct
-			if v.Type() == reflect.TypeOf(CIDR{}) {
+			if skipCustomStructs(v, typeOfURL, typeOfCIDR) {
 				continue
 			}
 

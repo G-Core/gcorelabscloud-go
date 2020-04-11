@@ -4,12 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/projects"
-
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/regions"
-
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/snapshots"
-
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/flags"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/flavors"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/floatingips/floatingips"
@@ -17,11 +11,15 @@ import (
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/images"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/instances"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/keypairs"
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/keystones"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/loadbalancers/loadbalancers"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/magnum"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/networks"
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/projects"
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/regions"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/securitygroups/securitygrouprules"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/securitygroups/securitygroups"
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/snapshots"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/subnets"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/tasks"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/volumes"
@@ -47,6 +45,7 @@ var commands = []*cli.Command{
 	&images.ImageCommands,
 	&regions.RegionCommands,
 	&projects.ProjectCommands,
+	&keystones.KeystoneCommands,
 }
 
 func main() {

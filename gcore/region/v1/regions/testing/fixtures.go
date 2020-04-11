@@ -3,6 +3,9 @@ package testing
 import (
 	"time"
 
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/keystone/v1/keystones"
+
+	keystonetypes "bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/keystone/v1/types"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/region/v1/types"
 
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
@@ -99,10 +102,10 @@ var (
 		SpiceProxyURL:     *spiceURL,
 		CreatedOn:         createdTime,
 		KeystoneID:        1,
-		Keystone: regions.Keystone{
+		Keystone: keystones.Keystone{
 			ID:                        1,
 			URL:                       *keystoneURL,
-			State:                     types.KeystoneStateNew,
+			State:                     keystonetypes.KeystoneStateNew,
 			KeystoneFederatedDomainID: "5ac0a17e556d4a9c8f946928a7953990",
 			CreatedOn:                 createdTime,
 			AdminPassword:             "******",
