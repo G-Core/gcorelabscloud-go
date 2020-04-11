@@ -40,7 +40,7 @@ type CreateOptsBuilder interface {
 type CreateOpts struct {
 	URL        string             `json:"url" required:"true" validate:"required,url"`
 	Name       string             `json:"name" required:"true" validate:"required"`
-	CowFormat  bool               `json:"cow_format,omitempty"`
+	CowFormat  bool               `json:"cow_format"`
 	Properties *map[string]string `json:"properties,omitempty"`
 }
 

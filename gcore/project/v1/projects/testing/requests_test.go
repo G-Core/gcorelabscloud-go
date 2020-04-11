@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"testing"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/region/v1/types"
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/project/v1/types"
 
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/region/v1/regions"
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/project/v1/projects"
 	fake "bitbucket.gcore.lu/gcloud/gcorecloud-go/testhelper/client"
 
 	"github.com/stretchr/testify/require"
@@ -21,11 +21,11 @@ import (
 )
 
 func prepareListTestURL() string {
-	return "/v1/regions"
+	return "/v1/projects"
 }
 
 func prepareGetTestURL(id int) string {
-	return fmt.Sprintf("/v1/regions/%d", id)
+	return fmt.Sprintf("/v1/projects/%d", id)
 }
 
 func TestList(t *testing.T) {
@@ -44,16 +44,16 @@ func TestList(t *testing.T) {
 		}
 	})
 
-	client := fake.ServiceTokenClient("regions", "v1")
+	client := fake.ServiceTokenClient("projects", "v1")
 	count := 0
 
-	err := regions.List(client).EachPage(func(page pagination.Page) (bool, error) {
+	err := projects.List(client).EachPage(func(page pagination.Page) (bool, error) {
 		count++
-		actual, err := regions.ExtractRegions(page)
+		actual, err := projects.ExtractProjects(page)
 		require.NoError(t, err)
 		ct := actual[0]
-		require.Equal(t, Region1, ct)
-		require.Equal(t, ExpectedRegionSlice, actual)
+		require.Equal(t, Project1, ct)
+		require.Equal(t, ExpectedProjectSlice, actual)
 		return true, nil
 	})
 
@@ -80,13 +80,13 @@ func TestListAll(t *testing.T) {
 		}
 	})
 
-	client := fake.ServiceTokenClient("regions", "v1")
+	client := fake.ServiceTokenClient("projects", "v1")
 
-	results, err := regions.ListAll(client)
+	results, err := projects.ListAll(client)
 	require.NoError(t, err)
 	ct := results[0]
-	require.Equal(t, Region1, ct)
-	require.Equal(t, ExpectedRegionSlice, results)
+	require.Equal(t, Project1, ct)
+	require.Equal(t, ExpectedProjectSlice, results)
 
 }
 
@@ -95,7 +95,7 @@ func TestGet(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
 
-	testURL := prepareGetTestURL(Region1.ID)
+	testURL := prepareGetTestURL(Project1.ID)
 
 	th.Mux.HandleFunc(testURL, func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "GET")
@@ -110,13 +110,13 @@ func TestGet(t *testing.T) {
 		}
 	})
 
-	client := fake.ServiceTokenClient("regions", "v1")
+	client := fake.ServiceTokenClient("projects", "v1")
 
-	ct, err := regions.Get(client, Region1.ID).Extract()
+	ct, err := projects.Get(client, Project1.ID).Extract()
 
 	require.NoError(t, err)
-	require.Equal(t, Region1, *ct)
-	require.Equal(t, createdTime, ct.CreatedOn)
+	require.Equal(t, Project1, *ct)
+	require.Equal(t, createdTime, ct.CreatedAt)
 
 }
 
@@ -139,24 +139,21 @@ func TestCreate(t *testing.T) {
 		}
 	})
 
-	options := regions.CreateOpts{
-		DisplayName:       Region1.DisplayName,
-		KeystoneName:      Region1.DisplayName,
-		State:             types.RegionStateActive,
-		EndpointType:      Region1.EndpointType,
-		ExternalNetworkID: Region1.ExternalNetworkID,
-		SpiceProxyURL:     nil,
-		KeystoneID:        Region1.KeystoneID,
+	options := projects.CreateOpts{
+		ClientID:    1,
+		State:       types.ProjectStateActive,
+		Name:        "default",
+		Description: "",
 	}
 
 	err := gcorecloud.TranslateValidationError(options.Validate())
 	require.NoError(t, err)
 
-	client := fake.ServiceTokenClient("regions", "v1")
-	region, err := regions.Create(client, options).Extract()
+	client := fake.ServiceTokenClient("projects", "v1")
+	project, err := projects.Create(client, options).Extract()
 	require.NoError(t, err)
-	require.Equal(t, Region1, *region)
-	require.Equal(t, createdTime, region.CreatedOn)
+	require.Equal(t, Project1, *project)
+	require.Equal(t, createdTime, project.CreatedAt)
 }
 
 func TestUpdate(t *testing.T) {
@@ -164,10 +161,10 @@ func TestUpdate(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
 
-	testURL := prepareGetTestURL(Region1.ID)
+	testURL := prepareGetTestURL(Project1.ID)
 
 	th.Mux.HandleFunc(testURL, func(w http.ResponseWriter, r *http.Request) {
-		th.TestMethod(t, r, "PATCH")
+		th.TestMethod(t, r, "PUT")
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 		th.TestHeader(t, r, "Content-Type", "application/json")
 		th.TestHeader(t, r, "Accept", "application/json")
@@ -181,19 +178,19 @@ func TestUpdate(t *testing.T) {
 		}
 	})
 
-	client := fake.ServiceTokenClient("regions", "v1")
+	client := fake.ServiceTokenClient("projects", "v1")
 
-	options := regions.UpdateOpts{
-		DisplayName: Region1.DisplayName,
-		State:       types.RegionStateDeleted,
+	options := projects.UpdateOpts{
+		Name:        Project1.Name,
+		Description: "description",
 	}
 
 	err := gcorecloud.TranslateValidationError(options.Validate())
 	require.NoError(t, err)
 
-	region, err := regions.Update(client, Region1.ID, options).Extract()
+	project, err := projects.Update(client, Project1.ID, options).Extract()
 	require.NoError(t, err)
-	require.Equal(t, Region1, *region)
-	require.Equal(t, createdTime, region.CreatedOn)
+	require.Equal(t, Project1, *project)
+	require.Equal(t, createdTime, project.CreatedAt)
 
 }

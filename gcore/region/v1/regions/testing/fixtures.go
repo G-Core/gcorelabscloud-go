@@ -27,6 +27,7 @@ const ListResponse = `
         "url": "https://ed-10.cloud.core.pw:5000/v3"
       },
       "state": "ACTIVE",
+	  "task_id": null,
       "external_network_id": "0521f854-8e34-4e67-8827-2aeb27fb3872",
       "spice_proxy_url": "https://ed-10.cloud.core.pw:6062",
       "endpoint_type": "public",
@@ -51,6 +52,7 @@ const GetResponse = `
     "url": "https://ed-10.cloud.core.pw:5000/v3"
   },
   "state": "ACTIVE",
+  "task_id": null,
   "external_network_id": "0521f854-8e34-4e67-8827-2aeb27fb3872",
   "spice_proxy_url": "https://ed-10.cloud.core.pw:6062",
   "endpoint_type": "public",
@@ -91,7 +93,7 @@ var (
 		DisplayName:       "ED-10",
 		KeystoneName:      "ED-10",
 		State:             types.RegionStateActive,
-		CreatorTaskID:     nil,
+		TaskID:            nil,
 		EndpointType:      types.EndpointTypePublic,
 		ExternalNetworkID: "0521f854-8e34-4e67-8827-2aeb27fb3872",
 		SpiceProxyURL:     *spiceURL,

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/projects"
+
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/regions"
 
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/snapshots"
@@ -44,6 +46,7 @@ var commands = []*cli.Command{
 	&snapshots.SnapshotCommands,
 	&images.ImageCommands,
 	&regions.RegionCommands,
+	&projects.ProjectCommands,
 }
 
 func main() {

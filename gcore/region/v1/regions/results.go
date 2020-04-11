@@ -61,7 +61,7 @@ type Region struct {
 	DisplayName       string                    `json:"display_name"`
 	KeystoneName      string                    `json:"keystone_name"`
 	State             types.RegionState         `json:"state"`
-	CreatorTaskID     *string                   `json:"creator_task_id"`
+	TaskID            *string                   `json:"task_id"`
 	EndpointType      types.EndpointType        `json:"endpoint_type"`
 	ExternalNetworkID string                    `json:"external_network_id"`
 	SpiceProxyURL     gcorecloud.URL            `json:"spice_proxy_url"`

@@ -62,11 +62,11 @@ type UpdateOptsBuilder interface {
 
 // UpdateOpts represents options used to update a region.
 type UpdateOpts struct {
-	DisplayName       string             `json:"display_name,omitempty"`
-	State             types.RegionState  `json:"state,omitempty" validate:"omitempty,enum"`
-	EndpointType      types.EndpointType `json:"endpoint_type,omitempty" validate:"omitempty,enum"`
-	ExternalNetworkID string             `json:"external_network_id,omitempty" validate:"omitempty,uuid4"`
-	SpiceProxyURL     *gcorecloud.URL    `json:"spice_proxy_url,omitempty"`
+	DisplayName       string             `json:"display_name,omitempty" validate:"required_without_all=State EndpointType ExternalNetworkID SpiceProxyURL"`
+	State             types.RegionState  `json:"state,omitempty" validate:"required_without_all=DisplayName EndpointType ExternalNetworkID SpiceProxyURL,omitempty,enum"`
+	EndpointType      types.EndpointType `json:"endpoint_type,omitempty" validate:"required_without_all=DisplayName State ExternalNetworkID SpiceProxyURL,omitempty,enum"`
+	ExternalNetworkID string             `json:"external_network_id,omitempty" validate:"required_without_all=DisplayName State EndpointType SpiceProxyURL,omitempty,uuid4"`
+	SpiceProxyURL     *gcorecloud.URL    `json:"spice_proxy_url,omitempty" validate:"required_without_all=DisplayName State EndpointType ExternalNetworkID"`
 }
 
 // ToRegionUpdateMap builds a request body from UpdateOpts.
