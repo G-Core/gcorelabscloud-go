@@ -492,7 +492,7 @@ var clusterCreateSubCommand = cli.Command{
 		},
 		&cli.StringFlag{
 			Name:        "fixed-network",
-			Usage:       "Fixed subnet that are using to allocate network address for nodes in cluster.",
+			Usage:       "Fixed network that are using to allocate network address for nodes in cluster.",
 			DefaultText: "nil",
 			Required:    false,
 		},
