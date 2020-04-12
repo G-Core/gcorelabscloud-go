@@ -16,6 +16,7 @@ import (
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/magnum"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/networks"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/projects"
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/quotas"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/regions"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/securitygroups/securitygrouprules"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/securitygroups/securitygroups"
@@ -46,6 +47,7 @@ var commands = []*cli.Command{
 	&regions.RegionCommands,
 	&projects.ProjectCommands,
 	&keystones.KeystoneCommands,
+	&quotas.QuotaCommands,
 }
 
 func main() {

@@ -7,6 +7,7 @@ require (
 	github.com/go-playground/locales v0.13.0
 	github.com/go-playground/universal-translator v0.17.0
 	github.com/go-playground/validator/v10 v10.2.0
+	github.com/iancoleman/strcase v0.0.0-20191112232945-16388991a334
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/kr/pretty v0.2.0 // indirect
 	github.com/ladydascalie/currency v1.5.0
