@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/limits"
+
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/flags"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/flavors"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/floatingips/floatingips"
@@ -48,6 +50,7 @@ var commands = []*cli.Command{
 	&projects.ProjectCommands,
 	&keystones.KeystoneCommands,
 	&quotas.QuotaCommands,
+	&limits.LimitCommands,
 }
 
 func main() {

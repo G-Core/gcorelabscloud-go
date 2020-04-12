@@ -19,6 +19,12 @@ func TestUpdateOptsToMap(t *testing.T) {
 	m, err := opts.ToQuotaUpdateMap()
 	require.NoError(t, err)
 	require.Len(t, m, 3)
+
+	opts = quotas.UpdateOpts{Quota: quotas.NewQuota()}
+	opts.ProjectCountLimit = -2
+	_, err = opts.ToQuotaUpdateMap()
+	require.Error(t, err)
+
 }
 
 func TestReplaceOptsToMap(t *testing.T) {
@@ -31,4 +37,10 @@ func TestReplaceOptsToMap(t *testing.T) {
 	opts.CPUCountLimit = 0
 	_, err = opts.ToQuotaReplaceMap()
 	require.Error(t, err)
+
+	opts = quotas.ReplaceOpts{Quota: quotas.NewQuota()}
+	opts.ProjectCountLimit = -2
+	_, err = opts.ToQuotaReplaceMap()
+	require.Error(t, err)
+
 }

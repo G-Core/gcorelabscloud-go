@@ -22,8 +22,17 @@ type ReplaceOpts struct {
 	Quota
 }
 
+// Validate
+func (opts Quota) Validate() error {
+	return gcorecloud.Validate.Struct(opts)
+}
+
 // ToQuotaReplaceMap builds a request body from ReplaceOpts.
 func (opts ReplaceOpts) ToQuotaReplaceMap() (map[string]interface{}, error) {
+	err := gcorecloud.TranslateValidationError(opts.Validate())
+	if err != nil {
+		return nil, err
+	}
 	m, err := gcorecloud.BuildRequestBody(opts, "")
 	if err != nil {
 		return nil, err
@@ -57,6 +66,10 @@ type UpdateOpts struct {
 
 // ToQuotaUpdateMap builds a request body from UpdateOpts.
 func (opts UpdateOpts) ToQuotaUpdateMap() (map[string]interface{}, error) {
+	err := gcorecloud.TranslateValidationError(opts.Validate())
+	if err != nil {
+		return nil, err
+	}
 	m := opts.ToRequestMap()
 	if len(opts.ToRequestMap()) == 0 {
 		return nil, fmt.Errorf("at least one Quota field should be set")
