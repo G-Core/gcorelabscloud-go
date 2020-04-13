@@ -117,6 +117,16 @@ const CreateRequest = `
 }
 `
 
+const UpdateRequest = `
+[
+	{
+		"path": "/labels",
+		"value": {"one": "two"},
+		"op": "replace"
+	}
+]
+`
+
 const CreateResponse = `
 {
   "docker_volume_size": 5,
@@ -164,6 +174,8 @@ const CreateResponse = `
   "updated_at": null
 }
 `
+
+const UpdateResponse = CreateResponse
 
 var createdTimeString = "2020-02-28T11:35:58+00:00"
 var createdTime, _ = time.Parse(time.RFC3339, createdTimeString)

@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"testing"
 
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/magnum/v1/types"
+
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/magnum/v1/clustertemplates"
 	fake "bitbucket.gcore.lu/gcloud/gcorecloud-go/testhelper/client"
 
@@ -29,6 +31,10 @@ func prepareListTestURL() string {
 }
 
 func prepareGetTestURL(id string) string {
+	return prepareGetTestURLParams(fake.ProjectID, fake.RegionID, id)
+}
+
+func prepareUpdateTestURL(id string) string {
 	return prepareGetTestURLParams(fake.ProjectID, fake.RegionID, id)
 }
 
@@ -176,4 +182,36 @@ func TestDelete(t *testing.T) {
 	client := fake.ServiceTokenClient("magnum", "v1")
 	res := clustertemplates.Delete(client, ClusterTemplate1.UUID)
 	th.AssertNoErr(t, res.Err)
+}
+
+func TestUpdate(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareUpdateTestURL(ClusterTemplate1.UUID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "PATCH")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestJSONRequest(t, r, UpdateRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+
+		_, err := fmt.Fprint(w, UpdateResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	options := clustertemplates.UpdateOpts{clustertemplates.UpdateOptsElem{
+		Path:  "/labels",
+		Value: map[string]string{"one": "two"},
+		Op:    types.ClusterUpdateOperationReplace,
+	}}
+
+	client := fake.ServiceTokenClient("magnum", "v1")
+	tasks, err := clustertemplates.Update(client, ClusterTemplate1.UUID, options).Extract()
+	require.NoError(t, err)
+	require.Equal(t, ClusterTemplate1, *tasks)
+
 }

@@ -206,11 +206,11 @@ var clusterUpgradeSubCommand = cli.Command{
 			if err != nil {
 				return nil, fmt.Errorf("cannot retrieve cluster ID from task info: %w", err)
 			}
-			network, err := clusters.Get(client, clusterID).Extract()
+			cluster, err := clusters.Get(client, clusterID).Extract()
 			if err != nil {
 				return nil, fmt.Errorf("cannot get cluster with ID: %s. Error: %w", clusterID, err)
 			}
-			utils.ShowResults(network, c.String("format"))
+			utils.ShowResults(cluster, c.String("format"))
 			return nil, nil
 		})
 
@@ -242,7 +242,7 @@ var clusterUpdateSubCommand = cli.Command{
 				Enum: clusterUpdateTypes,
 			},
 			Usage:    fmt.Sprintf("output in %s", strings.Join(clusterUpdateTypes, ", ")),
-			Required: false,
+			Required: true,
 		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
@@ -270,13 +270,18 @@ var clusterUpdateSubCommand = cli.Command{
 
 		for idx, path := range paths {
 			if !strings.HasPrefix(path, "/") {
-				return cli.NewExitError(fmt.Errorf("path parameter should be in format /value"), 1)
+				return cli.NewExitError(fmt.Errorf("path parameter should be in format /path"), 1)
 			}
 			var updateValue interface{}
 			value := values[idx]
 			intValue, err := strconv.Atoi(value)
 			if err == nil {
 				updateValue = intValue
+			} else if path == "/labels" {
+				updateValue, err = utils.StringSliceToMap(strings.Split(value, ","))
+				if err != nil {
+					return cli.NewExitError(fmt.Errorf("wrong labels format. should be in format: label_one=value_one,label_two=value_two"), 1)
+				}
 			} else {
 				updateValue = value
 			}

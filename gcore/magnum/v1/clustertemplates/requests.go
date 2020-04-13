@@ -2,6 +2,7 @@ package clustertemplates
 
 import (
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/magnum/v1/types"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/pagination"
 )
 
@@ -120,22 +121,42 @@ func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r CreateResult
 	return
 }
 
-// UpdateOptsBuilder allows extensions to add additional parameters to the Update request.
-type UpdateOptsBuilder interface {
-	ToClusterTemplateUpdateMap() (map[string]interface{}, error)
+// UpdateOpts represents options used to update a cluster template.
+type UpdateOpts []UpdateOptsElem
+
+// UpdateOptsElem represents options used to update a cluster template.
+type UpdateOptsElem struct {
+	Path  string                       `json:"path" required:"true" validate:"required,startswith=/"`
+	Value interface{}                  `json:"value,omitempty" validate:"rfe=Op:add;replace"`
+	Op    types.ClusterUpdateOperation `json:"op" required:"true" validate:"required,enum"`
 }
 
-// UpdateOpts represents options used to update a network.
-type UpdateOpts struct {
+// UpdateOptsBuilder allows extensions to add additional parameters to the Update request.
+type UpdateOptsBuilder interface {
+	ToClusterTemplateUpdateMap() ([]map[string]interface{}, error)
+}
+
+// Validate
+func (opts UpdateOpts) Validate() error {
+	for _, v := range opts {
+		err := gcorecloud.TranslateValidationError(gcorecloud.Validate.Struct(v))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // ToClusterTemplateUpdateMap builds a request body from UpdateOpts.
-func (opts UpdateOpts) ToClusterTemplateUpdateMap() (map[string]interface{}, error) {
-	return gcorecloud.BuildRequestBody(opts, "")
+func (opts UpdateOpts) ToClusterTemplateUpdateMap() ([]map[string]interface{}, error) {
+	err := opts.Validate()
+	if err != nil {
+		return nil, err
+	}
+	return gcorecloud.BuildSliceRequestBody(opts)
 }
 
-// Update accepts a UpdateOpts struct and updates an existing network using the
-// values provided. For more information, see the Create function.
+// Update accepts a UpdateOpts struct and updates an existing cluster template using the values provided.
 func Update(c *gcorecloud.ServiceClient, clusterTemplateID string, opts UpdateOptsBuilder) (r UpdateResult) {
 	b, err := opts.ToClusterTemplateUpdateMap()
 	if err != nil {

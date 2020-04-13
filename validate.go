@@ -54,6 +54,14 @@ func init() { // nolint
 	})
 	FailOnErrorF(err, "Cannot register translation for tag: %s", "url")
 
+	err = Validate.RegisterTranslation("startswith", Trans, func(ut ut.Translator) error {
+		return ut.Add("startswith", "{0} must start with {1}", true)
+	}, func(ut ut.Translator, fe validator.FieldError) string {
+		t, _ := ut.T("startswith", fe.Field(), fe.Param())
+		return t
+	})
+	FailOnErrorF(err, "Cannot register translation for tag: %s", "startswith")
+
 	err = Validate.RegisterTranslation("rfe", Trans, func(ut ut.Translator) error {
 		return ut.Add("rfe", "{0} is a required field", true)
 	}, func(ut ut.Translator, fe validator.FieldError) string {

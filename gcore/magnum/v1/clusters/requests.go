@@ -169,9 +169,20 @@ type UpdateOpts []UpdateOptsElem
 
 // UpdateOptsElem represents options used to update a cluster.
 type UpdateOptsElem struct {
-	Path  string                       `json:"path" required:"true"`
-	Value interface{}                  `json:"value" required:"true"`
-	Op    types.ClusterUpdateOperation `json:"op" required:"true"`
+	Path  string                       `json:"path" required:"true" validate:"required,startswith=/"`
+	Value interface{}                  `json:"value,omitempty" validate:"rfe=Op:add;replace"`
+	Op    types.ClusterUpdateOperation `json:"op" required:"true" validate:"required,enum"`
+}
+
+// Validate
+func (opts UpdateOpts) Validate() error {
+	for _, v := range opts {
+		err := gcorecloud.TranslateValidationError(gcorecloud.Validate.Struct(v))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // Update accepts a struct and updates an existing cluster using the values provided.
@@ -189,6 +200,10 @@ func Update(c *gcorecloud.ServiceClient, clusterID string, opts UpdateOptsBuilde
 
 // ToClusterUpdateMap builds a request body from UpdateOpts.
 func (opts UpdateOpts) ToClusterUpdateMap() ([]map[string]interface{}, error) {
+	err := opts.Validate()
+	if err != nil {
+		return nil, err
+	}
 	return gcorecloud.BuildSliceRequestBody(opts)
 }
 

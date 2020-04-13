@@ -1,14 +1,22 @@
 package templates
 
 import (
+	"fmt"
+	"strconv"
+	"strings"
+
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/magnum/v1/clustertemplates"
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/magnum/v1/types"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/flags"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/utils"
 
 	"github.com/urfave/cli/v2"
 )
 
-var clusterTemplateIDText = "clustertemplate_id is mandatory argument"
+var (
+	clusterTemplateIDText = "clustertemplate_id is mandatory argument"
+	clusterUpdateTypes    = types.ClusterUpdateOperation("").StringList()
+)
 
 var clusterTemplateCreateSubCommand = cli.Command{
 	Name:     "create",
@@ -161,6 +169,91 @@ var clusterTemplateGetSubCommand = cli.Command{
 	},
 }
 
+var clusterTemplateUpdateSubCommand = cli.Command{
+	Name:      "update",
+	Usage:     "Magnum update cluster template",
+	ArgsUsage: "<template_id>",
+	Category:  "template",
+	Flags: append([]cli.Flag{
+		&cli.StringSliceFlag{
+			Name:     "path",
+			Aliases:  []string{"p"},
+			Usage:    "Update json path. Example /node/count",
+			Required: true,
+		},
+		&cli.StringSliceFlag{
+			Name:     "value",
+			Aliases:  []string{"v"},
+			Usage:    "Update json value. For path /labels in format: label_one=value_one,label_two=value_two",
+			Required: false,
+		},
+		&cli.GenericFlag{
+			Name:    "op",
+			Aliases: []string{"o"},
+			Value: &utils.EnumStringSliceValue{
+				Enum: clusterUpdateTypes,
+			},
+			Usage:    fmt.Sprintf("output in %s", strings.Join(clusterUpdateTypes, ", ")),
+			Required: true,
+		},
+	}, flags.WaitCommandFlags...),
+	Action: func(c *cli.Context) error {
+		clusterTemplateID, err := flags.GetFirstArg(c, clusterTemplateIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "update")
+			return err
+		}
+		client, err := utils.BuildClient(c, "magnum", "", "")
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		paths := c.StringSlice("path")
+		values := c.StringSlice("value")
+		ops := utils.GetEnumStringSliceValue(c, "op")
+
+		if len(paths) != len(values) || len(values) != len(ops) {
+			_ = cli.ShowCommandHelp(c, "update")
+			return cli.NewExitError(fmt.Errorf("path, value and op parameters number should be same"), 1)
+		}
+
+		var opts clustertemplates.UpdateOpts
+
+		for idx, path := range paths {
+			if !strings.HasPrefix(path, "/") {
+				return cli.NewExitError(fmt.Errorf("path parameter should be in format /path"), 1)
+			}
+			var updateValue interface{}
+			value := values[idx]
+			intValue, err := strconv.Atoi(value)
+			if err == nil {
+				updateValue = intValue
+			} else if path == "/labels" {
+				updateValue, err = utils.StringSliceToMap(strings.Split(value, ","))
+				if err != nil {
+					return cli.NewExitError(fmt.Errorf("wrong labels format. should be in format: label_one=value_one,label_two=value_two"), 1)
+				}
+			} else {
+				updateValue = value
+			}
+			el := clustertemplates.UpdateOptsElem{
+				Path:  path,
+				Value: updateValue,
+				Op:    types.ClusterUpdateOperation(ops[idx]),
+			}
+			opts = append(opts, el)
+		}
+
+		results, err := clustertemplates.Update(client, clusterTemplateID, opts).Extract()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		utils.ShowResults(results, c.String("format"))
+		return nil
+	},
+}
+
 var ClusterTemplatesCommands = cli.Command{
 	Name:  "template",
 	Usage: "Magnum cluster template commands",
@@ -169,5 +262,6 @@ var ClusterTemplatesCommands = cli.Command{
 		&clusterTemplateListSubCommand,
 		&clusterTemplateDeleteDubCommand,
 		&clusterTemplateGetSubCommand,
+		&clusterTemplateUpdateSubCommand,
 	},
 }
