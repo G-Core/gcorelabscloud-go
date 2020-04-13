@@ -77,7 +77,7 @@ type CreateOpts struct {
 	DiscoveryURL      string                  `json:"discovery_url,omitempty"`
 	CreateTimeout     int                     `json:"create_timeout,omitempty"`
 	Labels            *map[string]string      `json:"labels,omitempty"`
-	FixedNetwork      string                  `json:"fixed_cluster,omitempty"`
+	FixedNetwork      string                  `json:"fixed_network,omitempty"`
 	FixedSubnet       string                  `json:"fixed_subnet,omitempty"`
 	FloatingIPEnabled bool                    `json:"floating_ip_enabled"`
 	Version           types.K8sClusterVersion `json:"version,omitempty"`
