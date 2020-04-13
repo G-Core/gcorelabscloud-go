@@ -244,3 +244,73 @@ func TestReauthTokenServiceClient(t *testing.T) {
 	require.Equal(t, reauthCount, 2)
 
 }
+
+func TestServiceClientURL(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	c, err := gcore.TokenClientService(gcorecloud.TokenOptions{
+		APIURL:       "http://test.com/",
+		AccessToken:  "1",
+		RefreshToken: "1",
+		AllowReauth:  false,
+	}, gcorecloud.EndpointOpts{
+		Type:    "test",
+		Name:    "test",
+		Region:  0,
+		Project: 0,
+		Version: "v1",
+	})
+	require.NoError(t, err)
+	actual := c.ServiceURL("more", "parts", "here")
+	require.Equal(t, "http://test.com/v1/test/test/more/parts/here", actual)
+
+	c, err = gcore.TokenClientService(gcorecloud.TokenOptions{
+		APIURL:       "http://test.com/",
+		AccessToken:  "1",
+		RefreshToken: "1",
+		AllowReauth:  false,
+	}, gcorecloud.EndpointOpts{
+		Type:    "test",
+		Name:    "test",
+		Region:  1,
+		Project: 1,
+		Version: "v1",
+	})
+	require.NoError(t, err)
+	actual = c.ServiceURL("more", "parts", "here")
+	require.Equal(t, "http://test.com/v1/test/1/1/test/more/parts/here", actual)
+
+	c, err = gcore.TokenClientService(gcorecloud.TokenOptions{
+		APIURL:       "http://test.com/",
+		AccessToken:  "1",
+		RefreshToken: "1",
+		AllowReauth:  false,
+	}, gcorecloud.EndpointOpts{
+		Type:    "",
+		Name:    "test",
+		Region:  1,
+		Project: 1,
+		Version: "v1",
+	})
+	require.NoError(t, err)
+	actual = c.ServiceURL("more", "parts", "here")
+	require.Equal(t, "http://test.com/v1/test/1/1/more/parts/here", actual)
+
+	c, err = gcore.TokenClientService(gcorecloud.TokenOptions{
+		APIURL:       "http://test.com",
+		AccessToken:  "1",
+		RefreshToken: "1",
+		AllowReauth:  false,
+	}, gcorecloud.EndpointOpts{
+		Type:    "",
+		Name:    "test",
+		Region:  1,
+		Project: 1,
+		Version: "v1",
+	})
+	require.NoError(t, err)
+	actual = c.ServiceURL("more", "parts", "here")
+	require.Equal(t, "http://test.com/v1/test/1/1/more/parts/here", actual)
+
+}

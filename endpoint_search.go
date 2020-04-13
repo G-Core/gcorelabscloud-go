@@ -1,7 +1,8 @@
 package gcorecloud
 
 import (
-	"fmt"
+	"strconv"
+	"strings"
 )
 
 // EndpointOpts specifies search criteria used by queries against an
@@ -53,7 +54,7 @@ func (eo *EndpointOpts) ApplyDefaults(t string) {
 
 func intIntoPathPath(value int) string {
 	if value != 0 {
-		return fmt.Sprintf("%d", value)
+		return strconv.Itoa(value)
 	}
 	return ""
 }
@@ -61,15 +62,14 @@ func intIntoPathPath(value int) string {
 // DefaultEndpointLocator - function to prepare API endpoint
 func DefaultEndpointLocator(endpoint string) EndpointLocator {
 	return func(eo EndpointOpts) (string, error) {
-		params := []interface{}{
-			endpoint,
+		params := []string{
+			StripLastSlashURL(endpoint),
 			eo.Version,
 			eo.Name,
 			intIntoPathPath(eo.Project),
 			intIntoPathPath(eo.Region),
 			eo.Type,
 		}
-		url := NormalizeURL(fmt.Sprintf("%s%s/%s/%s/%s/%s", params...))
-		return url, nil
+		return strings.Join(params, "/"), nil
 	}
 }
