@@ -145,12 +145,11 @@ func TestCreate(t *testing.T) {
 	})
 
 	mtu := 1450
-	createRoute := true
 
 	options := networks.CreateOpts{
 		Name:         Network1.Name,
-		Mtu:          &mtu,
-		CreateRouter: &createRoute,
+		Mtu:          mtu,
+		CreateRouter: true,
 	}
 
 	client := fake.ServiceTokenClient("networks", "v1")

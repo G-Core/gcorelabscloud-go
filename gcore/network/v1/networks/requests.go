@@ -28,14 +28,22 @@ type CreateOptsBuilder interface {
 
 // CreateOpts represents options used to create a network.
 type CreateOpts struct {
-	Name         string `json:"name"`
-	Mtu          *int   `json:"mtu,omitempty"`
-	CreateRouter *bool  `json:"create_router,omitempty"`
+	Name         string `json:"name" required:"true" validate:"required"`
+	Mtu          int    `json:"mtu,omitempty" validate:"omitempty,lte=1500"`
+	CreateRouter bool   `json:"create_router,omitempty"`
 }
 
 // ToNetworkCreateMap builds a request body from CreateOpts.
 func (opts CreateOpts) ToNetworkCreateMap() (map[string]interface{}, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, err
+	}
 	return gcorecloud.BuildRequestBody(opts, "")
+}
+
+// Validate
+func (opts CreateOpts) Validate() error {
+	return gcorecloud.TranslateValidationError(gcorecloud.Validate.Struct(opts))
 }
 
 // Create accepts a CreateOpts struct and creates a new network using the values provided.
@@ -56,12 +64,20 @@ type UpdateOptsBuilder interface {
 
 // UpdateOpts represents options used to update a network.
 type UpdateOpts struct {
-	Name string `json:"name,omitempty"`
+	Name string `json:"name" required:"true" validate:"required"`
 }
 
 // ToNetworkUpdateMap builds a request body from UpdateOpts.
 func (opts UpdateOpts) ToNetworkUpdateMap() (map[string]interface{}, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, err
+	}
 	return gcorecloud.BuildRequestBody(opts, "")
+}
+
+// Validate
+func (opts UpdateOpts) Validate() error {
+	return gcorecloud.TranslateValidationError(gcorecloud.Validate.Struct(opts))
 }
 
 // Update accepts a UpdateOpts struct and updates an existing network using the

@@ -163,6 +163,7 @@ var networkCreateCommand = cli.Command{
 			Name:        "mtu",
 			Usage:       "Network MTU",
 			DefaultText: "1450",
+			Value:       1450,
 			Required:    false,
 		},
 		&cli.BoolFlag{
@@ -180,8 +181,8 @@ var networkCreateCommand = cli.Command{
 		}
 		opts := networks.CreateOpts{
 			Name:         c.String("name"),
-			Mtu:          utils.IntToPointer(c.Int("mtu")),
-			CreateRouter: utils.BoolToPointer(c.Bool("create-router")),
+			Mtu:          c.Int("mtu"),
+			CreateRouter: c.Bool("create-router"),
 		}
 		results, err := networks.Create(client, opts).Extract()
 		if err != nil {
