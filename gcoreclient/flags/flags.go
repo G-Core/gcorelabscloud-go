@@ -53,12 +53,6 @@ var commonFlags = []cli.Flag{
 		Hidden: true,
 		Usage:  "client type as token or password",
 	},
-	&cli.BoolFlag{
-		Name:     "debug",
-		Aliases:  []string{"d"},
-		Usage:    "debug API requests",
-		Required: false,
-	},
 }
 
 var OutputFlags = []cli.Flag{

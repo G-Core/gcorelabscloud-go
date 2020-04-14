@@ -53,14 +53,23 @@ var commands = []*cli.Command{
 	&limits.LimitCommands,
 }
 
-func main() {
-
-	flags.AddOutputFlags(commands)
-
-	app := cli.NewApp()
-	app.Version = "0.0.1"
-	app.EnableBashCompletion = true
-	app.Commands = []*cli.Command{
+func buildClientCommands(commands []*cli.Command) []*cli.Command {
+	clientType := os.Getenv("GCLOUD_CLIENT_TYPE")
+	if clientType == "client" {
+		flags.AddFlags(commands, flags.TokenClientFlags...)
+		return commands
+	} else if clientType == "password" {
+		flags.AddFlags(commands, flags.PasswordClientFlags...)
+		return commands
+	}
+	return []*cli.Command{
+		{
+			Name:        "token",
+			Aliases:     nil,
+			Usage:       fmt.Sprintf("GCloud API client\n%s", flags.TokenClientHelpText),
+			Subcommands: commands,
+			Flags:       flags.TokenClientFlags,
+		},
 		{
 			Name:  "password",
 			Usage: fmt.Sprintf("GCloud API client\n%s", flags.PasswordClientHelpText),
@@ -70,13 +79,17 @@ func main() {
 			},
 			Subcommands: commands,
 		},
-		{
-			Name:        "token",
-			Usage:       fmt.Sprintf("GCloud API client\n%s", flags.TokenClientHelpText),
-			Flags:       flags.TokenClientFlags,
-			Subcommands: commands,
-		},
 	}
+}
+
+func main() {
+
+	flags.AddOutputFlags(commands)
+
+	app := cli.NewApp()
+	app.Version = "v0.2.7"
+	app.EnableBashCompletion = true
+	app.Commands = buildClientCommands(commands)
 	err := app.Run(os.Args)
 	if err != nil {
 		logrus.Errorf("Cannot initialize application: %+v", err)
