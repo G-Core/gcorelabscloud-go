@@ -81,11 +81,9 @@ func TestValidateCreateVolumeBlankSnapshotIDOpts(t *testing.T) {
 		VolumeID:   "",
 	}
 
-	err := opts.Validate()
+	err := gcorecloud.TranslateValidationError(opts.Validate())
 	require.Error(t, err)
-	errTranslated := gcorecloud.TranslateValidationError(err)
-	require.Error(t, errTranslated)
-	require.Contains(t, errTranslated.Error(), "Snapshot")
+	require.Contains(t, err.Error(), "Snapshot")
 
 	opts = instances.CreateVolumeOpts{
 		Source:     types.Snapshot,
@@ -98,12 +96,12 @@ func TestValidateCreateVolumeBlankSnapshotIDOpts(t *testing.T) {
 		VolumeID:   "",
 	}
 
-	err = opts.Validate()
+	err = gcorecloud.TranslateValidationError(opts.Validate())
 	require.NoError(t, err)
 
 }
 
-func TestValidateCreateVolumeBlankSizeOpts(t *testing.T) {
+func TestValidateCreateVolumeOpts(t *testing.T) {
 
 	opts := instances.CreateVolumeOpts{
 		Source:     types.NewVolume,
@@ -116,11 +114,9 @@ func TestValidateCreateVolumeBlankSizeOpts(t *testing.T) {
 		VolumeID:   "",
 	}
 
-	err := opts.Validate()
+	err := gcorecloud.TranslateValidationError(opts.Validate())
 	require.Error(t, err)
-	errTranslated := gcorecloud.TranslateValidationError(err)
-	require.Error(t, errTranslated)
-	require.Contains(t, errTranslated.Error(), "Size")
+	require.Contains(t, err.Error(), "Size")
 
 	opts = instances.CreateVolumeOpts{
 		Source:     types.NewVolume,
@@ -133,8 +129,56 @@ func TestValidateCreateVolumeBlankSizeOpts(t *testing.T) {
 		VolumeID:   "",
 	}
 
-	err = opts.Validate()
+	err = gcorecloud.TranslateValidationError(opts.Validate())
 	require.NoError(t, err)
+
+	opts = instances.CreateVolumeOpts{
+		Source:     types.NewVolume,
+		BootIndex:  0,
+		Size:       1,
+		TypeName:   volumes.Standard,
+		Name:       "name",
+		ImageID:    "28bfe198-a003-4283-8dca-ab5da4a71b62",
+		SnapshotID: "",
+		VolumeID:   "",
+	}
+
+	err = gcorecloud.TranslateValidationError(opts.Validate())
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "ImageID")
+
+	opts = instances.CreateVolumeOpts{
+		Source:     types.ExistingVolume,
+		BootIndex:  0,
+		Size:       1,
+		TypeName:   volumes.Standard,
+		Name:       "name",
+		ImageID:    "28bfe198-a003-4283-8dca-ab5da4a71b62",
+		SnapshotID: "28bfe198-a003-4283-8dca-ab5da4a71b62",
+		VolumeID:   "",
+	}
+
+	err = gcorecloud.TranslateValidationError(opts.Validate())
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "ImageID")
+	require.Contains(t, err.Error(), "VolumeID")
+	require.Contains(t, err.Error(), "SnapshotID")
+	require.Contains(t, err.Error(), "Size")
+
+	opts = instances.CreateVolumeOpts{
+		Source:     "cc",
+		BootIndex:  0,
+		Size:       1,
+		TypeName:   volumes.Standard,
+		Name:       "name",
+		ImageID:    "28bfe198-a003-4283-8dca-ab5da4a71b62",
+		SnapshotID: "28bfe198-a003-4283-8dca-ab5da4a71b62",
+		VolumeID:   "",
+	}
+
+	err = gcorecloud.TranslateValidationError(opts.Validate())
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "Source")
 
 }
 

@@ -14,9 +14,12 @@ import (
 	translations "github.com/go-playground/validator/v10/translations/en"
 )
 
+const splitParamsRegexString = `'[^']*'|\S+`
+
 var (
-	Validate *validator.Validate
-	Trans    ut.Translator
+	Validate         *validator.Validate
+	Trans            ut.Translator
+	splitParamsRegex = regexp.MustCompile(splitParamsRegexString)
 )
 
 type EnumValidator interface {
@@ -89,6 +92,28 @@ func init() { // nolint
 	})
 	FailOnErrorF(err, "Cannot register translation for tag: %s", "required_without_all")
 
+	err = Validate.RegisterTranslation("allowed_without_all", Trans, func(ut ut.Translator) error {
+		return nil
+	}, func(ut ut.Translator, fe validator.FieldError) string {
+		return fmt.Sprintf(
+			"%s should not be set when not any field from %s are set",
+			fe.StructField(),
+			fe.Param(),
+		)
+	})
+	FailOnErrorF(err, "Cannot register translation for tag: %s", "allowed_without_all")
+
+	err = Validate.RegisterTranslation("allowed_without", Trans, func(ut ut.Translator) error {
+		return nil
+	}, func(ut ut.Translator, fe validator.FieldError) string {
+		return fmt.Sprintf(
+			"%s should not be set when field %s is set",
+			fe.StructField(),
+			fe.Param(),
+		)
+	})
+	FailOnErrorF(err, "Cannot register translation for tag: %s", "allowed_without")
+
 	err = Validate.RegisterTranslation("enum", Trans, func(ut ut.Translator) error {
 		return nil
 	}, func(ut ut.Translator, fe validator.FieldError) string {
@@ -138,7 +163,15 @@ func init() { // nolint
 	})
 
 	Validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
-		name := strings.SplitN(fld.Tag.Get("allowed-without"), ",", 2)[0]
+		name := strings.SplitN(fld.Tag.Get("allowed_without"), ",", 2)[0]
+		if name == "-" {
+			return ""
+		}
+		return name
+	})
+
+	Validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
+		name := strings.SplitN(fld.Tag.Get("allowed_without_all"), ",", 2)[0]
 		if name == "-" {
 			return ""
 		}
@@ -159,8 +192,10 @@ func init() { // nolint
 	FailOnErrorF(err, "Cannot register custom validation tag: %s", "rfe")
 	err = Validate.RegisterValidation(`sfe`, suppressedIfFieldEqual)
 	FailOnErrorF(err, "Cannot register custom validation tag: %s", "sfe")
-	err = Validate.RegisterValidation(`allowed-without`, allowedWithout)
-	FailOnErrorF(err, "Cannot register custom validation tag: %s", "allowed-without")
+	err = Validate.RegisterValidation(`allowed_without`, allowedWithout)
+	FailOnErrorF(err, "Cannot register custom validation tag: %s", "allowed_without")
+	err = Validate.RegisterValidation(`allowed_without_all`, allowedWithoutAll)
+	FailOnErrorF(err, "Cannot register custom validation tag: %s", "allowed_without_all")
 	err = Validate.RegisterValidation(`regex`, regex)
 	FailOnErrorF(err, "Cannot register custom validation tag: %s", "regex")
 
@@ -168,12 +203,28 @@ func init() { // nolint
 
 func allowedWithout(fl validator.FieldLevel) bool {
 	param := strings.TrimSpace(fl.Param())
-	requiredField := requireCheckFieldKind(fl, param, true)
-	return requiredField && hasValue(fl)
+	notSet := requireCheckFieldKind(fl, param, true)
+	return !(!notSet && hasValue(fl))
+}
+
+func allowedWithoutAll(fl validator.FieldLevel) bool {
+
+	params := splitParamsRegex.FindAllString(strings.TrimSpace(fl.Param()), -1)
+
+	for _, field := range params {
+		field = strings.Replace(field, "'", "", -1)
+		notSet := requireCheckFieldKind(fl, field, true)
+		if !notSet && hasValue(fl) {
+			return false
+		}
+	}
+
+	return true
+
 }
 
 func requiredIfFieldEqual(fl validator.FieldLevel) bool {
-	param := strings.Split(fl.Param(), `:`)
+	param := strings.Split(strings.TrimSpace(fl.Param()), `:`)
 	paramField := param[0]
 	paramValue := param[1]
 
@@ -216,7 +267,7 @@ func enum(fl validator.FieldLevel) bool {
 }
 
 func suppressedIfFieldEqual(fl validator.FieldLevel) bool {
-	param := strings.Split(fl.Param(), `:`)
+	param := strings.Split(strings.TrimSpace(fl.Param()), `:`)
 	paramField := param[0]
 	paramValue := param[1]
 

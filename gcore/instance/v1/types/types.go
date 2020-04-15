@@ -25,7 +25,7 @@ const (
 
 func (vs VolumeSource) IsValid() error {
 	switch vs {
-	case NewVolume, Image, Snapshot:
+	case NewVolume, Image, Snapshot, ExistingVolume:
 		return nil
 	}
 	return fmt.Errorf("invalid VolumeSource type: %v", vs)
@@ -47,7 +47,7 @@ func (vs VolumeSource) String() string {
 }
 
 func (vs VolumeSource) List() []VolumeSource {
-	return []VolumeSource{NewVolume, Image, Snapshot}
+	return []VolumeSource{NewVolume, Image, Snapshot, ExistingVolume}
 }
 
 func (vs VolumeSource) Bootable() bool {

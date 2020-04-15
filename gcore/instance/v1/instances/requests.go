@@ -41,8 +41,8 @@ type DeleteOptsBuilder interface {
 // DeleteOpts. Set parameters for delete operation
 type DeleteOpts struct {
 	Volumes         []string `q:"volumes" validate:"omitempty,dive,uuid4" delimiter:"comma"`
-	DeleteFloatings bool     `q:"delete_floatings" validate:"omitempty,allowed-without=FloatingIPs"`
-	FloatingIPs     []string `q:"floatings" validate:"omitempty,allowed-without=DeleteFloatings,dive,uuid4" delimiter:"comma"`
+	DeleteFloatings bool     `q:"delete_floatings" validate:"omitempty,allowed_without=FloatingIPs"`
+	FloatingIPs     []string `q:"floatings" validate:"omitempty,allowed_without=DeleteFloatings,dive,uuid4" delimiter:"comma"`
 }
 
 // ToInstanceDeleteQuery formats a DeleteOpts into a query string.
@@ -65,14 +65,14 @@ type CreateOptsBuilder interface {
 
 // CreateVolumeOpts represents options used to create a volume.
 type CreateVolumeOpts struct {
-	Source     types.VolumeSource `json:"source" required:"true" validate:"required"`
+	Source     types.VolumeSource `json:"source" required:"true" validate:"required,enum"`
 	BootIndex  int                `json:"boot_index"`
-	Size       int                `json:"size,omitempty" validate:"rfe=Source:image;new-volume"`
-	TypeName   volumes.VolumeType `json:"type_name" required:"true" validate:"required"`
+	Size       int                `json:"size,omitempty" validate:"rfe=Source:image;new-volume,sfe=Source:snapshot;existing-volume"`
+	TypeName   volumes.VolumeType `json:"type_name" required:"true" validate:"required,enum"`
 	Name       string             `json:"name,omitempty" validate:"omitempty"`
-	ImageID    string             `json:"image_id,omitempty" validate:"rfe=Source:image,omitempty,uuid4"`
-	SnapshotID string             `json:"snapshot_id,omitempty" validate:"rfe=Source:snapshot,omitempty,uuid4"`
-	VolumeID   string             `json:"volume_id,omitempty" validate:"rfe=Source:existing-volume,omitempty,uuid4"`
+	ImageID    string             `json:"image_id,omitempty" validate:"rfe=Source:image,sfe=Source:snapshot;existing-volume;new-volume,allowed_without_all=SnapshotID VolumeID,omitempty,uuid4"`
+	SnapshotID string             `json:"snapshot_id,omitempty" validate:"rfe=Source:snapshot,sfe=Source:image;existing-volume;new-volume,allowed_without_all=ImageID VolumeID,omitempty,uuid4"`
+	VolumeID   string             `json:"volume_id,omitempty" validate:"rfe=Source:existing-volume,sfe=Source:image;shapshot;new-volume,allowed_without_all=ImageID SnapshotID,omitempty,uuid4"`
 }
 
 func (opts *CreateVolumeOpts) Validate() error {

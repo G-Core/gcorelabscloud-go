@@ -20,7 +20,6 @@ import (
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/projects"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/quotas"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/regions"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/securitygroups/securitygrouprules"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/securitygroups/securitygroups"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/snapshots"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/subnets"
@@ -42,7 +41,6 @@ var commands = []*cli.Command{
 	&magnum.MagnumsCommand,
 	&heat.HeatsCommand,
 	&securitygroups.SecurityGroupCommands,
-	&securitygrouprules.SecurityGroupRuleCommands,
 	&floatingips.FloatingIPCommands,
 	&snapshots.SnapshotCommands,
 	&images.ImageCommands,
@@ -53,43 +51,50 @@ var commands = []*cli.Command{
 	&limits.LimitCommands,
 }
 
-func buildClientCommands(commands []*cli.Command) []*cli.Command {
+func buildClientCommands(commands []*cli.Command) ([]*cli.Command, []cli.Flag, string) {
 	clientType := os.Getenv("GCLOUD_CLIENT_TYPE")
+	tokenClientUsage := fmt.Sprintf("GCloud API client\n%s", flags.TokenClientHelpText)
+	passwordClientUsage := fmt.Sprintf("GCloud API client\n%s", flags.PasswordClientHelpText)
 	if clientType == "client" {
-		flags.AddFlags(commands, flags.TokenClientFlags...)
-		return commands
+		return commands, flags.TokenClientFlags, tokenClientUsage
 	} else if clientType == "password" {
-		flags.AddFlags(commands, flags.PasswordClientFlags...)
-		return commands
+		return commands, flags.PasswordClientFlags, passwordClientUsage
 	}
 	return []*cli.Command{
 		{
 			Name:        "token",
 			Aliases:     nil,
-			Usage:       fmt.Sprintf("GCloud API client\n%s", flags.TokenClientHelpText),
+			Usage:       tokenClientUsage,
 			Subcommands: commands,
 			Flags:       flags.TokenClientFlags,
 		},
 		{
 			Name:  "password",
-			Usage: fmt.Sprintf("GCloud API client\n%s", flags.PasswordClientHelpText),
+			Usage: passwordClientUsage,
 			Flags: flags.PasswordClientFlags,
 			Before: func(c *cli.Context) error {
 				return c.Set("client-type", "password")
 			},
 			Subcommands: commands,
 		},
-	}
+	}, nil, ""
 }
 
 func main() {
 
 	flags.AddOutputFlags(commands)
 
+	commands, appFlags, usage := buildClientCommands(commands)
 	app := cli.NewApp()
 	app.Version = "v0.2.7"
 	app.EnableBashCompletion = true
-	app.Commands = buildClientCommands(commands)
+	app.Commands = commands
+	if appFlags != nil {
+		app.Flags = appFlags
+	}
+	if len(usage) > 0 {
+		app.Usage = usage
+	}
 	err := app.Run(os.Args)
 	if err != nil {
 		logrus.Errorf("Cannot initialize application: %+v", err)

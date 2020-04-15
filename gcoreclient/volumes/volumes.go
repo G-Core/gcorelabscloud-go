@@ -91,9 +91,7 @@ var volumeDeleteCommand = cli.Command{
 			DefaultText: "nil",
 			Required:    false,
 		},
-	},
-		flags.WaitCommandFlags...,
-	),
+	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
 		volumeID, err := flags.GetFirstArg(c, volumeIDText)
 		if err != nil {
@@ -110,9 +108,6 @@ var volumeDeleteCommand = cli.Command{
 		}
 		results, err := volumes.Delete(client, volumeID, opts).Extract()
 		if err != nil {
-			return cli.NewExitError(err, 1)
-		}
-		if results == nil {
 			return cli.NewExitError(err, 1)
 		}
 
@@ -188,35 +183,21 @@ var volumeCreateCommand = cli.Command{
 			DefaultText: "nil",
 			Required:    false,
 		},
-	}, flags.WaitCommandFlags...,
-	),
+	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
 		client, err := utils.BuildClient(c, "volumes", "", "")
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		source := volumes.VolumeSource(c.String("source"))
-		if err = source.IsValid(); err != nil {
-			return cli.NewExitError(err, 1)
-		}
-		volumeType := volumes.VolumeType(c.String("type"))
-		if err = volumeType.IsValid(); err != nil {
-			return cli.NewExitError(err, 1)
-		}
 		opts := volumes.CreateOpts{
-			Source:               source,
+			Source:               volumes.VolumeSource(c.String("source")),
 			Name:                 c.String("name"),
 			Size:                 c.Int("size"),
-			TypeName:             volumeType,
+			TypeName:             volumes.VolumeType(c.String("type")),
 			ImageID:              c.String("image-id"),
 			SnapshotID:           c.String("snapshot-id"),
 			InstanceIDToAttachTo: c.String("instance-id"),
-		}
-
-		err = gcorecloud.TranslateValidationError(opts.Validate())
-		if err != nil {
-			return cli.NewExitError(err, 1)
 		}
 
 		results, err := volumes.Create(client, opts).Extract()

@@ -11,41 +11,31 @@ import (
 
 var commonFlags = []cli.Flag{
 	&cli.StringFlag{
-		Name:     "api-version",
-		Aliases:  []string{"av"},
-		Usage:    "API version",
-		Required: false,
-	},
-	&cli.StringFlag{
-		Name:     "auth-url",
-		Aliases:  []string{"auu"},
-		Value:    "",
-		Usage:    "Auth base url",
-		Required: false,
+		Name:        "api-version",
+		Usage:       "API version",
+		DefaultText: "In case absent parameter it would take if from environ: GCLOUD_API_VERSION",
+		Required:    false,
 	},
 	&cli.UintFlag{
 		Name:        "region",
-		Aliases:     []string{"r"},
-		DefaultText: "no default value. In case absent parameter it would take if from environ: GCLOUD_REGION",
+		DefaultText: "In case absent parameter it would take if from environ: GCLOUD_REGION",
 		Usage:       "region ID",
 		Required:    false,
 	},
 	&cli.UintFlag{
 		Name:        "project",
-		Aliases:     []string{"p"},
-		DefaultText: "no default value. In case absent parameter it would take if from environ: GCLOUD_PROJECT",
+		DefaultText: "In case absent parameter it would take if from environ: GCLOUD_PROJECT",
 		Usage:       "project ID",
 		Required:    false,
 	},
 	&cli.StringFlag{
-		Name:     "api-url",
-		Aliases:  []string{"apu"},
-		Usage:    "Api base url",
-		Required: false,
+		Name:        "api-url",
+		Usage:       "Api base url",
+		DefaultText: "In case absent parameter it would take if from environ: GCLOUD_API_URL",
+		Required:    false,
 	},
 	&cli.GenericFlag{
-		Name:    "client-type",
-		Aliases: []string{"t"},
+		Name: "client-type",
 		Value: &utils.EnumValue{
 			Enum:    []string{"token", "password"},
 			Default: "token",
@@ -89,6 +79,12 @@ var tokenFlags = []cli.Flag{
 }
 
 var passwordFlags = []cli.Flag{
+	&cli.StringFlag{
+		Name:        "auth-url",
+		DefaultText: "In case absent parameter it would take if from environ: GCLOUD_AUTH_URL",
+		Usage:       "Auth base url",
+		Required:    false,
+	},
 	&cli.StringFlag{
 		Name:     "username",
 		Aliases:  []string{"u"},

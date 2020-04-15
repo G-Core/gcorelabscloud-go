@@ -42,17 +42,26 @@ type ListOpts struct {
 
 // CreateOpts represents options used to create a volume.
 type CreateOpts struct {
-	Source               VolumeSource `json:"source" required:"true" validate:"required"`
+	Source               VolumeSource `json:"source" required:"true" validate:"required,enum"`
 	Name                 string       `json:"name" required:"true" validate:"required"`
-	Size                 int          `json:"size,omitempty" validate:"rfe=Source:image;new-volume"`
-	TypeName             VolumeType   `json:"type_name" required:"true" validate:"required"`
-	ImageID              string       `json:"image_id,omitempty" validate:"rfe=Source:image,omitempty,uuid4"`
-	SnapshotID           string       `json:"snapshot_id,omitempty" validate:"rfe=Source:snapshot,omitempty,uuid4"`
+	Size                 int          `json:"size,omitempty" validate:"rfe=Source:image;new-volume,sfe=Source:snapshot"`
+	TypeName             VolumeType   `json:"type_name" required:"true" validate:"required,enum"`
+	ImageID              string       `json:"image_id,omitempty" validate:"rfe=Source:image,allowed_without=SnapshotID,omitempty,uuid4"`
+	SnapshotID           string       `json:"snapshot_id,omitempty" validate:"rfe=Source:snapshot,allowed_without=ImageID,omitempty,uuid4"`
 	InstanceIDToAttachTo string       `json:"instance_id_to_attach_to,omitempty" validate:"omitempty,uuid4"`
 }
 
 func (opts *CreateOpts) Validate() error {
 	return gcorecloud.Validate.Struct(opts)
+}
+
+// ToVolumeCreateMap builds a request body.
+func (opts CreateOpts) ToVolumeCreateMap() (map[string]interface{}, error) {
+	err := gcorecloud.TranslateValidationError(opts.Validate())
+	if err != nil {
+		return nil, err
+	}
+	return gcorecloud.BuildRequestBody(opts, "")
 }
 
 // DeleteOpts allows set additional parameters during volume deletion.
@@ -89,11 +98,6 @@ func (opts DeleteOpts) ToVolumeDeleteQuery() (string, error) {
 		return "", err
 	}
 	return q.String(), err
-}
-
-// ToVolumeCreateMap builds a request body.
-func (opts CreateOpts) ToVolumeCreateMap() (map[string]interface{}, error) {
-	return gcorecloud.BuildRequestBody(opts, "")
 }
 
 // ToVolumeInstanceOperationMap builds a request body.
@@ -219,12 +223,7 @@ func IDFromName(client *gcorecloud.ServiceClient, name string) (string, error) {
 
 	opts := ListOpts{}
 
-	pages, err := List(client, opts).AllPages()
-	if err != nil {
-		return "", err
-	}
-
-	all, err := ExtractVolumes(pages)
+	all, err := ListAll(client, opts)
 	if err != nil {
 		return "", err
 	}
