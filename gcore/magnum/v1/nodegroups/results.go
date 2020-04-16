@@ -46,7 +46,7 @@ type ClusterNodeGroup struct {
 	Labels           map[string]string `json:"labels"`
 	NodeAddresses    []net.IP          `json:"node_addresses"`
 	MinNodeCount     int               `json:"min_node_count"`
-	MaxNodeCount     *int              `json:"max_node_count,omitempty"`
+	MaxNodeCount     *int              `json:"max_node_count"`
 	IsDefault        bool              `json:"is_default"`
 	StackID          string            `json:"stack_id"`
 	StatusReason     *string           `json:"status_reason,omitempty"`
