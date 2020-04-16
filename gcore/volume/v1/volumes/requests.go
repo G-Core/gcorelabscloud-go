@@ -71,15 +71,15 @@ type DeleteOpts struct {
 
 // InstanceOperationOpts allows prepare data for Attach and Detach requests
 type InstanceOperationOpts struct {
-	InstanceID string `json:"instance_id,omitempty"`
+	InstanceID string `json:"instance_id" required:"true" validate:"required,uuid4"`
 }
 
 type VolumeTypePropertyOperationOpts struct {
-	VolumeType VolumeType `json:"volume_type,omitempty"`
+	VolumeType VolumeType `json:"volume_type" required:"true" validate:"required,enum"`
 }
 
 type SizePropertyOperationOpts struct {
-	Size int `json:"size,omitempty"`
+	Size int `json:"size" required:"true" validate:"required,gt=0"`
 }
 
 // ToVolumeListQuery formats a ListOpts into a query string.
@@ -102,16 +102,25 @@ func (opts DeleteOpts) ToVolumeDeleteQuery() (string, error) {
 
 // ToVolumeInstanceOperationMap builds a request body.
 func (opts InstanceOperationOpts) ToVolumeInstanceOperationMap() (map[string]interface{}, error) {
+	if err := gcorecloud.TranslateValidationError(gcorecloud.Validate.Struct(opts)); err != nil {
+		return nil, err
+	}
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
 // ToVolumePropertiesOperationMap builds a request body.
 func (opts VolumeTypePropertyOperationOpts) ToVolumePropertiesOperationMap() (map[string]interface{}, error) {
+	if err := gcorecloud.TranslateValidationError(gcorecloud.Validate.Struct(opts)); err != nil {
+		return nil, err
+	}
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
 // ToVolumePropertiesOperationMap builds a request body.
 func (opts SizePropertyOperationOpts) ToVolumePropertiesOperationMap() (map[string]interface{}, error) {
+	if err := gcorecloud.TranslateValidationError(gcorecloud.Validate.Struct(opts)); err != nil {
+		return nil, err
+	}
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 

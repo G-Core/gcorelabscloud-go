@@ -233,7 +233,7 @@ var volumeAttachCommand = cli.Command{
 	Category:  "volume",
 	Flags: []cli.Flag{
 		&cli.StringFlag{
-			Name:     "instance_id",
+			Name:     "instance-id",
 			Aliases:  []string{"i"},
 			Usage:    "Instance ID to attach",
 			Required: true,
@@ -269,7 +269,7 @@ var volumeDetachCommand = cli.Command{
 	Category:  "volume",
 	Flags: []cli.Flag{
 		&cli.StringFlag{
-			Name:     "instance_id",
+			Name:     "instance-id",
 			Aliases:  []string{"i"},
 			Usage:    "Instance ID to attach",
 			Required: true,
@@ -326,14 +326,9 @@ var volumeRetypeCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		volumeType := volumes.VolumeType(c.String("type"))
-		err = volumeType.IsValid()
-		if err != nil {
-			return cli.NewExitError(err, 1)
-		}
 
 		opts := volumes.VolumeTypePropertyOperationOpts{
-			VolumeType: volumeType,
+			VolumeType: volumes.VolumeType(c.String("type")),
 		}
 		volume, err := volumes.Retype(client, volumeID, opts).Extract()
 		if err != nil {
