@@ -170,6 +170,7 @@ var limitCreateCommand = cli.Command{
 
 		result, err := limits.Create(client, opts).Extract()
 		if err != nil {
+			_ = cli.ShowCommandHelp(c, "create")
 			return cli.NewExitError(err, 1)
 		}
 		utils.ShowResults(result, c.String("format"))

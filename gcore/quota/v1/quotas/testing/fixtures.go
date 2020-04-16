@@ -6,6 +6,8 @@ import (
 
 const GetResponse = `
 {
+  "cluster_count_usage": 0,
+  "cluster_count_limit": 1,
   "cpu_count_usage": 0,
   "cpu_count_limit": 1,
   "floating_count_usage": 0,
@@ -73,6 +75,7 @@ var (
 		FirewallCountLimit:        1,
 		LoadbalancerCountLimit:    1,
 		ExternalIPCountLimit:      1,
+		ClusterCountLimit:         1,
 		ProjectCountUsage:         0,
 		VMCountUsage:              0,
 		CPUCountUsage:             0,
@@ -90,5 +93,6 @@ var (
 		FirewallCountUsage:        0,
 		LoadbalancerCountUsage:    0,
 		ExternalIPCountUsage:      0,
+		ClusterCountUsage:         0,
 	}
 )

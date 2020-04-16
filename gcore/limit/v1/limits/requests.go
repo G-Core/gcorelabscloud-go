@@ -33,6 +33,7 @@ type Limit struct {
 	FirewallCountLimit        int `json:"firewall_count_limit" validate:"gte=-1"`
 	LoadbalancerCountLimit    int `json:"loadbalancer_count_limit" validate:"gte=-1"`
 	ExternalIPCountLimit      int `json:"external_ip_count_limit" validate:"gte=-1"`
+	ClusterCountLimit         int `json:"cluster_count_limit" validate:"gte=-1"`
 }
 
 func NewLimit() Limit {
@@ -54,6 +55,7 @@ func NewLimit() Limit {
 		FirewallCountLimit:        Sentinel,
 		LoadbalancerCountLimit:    Sentinel,
 		ExternalIPCountLimit:      Sentinel,
+		ClusterCountLimit:         Sentinel,
 	}
 }
 
@@ -108,7 +110,7 @@ func (opts CreateOpts) ToLimitCreateMap() (map[string]interface{}, error) {
 	}
 	rm := opts.RequestedQuotas.ToRequestMap()
 	if len(rm) == 0 {
-		return nil, fmt.Errorf("at least one of RequestedQuotas fields should be set")
+		return nil, fmt.Errorf("at least one of quota fields should be set")
 	}
 	m, err := gcorecloud.BuildRequestBody(opts, "")
 	if err != nil {

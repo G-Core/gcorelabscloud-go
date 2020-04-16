@@ -72,7 +72,7 @@ func (opts UpdateOpts) ToQuotaUpdateMap() (map[string]interface{}, error) {
 	}
 	m := opts.ToRequestMap()
 	if len(opts.ToRequestMap()) == 0 {
-		return nil, fmt.Errorf("at least one Quota field should be set")
+		return nil, fmt.Errorf("at least one of quota fields should be set")
 	}
 	return m, nil
 }

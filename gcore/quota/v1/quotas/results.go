@@ -32,6 +32,7 @@ type Quota struct {
 	FirewallCountLimit        int `json:"firewall_count_limit" validate:"gte=-1"`
 	LoadbalancerCountLimit    int `json:"loadbalancer_count_limit" validate:"gte=-1"`
 	ExternalIPCountLimit      int `json:"external_ip_count_limit" validate:"gte=-1"`
+	ClusterCountLimit         int `json:"cluster_count_limit" validate:"gte=-1"`
 	ProjectCountUsage         int `json:"project_count_usage" validate:"gte=-1"`
 	VMCountUsage              int `json:"vm_count_usage" validate:"gte=-1"`
 	CPUCountUsage             int `json:"cpu_count_usage" validate:"gte=-1"`
@@ -49,6 +50,7 @@ type Quota struct {
 	FirewallCountUsage        int `json:"firewall_count_usage" validate:"gte=-1"`
 	LoadbalancerCountUsage    int `json:"loadbalancer_count_usage" validate:"gte=-1"`
 	ExternalIPCountUsage      int `json:"external_ip_count_usage" validate:"gte=-1"`
+	ClusterCountUsage         int `json:"cluster_count_usage" validate:"gte=-1"`
 }
 
 func NewQuota() Quota {
@@ -70,6 +72,7 @@ func NewQuota() Quota {
 		FirewallCountLimit:        Sentinel,
 		LoadbalancerCountLimit:    Sentinel,
 		ExternalIPCountLimit:      Sentinel,
+		ClusterCountLimit:         Sentinel,
 		ProjectCountUsage:         Sentinel,
 		VMCountUsage:              Sentinel,
 		CPUCountUsage:             Sentinel,
@@ -87,6 +90,7 @@ func NewQuota() Quota {
 		FirewallCountUsage:        Sentinel,
 		LoadbalancerCountUsage:    Sentinel,
 		ExternalIPCountUsage:      Sentinel,
+		ClusterCountUsage:         Sentinel,
 	}
 }
 
