@@ -127,7 +127,7 @@ var stackGetSubCommand = cli.Command{
 	ArgsUsage: "<stack_id>",
 	Category:  "stack",
 	Action: func(c *cli.Context) error {
-		stackID, err := flags.GetFirstArg(c, stackIDText)
+		stackID, err := flags.GetFirstStringArg(c, stackIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
@@ -174,7 +174,7 @@ var stackUpdateSubCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		stackID, err := flags.GetFirstArg(c, stackIDText)
+		stackID, err := flags.GetFirstStringArg(c, stackIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "update")
 			return err

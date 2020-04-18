@@ -43,7 +43,7 @@ var networkGetCommand = cli.Command{
 	ArgsUsage: "<network_id>",
 	Category:  "network",
 	Action: func(c *cli.Context) error {
-		networkID, err := flags.GetFirstArg(c, networkIDText)
+		networkID, err := flags.GetFirstStringArg(c, networkIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
@@ -72,7 +72,7 @@ var networkDeleteCommand = cli.Command{
 	Category:  "network",
 	Flags:     flags.WaitCommandFlags,
 	Action: func(c *cli.Context) error {
-		networkID, err := flags.GetFirstArg(c, networkIDText)
+		networkID, err := flags.GetFirstStringArg(c, networkIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
@@ -120,7 +120,7 @@ var networkUpdateCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		networkID, err := flags.GetFirstArg(c, networkIDText)
+		networkID, err := flags.GetFirstStringArg(c, networkIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err

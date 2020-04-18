@@ -39,7 +39,7 @@ var keypairGetCommand = cli.Command{
 	ArgsUsage: "<keypair_id>",
 	Category:  "keypair",
 	Action: func(c *cli.Context) error {
-		keypairID, err := flags.GetFirstArg(c, keyPairIDText)
+		keypairID, err := flags.GetFirstStringArg(c, keyPairIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
@@ -65,7 +65,7 @@ var keypairDeleteCommand = cli.Command{
 	Category:  "keypair",
 	Flags:     flags.WaitCommandFlags,
 	Action: func(c *cli.Context) error {
-		keypairID, err := flags.GetFirstArg(c, keyPairIDText)
+		keypairID, err := flags.GetFirstStringArg(c, keyPairIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err

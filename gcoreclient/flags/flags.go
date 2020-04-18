@@ -170,7 +170,7 @@ func AddOutputFlags(commands []*cli.Command) {
 	AddFlags(commands, OutputFlags...)
 }
 
-func GetFirstArg(c *cli.Context, errorText string) (string, error) {
+func GetFirstStringArg(c *cli.Context, errorText string) (string, error) {
 	arg := c.Args().First()
 	if arg == "" {
 		return "", cli.NewExitError(fmt.Errorf(errorText), 1)

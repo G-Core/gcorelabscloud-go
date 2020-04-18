@@ -95,7 +95,7 @@ var loadBalancerGetSubCommand = cli.Command{
 	ArgsUsage: "<loadbalancer_id>",
 	Category:  "loadbalancer",
 	Action: func(c *cli.Context) error {
-		loadBalancerID, err := flags.GetFirstArg(c, loadBalancerIDText)
+		loadBalancerID, err := flags.GetFirstStringArg(c, loadBalancerIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
@@ -121,7 +121,7 @@ var loadBalancerDeleteSubCommand = cli.Command{
 	Category:  "loadbalancer",
 	Flags:     flags.WaitCommandFlags,
 	Action: func(c *cli.Context) error {
-		loadBalancerID, err := flags.GetFirstArg(c, loadBalancerIDText)
+		loadBalancerID, err := flags.GetFirstStringArg(c, loadBalancerIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
@@ -167,7 +167,7 @@ var loadBalancerUpdateSubCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		loadBalancerID, err := flags.GetFirstArg(c, loadBalancerIDText)
+		loadBalancerID, err := flags.GetFirstStringArg(c, loadBalancerIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "update")
 			return err

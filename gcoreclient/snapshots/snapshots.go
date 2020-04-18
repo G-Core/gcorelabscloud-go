@@ -57,7 +57,7 @@ var snapshotGetCommand = cli.Command{
 	ArgsUsage: "<snapshot_id>",
 	Category:  "snapshot",
 	Action: func(c *cli.Context) error {
-		snapshotID, err := flags.GetFirstArg(c, snapshotIDText)
+		snapshotID, err := flags.GetFirstStringArg(c, snapshotIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
@@ -86,7 +86,7 @@ var snapshotDeleteCommand = cli.Command{
 	Category:  "snapshot",
 	Flags:     flags.WaitCommandFlags,
 	Action: func(c *cli.Context) error {
-		snapshotID, err := flags.GetFirstArg(c, snapshotIDText)
+		snapshotID, err := flags.GetFirstStringArg(c, snapshotIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err

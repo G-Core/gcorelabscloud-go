@@ -33,7 +33,7 @@ var resourceMetadataSubCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		resourceName, err := flags.GetFirstArg(c, resourceNameText)
+		resourceName, err := flags.GetFirstStringArg(c, resourceNameText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "metadata")
 			return err
@@ -72,7 +72,7 @@ var resourceSignalSubCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		resourceName, err := flags.GetFirstArg(c, resourceNameText)
+		resourceName, err := flags.GetFirstStringArg(c, resourceNameText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "metadata")
 			return err
@@ -106,7 +106,7 @@ var resourceGetSubCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		resourceName, err := flags.GetFirstArg(c, resourceNameText)
+		resourceName, err := flags.GetFirstStringArg(c, resourceNameText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
@@ -152,7 +152,7 @@ var resourceMarkUnhealthySubCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		resourceName, err := flags.GetFirstArg(c, resourceNameText)
+		resourceName, err := flags.GetFirstStringArg(c, resourceNameText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "unhealthy")
 			return err
@@ -233,7 +233,7 @@ var resourceListSubCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		stackID, err := flags.GetFirstArg(c, stackIDText)
+		stackID, err := flags.GetFirstStringArg(c, stackIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "list")
 			return err

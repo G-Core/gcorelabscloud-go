@@ -56,7 +56,7 @@ var volumeGetCommand = cli.Command{
 	ArgsUsage: "<volume_id>",
 	Category:  "volume",
 	Action: func(c *cli.Context) error {
-		volumeID, err := flags.GetFirstArg(c, volumeIDText)
+		volumeID, err := flags.GetFirstStringArg(c, volumeIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
@@ -93,7 +93,7 @@ var volumeDeleteCommand = cli.Command{
 		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
-		volumeID, err := flags.GetFirstArg(c, volumeIDText)
+		volumeID, err := flags.GetFirstStringArg(c, volumeIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
@@ -240,7 +240,7 @@ var volumeAttachCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		volumeID, err := flags.GetFirstArg(c, volumeIDText)
+		volumeID, err := flags.GetFirstStringArg(c, volumeIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "attach")
 			return err
@@ -276,7 +276,7 @@ var volumeDetachCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		volumeID, err := flags.GetFirstArg(c, volumeIDText)
+		volumeID, err := flags.GetFirstStringArg(c, volumeIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "detach")
 			return err
@@ -316,7 +316,7 @@ var volumeRetypeCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		volumeID, err := flags.GetFirstArg(c, volumeIDText)
+		volumeID, err := flags.GetFirstStringArg(c, volumeIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "retype")
 			return err
@@ -354,7 +354,7 @@ var volumeExtendCommand = cli.Command{
 	}, flags.WaitCommandFlags...,
 	),
 	Action: func(c *cli.Context) error {
-		volumeID, err := flags.GetFirstArg(c, volumeIDText)
+		volumeID, err := flags.GetFirstStringArg(c, volumeIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "extend")
 			return err

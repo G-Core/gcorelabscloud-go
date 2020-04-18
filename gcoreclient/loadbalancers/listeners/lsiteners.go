@@ -132,7 +132,7 @@ var listenerGetSubCommand = cli.Command{
 	ArgsUsage: "<listener_id>",
 	Category:  "listener",
 	Action: func(c *cli.Context) error {
-		clusterID, err := flags.GetFirstArg(c, listenerIDText)
+		clusterID, err := flags.GetFirstStringArg(c, listenerIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
@@ -158,7 +158,7 @@ var listenerDeleteSubCommand = cli.Command{
 	Category:  "listener",
 	Flags:     flags.WaitCommandFlags,
 	Action: func(c *cli.Context) error {
-		listenerID, err := flags.GetFirstArg(c, listenerIDText)
+		listenerID, err := flags.GetFirstStringArg(c, listenerIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
@@ -204,7 +204,7 @@ var listenerUpdateSubCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		clusterID, err := flags.GetFirstArg(c, listenerIDText)
+		clusterID, err := flags.GetFirstStringArg(c, listenerIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "update")
 			return err

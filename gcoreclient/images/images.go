@@ -176,7 +176,7 @@ var imageShowCommand = cli.Command{
 	Category:  "image",
 	ArgsUsage: "<image_id>",
 	Action: func(c *cli.Context) error {
-		imageID, err := flags.GetFirstArg(c, imageIDText)
+		imageID, err := flags.GetFirstStringArg(c, imageIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
@@ -203,7 +203,7 @@ var imageDeleteCommand = cli.Command{
 	ArgsUsage: "<image_id>",
 	Flags:     flags.WaitCommandFlags,
 	Action: func(c *cli.Context) error {
-		imageID, err := flags.GetFirstArg(c, imageIDText)
+		imageID, err := flags.GetFirstStringArg(c, imageIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err

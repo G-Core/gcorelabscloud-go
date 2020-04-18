@@ -204,7 +204,7 @@ var lbpoolGetSubCommand = cli.Command{
 	ArgsUsage: "<pool_id>",
 	Category:  "pool",
 	Action: func(c *cli.Context) error {
-		clusterID, err := flags.GetFirstArg(c, lbpoolIDText)
+		clusterID, err := flags.GetFirstStringArg(c, lbpoolIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
@@ -230,7 +230,7 @@ var lbpoolDeleteSubCommand = cli.Command{
 	Category:  "pool",
 	Flags:     flags.WaitCommandFlags,
 	Action: func(c *cli.Context) error {
-		lbpoolID, err := flags.GetFirstArg(c, lbpoolIDText)
+		lbpoolID, err := flags.GetFirstStringArg(c, lbpoolIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
@@ -533,7 +533,7 @@ var lbpoolCreateMemberSubCommand = cli.Command{
 		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
-		lbpoolID, err := flags.GetFirstArg(c, lbpoolIDText)
+		lbpoolID, err := flags.GetFirstStringArg(c, lbpoolIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "create")
 			return err
@@ -594,7 +594,7 @@ var lbpoolDeleteMemberSubCommand = cli.Command{
 		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
-		memberID, err := flags.GetFirstArg(c, memberIDText)
+		memberID, err := flags.GetFirstStringArg(c, memberIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
@@ -748,7 +748,7 @@ var lbpoolUpdateSubCommand = cli.Command{
 		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
-		lbPoolID, err := flags.GetFirstArg(c, lbpoolIDText)
+		lbPoolID, err := flags.GetFirstStringArg(c, lbpoolIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "update")
 			return err

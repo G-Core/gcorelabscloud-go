@@ -28,7 +28,7 @@ var securityGroupRuleDeleteSubCommand = cli.Command{
 	ArgsUsage: "<securitygrouprule_id>",
 	Category:  "securitygrouprule",
 	Action: func(c *cli.Context) error {
-		securityGroupRuleID, err := flags.GetFirstArg(c, securityGroupRuleIDText)
+		securityGroupRuleID, err := flags.GetFirstStringArg(c, securityGroupRuleIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
@@ -111,7 +111,7 @@ var securityGroupRuleUpdateSubCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		securityGroupRuleID, err := flags.GetFirstArg(c, securityGroupRuleIDText)
+		securityGroupRuleID, err := flags.GetFirstStringArg(c, securityGroupRuleIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "add-rule")
 			return err
@@ -203,7 +203,7 @@ var securityGroupRuleAddSubCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		securityGroupID, err := flags.GetFirstArg(c, securityGroupIDText)
+		securityGroupID, err := flags.GetFirstStringArg(c, securityGroupIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "add-rule")
 			return err

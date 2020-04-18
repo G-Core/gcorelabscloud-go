@@ -108,7 +108,7 @@ var floatingIPGetSubCommand = cli.Command{
 	ArgsUsage: "<floatingip_id>",
 	Category:  "floatingip",
 	Action: func(c *cli.Context) error {
-		floatingIPID, err := flags.GetFirstArg(c, floatingIPIDText)
+		floatingIPID, err := flags.GetFirstStringArg(c, floatingIPIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
@@ -133,7 +133,7 @@ var floatingIPDeleteSubCommand = cli.Command{
 	ArgsUsage: "<floatingip_id>",
 	Category:  "floatingip",
 	Action: func(c *cli.Context) error {
-		floatingIPID, err := flags.GetFirstArg(c, floatingIPIDText)
+		floatingIPID, err := flags.GetFirstStringArg(c, floatingIPIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
@@ -184,7 +184,7 @@ var floatingIPAssignSubCommand = cli.Command{
 		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
-		floatingIPID, err := flags.GetFirstArg(c, floatingIPIDText)
+		floatingIPID, err := flags.GetFirstStringArg(c, floatingIPIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "update")
 			return err
@@ -222,7 +222,7 @@ var floatingIPUnAssignSubCommand = cli.Command{
 	ArgsUsage: "<floatingip_id>",
 	Category:  "floatingip",
 	Action: func(c *cli.Context) error {
-		floatingIPID, err := flags.GetFirstArg(c, floatingIPIDText)
+		floatingIPID, err := flags.GetFirstStringArg(c, floatingIPIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "update")
 			return err

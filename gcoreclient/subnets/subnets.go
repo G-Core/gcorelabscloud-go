@@ -55,7 +55,7 @@ var subnetGetCommand = cli.Command{
 	ArgsUsage: "<subnet_id>",
 	Category:  "subnet",
 	Action: func(c *cli.Context) error {
-		subnetID, err := flags.GetFirstArg(c, subnetIDText)
+		subnetID, err := flags.GetFirstStringArg(c, subnetIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
@@ -84,7 +84,7 @@ var subnetDeleteCommand = cli.Command{
 	Category:  "subnet",
 	Flags:     flags.WaitCommandFlags,
 	Action: func(c *cli.Context) error {
-		subnetID, err := flags.GetFirstArg(c, subnetIDText)
+		subnetID, err := flags.GetFirstStringArg(c, subnetIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
@@ -132,7 +132,7 @@ var subnetUpdateCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		subnetID, err := flags.GetFirstArg(c, subnetIDText)
+		subnetID, err := flags.GetFirstStringArg(c, subnetIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err

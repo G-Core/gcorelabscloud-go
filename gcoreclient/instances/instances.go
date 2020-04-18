@@ -202,7 +202,7 @@ var instanceListInterfacesCommand = cli.Command{
 	ArgsUsage: "<instance_id>",
 	Category:  "instance",
 	Action: func(c *cli.Context) error {
-		instanceID, err := flags.GetFirstArg(c, instanceIDText)
+		instanceID, err := flags.GetFirstStringArg(c, instanceIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "list")
 			return err
@@ -227,7 +227,7 @@ var instanceListSecurityGroupsCommand = cli.Command{
 	ArgsUsage: "<instance_id>",
 	Category:  "instance",
 	Action: func(c *cli.Context) error {
-		instanceID, err := flags.GetFirstArg(c, instanceIDText)
+		instanceID, err := flags.GetFirstStringArg(c, instanceIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "list")
 			return err
@@ -260,7 +260,7 @@ var instanceAssignSecurityGroupsCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		instanceID, err := flags.GetFirstArg(c, instanceIDText)
+		instanceID, err := flags.GetFirstStringArg(c, instanceIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "add")
 			return err
@@ -295,7 +295,7 @@ var instanceUnAssignSecurityGroupsCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		instanceID, err := flags.GetFirstArg(c, instanceIDText)
+		instanceID, err := flags.GetFirstStringArg(c, instanceIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
@@ -544,7 +544,7 @@ var instanceGetCommand = cli.Command{
 	ArgsUsage: "<instance_id>",
 	Category:  "instance",
 	Action: func(c *cli.Context) error {
-		instanceID, err := flags.GetFirstArg(c, instanceIDText)
+		instanceID, err := flags.GetFirstStringArg(c, instanceIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
@@ -586,7 +586,7 @@ var instanceDeleteCommand = cli.Command{
 	ArgsUsage: "<instance_id>",
 	Category:  "instance",
 	Action: func(c *cli.Context) error {
-		instanceID, err := flags.GetFirstArg(c, instanceIDText)
+		instanceID, err := flags.GetFirstStringArg(c, instanceIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
@@ -634,7 +634,7 @@ var instanceStartCommand = cli.Command{
 	ArgsUsage: "<instance_id>",
 	Category:  "instance",
 	Action: func(c *cli.Context) error {
-		instanceID, err := flags.GetFirstArg(c, instanceIDText)
+		instanceID, err := flags.GetFirstStringArg(c, instanceIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "start")
 			return err
@@ -660,7 +660,7 @@ var instanceStopCommand = cli.Command{
 	ArgsUsage: "<instance_id>",
 	Category:  "instance",
 	Action: func(c *cli.Context) error {
-		instanceID, err := flags.GetFirstArg(c, instanceIDText)
+		instanceID, err := flags.GetFirstStringArg(c, instanceIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "stop")
 			return err
@@ -686,7 +686,7 @@ var instancePowerCycleCommand = cli.Command{
 	ArgsUsage: "<instance_id>",
 	Category:  "instance",
 	Action: func(c *cli.Context) error {
-		instanceID, err := flags.GetFirstArg(c, instanceIDText)
+		instanceID, err := flags.GetFirstStringArg(c, instanceIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "powercycle")
 			return err
@@ -712,7 +712,7 @@ var instanceRebootCommand = cli.Command{
 	ArgsUsage: "<instance_id>",
 	Category:  "instance",
 	Action: func(c *cli.Context) error {
-		instanceID, err := flags.GetFirstArg(c, instanceIDText)
+		instanceID, err := flags.GetFirstStringArg(c, instanceIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "reboot")
 			return err
@@ -738,7 +738,7 @@ var instanceSuspendCommand = cli.Command{
 	ArgsUsage: "<instance_id>",
 	Category:  "instance",
 	Action: func(c *cli.Context) error {
-		instanceID, err := flags.GetFirstArg(c, instanceIDText)
+		instanceID, err := flags.GetFirstStringArg(c, instanceIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "suspend")
 			return err
@@ -764,7 +764,7 @@ var instanceResumeCommand = cli.Command{
 	ArgsUsage: "<instance_id>",
 	Category:  "instance",
 	Action: func(c *cli.Context) error {
-		instanceID, err := flags.GetFirstArg(c, instanceIDText)
+		instanceID, err := flags.GetFirstStringArg(c, instanceIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "resume")
 			return err
@@ -797,7 +797,7 @@ var instanceResizeCommand = cli.Command{
 		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
-		instanceID, err := flags.GetFirstArg(c, instanceIDText)
+		instanceID, err := flags.GetFirstStringArg(c, instanceIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "resize")
 			return err

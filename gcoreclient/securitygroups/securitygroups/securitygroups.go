@@ -248,7 +248,7 @@ var securityGroupGetSubCommand = cli.Command{
 	ArgsUsage: "<securitygroup_id>",
 	Category:  "securitygroup",
 	Action: func(c *cli.Context) error {
-		securityGroupID, err := flags.GetFirstArg(c, securityGroupIDText)
+		securityGroupID, err := flags.GetFirstStringArg(c, securityGroupIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
@@ -273,7 +273,7 @@ var securityGroupListInstancesSubCommand = cli.Command{
 	ArgsUsage: "<securitygroup_id>",
 	Category:  "securitygroup",
 	Action: func(c *cli.Context) error {
-		securityGroupID, err := flags.GetFirstArg(c, securityGroupIDText)
+		securityGroupID, err := flags.GetFirstStringArg(c, securityGroupIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "list")
 			return err
@@ -298,7 +298,7 @@ var securityGroupDeleteSubCommand = cli.Command{
 	ArgsUsage: "<securitygroup_id>",
 	Category:  "securitygroup",
 	Action: func(c *cli.Context) error {
-		securityGroupID, err := flags.GetFirstArg(c, securityGroupIDText)
+		securityGroupID, err := flags.GetFirstStringArg(c, securityGroupIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
@@ -330,7 +330,7 @@ var securityGroupUpdateSubCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		securityGroupID, err := flags.GetFirstArg(c, securityGroupIDText)
+		securityGroupID, err := flags.GetFirstStringArg(c, securityGroupIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "update")
 			return err

@@ -131,7 +131,7 @@ var clusterTemplateDeleteDubCommand = cli.Command{
 	ArgsUsage: "<template_id>",
 	Category:  "template",
 	Action: func(c *cli.Context) error {
-		clusterTemplateID, err := flags.GetFirstArg(c, clusterTemplateIDText)
+		clusterTemplateID, err := flags.GetFirstStringArg(c, clusterTemplateIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
@@ -155,7 +155,7 @@ var clusterTemplateGetSubCommand = cli.Command{
 	ArgsUsage: "<template_id>",
 	Category:  "template",
 	Action: func(c *cli.Context) error {
-		clusterTemplateID, err := flags.GetFirstArg(c, clusterTemplateIDText)
+		clusterTemplateID, err := flags.GetFirstStringArg(c, clusterTemplateIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
@@ -203,7 +203,7 @@ var clusterTemplateUpdateSubCommand = cli.Command{
 		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
-		clusterTemplateID, err := flags.GetFirstArg(c, clusterTemplateIDText)
+		clusterTemplateID, err := flags.GetFirstStringArg(c, clusterTemplateIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "update")
 			return err

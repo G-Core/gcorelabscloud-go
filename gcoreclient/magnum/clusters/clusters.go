@@ -48,7 +48,7 @@ var clusterDeleteSubCommand = cli.Command{
 	Category:  "cluster",
 	Flags:     flags.WaitCommandFlags,
 	Action: func(c *cli.Context) error {
-		clusterID, err := flags.GetFirstArg(c, clusterIDText)
+		clusterID, err := flags.GetFirstStringArg(c, clusterIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
@@ -104,7 +104,7 @@ var clusterResizeSubCommand = cli.Command{
 		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
-		clusterID, err := flags.GetFirstArg(c, clusterIDText)
+		clusterID, err := flags.GetFirstStringArg(c, clusterIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "resize")
 			return err
@@ -174,7 +174,7 @@ var clusterUpgradeSubCommand = cli.Command{
 		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
-		clusterID, err := flags.GetFirstArg(c, clusterIDText)
+		clusterID, err := flags.GetFirstStringArg(c, clusterIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "upgrade")
 			return err
@@ -245,7 +245,7 @@ var clusterUpdateSubCommand = cli.Command{
 		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
-		clusterID, err := flags.GetFirstArg(c, clusterIDText)
+		clusterID, err := flags.GetFirstStringArg(c, clusterIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "update")
 			return cli.NewExitError(err, 1)
@@ -323,7 +323,7 @@ var clusterGetSubCommand = cli.Command{
 	ArgsUsage: "<cluster_id>",
 	Category:  "cluster",
 	Action: func(c *cli.Context) error {
-		clusterID, err := flags.GetFirstArg(c, clusterIDText)
+		clusterID, err := flags.GetFirstStringArg(c, clusterIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
@@ -374,7 +374,7 @@ var clusterConfigSubCommand = cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		clusterID, err := flags.GetFirstArg(c, clusterIDText)
+		clusterID, err := flags.GetFirstStringArg(c, clusterIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "config")
 			return err
@@ -506,10 +506,9 @@ var clusterCreateSubCommand = cli.Command{
 			Required: false,
 		},
 		&cli.IntFlag{
-			Name:        "docker-volume-size",
-			Usage:       "Docker volume size for worker nodes.",
-			DefaultText: "nil",
-			Required:    false,
+			Name:     "docker-volume-size",
+			Usage:    "Docker volume size for worker nodes.",
+			Required: false,
 		},
 		&cli.GenericFlag{
 			Name: "version",

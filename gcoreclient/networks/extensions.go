@@ -36,7 +36,7 @@ var extensionGetCommand = cli.Command{
 	ArgsUsage: "<alias>",
 	Category:  "extension",
 	Action: func(c *cli.Context) error {
-		extensionID, err := flags.GetFirstArg(c, aliasText)
+		extensionID, err := flags.GetFirstStringArg(c, aliasText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
