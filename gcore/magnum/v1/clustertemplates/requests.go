@@ -74,29 +74,30 @@ type CreateOptsBuilder interface {
 
 // CreateOpts represents options used to create a cluster template.
 type CreateOpts struct {
-	ImageID             string             `json:"image_id"`
-	KeyPairID           string             `json:"keypair_id"`
-	Name                string             `json:"name"`
-	DockerVolumeSize    int                `json:"docker_volume_size"`
+	ImageID             string             `json:"image_id" required:"true"`
+	Name                string             `json:"name" required:"true"`
+	KeyPairID           string             `json:"keypair_id,omitempty"`
+	DockerVolumeSize    int                `json:"docker_volume_size,omitempty"`
 	Labels              *map[string]string `json:"labels,omitempty"`
-	FixedSubnet         *string            `json:"fixed_subnet,omitempty"`
-	MasterFlavorID      *string            `json:"master_flavor_id,omitempty"`
-	FlavorID            *string            `json:"flavor_id,omitempty"`
-	NoProxy             *string            `json:"no_proxy,omitempty"`
-	HTTPSProxy          *string            `json:"https_proxy,omitempty"`
-	HTTPProxy           *string            `json:"http_proxy,omitempty"`
-	TLSDisabled         *bool              `json:"tls_disabled,omitempty"`
-	Public              *bool              `json:"public,omitempty"`
-	ServerType          *string            `json:"server_type,omitempty"`
-	VolumeDriver        *string            `json:"volume_driver,omitempty"`
-	RegistryEnabled     *bool              `json:"registry_enabled,omitempty"`
-	DockerStorageDriver *string            `json:"docker_storage_driver,omitempty"`
-	NetworkDriver       *string            `json:"network_driver,omitempty"`
-	FixedNetwork        *string            `json:"fixed_network,omitempty"`
-	MasterLbEnabled     *bool              `json:"master_lb_enabled,omitempty"`
-	DNSNameServer       *string            `json:"dns_nameserver,omitempty"`
-	FloatingIPEnabled   *bool              `json:"floating_ip_enabled,omitempty"`
-	Hidden              *bool              `json:"hidden,omitempty"`
+	FixedSubnet         string             `json:"fixed_subnet,omitempty"`
+	MasterFlavorID      string             `json:"master_flavor_id,omitempty"`
+	FlavorID            string             `json:"flavor_id,omitempty"`
+	NoProxy             string             `json:"no_proxy,omitempty"`
+	HTTPSProxy          string             `json:"https_proxy,omitempty"`
+	HTTPProxy           string             `json:"http_proxy,omitempty"`
+	TLSDisabled         bool               `json:"tls_disabled,omitempty"`
+	Public              bool               `json:"public,omitempty"`
+	ServerType          string             `json:"server_type,omitempty"`
+	VolumeDriver        string             `json:"volume_driver,omitempty"`
+	RegistryEnabled     bool               `json:"registry_enabled,omitempty"`
+	DockerStorageDriver string             `json:"docker_storage_driver,omitempty"`
+	NetworkDriver       string             `json:"network_driver,omitempty"`
+	FixedNetwork        string             `json:"fixed_network,omitempty"`
+	ExternalNetworkID   string             `json:"external_network_id,omitempty"`
+	MasterLbEnabled     bool               `json:"master_lb_enabled,omitempty"`
+	DNSNameServer       string             `json:"dns_nameserver,omitempty"`
+	FloatingIPEnabled   bool               `json:"floating_ip_enabled,omitempty"`
+	Hidden              bool               `json:"hidden,omitempty"`
 }
 
 // ToClusterTemplateCreateMap builds a request body from CreateOpts.

@@ -33,7 +33,7 @@ var clusterTemplateCreateSubCommand = cli.Command{
 			Name:     "keypair",
 			Aliases:  []string{"k"},
 			Usage:    "The name of the SSH keypair",
-			Required: true,
+			Required: false,
 		},
 		&cli.StringFlag{
 			Name:     "name",
@@ -43,8 +43,12 @@ var clusterTemplateCreateSubCommand = cli.Command{
 		},
 		&cli.IntFlag{
 			Name:     "docker-volume-size",
-			Value:    10,
 			Usage:    "The size in GB for the local storage on each server for the Docker daemon to cache the images and host the containers",
+			Required: false,
+		},
+		&cli.StringFlag{
+			Name:     "external-network-id",
+			Usage:    "External network ID for cluster",
 			Required: false,
 		},
 		&cli.StringFlag{
@@ -62,7 +66,7 @@ var clusterTemplateCreateSubCommand = cli.Command{
 		&cli.StringFlag{
 			Name:     "flavor",
 			Usage:    "The flavor of the node for this cluster template",
-			Required: true,
+			Required: false,
 		},
 		&cli.StringSliceFlag{
 			Name:        "label",
@@ -83,14 +87,15 @@ var clusterTemplateCreateSubCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 		opts := clustertemplates.CreateOpts{
-			ImageID:          c.String("image"),
-			KeyPairID:        c.String("keypair"),
-			Name:             c.String("name"),
-			DockerVolumeSize: c.Int("docker-volume-size"),
-			Labels:           &labels,
-			FixedSubnet:      utils.StringToPointer(c.String("fixed-subnet")),
-			MasterFlavorID:   utils.StringToPointer(c.String("master-flavor")),
-			FlavorID:         utils.StringToPointer(c.String("flavor")),
+			ImageID:           c.String("image"),
+			KeyPairID:         c.String("keypair"),
+			Name:              c.String("name"),
+			DockerVolumeSize:  c.Int("docker-volume-size"),
+			Labels:            &labels,
+			ExternalNetworkID: c.String("external-network-id"),
+			FixedSubnet:       c.String("fixed-subnet"),
+			MasterFlavorID:    c.String("master-flavor"),
+			FlavorID:          c.String("flavor"),
 		}
 		result, err := clustertemplates.Create(client, opts).Extract()
 		if err != nil {

@@ -2,7 +2,10 @@ package testing
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
+
+	uuid "github.com/satori/go.uuid"
 
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/magnum/v1/clusters"
@@ -117,12 +120,12 @@ const CreateRequest = `
 }
 `
 
-const ResizeRequest = `
+var ResizeRequest = fmt.Sprintf(`
 {
     "node_count": 2,
-    "nodegroup": "test"
+    "nodegroup": "%s"
 }
-`
+`, nodeGroup)
 
 const UpdateRequest = `
 [
@@ -134,13 +137,13 @@ const UpdateRequest = `
 ]
 `
 
-const UpgradeRequest = `
+var UpgradeRequest = fmt.Sprintf(`
 {
-    "cluster_template": "test",
+    "cluster_template": "%s",
     "max_batch_size": 1,
-    "nodegroup": "test"
+    "nodegroup": "%s"
 }
-`
+`, clusterTemplate, nodeGroup)
 
 const CreateResponse = `
 {
@@ -246,6 +249,8 @@ var createdTimeString = "2020-03-02T12:20:43+00:00"
 var updatedTimeString = "2020-03-02T12:20:47+00:00"
 var createdTime, _ = time.Parse(time.RFC3339, createdTimeString)
 var updatedTime, _ = time.Parse(time.RFC3339, updatedTimeString)
+var nodeGroup = uuid.NewV4().String()
+var clusterTemplate = uuid.NewV4().String()
 
 var (
 	Config1  = clusters.Config{Config: ConfigStringResponse}
@@ -281,19 +286,19 @@ var (
 			StackID:           "78c48153-fa6c-48b8-aae3-08b5b230387a",
 		},
 		DiscoveryURL:       "https://discovery.etcd.io/161d73fde241377395f481c6276b42c7",
-		FixedSubnet:        nil,
-		CoeVersion:         nil,
+		FixedSubnet:        "",
+		CoeVersion:         "",
 		MasterAddresses:    []string{},
 		ProjectID:          "ec0f251d-2e36-436c-9a30-7e2c33297273",
 		CreatedAt:          createdTime,
-		ContainerVersion:   nil,
-		StatusReason:       nil,
+		ContainerVersion:   "",
+		StatusReason:       "",
 		HealthStatusReason: map[string]string{},
 		APIAddress:         nil,
 		UserID:             "8ba64372-1585-4808-b422-7a7aab5f3197",
 		NodeAddresses:      []string{},
 		UpdatedAt:          &updatedTime,
-		FixedNetwork:       nil,
+		FixedNetwork:       "",
 		FloatingIPEnabled:  false,
 	}
 	ClusterList1 = clusters.ClusterList{

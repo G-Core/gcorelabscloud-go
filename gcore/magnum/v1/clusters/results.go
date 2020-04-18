@@ -44,18 +44,18 @@ type ConfigResult struct {
 
 // Cluster represents a cluster structure.
 type Cluster struct {
-	StatusReason       *string           `json:"status_reason,omitempty"`
-	APIAddress         *string           `json:"api_address,omitempty"`
-	CoeVersion         *string           `json:"coe_version,omitempty"`
-	ContainerVersion   *string           `json:"container_version,omitempty"`
+	StatusReason       string            `json:"status_reason,omitempty"`
+	APIAddress         *gcorecloud.URL   `json:"api_address,omitempty"`
+	CoeVersion         string            `json:"coe_version,omitempty"`
+	ContainerVersion   string            `json:"container_version,omitempty"`
 	DiscoveryURL       string            `json:"discovery_url,omitempty"`
 	HealthStatusReason map[string]string `json:"health_status_reason,omitempty"`
 	ProjectID          string            `json:"project_id"`
 	UserID             string            `json:"user_id"`
 	NodeAddresses      []string          `json:"node_addresses"`
 	MasterAddresses    []string          `json:"master_addresses"`
-	FixedNetwork       *string           `json:"fixed_network"`
-	FixedSubnet        *string           `json:"fixed_subnet"`
+	FixedNetwork       string            `json:"fixed_network"`
+	FixedSubnet        string            `json:"fixed_subnet"`
 	FloatingIPEnabled  bool              `json:"floating_ip_enabled"`
 	CreatedAt          time.Time         `json:"created_at"`
 	UpdatedAt          *time.Time        `json:"updated_at"`

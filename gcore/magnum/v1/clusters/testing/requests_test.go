@@ -7,7 +7,6 @@ import (
 
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/magnum/v1/clusters"
 	fake "bitbucket.gcore.lu/gcloud/gcorecloud-go/testhelper/client"
-
 	"github.com/stretchr/testify/require"
 
 	log "github.com/sirupsen/logrus"
@@ -226,12 +225,10 @@ func TestResize(t *testing.T) {
 		}
 	})
 
-	nodeGroup := "test"
-
 	options := clusters.ResizeOpts{
 		NodeCount:     2,
 		NodesToRemove: nil,
-		NodeGroup:     &nodeGroup,
+		NodeGroup:     nodeGroup,
 	}
 
 	client := fake.ServiceTokenClient("magnum", "v1")
@@ -287,13 +284,12 @@ func TestUpgrade(t *testing.T) {
 		}
 	})
 
-	nodeGroup := "test"
 	MaxBatchSize := 1
 
 	options := clusters.UpgradeOpts{
-		ClusterTemplate: "test",
-		MaxBatchSize:    &MaxBatchSize,
-		NodeGroup:       &nodeGroup,
+		ClusterTemplate: clusterTemplate,
+		MaxBatchSize:    MaxBatchSize,
+		NodeGroup:       nodeGroup,
 	}
 
 	client := fake.ServiceTokenClient("magnum", "v1")

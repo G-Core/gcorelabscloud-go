@@ -123,7 +123,7 @@ var clusterResizeSubCommand = cli.Command{
 		opts := clusters.ResizeOpts{
 			NodeCount:     c.Int("node-count"),
 			NodesToRemove: nodes,
-			NodeGroup:     utils.StringToPointer(c.String("nodegroup")),
+			NodeGroup:     c.String("nodegroup"),
 		}
 
 		results, err := clusters.Resize(client, clusterID, opts).Extract()
@@ -144,8 +144,7 @@ var clusterResizeSubCommand = cli.Command{
 			if err != nil {
 				return nil, fmt.Errorf("cannot get cluster with ID: %s. Error: %w", clusterID, err)
 			}
-			utils.ShowResults(cluster, c.String("format"))
-			return nil, nil
+			return cluster, nil
 		})
 
 	},
@@ -188,8 +187,8 @@ var clusterUpgradeSubCommand = cli.Command{
 
 		opts := clusters.UpgradeOpts{
 			ClusterTemplate: c.String("cluster-template"),
-			MaxBatchSize:    utils.IntToPointer(c.Int("max-batch-size")),
-			NodeGroup:       utils.StringToPointer(c.String("nodegroup")),
+			MaxBatchSize:    c.Int("max-batch-size"),
+			NodeGroup:       c.String("nodegroup"),
 		}
 
 		results, err := clusters.Upgrade(client, clusterID, opts).Extract()
@@ -506,6 +505,12 @@ var clusterCreateSubCommand = cli.Command{
 			Usage:    "Enable fixed IP for cluster nodes.",
 			Required: false,
 		},
+		&cli.IntFlag{
+			Name:        "docker-volume-size",
+			Usage:       "Docker volume size for worker nodes.",
+			DefaultText: "nil",
+			Required:    false,
+		},
 		&cli.GenericFlag{
 			Name: "version",
 			Value: &utils.EnumValue{
@@ -547,6 +552,7 @@ var clusterCreateSubCommand = cli.Command{
 			FixedNetwork:      c.String("fixed-network"),
 			FixedSubnet:       c.String("fixed-subnet"),
 			FloatingIPEnabled: c.Bool("floating-ip-enabled"),
+			DockerVolumeSize:  c.Int("docker-volume-size"),
 			CreateTimeout:     c.Int("create-timeout"),
 			Version:           types.K8sClusterVersion(c.String("version")),
 		}

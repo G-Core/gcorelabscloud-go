@@ -3,6 +3,8 @@ package testing
 import (
 	"testing"
 
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/magnum/v1/clusters"
+
 	"github.com/stretchr/testify/require"
 
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/magnum/v1/clustertemplates"
@@ -62,6 +64,38 @@ func TestUpdateOpts(t *testing.T) {
 	}}
 
 	_, err = options.ToClusterTemplateUpdateMap()
+	require.NoError(t, err)
+
+}
+
+func TestResizeOpts(t *testing.T) {
+	options := clusters.ResizeOpts{
+		NodeCount:     0,
+		NodesToRemove: nil,
+		NodeGroup:     "",
+	}
+
+	_, err := options.ToClusterResizeMap()
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "NodeCount")
+
+	options = clusters.ResizeOpts{
+		NodeCount:     1,
+		NodesToRemove: []string{"1"},
+		NodeGroup:     "",
+	}
+
+	_, err = options.ToClusterResizeMap()
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "NodeGroup")
+	require.Contains(t, err.Error(), "NodesToRemove")
+
+	options = clusters.ResizeOpts{
+		NodeCount: 1,
+		NodeGroup: "",
+	}
+
+	_, err = options.ToClusterResizeMap()
 	require.NoError(t, err)
 
 }

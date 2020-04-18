@@ -68,23 +68,27 @@ type CreateOptsBuilder interface {
 // CreateOpts represents options used to create a cluster.
 type CreateOpts struct {
 	Name              string                  `json:"name" required:"true"`
-	ClusterTemplateID string                  `json:"cluster_template_id" required:"true"`
-	NodeCount         int                     `json:"node_count" required:"true"`
-	MasterCount       int                     `json:"master_count" required:"true"`
+	ClusterTemplateID string                  `json:"cluster_template_id" required:"true" validate:"required,uuid4"`
+	NodeCount         int                     `json:"node_count" required:"true" validate:"required,gt=0"`
+	MasterCount       int                     `json:"master_count" required:"true" validate:"required,gt=0"`
 	KeyPair           string                  `json:"keypair,omitempty"`
 	FlavorID          string                  `json:"flavor_id,omitempty"`
 	MasterFlavorID    string                  `json:"master_flavor_id,omitempty"`
-	DiscoveryURL      string                  `json:"discovery_url,omitempty"`
+	DiscoveryURL      string                  `json:"discovery_url,omitempty" validate:"omitempty,url"`
 	CreateTimeout     int                     `json:"create_timeout,omitempty"`
 	Labels            *map[string]string      `json:"labels,omitempty"`
-	FixedNetwork      string                  `json:"fixed_network,omitempty"`
-	FixedSubnet       string                  `json:"fixed_subnet,omitempty"`
+	FixedNetwork      string                  `json:"fixed_network,omitempty" validate:"omitempty,uuid4"`
+	FixedSubnet       string                  `json:"fixed_subnet,omitempty" validate:"omitempty,uuid4"`
 	FloatingIPEnabled bool                    `json:"floating_ip_enabled"`
+	DockerVolumeSize  int                     `json:"docker_volume_size,omitempty" validate:"omitempty,gt=0"`
 	Version           types.K8sClusterVersion `json:"version,omitempty"`
 }
 
 // ToClusterCreateMap builds a request body from CreateOpts.
 func (opts CreateOpts) ToClusterCreateMap() (map[string]interface{}, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return nil, err
+	}
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
@@ -106,13 +110,16 @@ type ResizeOptsBuilder interface {
 
 // ResizeOpts represents options used to update a cluster.
 type ResizeOpts struct {
-	NodeCount     int      `json:"node_count"`
-	NodesToRemove []string `json:"nodes_to_remove,omitempty"`
-	NodeGroup     *string  `json:"nodegroup,omitempty"`
+	NodeCount     int      `json:"node_count" required:"true" validate:"required,gt=0"`
+	NodesToRemove []string `json:"nodes_to_remove,omitempty" validate:"omitempty,dive,uuid4"`
+	NodeGroup     string   `json:"nodegroup,omitempty" validate:"required_with=NodesToRemove,omitempty,uuid4"`
 }
 
 // ToClusterResizeMap builds a request body from ResizeOpts.
 func (opts ResizeOpts) ToClusterResizeMap() (map[string]interface{}, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return nil, err
+	}
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
@@ -136,13 +143,16 @@ type UpgradeOptsBuilder interface {
 
 // UpgradeOpts represents options used to upgrade a cluster.
 type UpgradeOpts struct {
-	ClusterTemplate string  `json:"cluster_template" required:"true"`
-	MaxBatchSize    *int    `json:"max_batch_size,omitempty"`
-	NodeGroup       *string `json:"nodegroup,omitempty"`
+	ClusterTemplate string `json:"cluster_template" required:"true" validate:"required,uuid4"`
+	MaxBatchSize    int    `json:"max_batch_size,omitempty" validate:"gt=0"`
+	NodeGroup       string `json:"nodegroup,omitempty" validate:"omitempty,uuid4"`
 }
 
 // ToClusterUpgradeMap builds a request body from UpgradeOpts.
 func (opts UpgradeOpts) ToClusterUpgradeMap() (map[string]interface{}, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return nil, err
+	}
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 

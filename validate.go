@@ -439,3 +439,7 @@ func TranslateValidationError(err error) error {
 	errorText := strings.Join(errs, ", ")
 	return fmt.Errorf(errorText)
 }
+
+func ValidateStruct(s interface{}) error {
+	return TranslateValidationError(Validate.Struct(s))
+}
