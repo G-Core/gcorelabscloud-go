@@ -132,6 +132,7 @@ var floatingIPDeleteSubCommand = cli.Command{
 	Usage:     "Delete floating ip",
 	ArgsUsage: "<floatingip_id>",
 	Category:  "floatingip",
+	Flags:     flags.WaitCommandFlags,
 	Action: func(c *cli.Context) error {
 		floatingIPID, err := flags.GetFirstStringArg(c, floatingIPIDText)
 		if err != nil {
