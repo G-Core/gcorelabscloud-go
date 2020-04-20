@@ -172,13 +172,13 @@ var volumeCreateCommand = cli.Command{
 			Required:    false,
 		},
 		&cli.StringFlag{
-			Name:        "snapshot_id",
+			Name:        "snapshot-id",
 			Usage:       "Snapshot ID",
 			DefaultText: "nil",
 			Required:    false,
 		},
 		&cli.StringFlag{
-			Name:        "instance_id",
+			Name:        "instance-id",
 			Usage:       "Instance ID to attach",
 			DefaultText: "nil",
 			Required:    false,
@@ -220,8 +220,7 @@ var volumeCreateCommand = cli.Command{
 			if err != nil {
 				return nil, fmt.Errorf("cannot get volume with ID: %s. Error: %w", volumeID, err)
 			}
-			utils.ShowResults(volume, c.String("format"))
-			return nil, nil
+			return volume, nil
 		})
 	},
 }
