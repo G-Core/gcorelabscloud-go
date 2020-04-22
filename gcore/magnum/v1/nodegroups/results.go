@@ -55,13 +55,17 @@ type ClusterNodeGroup struct {
 
 // ClusterListNodeGroup represents a cluster nodegroup in the list response.
 type ClusterListNodeGroup struct {
-	UUID      string              `json:"uuid"`
-	Name      string              `json:"name"`
-	FlavorID  string              `json:"flavor_id"`
-	ImageID   string              `json:"image_id"`
-	NodeCount int                 `json:"node_count"`
-	Status    string              `json:"status"`
-	Role      types.NodegroupRole `json:"role"`
+	UUID         string              `json:"uuid"`
+	Name         string              `json:"name"`
+	FlavorID     string              `json:"flavor_id"`
+	ImageID      string              `json:"image_id"`
+	NodeCount    int                 `json:"node_count"`
+	MinNodeCount int                 `json:"min_node_count"`
+	MaxNodeCount *int                `json:"max_node_count"`
+	IsDefault    bool                `json:"is_default"`
+	StackID      string              `json:"stack_id"`
+	Status       string              `json:"status"`
+	Role         types.NodegroupRole `json:"role"`
 }
 
 // ClusterNodeGroupPage is the page returned by a pager when traversing over a

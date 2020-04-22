@@ -215,6 +215,13 @@ func (e ErrDefault405) Error() string {
 func (e ErrDefault408) Error() string {
 	return "The server timed out waiting for the request"
 }
+func (e ErrDefault409) Error() string {
+	e.ReadGcoreError()
+	if e.Info != "" {
+		return e.choseErrString()
+	}
+	return "Conflict"
+}
 func (e ErrDefault429) Error() string {
 	return "Too many requests have been sent in a given amount of time. Pause" +
 		" requests, wait up to one minute, and try again."

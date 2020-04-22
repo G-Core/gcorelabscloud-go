@@ -130,6 +130,14 @@ func init() { // nolint
 	})
 	FailOnErrorF(err, "Cannot register translation for tag: %s", "enum")
 
+	err = Validate.RegisterTranslation("sem", Trans, func(ut ut.Translator) error {
+		return ut.Add("sem", "{0} is not a valid sem version representation", true)
+	}, func(ut ut.Translator, fe validator.FieldError) string {
+		t, _ := ut.T("sem", fe.Field())
+		return t
+	})
+	FailOnErrorF(err, "Cannot register translation for tag: %s", "sfe")
+
 	Validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
 		name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
 		if name == "-" {
@@ -186,6 +194,14 @@ func init() { // nolint
 		return name
 	})
 
+	Validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
+		name := strings.SplitN(fld.Tag.Get("sem"), ",", 2)[0]
+		if name == "-" {
+			return ""
+		}
+		return name
+	})
+
 	err = Validate.RegisterValidation("enum", enum)
 	FailOnErrorF(err, "Cannot register custom validator tag: %v", "enum")
 	err = Validate.RegisterValidation(`rfe`, requiredIfFieldEqual)
@@ -198,6 +214,8 @@ func init() { // nolint
 	FailOnErrorF(err, "Cannot register custom validation tag: %s", "allowed_without_all")
 	err = Validate.RegisterValidation(`regex`, regex)
 	FailOnErrorF(err, "Cannot register custom validation tag: %s", "regex")
+	err = Validate.RegisterValidation(`sem`, sem)
+	FailOnErrorF(err, "Cannot register custom validation tag: %s", "sem")
 
 }
 
@@ -345,6 +363,28 @@ func regex(fl validator.FieldLevel) bool {
 	if field.Kind() == reflect.String {
 		value := field.String()
 		return validRegex.MatchString(value)
+	}
+
+	panic(fmt.Sprintf("Bad field type %T", field.Interface()))
+}
+
+// sem is the validation function for validating semantic version
+func sem(fl validator.FieldLevel) bool {
+
+	field := fl.Field()
+
+	if field.Kind() == reflect.String {
+		value := field.String()
+		parts := strings.Split(value, ".")
+		if len(parts) > 3 || len(parts) < 2 {
+			return false
+		}
+		for _, part := range parts {
+			if _, err := strconv.Atoi(part); err != nil {
+				return false
+			}
+		}
+		return true
 	}
 
 	panic(fmt.Sprintf("Bad field type %T", field.Interface()))

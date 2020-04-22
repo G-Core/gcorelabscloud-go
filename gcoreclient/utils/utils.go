@@ -521,3 +521,33 @@ func WriteKubeconfigFile(filename string, content []byte) error {
 	}
 	return nil
 }
+
+func getSliceLength(slice interface{}) (int, error) {
+	switch t := slice.(type) {
+	case []string:
+		return len(t), nil
+	case []int:
+		return len(t), nil
+	}
+	return 0, fmt.Errorf("unexpected type: %T", slice)
+}
+
+func ValidateEqualSlicesLength(slices ...interface{}) error {
+	if len(slices) == 0 || len(slices) == 1 {
+		return nil
+	}
+	ln, err := getSliceLength(slices[0])
+	if err != nil {
+		return err
+	}
+	for _, slice := range slices[1:] {
+		lns, err := getSliceLength(slice)
+		if err != nil {
+			return err
+		}
+		if lns != ln {
+			return fmt.Errorf("element %v has different length than %v", slice, slices[0])
+		}
+	}
+	return nil
+}
