@@ -2,6 +2,7 @@ package nodegroups
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/magnum/v1/types"
@@ -16,9 +17,10 @@ import (
 )
 
 var (
-	nodeGroupIDText = "nodegroup_id is mandatory argument"
-	clusterIDText   = "cluster_id is mandatory argument"
-	nodegroupRoles  = types.NodegroupRole("").StringList()
+	nodeGroupIDText       = "nodegroup_id is mandatory argument"
+	clusterIDText         = "cluster_id is mandatory argument"
+	nodegroupsUpdateTypes = types.ClusterUpdateOperation("").StringList()
+	nodegroupRoles        = types.NodegroupRole("").StringList()
 )
 
 var nodegroupListSubCommand = cli.Command{
@@ -101,28 +103,35 @@ var nodegroupUpdateSubCommand = cli.Command{
 	Usage:     "Magnum update nodegroup",
 	ArgsUsage: "<nodegroup_id>",
 	Category:  "nodegroup",
-	Flags: []cli.Flag{
+	Flags: append([]cli.Flag{
 		&cli.StringFlag{
 			Name:     "cluster-id",
 			Aliases:  []string{"c"},
 			Usage:    "Magnum cluster ID",
 			Required: true,
 		},
-		&cli.IntFlag{
-			Name:        "min-node-count",
-			Usage:       "Minimum number of nodes",
-			Aliases:     []string{"min"},
-			DefaultText: "nil",
-			Required:    false,
+		&cli.StringSliceFlag{
+			Name:     "path",
+			Aliases:  []string{"p"},
+			Usage:    "Update json path. Example /node_count",
+			Required: true,
 		},
-		&cli.IntFlag{
-			Name:        "max-node-count",
-			Usage:       "Maximum number of nodes",
-			Aliases:     []string{"max"},
-			DefaultText: "nil",
-			Required:    false,
+		&cli.StringSliceFlag{
+			Name:     "value",
+			Aliases:  []string{"v"},
+			Usage:    "Update json value",
+			Required: true,
 		},
-	},
+		&cli.GenericFlag{
+			Name:    "op",
+			Aliases: []string{"o"},
+			Value: &utils.EnumStringSliceValue{
+				Enum: nodegroupsUpdateTypes,
+			},
+			Usage:    fmt.Sprintf("output in %s", strings.Join(nodegroupsUpdateTypes, ", ")),
+			Required: true,
+		},
+	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
 		nodeGroupID, err := flags.GetFirstStringArg(c, nodeGroupIDText)
 		if err != nil {
@@ -135,11 +144,41 @@ var nodegroupUpdateSubCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		opts := nodegroups.UpdateOpts{
-			MinNodeCount: utils.IntToPointer(c.Int("min-node-count")),
-			MaxNodeCount: utils.IntToPointer(c.Int("max-node-count")),
+		paths := c.StringSlice("path")
+		values := c.StringSlice("value")
+		ops := utils.GetEnumStringSliceValue(c, "op")
+
+		if len(paths) != len(values) || len(values) != len(ops) {
+			_ = cli.ShowCommandHelp(c, "update")
+			return cli.NewExitError(fmt.Errorf("path, value and op parameters number should be same"), 1)
 		}
 
+		var opts nodegroups.UpdateOpts
+
+		for idx, path := range paths {
+			if !strings.HasPrefix(path, "/") {
+				return cli.NewExitError(fmt.Errorf("path parameter should be in format /path"), 1)
+			}
+			var updateValue interface{}
+			value := values[idx]
+			intValue, err := strconv.Atoi(value)
+			if err == nil {
+				updateValue = intValue
+			} else if path == "/labels" {
+				updateValue, err = utils.StringSliceToMap(strings.Split(value, ","))
+				if err != nil {
+					return cli.NewExitError(fmt.Errorf("wrong labels format. should be in format: label_one=value_one,label_two=value_two"), 1)
+				}
+			} else {
+				updateValue = value
+			}
+			el := nodegroups.UpdateOptsElem{
+				Path:  path,
+				Value: updateValue,
+				Op:    types.ClusterUpdateOperation(ops[idx]),
+			}
+			opts = append(opts, el)
+		}
 		result, err := nodegroups.Update(client, clusterID, nodeGroupID, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)

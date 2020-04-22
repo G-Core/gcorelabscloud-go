@@ -95,18 +95,37 @@ func Create(c *gcorecloud.ServiceClient, clusterID string, opts CreateOptsBuilde
 
 // UpdateOptsBuilder allows extensions to add additional parameters to the Update request.
 type UpdateOptsBuilder interface {
-	ToClusterNodeGroupUpdateMap() (map[string]interface{}, error)
+	ToClusterNodeGroupUpdateMap() ([]map[string]interface{}, error)
 }
 
-// UpdateOpts represents options used to update a cluster nodegroup.
-type UpdateOpts struct {
-	MinNodeCount *int `json:"min_node_count,omitempty"`
-	MaxNodeCount *int `json:"max_node_count,omitempty"`
+// UpdateOpts represents options used to update a cluster.
+type UpdateOpts []UpdateOptsElem
+
+// UpdateOptsElem represents options used to update a cluster.
+type UpdateOptsElem struct {
+	Path  string                       `json:"path" required:"true" validate:"required,startswith=/"`
+	Value interface{}                  `json:"value,omitempty" validate:"rfe=Op:add;replace"`
+	Op    types.ClusterUpdateOperation `json:"op" required:"true" validate:"required,enum"`
+}
+
+// Validate
+func (opts UpdateOpts) Validate() error {
+	for _, v := range opts {
+		err := gcorecloud.TranslateValidationError(gcorecloud.Validate.Struct(v))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // ToClusterNodeGroupUpdateMap builds a request body from UpdateOpts.
-func (opts UpdateOpts) ToClusterNodeGroupUpdateMap() (map[string]interface{}, error) {
-	return gcorecloud.BuildRequestBody(opts, "")
+func (opts UpdateOpts) ToClusterNodeGroupUpdateMap() ([]map[string]interface{}, error) {
+	err := opts.Validate()
+	if err != nil {
+		return nil, err
+	}
+	return gcorecloud.BuildSliceRequestBody(opts)
 }
 
 // Update accepts a UpdateOpts struct and updates an existing nodegroup using the values provided.

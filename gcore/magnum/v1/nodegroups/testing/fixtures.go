@@ -125,10 +125,13 @@ const CreateRequest = `
 `
 
 const UpdateRequest = `
-{
-  "max_node_count": 20,
-  "min_node_count": null,
-}
+[
+	{
+		"path": "/node_count",
+		"value": 2,
+		"op": "replace"
+	}
+]
 `
 
 const CreateResponse = `

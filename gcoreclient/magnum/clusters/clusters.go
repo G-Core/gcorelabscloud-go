@@ -225,7 +225,7 @@ var clusterUpdateSubCommand = cli.Command{
 		&cli.StringSliceFlag{
 			Name:     "path",
 			Aliases:  []string{"p"},
-			Usage:    "Update json path. Example /node/count",
+			Usage:    "Update json path. Example /node_count",
 			Required: true,
 		},
 		&cli.StringSliceFlag{

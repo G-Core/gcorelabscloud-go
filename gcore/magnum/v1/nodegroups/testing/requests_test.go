@@ -231,11 +231,11 @@ func TestUpdate(t *testing.T) {
 
 	client := fake.ServiceTokenClient("magnum", "v1")
 
-	maxNodeCount := 20
-
-	options := nodegroups.UpdateOpts{
-		MaxNodeCount: &maxNodeCount,
-	}
+	options := nodegroups.UpdateOpts{nodegroups.UpdateOptsElem{
+		Path:  "/node_count",
+		Value: 2,
+		Op:    "replace",
+	}}
 
 	ct, err := nodegroups.Update(client, NodeGroup1.ClusterID, NodeGroup1.UUID, options).Extract()
 
