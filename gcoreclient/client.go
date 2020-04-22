@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/k8s"
+
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/limits"
 
 	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/flags"
@@ -49,6 +51,7 @@ var commands = []*cli.Command{
 	&keystones.KeystoneCommands,
 	&quotas.QuotaCommands,
 	&limits.LimitCommands,
+	&k8s.ClusterCommands,
 }
 
 func buildClientCommands(commands []*cli.Command) ([]*cli.Command, []cli.Flag, string) {
