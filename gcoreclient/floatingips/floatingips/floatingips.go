@@ -4,16 +4,16 @@ import (
 	"fmt"
 	"net"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/floatingips/availablefloatingips"
+	"github.com/G-Core/gcorelabscloud-go/gcoreclient/floatingips/availablefloatingips"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/volume/v1/volumes"
+	"github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/floatingip/v1/floatingips"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/flags"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/utils"
+	"github.com/G-Core/gcorelabscloud-go/gcore/floatingip/v1/floatingips"
+	"github.com/G-Core/gcorelabscloud-go/gcoreclient/flags"
+	"github.com/G-Core/gcorelabscloud-go/gcoreclient/utils"
 	"github.com/urfave/cli/v2"
 )
 

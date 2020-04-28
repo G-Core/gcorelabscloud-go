@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/network/v1/networks"
+	"github.com/G-Core/gcorelabscloud-go/gcore/network/v1/networks"
 )
 
 func TestCreateOpts(t *testing.T) {

@@ -3,10 +3,10 @@ package testing
 import (
 	"time"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/project/v1/types"
+	"github.com/G-Core/gcorelabscloud-go/gcore/project/v1/types"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/project/v1/projects"
+	"github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/project/v1/projects"
 )
 
 const ListResponse = `

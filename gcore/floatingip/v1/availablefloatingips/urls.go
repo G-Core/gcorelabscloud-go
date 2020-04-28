@@ -1,7 +1,7 @@
 package availablefloatingips
 
 import (
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
+	"github.com/G-Core/gcorelabscloud-go"
 )
 
 func rootURL(c *gcorecloud.ServiceClient) string {

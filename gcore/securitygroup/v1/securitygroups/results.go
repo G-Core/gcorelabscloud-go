@@ -1,10 +1,10 @@
 package securitygroups
 
 import (
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/instance/v1/instances"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/securitygroup/v1/types"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/pagination"
+	"github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
+	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/types"
+	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
 type commonResult struct {

@@ -1,8 +1,8 @@
 package securitygrouprules
 
 import (
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/securitygroup/v1/securitygroups"
+	"github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/securitygroups"
 )
 
 // Replace accepts a CreateOpts struct and creates a new security group rule using the values provided.

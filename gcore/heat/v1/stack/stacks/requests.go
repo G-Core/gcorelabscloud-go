@@ -3,10 +3,10 @@ package stacks
 import (
 	"strings"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/heat/v1/stack/stacks/types"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/pagination"
+	"github.com/G-Core/gcorelabscloud-go/gcore/heat/v1/stack/stacks/types"
+	"github.com/G-Core/gcorelabscloud-go/pagination"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
+	"github.com/G-Core/gcorelabscloud-go"
 )
 
 // CreateOptsBuilder is the interface options structs have to satisfy in order

@@ -3,13 +3,13 @@ package testing
 import (
 	"testing"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/volume/v1/volumes"
+	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
+	"github.com/G-Core/gcorelabscloud-go"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/instance/v1/types"
+	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/instance/v1/instances"
+	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 
 	"github.com/stretchr/testify/require"
 )

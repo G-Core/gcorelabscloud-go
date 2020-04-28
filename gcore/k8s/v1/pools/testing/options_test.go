@@ -3,7 +3,7 @@ package testing
 import (
 	"testing"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/k8s/v1/pools"
+	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v1/pools"
 
 	"github.com/stretchr/testify/require"
 )

@@ -13,9 +13,9 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
-	th "bitbucket.gcore.lu/gcloud/gcorecloud-go/testhelper"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/testhelper/client"
+	"github.com/G-Core/gcorelabscloud-go"
+	th "github.com/G-Core/gcorelabscloud-go/testhelper"
+	"github.com/G-Core/gcorelabscloud-go/testhelper/client"
 
 	"github.com/stretchr/testify/assert"
 )

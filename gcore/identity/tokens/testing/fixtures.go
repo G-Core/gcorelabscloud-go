@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"testing"
 
-	fake "bitbucket.gcore.lu/gcloud/gcorecloud-go/testhelper/client"
+	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/identity/tokens"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/testhelper"
+	"github.com/G-Core/gcorelabscloud-go/gcore/identity/tokens"
+	"github.com/G-Core/gcorelabscloud-go/testhelper"
 )
 
 // TokenOutput is a sample response to a AccessToken call.

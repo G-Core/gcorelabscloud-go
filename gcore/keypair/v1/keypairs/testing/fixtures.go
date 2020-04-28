@@ -1,7 +1,7 @@
 package testing
 
 import (
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/keypair/v1/keypairs"
+	"github.com/G-Core/gcorelabscloud-go/gcore/keypair/v1/keypairs"
 )
 
 const ListResponse = `

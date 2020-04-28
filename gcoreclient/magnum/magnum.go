@@ -1,9 +1,9 @@
 package magnum
 
 import (
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/magnum/clusters"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/magnum/nodegroups"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/magnum/templates"
+	"github.com/G-Core/gcorelabscloud-go/gcoreclient/magnum/clusters"
+	"github.com/G-Core/gcorelabscloud-go/gcoreclient/magnum/nodegroups"
+	"github.com/G-Core/gcorelabscloud-go/gcoreclient/magnum/templates"
 	"github.com/urfave/cli/v2"
 )
 

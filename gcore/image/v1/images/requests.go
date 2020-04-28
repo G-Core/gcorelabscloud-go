@@ -3,12 +3,12 @@ package images
 import (
 	"net/http"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/image/v1/images/types"
+	"github.com/G-Core/gcorelabscloud-go/gcore/image/v1/images/types"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/pagination"
+	"github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
 // ListOptsBuilder allows extensions to add additional parameters to the List request.

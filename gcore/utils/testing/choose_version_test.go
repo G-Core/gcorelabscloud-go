@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"testing"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/utils"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/testhelper"
+	"github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils"
+	"github.com/G-Core/gcorelabscloud-go/testhelper"
 )
 
 func setupVersionHandler() {

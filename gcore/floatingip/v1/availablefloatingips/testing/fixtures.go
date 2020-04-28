@@ -4,13 +4,13 @@ import (
 	"net"
 	"time"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/flavor/v1/flavors"
+	"github.com/G-Core/gcorelabscloud-go/gcore/flavor/v1/flavors"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/floatingip/v1/floatingips"
+	"github.com/G-Core/gcorelabscloud-go/gcore/floatingip/v1/floatingips"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/instance/v1/instances"
+	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
+	"github.com/G-Core/gcorelabscloud-go"
 )
 
 const ListResponse = `

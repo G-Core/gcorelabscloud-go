@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
+	"github.com/G-Core/gcorelabscloud-go"
 )
 
 // BaseEndpoint will return a URL without the /vX.Y

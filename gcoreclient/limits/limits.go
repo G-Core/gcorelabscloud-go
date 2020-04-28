@@ -6,13 +6,13 @@ import (
 	"sort"
 	"strings"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/limit/v1/types"
+	"github.com/G-Core/gcorelabscloud-go/gcore/limit/v1/types"
 
 	"github.com/iancoleman/strcase"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/limit/v1/limits"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/flags"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/utils"
+	"github.com/G-Core/gcorelabscloud-go/gcore/limit/v1/limits"
+	"github.com/G-Core/gcorelabscloud-go/gcoreclient/flags"
+	"github.com/G-Core/gcorelabscloud-go/gcoreclient/utils"
 	"github.com/urfave/cli/v2"
 )
 

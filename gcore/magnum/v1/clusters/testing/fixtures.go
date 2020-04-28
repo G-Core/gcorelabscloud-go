@@ -7,9 +7,9 @@ import (
 
 	uuid "github.com/satori/go.uuid"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/magnum/v1/clusters"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
+	"github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/magnum/v1/clusters"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 )
 
 const ListResponse = `

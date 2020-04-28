@@ -1,9 +1,9 @@
 package testing
 
 import (
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/loadbalancer/v1/listeners"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/loadbalancer/v1/types"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
+	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/listeners"
+	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/types"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 )
 
 const ListResponse = `

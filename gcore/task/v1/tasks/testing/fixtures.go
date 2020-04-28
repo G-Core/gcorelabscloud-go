@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"time"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
+	"github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 )
 
 const ListResponse = `

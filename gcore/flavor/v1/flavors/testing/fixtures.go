@@ -1,8 +1,8 @@
 package testing
 
 import (
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/flavor/v1/flavors"
+	"github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/flavor/v1/flavors"
 
 	"github.com/shopspring/decimal"
 )

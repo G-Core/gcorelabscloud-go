@@ -3,8 +3,8 @@ package testing
 import (
 	"testing"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/utils"
-	th "bitbucket.gcore.lu/gcloud/gcorecloud-go/testhelper"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils"
+	th "github.com/G-Core/gcorelabscloud-go/testhelper"
 )
 
 type endpointTestCases struct {

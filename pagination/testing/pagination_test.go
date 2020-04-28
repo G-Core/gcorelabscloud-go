@@ -1,8 +1,8 @@
 package testing
 
 import (
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/testhelper"
+	"github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/testhelper"
 )
 
 func createClient() *gcorecloud.ServiceClient {

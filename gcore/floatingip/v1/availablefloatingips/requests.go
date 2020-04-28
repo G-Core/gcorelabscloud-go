@@ -1,9 +1,9 @@
 package availablefloatingips
 
 import (
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/floatingip/v1/floatingips"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/pagination"
+	"github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/floatingip/v1/floatingips"
+	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
 func List(c *gcorecloud.ServiceClient) pagination.Pager {

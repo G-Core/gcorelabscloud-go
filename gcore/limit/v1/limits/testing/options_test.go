@@ -3,7 +3,7 @@ package testing
 import (
 	"testing"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/limit/v1/limits"
+	"github.com/G-Core/gcorelabscloud-go/gcore/limit/v1/limits"
 
 	"github.com/stretchr/testify/require"
 )

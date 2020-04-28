@@ -1,11 +1,11 @@
 package regions
 
 import (
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/keystone/v1/keystones"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/region/v1/types"
+	"github.com/G-Core/gcorelabscloud-go/gcore/keystone/v1/keystones"
+	"github.com/G-Core/gcorelabscloud-go/gcore/region/v1/types"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/pagination"
+	"github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
 type commonResult struct {

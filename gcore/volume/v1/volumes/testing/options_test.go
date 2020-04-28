@@ -3,7 +3,7 @@ package testing
 import (
 	"testing"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/volume/v1/volumes"
+	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
 	"github.com/stretchr/testify/require"
 )
 

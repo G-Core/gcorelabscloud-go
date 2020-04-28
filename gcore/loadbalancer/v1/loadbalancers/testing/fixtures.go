@@ -4,11 +4,11 @@ import (
 	"net"
 	"time"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/loadbalancer/v1/loadbalancers"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/loadbalancer/v1/types"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
-	fake "bitbucket.gcore.lu/gcloud/gcorecloud-go/testhelper/client"
+	"github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/loadbalancers"
+	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/types"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
+	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 )
 
 const ListResponse = `

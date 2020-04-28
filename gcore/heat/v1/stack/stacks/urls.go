@@ -1,7 +1,7 @@
 package stacks
 
 import (
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
+	"github.com/G-Core/gcorelabscloud-go"
 )
 
 func resourceURL(c *gcorecloud.ServiceClient, stackID string) string {

@@ -3,11 +3,11 @@ package testing
 import (
 	"time"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/image/v1/images"
+	"github.com/G-Core/gcorelabscloud-go/gcore/image/v1/images"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
+	"github.com/G-Core/gcorelabscloud-go"
 )
 
 const ListResponse = `

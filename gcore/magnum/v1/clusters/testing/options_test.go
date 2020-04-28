@@ -3,12 +3,12 @@ package testing
 import (
 	"testing"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/magnum/v1/clusters"
+	"github.com/G-Core/gcorelabscloud-go/gcore/magnum/v1/clusters"
 
 	"github.com/stretchr/testify/require"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/magnum/v1/clustertemplates"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/magnum/v1/types"
+	"github.com/G-Core/gcorelabscloud-go/gcore/magnum/v1/clustertemplates"
+	"github.com/G-Core/gcorelabscloud-go/gcore/magnum/v1/types"
 )
 
 func TestUpdateOpts(t *testing.T) {

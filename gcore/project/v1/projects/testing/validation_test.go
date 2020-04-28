@@ -3,9 +3,9 @@ package testing
 import (
 	"testing"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/project/v1/projects"
+	"github.com/G-Core/gcorelabscloud-go/gcore/project/v1/projects"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
+	"github.com/G-Core/gcorelabscloud-go"
 	"github.com/stretchr/testify/require"
 )
 

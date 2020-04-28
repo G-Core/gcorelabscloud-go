@@ -1,12 +1,12 @@
 package clusters
 
 import (
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/instance/v1/instances"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/k8s/v1/pools"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/volume/v1/volumes"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/pagination"
+	"github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
+	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v1/pools"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
+	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
+	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
 // ListOptsBuilder allows extensions to add additional parameters to the

@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"testing"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/quota/v1/quotas"
-	th "bitbucket.gcore.lu/gcloud/gcorecloud-go/testhelper"
-	fake "bitbucket.gcore.lu/gcloud/gcorecloud-go/testhelper/client"
+	"github.com/G-Core/gcorelabscloud-go/gcore/quota/v1/quotas"
+	th "github.com/G-Core/gcorelabscloud-go/testhelper"
+	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )

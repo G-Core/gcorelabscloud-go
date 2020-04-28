@@ -7,14 +7,14 @@ import (
 	"sort"
 	"strings"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
+	"github.com/G-Core/gcorelabscloud-go"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/instance/v1/instances"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/instance/v1/types"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/volume/v1/volumes"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/flags"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/utils"
+	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
+	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
+	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
+	"github.com/G-Core/gcorelabscloud-go/gcoreclient/flags"
+	"github.com/G-Core/gcorelabscloud-go/gcoreclient/utils"
 	"github.com/urfave/cli/v2"
 )
 

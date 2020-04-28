@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
+	"github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 
 	"github.com/mitchellh/go-homedir"
 

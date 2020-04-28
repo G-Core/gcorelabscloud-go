@@ -3,11 +3,11 @@ package testing
 import (
 	"time"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/securitygroup/v1/types"
+	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/types"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/securitygroup/v1/securitygroups"
-	fake "bitbucket.gcore.lu/gcloud/gcorecloud-go/testhelper/client"
+	"github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/securitygroups"
+	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 )
 
 const ListResponse = `

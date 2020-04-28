@@ -7,8 +7,8 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	th "bitbucket.gcore.lu/gcloud/gcorecloud-go/testhelper"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/testhelper/client"
+	th "github.com/G-Core/gcorelabscloud-go/testhelper"
+	"github.com/G-Core/gcorelabscloud-go/testhelper/client"
 )
 
 func SetupHandler(t *testing.T, url, method, requestBody, responseBody string, status int) {

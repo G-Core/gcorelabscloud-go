@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/subnet/v1/subnets"
+	"github.com/G-Core/gcorelabscloud-go/gcore/subnet/v1/subnets"
 
 	"github.com/stretchr/testify/require"
 )

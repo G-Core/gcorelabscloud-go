@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
+	"github.com/G-Core/gcorelabscloud-go"
 )
 
 // SinglePageBase may be embedded in a Page that contains all of the results from an operation at once.

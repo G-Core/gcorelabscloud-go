@@ -5,10 +5,10 @@ import (
 	"strconv"
 	"strings"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/magnum/v1/clustertemplates"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/magnum/v1/types"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/flags"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/utils"
+	"github.com/G-Core/gcorelabscloud-go/gcore/magnum/v1/clustertemplates"
+	"github.com/G-Core/gcorelabscloud-go/gcore/magnum/v1/types"
+	"github.com/G-Core/gcorelabscloud-go/gcoreclient/flags"
+	"github.com/G-Core/gcorelabscloud-go/gcoreclient/utils"
 
 	"github.com/urfave/cli/v2"
 )

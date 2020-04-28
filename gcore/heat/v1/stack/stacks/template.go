@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strings"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
+	"github.com/G-Core/gcorelabscloud-go"
 )
 
 // Template is a structure that represents OpenStack Heat templates

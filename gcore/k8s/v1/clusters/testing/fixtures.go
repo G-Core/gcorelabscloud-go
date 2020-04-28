@@ -6,13 +6,13 @@ import (
 	"net"
 	"time"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
+	"github.com/G-Core/gcorelabscloud-go"
 	uuid "github.com/satori/go.uuid"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/k8s/v1/pools"
+	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v1/pools"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/k8s/v1/clusters"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
+	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v1/clusters"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 )
 
 const ListResponse = `

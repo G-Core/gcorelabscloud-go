@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"strings"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
+	"github.com/G-Core/gcorelabscloud-go"
 
 	"gopkg.in/yaml.v2"
 )

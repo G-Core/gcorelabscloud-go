@@ -5,16 +5,16 @@ import (
 	"net/http"
 	"testing"
 
-	instancestesting "bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/instance/v1/instances/testing"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/securitygroup/v1/securitygroups"
-	fake "bitbucket.gcore.lu/gcloud/gcorecloud-go/testhelper/client"
+	instancestesting "github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances/testing"
+	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/securitygroups"
+	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 
 	"github.com/stretchr/testify/require"
 
 	log "github.com/sirupsen/logrus"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/pagination"
-	th "bitbucket.gcore.lu/gcloud/gcorecloud-go/testhelper"
+	"github.com/G-Core/gcorelabscloud-go/pagination"
+	th "github.com/G-Core/gcorelabscloud-go/testhelper"
 )
 
 func prepareListTestURLParams(projectID int, regionID int) string {

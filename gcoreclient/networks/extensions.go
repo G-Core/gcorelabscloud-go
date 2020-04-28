@@ -1,10 +1,10 @@
 package networks
 
 import (
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/network/v1/extensions"
+	"github.com/G-Core/gcorelabscloud-go/gcore/network/v1/extensions"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/flags"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/utils"
+	"github.com/G-Core/gcorelabscloud-go/gcoreclient/flags"
+	"github.com/G-Core/gcorelabscloud-go/gcoreclient/utils"
 
 	"github.com/urfave/cli/v2"
 )

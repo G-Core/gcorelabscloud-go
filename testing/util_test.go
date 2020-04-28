@@ -10,8 +10,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
-	th "bitbucket.gcore.lu/gcloud/gcorecloud-go/testhelper"
+	"github.com/G-Core/gcorelabscloud-go"
+	th "github.com/G-Core/gcorelabscloud-go/testhelper"
 )
 
 func TestWaitFor(t *testing.T) {

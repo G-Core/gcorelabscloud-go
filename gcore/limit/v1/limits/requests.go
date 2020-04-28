@@ -5,11 +5,11 @@ import (
 	"reflect"
 	"strings"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/limit/v1/types"
+	"github.com/G-Core/gcorelabscloud-go/gcore/limit/v1/types"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/pagination"
+	"github.com/G-Core/gcorelabscloud-go/pagination"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
+	"github.com/G-Core/gcorelabscloud-go"
 )
 
 const Sentinel = -1

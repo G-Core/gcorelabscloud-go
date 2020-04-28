@@ -8,9 +8,9 @@ import (
 
 	"github.com/iancoleman/strcase"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/quota/v1/quotas"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/flags"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/utils"
+	"github.com/G-Core/gcorelabscloud-go/gcore/quota/v1/quotas"
+	"github.com/G-Core/gcorelabscloud-go/gcoreclient/flags"
+	"github.com/G-Core/gcorelabscloud-go/gcoreclient/utils"
 	"github.com/urfave/cli/v2"
 )
 

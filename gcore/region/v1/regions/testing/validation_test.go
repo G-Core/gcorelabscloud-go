@@ -3,10 +3,10 @@ package testing
 import (
 	"testing"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/region/v1/types"
+	"github.com/G-Core/gcorelabscloud-go/gcore/region/v1/types"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/region/v1/regions"
+	"github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/region/v1/regions"
 	"github.com/stretchr/testify/require"
 )
 

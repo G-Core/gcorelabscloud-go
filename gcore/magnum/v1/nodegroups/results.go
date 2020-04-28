@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"net"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/magnum/v1/types"
+	"github.com/G-Core/gcorelabscloud-go/gcore/magnum/v1/types"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/task/v1/tasks"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/pagination"
+	"github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
+	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
 type commonResult struct {

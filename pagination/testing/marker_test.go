@@ -8,8 +8,8 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/pagination"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/testhelper"
+	"github.com/G-Core/gcorelabscloud-go/pagination"
+	"github.com/G-Core/gcorelabscloud-go/testhelper"
 )
 
 // MarkerPager sample and test cases.

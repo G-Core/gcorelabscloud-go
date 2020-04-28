@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/heat/v1/stack/resources"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/heat/v1/stack/resources/types"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/flags"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/utils"
+	"github.com/G-Core/gcorelabscloud-go/gcore/heat/v1/stack/resources"
+	"github.com/G-Core/gcorelabscloud-go/gcore/heat/v1/stack/resources/types"
+	"github.com/G-Core/gcorelabscloud-go/gcoreclient/flags"
+	"github.com/G-Core/gcorelabscloud-go/gcoreclient/utils"
 
 	"github.com/urfave/cli/v2"
 )

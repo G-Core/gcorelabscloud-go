@@ -1,8 +1,8 @@
 package heat
 
 import (
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/heat/resources"
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcoreclient/heat/stacks"
+	"github.com/G-Core/gcorelabscloud-go/gcoreclient/heat/resources"
+	"github.com/G-Core/gcorelabscloud-go/gcoreclient/heat/stacks"
 	"github.com/urfave/cli/v2"
 )
 

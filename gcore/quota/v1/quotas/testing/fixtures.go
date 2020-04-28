@@ -1,7 +1,7 @@
 package testing
 
 import (
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go/gcore/quota/v1/quotas"
+	"github.com/G-Core/gcorelabscloud-go/gcore/quota/v1/quotas"
 )
 
 const GetResponse = `

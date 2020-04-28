@@ -3,7 +3,7 @@ package keystones
 import (
 	"strconv"
 
-	"bitbucket.gcore.lu/gcloud/gcorecloud-go"
+	"github.com/G-Core/gcorelabscloud-go"
 )
 
 func resourceURL(c *gcorecloud.ServiceClient, id int) string {
