@@ -23,3 +23,5 @@ require (
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/yaml.v2 v2.2.7
 )
+
+replace bitbucket.gcore.lu/gcloud/gcorecloud-go => github.com/G-Core/gcorelabscloud-go v0.0.0-20200428145832-f72daed8d244
