@@ -227,7 +227,7 @@ var clusterCreateSubCommand = cli.Command{
 		},
 		&cli.StringFlag{
 			Name:     "version",
-			Value:    "1.17",
+			Value:    "",
 			Usage:    "K8s cluster version",
 			Required: false,
 		},
