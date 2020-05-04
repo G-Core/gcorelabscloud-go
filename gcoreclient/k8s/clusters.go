@@ -580,6 +580,77 @@ var clusterDeleteSubCommand = cli.Command{
 	},
 }
 
+var clusterCertificateSubCommand = cli.Command{
+	Name:      "get",
+	Usage:     "K8s get cluster CA certificate",
+	ArgsUsage: "<cluster_id>",
+	Category:  "cluster",
+	Action: func(c *cli.Context) error {
+		clusterID, err := flags.GetFirstStringArg(c, clusterIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "get")
+			return err
+		}
+		client, err := utils.BuildClient(c, "k8s", "", "")
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		certificate, err := clusters.Certificate(client, clusterID).Extract()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		utils.ShowResults(certificate, c.String("format"))
+		return nil
+
+	},
+}
+
+var clusterSignCertificateSubCommand = cli.Command{
+	Name:      "sign",
+	Usage:     "K8s sign cluster CSR certificate request",
+	ArgsUsage: "<cluster_id>",
+	Category:  "cluster",
+	Flags: []cli.Flag{
+		&cli.StringFlag{
+			Name:     "csr",
+			Aliases:  []string{"r"},
+			Usage:    "cluster certificate sign request file",
+			Required: true,
+		},
+	},
+	Action: func(c *cli.Context) error {
+		clusterID, err := flags.GetFirstStringArg(c, clusterIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "get")
+			return err
+		}
+
+		data, err := utils.ReadFile(c.String("csr"))
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "get")
+			return err
+		}
+		opts := clusters.ClusterSignCertificateOpts{
+			CSR: string(data),
+		}
+		client, err := utils.BuildClient(c, "k8s", "", "")
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		signedCertificate, err := clusters.SignCertificate(client, clusterID, opts).Extract()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		utils.ShowResults(signedCertificate, c.String("format"))
+		return nil
+
+	},
+}
+
 var ClusterCommands = cli.Command{
 	Name:  "cluster",
 	Usage: "k8s cluster commands",
@@ -594,5 +665,13 @@ var ClusterCommands = cli.Command{
 		&clusterVersionsSubCommand,
 		&clusterVolumesSubCommand,
 		&clusterInstancesSubCommand,
+		{
+			Name:  "certificate",
+			Usage: "K8s sign  certificates",
+			Subcommands: []*cli.Command{
+				&clusterCertificateSubCommand,
+				&clusterSignCertificateSubCommand,
+			},
+		},
 	},
 }

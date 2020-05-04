@@ -61,6 +61,29 @@ const ListResponse = `
 }
 `
 
+const ClusterCsrRequest = `
+{
+  "csr": "string"
+}
+`
+
+var ClusterSignResponse = fmt.Sprintf(`
+{
+  "cluster_uuid": "%s",
+  "pem": "string",
+  "csr": "string"
+}
+`, ClusterList1.UUID,
+)
+
+var ClusterCAResponse = fmt.Sprintf(`
+{
+  "cluster_uuid": "%s",
+  "pem": "string"
+}
+`, ClusterList1.UUID,
+)
+
 const GetResponse = `
 {
   "health_status": "HEALTHY",
@@ -326,6 +349,15 @@ var (
 			ClusterListPool:  &listPool,
 		},
 		},
+	}
+	ClusterCertificate = clusters.ClusterCACertificate{
+		ClusterUUID: ClusterList1.UUID,
+		PEM:         "string",
+	}
+	ClusterSignedCertificate = clusters.ClusterSignCertificate{
+		ClusterUUID: ClusterList1.UUID,
+		PEM:         "string",
+		CSR:         "string",
 	}
 	Tasks1 = tasks.TaskResults{
 		Tasks: []tasks.TaskID{"50f53a35-42ed-40c4-82b2-5a37fb3e00bc"},

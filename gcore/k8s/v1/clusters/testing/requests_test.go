@@ -56,6 +56,10 @@ func prepareUpgradeTestURL(id string) string {
 	return prepareActionTestURLParams(fake.ProjectID, fake.RegionID, id, "upgrade")
 }
 
+func prepareClusterCertificateURL(id string) string {
+	return prepareActionTestURLParams(fake.ProjectID, fake.RegionID, id, "certificates")
+}
+
 func TestList(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
@@ -320,5 +324,65 @@ func TestUpgrade(t *testing.T) {
 	tasks, err := clusters.Upgrade(client, Cluster1.UUID, options).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
+
+}
+
+func TestGetCACertificate(t *testing.T) {
+
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareClusterCertificateURL(Cluster1.UUID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, ClusterCAResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("k8s", "v1")
+
+	ct, err := clusters.Certificate(client, Cluster1.UUID).Extract()
+
+	require.NoError(t, err)
+	require.Equal(t, ClusterCertificate, *ct)
+
+}
+
+func TestSignCertificate(t *testing.T) {
+
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareClusterCertificateURL(Cluster1.UUID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestJSONRequest(t, r, ClusterCsrRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, ClusterSignResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("k8s", "v1")
+
+	opts := clusters.ClusterSignCertificateOpts{
+		CSR: "string",
+	}
+
+	ct, err := clusters.SignCertificate(client, Cluster1.UUID, opts).Extract()
+
+	require.NoError(t, err)
+	require.Equal(t, ClusterSignedCertificate, *ct)
 
 }

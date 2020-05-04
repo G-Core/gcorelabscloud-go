@@ -44,6 +44,43 @@ type ConfigResult struct {
 	gcorecloud.Result
 }
 
+// ClusterCertificateCAResult represents the result of CA cluster certificates
+type ClusterCertificateCAResult struct {
+	gcorecloud.Result
+}
+
+// Extract is a function that accepts a result and extracts a cluster CA certificate.
+func (r ClusterCertificateCAResult) Extract() (*ClusterCACertificate, error) {
+	var c ClusterCACertificate
+	err := r.ExtractInto(&c)
+	return &c, err
+}
+
+// ClusterCertificateSignResult represents the result of signing cluster certificate operation
+type ClusterCertificateSignResult struct {
+	gcorecloud.Result
+}
+
+// Extract is a function that accepts a result and extracts a cluster signed certificate.
+func (r ClusterCertificateSignResult) Extract() (*ClusterSignCertificate, error) {
+	var c ClusterSignCertificate
+	err := r.ExtractInto(&c)
+	return &c, err
+}
+
+// ClusterCACertificate represents a cluster CA certificate structure.
+type ClusterCACertificate struct {
+	ClusterUUID string `json:"cluster_uuid"`
+	PEM         string `json:"pem"`
+}
+
+// ClusterSignCertificate represents a cluster signed certificate structure.
+type ClusterSignCertificate struct {
+	ClusterUUID string `json:"cluster_uuid"`
+	PEM         string `json:"pem"`
+	CSR         string `json:"csr"`
+}
+
 // Cluster represents a cluster structure.
 type Cluster struct {
 	StatusReason       string            `json:"status_reason"`

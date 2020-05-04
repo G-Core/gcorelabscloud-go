@@ -36,6 +36,10 @@ func instancesURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceActionURL(c, id, "instances")
 }
 
+func certificatesURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "certificates")
+}
+
 func volumesURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceActionURL(c, id, "volumes")
 }

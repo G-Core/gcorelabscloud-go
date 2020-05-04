@@ -194,7 +194,7 @@ func Delete(c *gcorecloud.ServiceClient, clusterID string) (r tasks.Result) {
 	return
 }
 
-// Config accepts a unique ID and get cluster k8s config.
+// GetConfig accepts a unique ID and get cluster k8s config.
 func GetConfig(c *gcorecloud.ServiceClient, clusterID string) (r ConfigResult) {
 	url := configURL(c, clusterID)
 	_, r.Err = c.Get(url, &r.Body, nil)
@@ -235,4 +235,43 @@ func VersionsAll(c *gcorecloud.ServiceClient) ([]string, error) {
 		return nil, err
 	}
 	return ExtractVersions(page)
+}
+
+// ClusterSignCertificateOptsBuilder allows extensions to add additional parameters to the SignCertificate request.
+type ClusterSignCertificateOptsBuilder interface {
+	ToClusterSignCertificateMap() (map[string]interface{}, error)
+}
+
+// ClusterSignCertificateOpts represents a options to sign cluster certificate.
+type ClusterSignCertificateOpts struct {
+	CSR string `json:"csr" validate:"required"`
+}
+
+// ToClusterSignCertificateMap builds a request body from ClusterSignCertificateOpts.
+func (opts ClusterSignCertificateOpts) ToClusterSignCertificateMap() (map[string]interface{}, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return nil, err
+	}
+	return gcorecloud.BuildRequestBody(opts, "")
+}
+
+// SignCertificate accepts a unique ID and sign cluster certificate.
+func SignCertificate(c *gcorecloud.ServiceClient, clusterID string, opts ClusterSignCertificateOptsBuilder) (r ClusterCertificateSignResult) {
+	url := certificatesURL(c, clusterID)
+	b, err := opts.ToClusterSignCertificateMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = c.Post(url, b, &r.Body, &gcorecloud.RequestOpts{
+		OkCodes: []int{200, 201},
+	})
+	return
+}
+
+// Certificate accepts a unique ID and return cluster CA.
+func Certificate(c *gcorecloud.ServiceClient, clusterID string) (r ClusterCertificateCAResult) {
+	url := certificatesURL(c, clusterID)
+	_, r.Err = c.Get(url, &r.Body, nil)
+	return
 }
