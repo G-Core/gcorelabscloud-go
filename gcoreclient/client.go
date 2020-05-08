@@ -17,7 +17,6 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcoreclient/keypairs"
 	"github.com/G-Core/gcorelabscloud-go/gcoreclient/keystones"
 	"github.com/G-Core/gcorelabscloud-go/gcoreclient/loadbalancers/loadbalancers"
-	"github.com/G-Core/gcorelabscloud-go/gcoreclient/magnum"
 	"github.com/G-Core/gcorelabscloud-go/gcoreclient/networks"
 	"github.com/G-Core/gcorelabscloud-go/gcoreclient/projects"
 	"github.com/G-Core/gcorelabscloud-go/gcoreclient/quotas"
@@ -40,7 +39,6 @@ var commands = []*cli.Command{
 	&flavors.FlavorCommands,
 	&loadbalancers.LoadBalancerCommands,
 	&instances.InstanceCommands,
-	&magnum.MagnumsCommand,
 	&heat.HeatsCommand,
 	&securitygroups.SecurityGroupCommands,
 	&floatingips.FloatingIPCommands,
