@@ -1,6 +1,6 @@
 package tokens
 
-import "github.com/G-Core/gcorelabscloud-go"
+import gcorecloud "github.com/G-Core/gcorelabscloud-go"
 
 func tokenURL(c *gcorecloud.ServiceClient) string {
 	return c.ServiceURL("auth", "jwt", "login")

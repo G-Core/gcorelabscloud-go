@@ -6,7 +6,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/snapshot/v1/snapshots"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 
-	"github.com/G-Core/gcorelabscloud-go"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 )
 

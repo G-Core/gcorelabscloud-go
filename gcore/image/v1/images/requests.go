@@ -7,7 +7,7 @@ import (
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/image/v1/images/types"
 
-	"github.com/G-Core/gcorelabscloud-go"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 

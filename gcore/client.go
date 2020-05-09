@@ -3,7 +3,7 @@ package gcore
 import (
 	"reflect"
 
-	"github.com/G-Core/gcorelabscloud-go"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/identity/tokens"
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils"
 )

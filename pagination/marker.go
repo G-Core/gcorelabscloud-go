@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/G-Core/gcorelabscloud-go"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 )
 
 // MarkerPage is a stricter Page interface that describes additional functionality required for use with NewMarkerPager.

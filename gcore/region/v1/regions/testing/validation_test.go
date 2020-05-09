@@ -3,9 +3,9 @@ package testing
 import (
 	"testing"
 
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/region/v1/types"
 
-	"github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/region/v1/regions"
 	"github.com/stretchr/testify/require"
 )

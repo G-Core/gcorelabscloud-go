@@ -3,7 +3,7 @@ package testing
 import (
 	"time"
 
-	"github.com/G-Core/gcorelabscloud-go"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/limit/v1/limits"
 	"github.com/G-Core/gcorelabscloud-go/gcore/limit/v1/types"
 )

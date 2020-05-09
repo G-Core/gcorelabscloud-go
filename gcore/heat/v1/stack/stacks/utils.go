@@ -9,8 +9,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/G-Core/gcorelabscloud-go"
-
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"gopkg.in/yaml.v2"
 )
 

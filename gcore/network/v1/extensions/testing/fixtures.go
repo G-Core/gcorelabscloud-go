@@ -5,7 +5,7 @@ import (
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/network/v1/extensions"
 
-	"github.com/G-Core/gcorelabscloud-go"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 )
 
 const ListResponse = `

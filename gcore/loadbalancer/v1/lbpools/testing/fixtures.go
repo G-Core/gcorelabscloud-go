@@ -3,7 +3,7 @@ package testing
 import (
 	"net"
 
-	"github.com/G-Core/gcorelabscloud-go"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/lbpools"
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/types"

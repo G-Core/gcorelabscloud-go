@@ -10,7 +10,7 @@ import (
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 
-	"github.com/G-Core/gcorelabscloud-go"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 )
 
 const ListResponse = `

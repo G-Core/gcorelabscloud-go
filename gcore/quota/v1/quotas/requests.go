@@ -3,7 +3,7 @@ package quotas
 import (
 	"fmt"
 
-	"github.com/G-Core/gcorelabscloud-go"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 )
 
 // Get retrieves a specific quota based on its unique ID.

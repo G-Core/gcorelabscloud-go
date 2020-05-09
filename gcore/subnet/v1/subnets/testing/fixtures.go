@@ -4,7 +4,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/G-Core/gcorelabscloud-go"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/subnet/v1/subnets"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"

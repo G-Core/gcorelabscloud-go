@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/G-Core/gcorelabscloud-go"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils"
 	"github.com/G-Core/gcorelabscloud-go/testhelper"
 )

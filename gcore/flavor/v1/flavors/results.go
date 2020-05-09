@@ -1,7 +1,7 @@
 package flavors
 
 import (
-	"github.com/G-Core/gcorelabscloud-go"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 
 	"github.com/shopspring/decimal"

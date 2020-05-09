@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/G-Core/gcorelabscloud-go"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/stretchr/testify/require"
 )
 

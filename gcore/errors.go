@@ -3,7 +3,7 @@ package gcore
 import (
 	"fmt"
 
-	"github.com/G-Core/gcorelabscloud-go"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 )
 
 // ErrEndpointNotFound is the error when no suitable endpoint can be found

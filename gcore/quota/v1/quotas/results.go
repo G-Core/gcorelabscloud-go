@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/G-Core/gcorelabscloud-go"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 )
 
 const Sentinel = -1

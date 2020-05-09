@@ -5,7 +5,7 @@ import (
 
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 
-	"github.com/G-Core/gcorelabscloud-go"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 )
 
 type commonResult struct {

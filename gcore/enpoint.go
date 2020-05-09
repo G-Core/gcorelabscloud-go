@@ -4,7 +4,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/G-Core/gcorelabscloud-go"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 )
 
 var nilEndpointOptions = gcorecloud.EndpointOpts{}

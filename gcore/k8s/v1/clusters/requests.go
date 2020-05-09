@@ -1,7 +1,7 @@
 package clusters
 
 import (
-	"github.com/G-Core/gcorelabscloud-go"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v1/pools"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"

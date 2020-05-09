@@ -1,8 +1,6 @@
 package pools
 
-import (
-	"github.com/G-Core/gcorelabscloud-go"
-)
+import gcorecloud "github.com/G-Core/gcorelabscloud-go"
 
 func resourceURL(c *gcorecloud.ServiceClient, clusterID, id string) string {
 	return c.ServiceURL("pools", clusterID, id)

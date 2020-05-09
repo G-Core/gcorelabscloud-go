@@ -3,7 +3,7 @@ package tasks
 import (
 	"fmt"
 
-	"github.com/G-Core/gcorelabscloud-go"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 )
 
 // WaitForStatus will continually poll the task resource, checking for a particular

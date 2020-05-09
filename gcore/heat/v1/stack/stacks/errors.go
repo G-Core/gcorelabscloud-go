@@ -3,7 +3,7 @@ package stacks
 import (
 	"fmt"
 
-	"github.com/G-Core/gcorelabscloud-go"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 )
 
 type ErrInvalidEnvironment struct {

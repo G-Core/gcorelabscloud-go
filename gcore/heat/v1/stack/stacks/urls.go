@@ -1,8 +1,6 @@
 package stacks
 
-import (
-	"github.com/G-Core/gcorelabscloud-go"
-)
+import gcorecloud "github.com/G-Core/gcorelabscloud-go"
 
 func resourceURL(c *gcorecloud.ServiceClient, stackID string) string {
 	return c.ServiceURL("stacks", stackID)

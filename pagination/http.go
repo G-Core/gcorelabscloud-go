@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/G-Core/gcorelabscloud-go"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 )
 
 // PageResult stores the HTTP response that returned the current page of results.

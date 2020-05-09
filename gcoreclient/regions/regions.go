@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/G-Core/gcorelabscloud-go"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/region/v1/regions"
 	"github.com/G-Core/gcorelabscloud-go/gcore/region/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcoreclient/flags"

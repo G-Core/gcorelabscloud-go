@@ -6,7 +6,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/G-Core/gcorelabscloud-go"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v1/pools"
