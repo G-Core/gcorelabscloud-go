@@ -9,35 +9,13 @@ import (
 )
 
 /*
-NewClient prepares an unauthenticated ProviderClient instance.
+NewGCoreClient prepares an unauthenticated ProviderClient instance.
 Most users will probably prefer using the AuthenticatedClient function instead.
 
 This is useful if you wish to explicitly control the version of the identity
 service that's used for authentication explicitly, for example.
 
-A basic example of using this would be:
-
-	ao, err := gcore.AuthOptionsFromEnv()
-	provider, err := gcore.NewClient(ao.APIURL)
-	client, err := gcore.NewIdentity(provider, gcorecloud.EndpointOpts{})
 */
-func NewClient(endpoint string) (*gcorecloud.ProviderClient, error) {
-	base, err := utils.BaseEndpoint(endpoint)
-	if err != nil {
-		return nil, err
-	}
-
-	endpoint = gcorecloud.NormalizeURL(endpoint)
-	base = gcorecloud.NormalizeURL(base)
-
-	p := gcorecloud.NewProviderClient()
-	p.IdentityBase = base
-	p.IdentityEndpoint = endpoint
-	p.UseTokenLock()
-
-	return p, nil
-}
-
 func NewGCoreClient(endpoint string) (*gcorecloud.ProviderClient, error) {
 	base, err := utils.BaseRootEndpoint(endpoint)
 	if err != nil {
@@ -64,7 +42,7 @@ Example:
 
 	ao, err := gcore.AuthOptionsFromEnv()
 	provider, err := gcore.AuthenticatedClient(ao)
-	client, err := gcore.NewMagnumV1(client, gcorecloud.EndpointOpts{})
+	client, err := gcore.NewMagnumV1(provider, gcorecloud.EndpointOpts{})
 */
 func AuthenticatedClient(options gcorecloud.AuthOptions) (*gcorecloud.ProviderClient, error) {
 	client, err := NewGCoreClient(options.APIURL)
@@ -78,6 +56,15 @@ func AuthenticatedClient(options gcorecloud.AuthOptions) (*gcorecloud.ProviderCl
 	return client, nil
 }
 
+func AuthenticatedClientWithDebug(options gcorecloud.AuthOptions, debug bool) (*gcorecloud.ProviderClient, error) {
+	client, err := AuthenticatedClient(options)
+	if err != nil {
+		return nil, err
+	}
+	client.SetDebug(debug)
+	return client, err
+}
+
 func TokenClient(options gcorecloud.TokenOptions) (*gcorecloud.ProviderClient, error) {
 	client, err := NewGCoreClient(options.APIURL)
 	if err != nil {
@@ -89,6 +76,15 @@ func TokenClient(options gcorecloud.TokenOptions) (*gcorecloud.ProviderClient, e
 	}
 	setGCloudReauth(client, "", options, gcorecloud.EndpointOpts{})
 	return client, nil
+}
+
+func TokenClientWithDebug(options gcorecloud.TokenOptions, debug bool) (*gcorecloud.ProviderClient, error) {
+	client, err := TokenClient(options)
+	if err != nil {
+		return nil, err
+	}
+	client.SetDebug(debug)
+	return client, err
 }
 
 // Authenticate or re-authenticate against the most recent identity service supported at the provided endpoint.
@@ -316,8 +312,24 @@ func TokenClientService(options gcorecloud.TokenOptions, eo gcorecloud.EndpointO
 	return ClientServiceFromProvider(provider, eo)
 }
 
+func TokenClientServiceWithDebug(options gcorecloud.TokenOptions, eo gcorecloud.EndpointOpts, debug bool) (*gcorecloud.ServiceClient, error) {
+	provider, err := TokenClientWithDebug(options, debug)
+	if err != nil {
+		return nil, err
+	}
+	return ClientServiceFromProvider(provider, eo)
+}
+
 func AuthClientService(options gcorecloud.AuthOptions, eo gcorecloud.EndpointOpts) (*gcorecloud.ServiceClient, error) {
 	provider, err := AuthenticatedClient(options)
+	if err != nil {
+		return nil, err
+	}
+	return ClientServiceFromProvider(provider, eo)
+}
+
+func AuthClientServiceWithDebug(options gcorecloud.AuthOptions, eo gcorecloud.EndpointOpts, debug bool) (*gcorecloud.ServiceClient, error) {
+	provider, err := AuthenticatedClientWithDebug(options, debug)
 	if err != nil {
 		return nil, err
 	}
@@ -330,4 +342,18 @@ func ClientServiceFromProvider(provider *gcorecloud.ProviderClient, eo gcoreclou
 		return nil, err
 	}
 	return client, nil
+}
+
+func newEndpointOpts(region int, project int, name string, version string) gcorecloud.EndpointOpts {
+	return gcorecloud.EndpointOpts{
+		Type:    "",
+		Name:    name,
+		Region:  region,
+		Project: project,
+		Version: version,
+	}
+}
+
+func NewK8sV1(provider *gcorecloud.ProviderClient, region int, project int) (*gcorecloud.ServiceClient, error) {
+	return ClientServiceFromProvider(provider, newEndpointOpts(region, project, "k8s", "v1"))
 }

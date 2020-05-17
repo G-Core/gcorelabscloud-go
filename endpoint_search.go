@@ -17,7 +17,7 @@ type EndpointOpts struct {
 	// function, but a user-given value will be honored if provided.
 	Type string
 
-	// Name [optional] is the service name for the client (e.g., "magnum") as it
+	// Name [optional] is the service name for the client (e.g., "k8s") as it
 	// appears in the service catalog. Services can have the same Type but a
 	// different Name, which is why both Type and Name are sometimes needed.
 	Name string

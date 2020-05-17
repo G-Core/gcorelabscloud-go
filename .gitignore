@@ -1,4 +1,4 @@
 **/*.swp
 .idea
 .vscode
-gcoreclient/gcoreclient
+./gcoreclient

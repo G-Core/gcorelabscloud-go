@@ -22,13 +22,13 @@ DIST_DIRS	= find * -type d -exec
 TEMP_DIR	:=$(shell mktemp -d)
 
 GOOS		?= $(shell go env GOOS)
-VERSION		?= $(shell git describe --exact-match 2> /dev/null || \
+VERSION		?= $(shell git describe --tags 2> /dev/null || \
 			   git describe --match=$(git rev-parse --short=8 HEAD) --always --dirty --abbrev=8)
 GOARCH		:= amd64
 TAGS		:=
-LDFLAGS		:= "-w -s"
-CMD_PACKAGE := ./gcoreclient
-BINARY 		:= ./gcoreclient/gcoreclient
+LDFLAGS		:= "-w -s -X 'main.AppVersion=${VERSION}'"
+CMD_PACKAGE := ./cmd/gcoreclient
+BINARY 		:= ./gcoreclient
 
 # CTI targets
 
@@ -78,7 +78,7 @@ endif
 	golangci-lint run ./...
 
 cover: work
-	go test -tags=unit ./... -cover
+	go test $(TESTARGS) -tags=unit -cover -coverpkg=./ ./...
 
 
 prepare:

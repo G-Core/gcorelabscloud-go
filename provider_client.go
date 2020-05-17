@@ -299,6 +299,10 @@ func (client *ProviderClient) SetDebug(debug bool) {
 	log.SetLevel(log.DebugLevel)
 }
 
+func (client *ProviderClient) IsDebug() bool {
+	return client.debug
+}
+
 func (client *ProviderClient) debugRequest(request *http.Request) {
 	if client.debug {
 		dump, err := httputil.DumpRequestOut(request, true)
