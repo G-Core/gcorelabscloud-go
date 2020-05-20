@@ -274,12 +274,34 @@ var clusterCreateSubCommand = cli.Command{
 			Usage:    "maximum number of pool nodes",
 			Required: true,
 		},
+		&cli.StringFlag{
+			Name:        "pods-ip-pool",
+			Usage:       "cluster pods ip pool in CIDR notation",
+			DefaultText: "nil",
+			Required:    false,
+		},
+		&cli.StringFlag{
+			Name:        "services-ip-pool",
+			Usage:       "cluster services ip pool in CIDR notation",
+			DefaultText: "nil",
+			Required:    false,
+		},
 	}, flags.WaitCommandFlags...,
 	),
 	Action: func(c *cli.Context) error {
 		client, err := client.NewK8sClientV1(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		podsIPPool, err := gcorecloud.ParseCIDRStringOrNil(c.String("pods-ip-pool"))
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+
+		servicesIPPool, err := gcorecloud.ParseCIDRStringOrNil(c.String("services-ip-pool"))
+		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
 
@@ -301,6 +323,8 @@ var clusterCreateSubCommand = cli.Command{
 			FixedSubnet:               c.String("fixed-subnet"),
 			MasterCount:               masterCount,
 			KeyPair:                   c.String("keypair"),
+			PodsIPPool:                podsIPPool,
+			ServicesIPPool:            servicesIPPool,
 			AutoHealingEnabled:        c.Bool("auto-healing-enabled"),
 			MasterLBFloatingIPEnabled: masterLbFloatingIPEnabled,
 			Version:                   c.String("version"),

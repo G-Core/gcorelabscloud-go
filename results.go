@@ -581,6 +581,13 @@ func ParseCIDRString(s string) (*CIDR, error) {
 	return &CIDR{IPNet: *nt}, nil
 }
 
+func ParseCIDRStringOrNil(s string) (*CIDR, error) {
+	if s == "" {
+		return nil, nil
+	}
+	return ParseCIDRString(s)
+}
+
 // UnmarshalJSON - implements Unmarshaler interface for CIDR
 func (c *CIDR) UnmarshalJSON(data []byte) error {
 	var s string
