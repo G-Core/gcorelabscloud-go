@@ -171,11 +171,7 @@ func List(client *gcorecloud.ServiceClient, opts ListOptsBuilder) pagination.Pag
 // Get retrieves a specific instance based on its unique ID.
 func Get(client *gcorecloud.ServiceClient, id string) (r GetResult) {
 	url := getURL(client, id)
-	var resp *http.Response
-	resp, r.Err = client.Get(url, &r.Body, nil)
-	defer func() {
-		_ = resp.Body.Close()
-	}()
+	_, r.Err = client.Get(url, &r.Body, nil) // nolint
 	return
 }
 
@@ -249,14 +245,9 @@ func AssignSecurityGroup(client *gcorecloud.ServiceClient, id string, opts Secur
 		r.Err = err
 		return
 	}
-	var resp *http.Response
-	resp, r.Err = client.Post(addSecurityGroupsURL(client, id), b, nil, &gcorecloud.RequestOpts{
+	_, r.Err = client.Post(addSecurityGroupsURL(client, id), b, nil, &gcorecloud.RequestOpts{ // nolint
 		OkCodes: []int{http.StatusNoContent, http.StatusOK},
 	})
-	defer func() {
-		_ = resp.Body.Close()
-	}()
-
 	return
 }
 
@@ -267,13 +258,9 @@ func UnAssignSecurityGroup(client *gcorecloud.ServiceClient, id string, opts Sec
 		r.Err = err
 		return
 	}
-	var resp *http.Response
-	resp, r.Err = client.Post(deleteSecurityGroupsURL(client, id), b, nil, &gcorecloud.RequestOpts{
+	_, r.Err = client.Post(deleteSecurityGroupsURL(client, id), b, nil, &gcorecloud.RequestOpts{ // nolint
 		OkCodes: []int{http.StatusNoContent, http.StatusOK},
 	})
-	defer func() {
-		_ = resp.Body.Close()
-	}()
 	return
 }
 
@@ -284,11 +271,7 @@ func Create(client *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r tasks.R
 		r.Err = err
 		return
 	}
-	var resp *http.Response
-	resp, r.Err = client.Post(createURL(client), b, &r.Body, nil)
-	defer func() {
-		_ = resp.Body.Close()
-	}()
+	_, r.Err = client.Post(createURL(client), b, &r.Body, nil) // nolint
 	return
 }
 
@@ -302,71 +285,43 @@ func Delete(client *gcorecloud.ServiceClient, instanceID string, opts DeleteOpts
 		}
 		url += query
 	}
-	var resp *http.Response
-	resp, r.Err = client.DeleteWithResponse(url, &r.Body, nil)
-	defer func() {
-		_ = resp.Body.Close()
-	}()
+	_, r.Err = client.DeleteWithResponse(url, &r.Body, nil) // nolint
 	return
 }
 
 // Start instance.
 func Start(client *gcorecloud.ServiceClient, id string) (r UpdateResult) {
-	var resp *http.Response
-	resp, r.Err = client.Post(startInstanceURL(client, id), nil, &r.Body, nil)
-	defer func() {
-		_ = resp.Body.Close()
-	}()
+	_, r.Err = client.Post(startInstanceURL(client, id), nil, &r.Body, nil) // nolint
 	return
 }
 
 // Stop instance.
 func Stop(client *gcorecloud.ServiceClient, id string) (r UpdateResult) {
-	var resp *http.Response
-	resp, r.Err = client.Post(stopInstanceURL(client, id), nil, &r.Body, nil)
-	defer func() {
-		_ = resp.Body.Close()
-	}()
+	_, r.Err = client.Post(stopInstanceURL(client, id), nil, &r.Body, nil) // nolint
 	return
 }
 
 // PowerCycle instance.
 func PowerCycle(client *gcorecloud.ServiceClient, id string) (r UpdateResult) {
-	var resp *http.Response
-	resp, r.Err = client.Post(powerCycleInstanceURL(client, id), nil, &r.Body, nil)
-	defer func() {
-		_ = resp.Body.Close()
-	}()
+	_, r.Err = client.Post(powerCycleInstanceURL(client, id), nil, &r.Body, nil) // nolint
 	return
 }
 
 // Reboot instance.
 func Reboot(client *gcorecloud.ServiceClient, id string) (r UpdateResult) {
-	var resp *http.Response
-	resp, r.Err = client.Post(rebootInstanceURL(client, id), nil, &r.Body, nil)
-	defer func() {
-		_ = resp.Body.Close()
-	}()
+	_, r.Err = client.Post(rebootInstanceURL(client, id), nil, &r.Body, nil) // nolint
 	return
 }
 
 // Suspend instance.
 func Suspend(client *gcorecloud.ServiceClient, id string) (r UpdateResult) {
-	var resp *http.Response
-	resp, r.Err = client.Post(suspendInstanceURL(client, id), nil, &r.Body, nil)
-	defer func() {
-		_ = resp.Body.Close()
-	}()
+	_, r.Err = client.Post(suspendInstanceURL(client, id), nil, &r.Body, nil) // nolint
 	return
 }
 
 // Resume instance.
 func Resume(client *gcorecloud.ServiceClient, id string) (r UpdateResult) {
-	var resp *http.Response
-	resp, r.Err = client.Post(resumeInstanceURL(client, id), nil, &r.Body, nil)
-	defer func() {
-		_ = resp.Body.Close()
-	}()
+	_, r.Err = client.Post(resumeInstanceURL(client, id), nil, &r.Body, nil) // nolint
 	return
 }
 
@@ -377,10 +332,6 @@ func Resize(client *gcorecloud.ServiceClient, id string, opts ChangeFlavorOptsBu
 		r.Err = err
 		return
 	}
-	var resp *http.Response
-	resp, r.Err = client.Post(changeFlavorInstanceURL(client, id), b, &r.Body, nil)
-	defer func() {
-		_ = resp.Body.Close()
-	}()
+	_, r.Err = client.Post(changeFlavorInstanceURL(client, id), b, &r.Body, nil) // nolint
 	return
 }

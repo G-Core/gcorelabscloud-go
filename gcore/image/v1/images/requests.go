@@ -1,8 +1,6 @@
 package images
 
 import (
-	"net/http"
-
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/image/v1/images/types"
@@ -71,11 +69,7 @@ func List(client *gcorecloud.ServiceClient, opts ListOptsBuilder) pagination.Pag
 // Get retrieves a specific image based on its unique ID.
 func Get(client *gcorecloud.ServiceClient, id string) (r GetResult) {
 	url := getURL(client, id)
-	var resp *http.Response
-	resp, r.Err = client.Get(url, &r.Body, nil)
-	defer func() {
-		_ = resp.Body.Close()
-	}()
+	_, r.Err = client.Get(url, &r.Body, nil) // nolint
 	return
 }
 
@@ -101,21 +95,13 @@ func Create(client *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r tasks.R
 		r.Err = err
 		return
 	}
-	var resp *http.Response
-	resp, r.Err = client.Post(createURL(client), b, &r.Body, nil)
-	defer func() {
-		_ = resp.Body.Close()
-	}()
+	_, r.Err = client.Post(createURL(client), b, &r.Body, nil) // nolint
 	return
 }
 
 // Delete an image.
 func Delete(client *gcorecloud.ServiceClient, imageID string) (r tasks.Result) {
 	url := deleteURL(client, imageID)
-	var resp *http.Response
-	resp, r.Err = client.DeleteWithResponse(url, &r.Body, nil)
-	defer func() {
-		_ = resp.Body.Close()
-	}()
+	_, r.Err = client.DeleteWithResponse(url, &r.Body, nil) // nolint
 	return
 }

@@ -1,8 +1,6 @@
 package projects
 
 import (
-	"net/http"
-
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/project/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
@@ -17,11 +15,7 @@ func List(c *gcorecloud.ServiceClient) pagination.Pager {
 
 // Get retrieves a specific project based on its unique ID.
 func Get(c *gcorecloud.ServiceClient, id int) (r GetResult) {
-	var resp *http.Response
-	resp, r.Err = c.Get(getURL(c, id), &r.Body, nil)
-	defer func() {
-		_ = resp.Body.Close()
-	}()
+	_, r.Err = c.Get(getURL(c, id), &r.Body, nil) // nolint
 	return
 }
 
@@ -55,11 +49,7 @@ func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r CreateResult
 		r.Err = err
 		return
 	}
-	var resp *http.Response
-	resp, r.Err = c.Post(createURL(c), b, &r.Body, nil)
-	defer func() {
-		_ = resp.Body.Close()
-	}()
+	_, r.Err = c.Post(createURL(c), b, &r.Body, nil) // nolint
 	return
 }
 
@@ -91,13 +81,9 @@ func Update(c *gcorecloud.ServiceClient, id int, opts UpdateOptsBuilder) (r Upda
 		r.Err = err
 		return
 	}
-	var resp *http.Response
-	resp, r.Err = c.Put(updateURL(c, id), b, &r.Body, &gcorecloud.RequestOpts{
+	_, r.Err = c.Put(updateURL(c, id), b, &r.Body, &gcorecloud.RequestOpts{ // nolint
 		OkCodes: []int{200, 201},
 	})
-	defer func() {
-		_ = resp.Body.Close()
-	}()
 	return
 }
 
@@ -119,10 +105,6 @@ func ListAll(client *gcorecloud.ServiceClient) ([]Project, error) {
 // Delete a project
 func Delete(client *gcorecloud.ServiceClient, id int) (r tasks.Result) {
 	url := deleteURL(client, id)
-	var resp *http.Response
-	resp, r.Err = client.DeleteWithResponse(url, &r.Body, nil)
-	defer func() {
-		_ = resp.Body.Close()
-	}()
+	_, r.Err = client.DeleteWithResponse(url, &r.Body, nil) // nolint
 	return
 }

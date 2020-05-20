@@ -77,7 +77,9 @@ func (t *TE) Fetch() error {
 		return err
 	}
 	defer func() {
-		_ = resp.Body.Close()
+		if resp != nil {
+			_ = resp.Body.Close()
+		}
 	}()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
