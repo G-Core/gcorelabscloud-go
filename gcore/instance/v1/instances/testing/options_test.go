@@ -1,6 +1,7 @@
 package testing
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
@@ -286,4 +287,54 @@ func TestDeleteOpts(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, "?volumes=28bfe198-a003-4283-8dca-ab5da4a71b62%2C29bfe198-a003-4283-8dca-ab5da4a71b62", query)
 
+}
+
+func TestMetadataOpts(t *testing.T) {
+	opts := instances.MetadataOpts{
+		Key:   "test",
+		Value: strings.Repeat("test", 100),
+	}
+	err := opts.Validate()
+	require.Error(t, err)
+}
+
+func TestMetadataSetOpts(t *testing.T) {
+	opts := instances.MetadataSetOpts{
+		Metadata: []instances.MetadataOpts{
+			{
+				Key:   "test",
+				Value: strings.Repeat("test", 100),
+			},
+			{
+				Key:   "test",
+				Value: strings.Repeat("test", 100),
+			},
+		},
+	}
+	err := opts.Validate()
+	require.Error(t, err)
+
+	blankOpts := instances.MetadataSetOpts{}
+	err = blankOpts.Validate()
+	require.Error(t, err)
+
+	_, err = opts.ToMetadataMap()
+	require.Error(t, err)
+
+	opts = instances.MetadataSetOpts{
+		Metadata: []instances.MetadataOpts{
+			{
+				Key:   "test1",
+				Value: "test1",
+			},
+			{
+				Key:   "test2",
+				Value: "test2",
+			},
+		},
+	}
+
+	data, err := opts.ToMetadataMap()
+	require.NoError(t, err)
+	require.Equal(t, map[string]interface{}{"test1": "test1", "test2": "test2"}, data)
 }

@@ -4,13 +4,11 @@ import (
 	"net"
 	"time"
 
-	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
-
-	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
-
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/flavor/v1/flavors"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
+	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 )
 
 const ListResponse = `
@@ -323,6 +321,39 @@ const DeleteResponse = `
 }
 `
 
+const MetadataListResponse = `
+{
+  "count": 2,
+  "results": [
+    {
+      "key": "cost-center",
+      "value": "Atlanta",
+      "read_only": false
+    },
+    {
+      "key": "data-center",
+      "value": "A",
+      "read_only": false
+    }
+  ]
+}
+`
+
+const MetadataResponse = `
+{
+  "key": "cost-center",
+  "value": "Atlanta",
+  "read_only": false
+}
+`
+
+const MetadataCreateRequest = `
+{
+"test1": "test1", 
+"test2": "test2"
+}
+`
+
 var (
 	ip1                 = net.ParseIP("10.0.0.17")
 	ip2                 = net.ParseIP("92.38.157.215")
@@ -500,4 +531,15 @@ var (
 	Tasks1                          = tasks.TaskResults{
 		Tasks: []tasks.TaskID{"50f53a35-42ed-40c4-82b2-5a37fb3e00bc"},
 	}
+	Metadata1 = instances.Metadata{
+		Key:      "cost-center",
+		Value:    "Atlanta",
+		ReadOnly: false,
+	}
+	Metadata2 = instances.Metadata{
+		Key:      "data-center",
+		Value:    "A",
+		ReadOnly: false,
+	}
+	ExpectedMetadataList = []instances.Metadata{Metadata1, Metadata2}
 )

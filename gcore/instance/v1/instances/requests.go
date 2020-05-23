@@ -47,6 +47,9 @@ type DeleteOpts struct {
 
 // ToInstanceDeleteQuery formats a DeleteOpts into a query string.
 func (opts DeleteOpts) ToInstanceDeleteQuery() (string, error) {
+	if err := opts.Validate(); err != nil {
+		return "", err
+	}
 	q, err := gcorecloud.BuildQueryString(opts)
 	if err != nil {
 		return "", err
@@ -55,7 +58,7 @@ func (opts DeleteOpts) ToInstanceDeleteQuery() (string, error) {
 }
 
 func (opts *DeleteOpts) Validate() error {
-	return gcorecloud.Validate.Struct(opts)
+	return gcorecloud.ValidateStruct(opts)
 }
 
 // CreateOptsBuilder allows extensions to add additional parameters to the Create request.
@@ -76,7 +79,7 @@ type CreateVolumeOpts struct {
 }
 
 func (opts *CreateVolumeOpts) Validate() error {
-	return gcorecloud.Validate.Struct(opts)
+	return gcorecloud.ValidateStruct(opts)
 }
 
 type CreateNewInterfaceFloatingIPOpts struct {
@@ -86,7 +89,7 @@ type CreateNewInterfaceFloatingIPOpts struct {
 
 // Validate
 func (opts CreateNewInterfaceFloatingIPOpts) Validate() error {
-	return gcorecloud.Validate.Struct(opts)
+	return gcorecloud.ValidateStruct(opts)
 }
 
 type CreateInterfaceOpts struct {
@@ -98,7 +101,7 @@ type CreateInterfaceOpts struct {
 
 // Validate
 func (opts CreateInterfaceOpts) Validate() error {
-	return gcorecloud.Validate.Struct(opts)
+	return gcorecloud.ValidateStruct(opts)
 }
 
 // CreateOpts represents options used to create a instance.
@@ -113,17 +116,37 @@ type CreateOpts struct {
 	Password       string                `json:"password" validate:"omitempty,required_with=Username"`
 	Username       string                `json:"username" validate:"omitempty,required_with=Password"`
 	UserData       string                `json:"user_data" validate:"omitempty,base64"`
-	Metadata       map[string]string     `json:"metadata,omitempty"`
+	Metadata       *MetadataSetOpts      `json:"metadata,omitempty" validate:"omitempty,dive"`
 }
 
 // Validate
 func (opts CreateOpts) Validate() error {
-	return gcorecloud.Validate.Struct(opts)
+	return gcorecloud.ValidateStruct(opts)
 }
 
 // ToInstanceCreateMap builds a request body from CreateOpts.
 func (opts CreateOpts) ToInstanceCreateMap() (map[string]interface{}, error) {
-	return gcorecloud.BuildRequestBody(opts, "")
+	if err := opts.Validate(); err != nil {
+		return nil, err
+	}
+	var err error
+	var metadata map[string]interface{}
+	if opts.Metadata != nil {
+		metadata, err = opts.Metadata.ToMetadataMap()
+		if err != nil {
+			return nil, err
+		}
+	}
+	mp, err := gcorecloud.BuildRequestBody(opts, "")
+	if err != nil {
+		return nil, err
+	}
+	if len(metadata) > 0 {
+		mp["metadata"] = metadata
+	} else {
+		delete(mp, "metadata")
+	}
+	return mp, nil
 }
 
 // SecurityGroupOptsBuilder allows extensions to add parameters to the security groups request.
@@ -132,11 +155,19 @@ type SecurityGroupOptsBuilder interface {
 }
 
 type SecurityGroupOpts struct {
-	Name string `json:"name" required:"true"`
+	Name string `json:"name" required:"true" validate:"required"`
+}
+
+// Validate.
+func (opts SecurityGroupOpts) Validate() error {
+	return gcorecloud.ValidateStruct(opts)
 }
 
 // ToSecurityGroupActionMap builds a request body from SecurityGroupOpts.
 func (opts SecurityGroupOpts) ToSecurityGroupActionMap() (map[string]interface{}, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, err
+	}
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
@@ -146,11 +177,18 @@ type ChangeFlavorOptsBuilder interface {
 }
 
 type ChangeFlavorOpts struct {
-	FlavorID string `json:"flavor_id" required:"true"`
+	FlavorID string `json:"flavor_id" required:"true" validate:"required"`
+}
+
+func (opts ChangeFlavorOpts) Validate() error {
+	return gcorecloud.ValidateStruct(opts)
 }
 
 // ToChangeFlavorActionMap builds a request body from ChangeFlavorOpts.
 func (opts ChangeFlavorOpts) ToChangeFlavorActionMap() (map[string]interface{}, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, err
+	}
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
@@ -333,5 +371,103 @@ func Resize(client *gcorecloud.ServiceClient, id string, opts ChangeFlavorOptsBu
 		return
 	}
 	_, r.Err = client.Post(changeFlavorInstanceURL(client, id), b, &r.Body, nil) // nolint
+	return
+}
+
+func MetadataList(client *gcorecloud.ServiceClient, id string) pagination.Pager {
+	url := metadataURL(client, id)
+	return pagination.NewPager(client, url, func(r pagination.PageResult) pagination.Page {
+		return MetadataPage{pagination.LinkedPageBase{PageResult: r}}
+	})
+}
+
+func MetadataListAll(client *gcorecloud.ServiceClient, id string) ([]Metadata, error) {
+	pages, err := MetadataList(client, id).AllPages()
+	if err != nil {
+		return nil, err
+	}
+	all, err := ExtractMetadata(pages)
+	if err != nil {
+		return nil, err
+	}
+	return all, nil
+}
+
+// MetadataOptsBuilder allows extensions to add additional parameters to the metadata Create and Update request.
+type MetadataOptsBuilder interface {
+	ToMetadataMap() (string, error)
+}
+
+// MetadataOpts. Set parameters for Create or Update operation
+type MetadataOpts struct {
+	Key   string `json:"key" validate:"required,max=255"`
+	Value string `json:"value" validate:"required,max=255"`
+}
+
+// MetadataSetOpts. Set parameters for Create or Update operation
+type MetadataSetOpts struct {
+	Metadata []MetadataOpts `json:"metadata" validate:"required,min=1,dive"`
+}
+
+// Validate
+func (opts MetadataOpts) Validate() error {
+	return gcorecloud.ValidateStruct(opts)
+}
+
+// Validate
+func (opts MetadataSetOpts) Validate() error {
+	return gcorecloud.ValidateStruct(opts)
+}
+
+// ToMetadataMap builds a request body from MetadataSetOpts.
+func (opts MetadataSetOpts) ToMetadataMap() (map[string]interface{}, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, err
+	}
+	m := make(map[string]interface{})
+	for _, md := range opts.Metadata {
+		m[md.Key] = md.Value
+	}
+	return m, nil
+}
+
+// MetadataCreate creates a metadata for an instance.
+func MetadataCreate(client *gcorecloud.ServiceClient, id string, opts MetadataSetOpts) (r MetadataActionResult) {
+	b, err := opts.ToMetadataMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = client.Post(metadataURL(client, id), b, nil, &gcorecloud.RequestOpts{ // nolint
+		OkCodes: []int{http.StatusNoContent, http.StatusOK},
+	})
+	return
+}
+
+// MetadataUpdate updates a metadata for an instance.
+func MetadataUpdate(client *gcorecloud.ServiceClient, id string, opts MetadataSetOpts) (r MetadataActionResult) {
+	b, err := opts.ToMetadataMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = client.Put(metadataURL(client, id), b, nil, &gcorecloud.RequestOpts{ // nolint
+		OkCodes: []int{http.StatusNoContent, http.StatusOK},
+	})
+	return
+}
+
+// MetadataDelete deletes defined metadata key for an instance.
+func MetadataDelete(client *gcorecloud.ServiceClient, id string, key string) (r MetadataActionResult) {
+	_, r.Err = client.Delete(metadataDetailsURL(client, id, key), &gcorecloud.RequestOpts{ // nolint
+		OkCodes: []int{http.StatusNoContent, http.StatusOK},
+	})
+	return
+}
+
+// MetadataGet gets defined metadata key for an instance.
+func MetadataGet(client *gcorecloud.ServiceClient, id string, key string) (r MetadataResult) {
+	url := metadataDetailsURL(client, id, key)
+	_, r.Err = client.Get(url, &r.Body, nil) // nolint
 	return
 }

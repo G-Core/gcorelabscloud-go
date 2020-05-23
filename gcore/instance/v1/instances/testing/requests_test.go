@@ -34,6 +34,10 @@ func prepareGetActionTestURLParams(version string, id string, action string) str
 	return fmt.Sprintf("/%s/instances/%d/%d/%s/%s", version, fake.ProjectID, fake.RegionID, id, action)
 }
 
+func prepareGetActionDetailsTestURLParams(version string, id string, action, actionID string) string { // nolint
+	return fmt.Sprintf("/%s/instances/%d/%d/%s/%s/%s", version, fake.ProjectID, fake.RegionID, id, action, actionID)
+}
+
 func prepareListTestURL() string {
 	return prepareListTestURLParams("v1", fake.ProjectID, fake.RegionID)
 }
@@ -80,6 +84,14 @@ func prepareResumeTestURL(id string) string {
 
 func prepareChangeFlavorTestURL(id string) string {
 	return prepareGetActionTestURLParams("v1", id, "changeflavor")
+}
+
+func prepareMetadataTestURL(id string) string {
+	return prepareGetActionTestURLParams("v1", id, "metadata")
+}
+
+func prepareMetadataDetailsTestURL(id, key string) string {
+	return prepareGetActionDetailsTestURLParams("v1", id, "metadata", key)
 }
 
 func prepareGetTestURL(id string) string {
@@ -536,4 +548,129 @@ func TestResize(t *testing.T) {
 	tasks, err := instances.Resize(client, instanceID, opts).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
+}
+
+func TestMetadataListAll(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareMetadataTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, MetadataListResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("instances", "v1")
+
+	actual, err := instances.MetadataListAll(client, instanceID)
+	require.NoError(t, err)
+	ct := actual[0]
+	require.Equal(t, Metadata1, ct)
+	require.Equal(t, ExpectedMetadataList, actual)
+}
+
+func TestMetadataGet(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareMetadataDetailsTestURL(instanceID, Metadata1.Key), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, MetadataResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("instances", "v1")
+
+	actual, err := instances.MetadataGet(client, instanceID, Metadata1.Key).Extract()
+	require.NoError(t, err)
+	require.Equal(t, &Metadata1, actual)
+}
+
+func TestMetadataCreate(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareMetadataTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestJSONRequest(t, r, MetadataCreateRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	opts := instances.MetadataSetOpts{
+		Metadata: []instances.MetadataOpts{{
+			Key:   "test1",
+			Value: "test1",
+		}, {
+			Key:   "test2",
+			Value: "test2",
+		},
+		}}
+
+	client := fake.ServiceTokenClient("instances", "v1")
+	err := instances.MetadataCreate(client, instanceID, opts).ExtractErr()
+	require.NoError(t, err)
+}
+
+func TestMetadataUpdate(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareMetadataTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "PUT")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestJSONRequest(t, r, MetadataCreateRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	opts := instances.MetadataSetOpts{
+		Metadata: []instances.MetadataOpts{{
+			Key:   "test1",
+			Value: "test1",
+		}, {
+			Key:   "test2",
+			Value: "test2",
+		},
+		}}
+
+	client := fake.ServiceTokenClient("instances", "v1")
+	err := instances.MetadataUpdate(client, instanceID, opts).ExtractErr()
+	require.NoError(t, err)
+}
+
+func TestMetadataDelete(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareMetadataDetailsTestURL(instanceID, Metadata1.Key), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "DELETE")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Accept", "application/json")
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	client := fake.ServiceTokenClient("instances", "v1")
+	err := instances.MetadataDelete(client, instanceID, Metadata1.Key).ExtractErr()
+	require.NoError(t, err)
 }

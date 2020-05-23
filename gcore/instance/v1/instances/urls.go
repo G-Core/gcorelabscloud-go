@@ -26,6 +26,10 @@ func resourceActionURL(c *gcorecloud.ServiceClient, id string, action string) st
 	return c.ServiceURL(id, action)
 }
 
+func resourceActionDetailsURL(c *gcorecloud.ServiceClient, id string, action string, actionID string) string {
+	return c.ServiceURL(id, action, actionID)
+}
+
 func interfacesListURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceActionURL(c, id, "interfaces")
 }
@@ -68,6 +72,14 @@ func resumeInstanceURL(c *gcorecloud.ServiceClient, id string) string {
 
 func changeFlavorInstanceURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceActionURL(c, id, "changeflavor")
+}
+
+func metadataURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "metadata")
+}
+
+func metadataDetailsURL(c *gcorecloud.ServiceClient, id string, actionID string) string {
+	return resourceActionDetailsURL(c, id, "metadata", actionID)
 }
 
 func createURL(c *gcorecloud.ServiceClient) string {

@@ -29,6 +29,18 @@ var (
 	interfaceFloatingIPSource = types.FloatingIPSource("").StringList()
 )
 
+func StringSliceToMetadataSetOpts(slice []string) (instances.MetadataSetOpts, error) {
+	var m instances.MetadataSetOpts
+	for _, s := range slice {
+		parts := strings.SplitN(s, "=", 2)
+		if len(parts) != 2 {
+			return m, fmt.Errorf("wrong label format: %s", s)
+		}
+		m.Metadata = append(m.Metadata, instances.MetadataOpts{Key: parts[0], Value: parts[1]})
+	}
+	return m, nil
+}
+
 func getUserData(c *cli.Context) (string, error) {
 	userData := ""
 	userDataFile := c.String("user-data-file")
@@ -89,7 +101,7 @@ func getInstanceVolumes(c *cli.Context) ([]instances.CreateVolumeOpts, error) {
 
 	}
 
-	// adjust boot order
+	// adjust boot order number so that they goes consistently
 	sort.Slice(res, func(i, j int) bool {
 		return res[i].BootIndex < res[j].BootIndex
 	})
@@ -320,8 +332,10 @@ var instanceUnAssignSecurityGroupsCommand = cli.Command{
 }
 
 var instanceCreateCommandV2 = cli.Command{
-	Name:     "create",
-	Usage:    "Create instance. Example: gcoreclient token instance create --flavor g1-standard-1-2 --name test1 --keypair keypair --volume-source image --volume-type standard --volume-image-id --interface-type subnet --interface-network-id 95ea2073-c5eb-448a-aed5-78045f88f24a --interface-subnet-id b7fd6e0a-36a5-4f6a-9dc4-90a39eb9833f --volume-size 2 --metadata one=two -d -w",
+	Name: "create",
+	Usage: `
+	Create instance. 
+	Example: gcoreclient token instance create --flavor g1-standard-1-2 --name test1 --keypair keypair --volume-source image --volume-type standard --volume-image-id --interface-type subnet --interface-network-id 95ea2073-c5eb-448a-aed5-78045f88f24a --interface-subnet-id b7fd6e0a-36a5-4f6a-9dc4-90a39eb9833f --volume-size 2 --metadata one=two -d -w`,
 	Category: "instance",
 	Flags: append([]cli.Flag{
 		&cli.StringSliceFlag{
@@ -393,7 +407,7 @@ var instanceCreateCommandV2 = cli.Command{
 			Value: &utils.EnumStringSliceValue{
 				Enum: volumeType,
 			},
-			Usage:    fmt.Sprintf("instance volume tyeps. output in %s", strings.Join(volumeType, ", ")),
+			Usage:    fmt.Sprintf("instance volume types. output in %s", strings.Join(volumeType, ", ")),
 			Required: true,
 		},
 		&cli.StringSliceFlag{
@@ -493,9 +507,9 @@ var instanceCreateCommandV2 = cli.Command{
 
 		securityGroups := getSecurityGroups(c)
 
-		metadata, err := utils.StringSliceToMap(c.StringSlice("metadata"))
+		metadata, err := StringSliceToMetadataSetOpts(c.StringSlice("metadata"))
 		if err != nil {
-			_ = cli.ShowCommandHelp(c, "create")
+			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
 
@@ -510,7 +524,7 @@ var instanceCreateCommandV2 = cli.Command{
 			Password:       c.String("password"),
 			Username:       c.String("username"),
 			UserData:       userData,
-			Metadata:       metadata,
+			Metadata:       &metadata,
 		}
 
 		err = gcorecloud.TranslateValidationError(opts.Validate())
@@ -827,6 +841,170 @@ var instanceResizeCommand = cli.Command{
 	},
 }
 
+var metadataListCommand = cli.Command{
+	Name:      "list",
+	Usage:     "Get instance metadata",
+	ArgsUsage: "<instance_id>",
+	Category:  "metadata",
+	Action: func(c *cli.Context) error {
+		instanceID, err := flags.GetFirstStringArg(c, instanceIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "list")
+			return err
+		}
+		client, err := client.NewInstanceClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+		metadata, err := instances.MetadataListAll(client, instanceID)
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		utils.ShowResults(metadata, c.String("format"))
+		return nil
+	},
+}
+
+var metadataGetCommand = cli.Command{
+	Name:      "show",
+	Usage:     "Show instance metadata by key",
+	ArgsUsage: "<instance_id>",
+	Category:  "metadata",
+	Flags: []cli.Flag{
+		&cli.StringFlag{
+			Name:     "metadata",
+			Aliases:  []string{"m"},
+			Usage:    "instance metadata key",
+			Required: true,
+		},
+	},
+	Action: func(c *cli.Context) error {
+		instanceID, err := flags.GetFirstStringArg(c, instanceIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "show")
+			return err
+		}
+		client, err := client.NewInstanceClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+		metadata, err := instances.MetadataGet(client, instanceID, c.String("metadata")).Extract()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		utils.ShowResults(metadata, c.String("format"))
+		return nil
+	},
+}
+
+var metadataDeleteCommand = cli.Command{
+	Name:      "delete",
+	Usage:     "Delete instance metadata by key",
+	ArgsUsage: "<instance_id>",
+	Category:  "metadata",
+	Flags: []cli.Flag{
+		&cli.StringFlag{
+			Name:     "metadata",
+			Aliases:  []string{"m"},
+			Usage:    "instance metadata key",
+			Required: true,
+		},
+	},
+	Action: func(c *cli.Context) error {
+		instanceID, err := flags.GetFirstStringArg(c, instanceIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "delete")
+			return err
+		}
+		client, err := client.NewInstanceClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+		err = instances.MetadataDelete(client, instanceID, c.String("metadata")).ExtractErr()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		return nil
+	},
+}
+
+var metadataCreateCommand = cli.Command{
+	Name:      "create",
+	Usage:     "Create instance metadata. It would update existing keys",
+	ArgsUsage: "<instance_id>",
+	Category:  "metadata",
+	Flags: []cli.Flag{
+		&cli.StringSliceFlag{
+			Name:     "metadata",
+			Aliases:  []string{"m"},
+			Usage:    "instance metadata. Example: --metadata one=two --metadata three=four",
+			Required: true,
+		},
+	},
+	Action: func(c *cli.Context) error {
+		instanceID, err := flags.GetFirstStringArg(c, instanceIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "create")
+			return err
+		}
+		client, err := client.NewInstanceClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+		opts, err := StringSliceToMetadataSetOpts(c.StringSlice("metadata"))
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+		err = instances.MetadataCreate(client, instanceID, opts).ExtractErr()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		return nil
+	},
+}
+
+var metadataUpdateCommand = cli.Command{
+	Name:      "update",
+	Usage:     "Update instance metadata. It replace existing records",
+	ArgsUsage: "<instance_id>",
+	Category:  "metadata",
+	Flags: []cli.Flag{
+		&cli.StringSliceFlag{
+			Name:     "metadata",
+			Aliases:  []string{"m"},
+			Usage:    "instance metadata. Example: --metadata one=two --metadata three=four",
+			Required: true,
+		},
+	},
+	Action: func(c *cli.Context) error {
+		instanceID, err := flags.GetFirstStringArg(c, instanceIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "update")
+			return err
+		}
+		client, err := client.NewInstanceClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+		opts, err := StringSliceToMetadataSetOpts(c.StringSlice("metadata"))
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+		err = instances.MetadataUpdate(client, instanceID, opts).ExtractErr()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		return nil
+	},
+}
+
 var InstanceCommands = cli.Command{
 	Name:  "instance",
 	Usage: "GCloud instances API",
@@ -856,6 +1034,17 @@ var InstanceCommands = cli.Command{
 				&instanceListSecurityGroupsCommand,
 				&instanceAssignSecurityGroupsCommand,
 				&instanceUnAssignSecurityGroupsCommand,
+			},
+		},
+		{
+			Name:  "metadata",
+			Usage: "Instance metadata",
+			Subcommands: []*cli.Command{
+				&metadataListCommand,
+				&metadataGetCommand,
+				&metadataCreateCommand,
+				&metadataUpdateCommand,
+				&metadataDeleteCommand,
 			},
 		},
 	},
