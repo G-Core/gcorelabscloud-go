@@ -9,7 +9,15 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var ClientType string
+const (
+	ClientTypeToken    = "token"
+	ClientTypePlatform = "platform"
+)
+
+var (
+	ClientType  string
+	ClientTypes = []string{ClientTypeToken, ClientTypePlatform}
+)
 
 var commonFlags = []cli.Flag{
 	&cli.StringFlag{
@@ -39,7 +47,7 @@ var commonFlags = []cli.Flag{
 	&cli.GenericFlag{
 		Name: "client-type",
 		Value: &utils.EnumValue{
-			Enum:        []string{"token", "platform"},
+			Enum:        ClientTypes,
 			Default:     "token",
 			Destination: &ClientType,
 		},

@@ -61,11 +61,7 @@ func buildTokenClient(c *cli.Context, endpointName, endpointType string, version
 
 	options := settings.ToTokenOptions()
 	eo := settings.ToEndpointOptions()
-	client, err := gcore.TokenClientServiceWithDebug(options, eo, settings.Debug)
-	if err != nil {
-		return client, err
-	}
-	return client, err
+	return gcore.TokenClientServiceWithDebug(options, eo, settings.Debug)
 }
 
 func buildPlatformClient(c *cli.Context, endpointName, endpointType string, version string) (*gcorecloud.ServiceClient, error) {
@@ -122,11 +118,7 @@ func buildPlatformClient(c *cli.Context, endpointName, endpointType string, vers
 
 	options := settings.ToAuthOptions()
 	eo := settings.ToEndpointOptions()
-	client, err := gcore.AuthClientServiceWithDebug(options, eo, settings.Debug)
-	if err != nil {
-		return client, err
-	}
-	return client, err
+	return gcore.AuthClientServiceWithDebug(options, eo, settings.Debug)
 }
 
 func BuildClient(c *cli.Context, endpointName, version string) (*gcorecloud.ServiceClient, error) {

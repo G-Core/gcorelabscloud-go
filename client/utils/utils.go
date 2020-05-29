@@ -118,6 +118,14 @@ func renderTable(input interface{}) {
 		return
 	}
 	res := results[0]
+	if reflect.TypeOf(res).Kind() != reflect.Struct {
+		for i := 0; i < len(results); i++ {
+			results[i] = struct {
+				Value string
+			}{Value: reflect.ValueOf(results[i]).String()}
+		}
+		res = results[0]
+	}
 	headers := tableHeaderFromStruct(res)
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader(headers)

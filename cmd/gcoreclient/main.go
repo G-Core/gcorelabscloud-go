@@ -74,28 +74,24 @@ type clientCommands struct {
 	usage    string
 }
 
-func buildClientCommands(commands []*cli.Command) (clientCommands, error) {
+func buildClientCommands(commands []*cli.Command) clientCommands {
 	clientType := os.Getenv("GCLOUD_CLIENT_TYPE")
 	tokenClientUsage := fmt.Sprintf("GCloud API client\n%s", flags.TokenClientHelpText)
 	platformClientUsage := fmt.Sprintf("GCloud API client\n%s", flags.PlatformClientHelpText)
 	switch clientType {
-	case "token":
+	case flags.ClientTypeToken:
 		flags.ClientType = clientType
 		return clientCommands{
 			commands: commands,
 			flags:    flags.TokenClientFlags,
 			usage:    tokenClientUsage,
-		}, nil
-	case "platform":
+		}
+	case flags.ClientTypePlatform:
 		flags.ClientType = clientType
 		return clientCommands{
 			commands: commands,
 			flags:    flags.PlatformClientFlags,
 			usage:    platformClientUsage,
-		}, nil
-	default:
-		if len(clientType) > 0 {
-			return clientCommands{}, fmt.Errorf("unsupported GCLOUD_CLIENT_TYPE environ")
 		}
 	}
 	mainClientUsage := fmt.Sprintf("GCloud API client\n%s", flags.MainClientHelpText)
@@ -122,17 +118,12 @@ func buildClientCommands(commands []*cli.Command) (clientCommands, error) {
 		},
 		flags: nil,
 		usage: mainClientUsage,
-	}, nil
+	}
 }
 
 func main() {
-
 	flags.AddOutputFlags(commands)
-	clientCommands, err := buildClientCommands(commands)
-	if err != nil {
-		logrus.Errorf("Cannot initialize application: %+v", err)
-		os.Exit(1)
-	}
+	clientCommands := buildClientCommands(commands)
 	app := cli.NewApp()
 	app.Version = AppVersion
 	app.EnableBashCompletion = true
@@ -143,7 +134,7 @@ func main() {
 	if len(clientCommands.usage) > 0 {
 		app.Usage = clientCommands.usage
 	}
-	err = app.Run(os.Args)
+	err := app.Run(os.Args)
 	if err != nil {
 		logrus.Errorf("Cannot initialize application: %+v", err)
 		os.Exit(1)
