@@ -85,7 +85,7 @@ func init() { // nolint
 		return nil
 	}, func(ut ut.Translator, fe validator.FieldError) string {
 		return fmt.Sprintf(
-			"%s should be set when not any field from %s are set",
+			"%s should be set when all fields [%s] are not set",
 			fe.StructField(),
 			fe.Param(),
 		)
@@ -96,7 +96,7 @@ func init() { // nolint
 		return nil
 	}, func(ut ut.Translator, fe validator.FieldError) string {
 		return fmt.Sprintf(
-			"%s should not be set when not any field from %s are set",
+			"%s should not be set when all fields [%s] are set",
 			fe.StructField(),
 			fe.Param(),
 		)

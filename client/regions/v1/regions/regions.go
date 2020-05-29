@@ -126,7 +126,7 @@ var regionUpdateCommand = cli.Command{
 			SpiceProxyURL:     url,
 		}
 
-		err = gcorecloud.TranslateValidationError(opts.Validate())
+		err = gcorecloud.ValidateStruct(opts)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "update")
 			return cli.NewExitError(err, 1)

@@ -702,6 +702,14 @@ func ParseURL(s string) (*URL, error) {
 	return &URL{URL: u}, nil
 }
 
+func MustParseURL(s string) *URL {
+	u, err := url.Parse(s)
+	if err != nil {
+		panic(err)
+	}
+	return &URL{URL: u}
+}
+
 func ParseURLNonMandatory(s string) (*URL, error) {
 	if s == "" {
 		return nil, nil
