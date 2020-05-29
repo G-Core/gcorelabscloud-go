@@ -68,50 +68,82 @@ var commands = []*cli.Command{
 	&k8s2.ClusterPoolCommands,
 }
 
-func buildClientCommands(commands []*cli.Command) ([]*cli.Command, []cli.Flag, string) {
+type clientCommands struct {
+	commands []*cli.Command
+	flags    []cli.Flag
+	usage    string
+}
+
+func buildClientCommands(commands []*cli.Command) (clientCommands, error) {
 	clientType := os.Getenv("GCLOUD_CLIENT_TYPE")
 	tokenClientUsage := fmt.Sprintf("GCloud API client\n%s", flags.TokenClientHelpText)
-	passwordClientUsage := fmt.Sprintf("GCloud API client\n%s", flags.PasswordClientHelpText)
-	if clientType == "client" {
-		return commands, flags.TokenClientFlags, tokenClientUsage
-	} else if clientType == "password" {
-		return commands, flags.PasswordClientFlags, passwordClientUsage
+	platformClientUsage := fmt.Sprintf("GCloud API client\n%s", flags.PlatformClientHelpText)
+	switch clientType {
+	case "token":
+		flags.ClientType = clientType
+		return clientCommands{
+			commands: commands,
+			flags:    flags.TokenClientFlags,
+			usage:    tokenClientUsage,
+		}, nil
+	case "platform":
+		flags.ClientType = clientType
+		return clientCommands{
+			commands: commands,
+			flags:    flags.PlatformClientFlags,
+			usage:    platformClientUsage,
+		}, nil
+	default:
+		if len(clientType) > 0 {
+			return clientCommands{}, fmt.Errorf("unsupported GCLOUD_CLIENT_TYPE environ")
+		}
 	}
-	return []*cli.Command{
-		{
-			Name:        "token",
-			Aliases:     nil,
-			Usage:       tokenClientUsage,
-			Subcommands: commands,
-			Flags:       flags.TokenClientFlags,
-		},
-		{
-			Name:  "password",
-			Usage: passwordClientUsage,
-			Flags: flags.PasswordClientFlags,
-			Before: func(c *cli.Context) error {
-				return c.Set("client-type", "password")
+	mainClientUsage := fmt.Sprintf("GCloud API client\n%s", flags.MainClientHelpText)
+	return clientCommands{
+		commands: []*cli.Command{
+			{
+				Name:        "token",
+				Usage:       tokenClientUsage,
+				Flags:       flags.TokenClientFlags,
+				Subcommands: commands,
+				Before: func(c *cli.Context) error {
+					return c.Set("client-type", "token")
+				},
 			},
-			Subcommands: commands,
+			{
+				Name:        "platform",
+				Usage:       platformClientUsage,
+				Flags:       flags.PlatformClientFlags,
+				Subcommands: commands,
+				Before: func(c *cli.Context) error {
+					return c.Set("client-type", "platform")
+				},
+			},
 		},
-	}, nil, ""
+		flags: nil,
+		usage: mainClientUsage,
+	}, nil
 }
 
 func main() {
 
 	flags.AddOutputFlags(commands)
-	commands, appFlags, usage := buildClientCommands(commands)
+	clientCommands, err := buildClientCommands(commands)
+	if err != nil {
+		logrus.Errorf("Cannot initialize application: %+v", err)
+		os.Exit(1)
+	}
 	app := cli.NewApp()
 	app.Version = AppVersion
 	app.EnableBashCompletion = true
-	app.Commands = commands
-	if appFlags != nil {
-		app.Flags = appFlags
+	app.Commands = clientCommands.commands
+	if clientCommands.flags != nil {
+		app.Flags = clientCommands.flags
 	}
-	if len(usage) > 0 {
-		app.Usage = usage
+	if len(clientCommands.usage) > 0 {
+		app.Usage = clientCommands.usage
 	}
-	err := app.Run(os.Args)
+	err = app.Run(os.Args)
 	if err != nil {
 		logrus.Errorf("Cannot initialize application: %+v", err)
 		os.Exit(1)

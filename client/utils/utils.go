@@ -24,14 +24,18 @@ var (
 )
 
 type EnumValue struct {
-	Enum     []string
-	Default  string
-	selected string
+	Enum        []string
+	Default     string
+	Destination *string
+	selected    string
 }
 
 func (e *EnumValue) Set(value string) error {
 	for _, enum := range e.Enum {
 		if enum == value {
+			if e.Destination != nil {
+				e.Destination = &value
+			}
 			e.selected = value
 			return nil
 		}

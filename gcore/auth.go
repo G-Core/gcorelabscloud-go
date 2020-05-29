@@ -90,7 +90,7 @@ func TokenOptionsFromEnv() (gcorecloud.TokenOptions, error) {
 	return to, nil
 }
 
-func NewGCloudPasswordAPISettingsFromEnv() (*gcorecloud.PasswordAPISettings, error) {
+func NewGCloudPlatformAPISettingsFromEnv() (*gcorecloud.PasswordAPISettings, error) {
 	authURL := os.Getenv("GCLOUD_AUTH_URL")
 	apiURL := os.Getenv("GCLOUD_API_URL")
 	username := os.Getenv("GCLOUD_USERNAME")

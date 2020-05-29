@@ -9,6 +9,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var ClientType string
+
 var commonFlags = []cli.Flag{
 	&cli.StringFlag{
 		Name:        "api-version",
@@ -37,11 +39,12 @@ var commonFlags = []cli.Flag{
 	&cli.GenericFlag{
 		Name: "client-type",
 		Value: &utils.EnumValue{
-			Enum:    []string{"token", "password"},
-			Default: "token",
+			Enum:        []string{"token", "platform"},
+			Default:     "token",
+			Destination: &ClientType,
 		},
 		Hidden: true,
-		Usage:  "client type as token or password",
+		Usage:  "client type. Either use prepared token for gcloud API access or get an access token via gcloud platform",
 	},
 }
 
@@ -78,7 +81,7 @@ var tokenFlags = []cli.Flag{
 	},
 }
 
-var passwordFlags = []cli.Flag{
+var platformFlags = []cli.Flag{
 	&cli.StringFlag{
 		Name:        "auth-url",
 		DefaultText: "In case absent parameter it would take if from environ: GCLOUD_AUTH_URL",
@@ -122,15 +125,15 @@ func buildTokenClientFlags() []cli.Flag {
 	return flags
 }
 
-func buildPasswordClientFlags() []cli.Flag {
+func buildPlatformClientFlags() []cli.Flag {
 	var flags []cli.Flag
 	flags = append(flags, commonFlags...)
-	flags = append(flags, passwordFlags...)
+	flags = append(flags, platformFlags...)
 	return flags
 }
 
 var TokenClientFlags = buildTokenClientFlags()
-var PasswordClientFlags = buildPasswordClientFlags()
+var PlatformClientFlags = buildPlatformClientFlags()
 
 var TokenClientHelpText = `
    Environment variables example:
@@ -143,7 +146,7 @@ var TokenClientHelpText = `
    GCLOUD_PROJECT=
 `
 
-var PasswordClientHelpText = `
+var PlatformClientHelpText = `
    Environment variables example:
 
    GCLOUD_AUTH_URL=
@@ -153,6 +156,12 @@ var PasswordClientHelpText = `
    GCLOUD_PASSWORD=
    GCLOUD_REGION=
    GCLOUD_PROJECT=
+`
+
+var MainClientHelpText = `
+   Environment variables example:
+	
+   GCLOUD_CLIENT_TYPE=[platform,token]
 `
 
 func AddFlags(commands []*cli.Command, flags ...cli.Flag) {

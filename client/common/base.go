@@ -2,6 +2,7 @@ package common
 
 import (
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/gcore"
 
 	"github.com/urfave/cli/v2"
@@ -67,8 +68,8 @@ func buildTokenClient(c *cli.Context, endpointName, endpointType string, version
 	return client, err
 }
 
-func buildPasswordClient(c *cli.Context, endpointName, endpointType string, version string) (*gcorecloud.ServiceClient, error) {
-	settings, err := gcore.NewGCloudPasswordAPISettingsFromEnv()
+func buildPlatformClient(c *cli.Context, endpointName, endpointType string, version string) (*gcorecloud.ServiceClient, error) {
+	settings, err := gcore.NewGCloudPlatformAPISettingsFromEnv()
 	if err != nil {
 		return nil, err
 	}
@@ -129,9 +130,12 @@ func buildPasswordClient(c *cli.Context, endpointName, endpointType string, vers
 }
 
 func BuildClient(c *cli.Context, endpointName, version string) (*gcorecloud.ServiceClient, error) {
-	clientType := c.String("client-type")
+	clientType := flags.ClientType
+	if clientType == "" {
+		clientType = c.String("client-type")
+	}
 	if clientType == "token" {
 		return buildTokenClient(c, endpointName, "", version)
 	}
-	return buildPasswordClient(c, endpointName, "", version)
+	return buildPlatformClient(c, endpointName, "", version)
 }
