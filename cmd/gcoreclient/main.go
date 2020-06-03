@@ -4,41 +4,27 @@ import (
 	"fmt"
 	"os"
 
-	flavors2 "github.com/G-Core/gcorelabscloud-go/client/flavors/v1/flavors"
-
-	images2 "github.com/G-Core/gcorelabscloud-go/client/images/v1/images"
-
-	instances2 "github.com/G-Core/gcorelabscloud-go/client/instances/v1/instances"
-
-	k8s2 "github.com/G-Core/gcorelabscloud-go/client/k8s/v1/k8s"
-
-	keypairs2 "github.com/G-Core/gcorelabscloud-go/client/keypairs/v1/keypairs"
-
-	keystones2 "github.com/G-Core/gcorelabscloud-go/client/keystones/v1/keystones"
-
-	limits2 "github.com/G-Core/gcorelabscloud-go/client/limits/v1/limits"
-
-	networks2 "github.com/G-Core/gcorelabscloud-go/client/networks/v1/networks"
-
-	"github.com/G-Core/gcorelabscloud-go/client/projects/v1/projects"
-
-	quotas2 "github.com/G-Core/gcorelabscloud-go/client/quotas/v1/quotas"
-
-	regions2 "github.com/G-Core/gcorelabscloud-go/client/regions/v1/regions"
-
-	snapshots2 "github.com/G-Core/gcorelabscloud-go/client/snapshots/v1/snapshots"
-
-	subnets2 "github.com/G-Core/gcorelabscloud-go/client/subnets/v1/subnets"
-
-	tasks2 "github.com/G-Core/gcorelabscloud-go/client/tasks/v1/tasks"
-
-	volumes2 "github.com/G-Core/gcorelabscloud-go/client/volumes/v1/volumes"
-
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
+	"github.com/G-Core/gcorelabscloud-go/client/flavors/v1/flavors"
 	"github.com/G-Core/gcorelabscloud-go/client/floatingips/v1/floatingips"
 	"github.com/G-Core/gcorelabscloud-go/client/heat"
+	"github.com/G-Core/gcorelabscloud-go/client/images/v1/images"
+	"github.com/G-Core/gcorelabscloud-go/client/instances/v1/instances"
+	"github.com/G-Core/gcorelabscloud-go/client/k8s/v1/k8s"
+	"github.com/G-Core/gcorelabscloud-go/client/keypairs/v1/keypairs"
+	keypairs2 "github.com/G-Core/gcorelabscloud-go/client/keypairs/v2/keypairs"
+	"github.com/G-Core/gcorelabscloud-go/client/keystones/v1/keystones"
+	"github.com/G-Core/gcorelabscloud-go/client/limits/v1/limits"
 	"github.com/G-Core/gcorelabscloud-go/client/loadbalancers/v1/loadbalancers"
+	"github.com/G-Core/gcorelabscloud-go/client/networks/v1/networks"
+	"github.com/G-Core/gcorelabscloud-go/client/projects/v1/projects"
+	"github.com/G-Core/gcorelabscloud-go/client/quotas/v1/quotas"
+	"github.com/G-Core/gcorelabscloud-go/client/regions/v1/regions"
 	"github.com/G-Core/gcorelabscloud-go/client/securitygroups/v1/securitygroups"
+	"github.com/G-Core/gcorelabscloud-go/client/snapshots/v1/snapshots"
+	"github.com/G-Core/gcorelabscloud-go/client/subnets/v1/subnets"
+	"github.com/G-Core/gcorelabscloud-go/client/tasks/v1/tasks"
+	"github.com/G-Core/gcorelabscloud-go/client/volumes/v1/volumes"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
@@ -46,26 +32,27 @@ import (
 var AppVersion = "v0.2.11"
 
 var commands = []*cli.Command{
-	&networks2.NetworkCommands,
-	&tasks2.TaskCommands,
+	&networks.NetworkCommands,
+	&tasks.TaskCommands,
+	&keypairs.KeypairCommands,
 	&keypairs2.KeypairCommands,
-	&volumes2.VolumeCommands,
-	&subnets2.SubnetCommands,
-	&flavors2.FlavorCommands,
+	&volumes.VolumeCommands,
+	&subnets.SubnetCommands,
+	&flavors.FlavorCommands,
 	&loadbalancers.LoadBalancerCommands,
-	&instances2.InstanceCommands,
+	&instances.InstanceCommands,
 	&heat.HeatsCommand,
 	&securitygroups.SecurityGroupCommands,
 	&floatingips.FloatingIPCommands,
-	&snapshots2.SnapshotCommands,
-	&images2.ImageCommands,
-	&regions2.RegionCommands,
+	&snapshots.SnapshotCommands,
+	&images.ImageCommands,
+	&regions.RegionCommands,
 	&projects.ProjectCommands,
-	&keystones2.KeystoneCommands,
-	&quotas2.QuotaCommands,
-	&limits2.LimitCommands,
-	&k8s2.ClusterCommands,
-	&k8s2.ClusterPoolCommands,
+	&keystones.KeystoneCommands,
+	&quotas.QuotaCommands,
+	&limits.LimitCommands,
+	&k8s.ClusterCommands,
+	&k8s.ClusterPoolCommands,
 }
 
 type clientCommands struct {
