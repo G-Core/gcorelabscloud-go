@@ -143,7 +143,6 @@ var keypairCreateCommand = cli.Command{
 		}
 		result, err := keypairs.Create(client, opts).Extract()
 		if err != nil {
-			_ = cli.ShowCommandHelp(c, "create")
 			return cli.NewExitError(err, 1)
 		}
 		utils.ShowResults(result, c.String("format"))

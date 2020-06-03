@@ -509,7 +509,7 @@ var instanceCreateCommandV2 = cli.Command{
 
 		metadata, err := StringSliceToMetadataSetOpts(c.StringSlice("metadata"))
 		if err != nil {
-			_ = cli.ShowAppHelp(c)
+			_ = cli.ShowCommandHelp(c, "create")
 			return cli.NewExitError(err, 1)
 		}
 
