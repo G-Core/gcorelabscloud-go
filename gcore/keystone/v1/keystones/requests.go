@@ -59,10 +59,10 @@ type UpdateOptsBuilder interface {
 
 // UpdateOpts represents options used to update a keystone.
 type UpdateOpts struct {
-	URL                       *gcorecloud.URL     `json:"url,omitempty" validate:"required_without_all=State KeystoneFederatedDomainID AdminPassword"`
-	State                     types.KeystoneState `json:"state,omitempty" validate:"required_without_all=URL KeystoneFederatedDomainID AdminPassword"`
+	URL                       *gcorecloud.URL     `json:"url,omitempty" validate:"required_without_all=State KeystoneFederatedDomainID AdminPassword"`
+	State                     types.KeystoneState `json:"state,omitempty" validate:"required_without_all=URL KeystoneFederatedDomainID AdminPassword"`
 	KeystoneFederatedDomainID string              `json:"keystone_federated_domain_id,omitempty" validate:"required_without_all=URL State AdminPassword"`
-	AdminPassword             string              `json:"admin_password,omitempty" validate:"required_without_all=URL State KeystoneFederatedDomainID"`
+	AdminPassword             string              `json:"admin_password,omitempty" validate:"required_without_all=State KeystoneFederatedDomainID AdminPassword"`
 }
 
 // ToKeystoneUpdateMap builds a request body from UpdateOpts.
