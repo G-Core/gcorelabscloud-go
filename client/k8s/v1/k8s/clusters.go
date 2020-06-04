@@ -677,7 +677,7 @@ var clusterSignCertificateSubCommand = cli.Command{
 
 var ClusterCommands = cli.Command{
 	Name:  "cluster",
-	Usage: "k8s cluster commands",
+	Usage: "Gcloud k8s cluster commands",
 	Subcommands: []*cli.Command{
 		&clusterListSubCommand,
 		&clusterGetSubCommand,

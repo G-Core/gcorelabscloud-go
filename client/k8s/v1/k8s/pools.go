@@ -344,7 +344,7 @@ var poolVolumesSubCommand = cli.Command{
 
 var ClusterPoolCommands = cli.Command{
 	Name:  "pool",
-	Usage: "K8s pool commands",
+	Usage: "Gcloud K8s pool commands",
 	Subcommands: []*cli.Command{
 		&poolListSubCommand,
 		&poolDeleteSubCommand,
