@@ -51,6 +51,8 @@ type Subnet struct {
 	ConnectToNetworkRouter *bool                   `json:"connect_to_network_router,omitempty"`
 	ProjectID              int                     `json:"project_id"`
 	RegionID               int                     `json:"region_id"`
+	AvailableIps           int                     `json:"available_ips"`
+	TotalIps               int                     `json:"total_ips"`
 }
 
 // SubnetPage is the page returned by a pager when traversing over a

@@ -1,6 +1,7 @@
 package testing
 
 import (
+	"fmt"
 	"net"
 	"time"
 
@@ -10,7 +11,7 @@ import (
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 )
 
-const ListResponse = `
+var ListResponse = fmt.Sprintf(`
 {
   "count": 1,
   "results": [
@@ -26,14 +27,16 @@ const ListResponse = `
 	  "task_id": "50f53a35-42ed-40c4-82b2-5a37fb3e00bc",
 	  "creator_task_id": "50f53a35-42ed-40c4-82b2-5a37fb3e00bc",
 	  "region": "RegionOne",
+	  "available_ips": %d,
+	  "total_ips": %d,
       "project_id": 1,
       "region_id": 1
     }
   ]
 }
-`
+`, availableIps, totalIps)
 
-const GetResponse = `
+var GetResponse = fmt.Sprintf(`
 {
   "id": "e7944e55-f957-413d-aa56-fdc876543113",
   "name": "subnet",
@@ -47,9 +50,11 @@ const GetResponse = `
   "creator_task_id": "50f53a35-42ed-40c4-82b2-5a37fb3e00bc",
   "region": "RegionOne",
   "project_id": 1,
-  "region_id": 1
+  "region_id": 1,
+  "available_ips": %d,
+  "total_ips": %d
 }
-`
+`, availableIps, totalIps)
 
 const CreateRequest = `
 {
@@ -92,6 +97,8 @@ var updatedTime = gcorecloud.JSONRFC3339Z{Time: updatedTimeParsed}
 var _, nt, _ = net.ParseCIDR("192.168.10.0/24")
 var cidr = gcorecloud.CIDR{IPNet: *nt}
 var taskID = "50f53a35-42ed-40c4-82b2-5a37fb3e00bc"
+var availableIps = 241
+var totalIps = 243
 
 var (
 	Subnet1 = subnets.Subnet{
@@ -108,6 +115,8 @@ var (
 		Region:        "RegionOne",
 		ProjectID:     fake.ProjectID,
 		RegionID:      fake.RegionID,
+		AvailableIps:  availableIps,
+		TotalIps:      totalIps,
 	}
 	Tasks1 = tasks.TaskResults{
 		Tasks: []tasks.TaskID{"50f53a35-42ed-40c4-82b2-5a37fb3e00bc"},
