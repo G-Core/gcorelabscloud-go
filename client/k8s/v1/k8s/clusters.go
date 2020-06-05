@@ -58,6 +58,43 @@ func getPools(c *cli.Context) ([]pools.CreateOpts, error) {
 
 }
 
+type k8sConfigFileOptions struct {
+	save     bool
+	filename string
+	exists   bool
+	merge    bool
+	force    bool
+}
+
+func (opts k8sConfigFileOptions) check() error {
+	if opts.exists && ((!opts.force && !opts.merge) || (opts.force && opts.merge)) {
+		return fmt.Errorf("file %s exists, either --force or --merge shoud be set", opts.filename)
+	}
+	return nil
+}
+
+func getK8sConfigFileOptions(c *cli.Context) (k8sConfigFileOptions, error) {
+	opts := k8sConfigFileOptions{
+		save:     c.Bool("save"),
+		filename: c.String("file"),
+		exists:   false,
+		merge:    c.Bool("merge"),
+		force:    c.Bool("force"),
+	}
+	if opts.save {
+		var err error
+		opts.exists, err = utils.FileExists(opts.filename)
+		if err != nil {
+			return opts, err
+		}
+		err = opts.check()
+		if err != nil {
+			return opts, err
+		}
+	}
+	return opts, nil
+}
+
 var clusterListSubCommand = cli.Command{
 	Name:     "list",
 	Usage:    "K8s list clusters",
@@ -145,40 +182,33 @@ var clusterConfigSubCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
+		options, err := getK8sConfigFileOptions(c)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "config")
+			return cli.NewExitError(err, 1)
+		}
 		result, err := clusters.GetConfig(client, clusterID).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
-		if c.Bool("save") {
-			filename := c.String("file")
-			exists, err := utils.FileExists(filename)
-			if err != nil {
-				_ = cli.ShowCommandHelp(c, "config")
-				return cli.NewExitError(err, 1)
-			}
-			if exists {
-				merge := c.Bool("merge")
-				force := c.Bool("force")
-				if (!force && !merge) || (force && merge) {
-					_ = cli.ShowCommandHelp(c, "config")
-					return cli.NewExitError(fmt.Errorf("either --force or --merge shoud be set"), 1)
-				}
-				if force {
-					err := utils.WriteKubeconfigFile(filename, []byte(result.Config))
+		if options.save {
+			if options.exists {
+				if options.force {
+					err := utils.WriteKubeconfigFile(options.filename, []byte(result.Config))
 					if err != nil {
 						return cli.NewExitError(err, 1)
 					}
 					return nil
 				}
-				if merge {
-					err := utils.MergeKubeconfigFile(filename, []byte(result.Config))
+				if options.merge {
+					err := utils.MergeKubeconfigFile(options.filename, []byte(result.Config))
 					if err != nil {
 						return cli.NewExitError(err, 1)
 					}
 					return nil
 				}
 			} else {
-				err := utils.WriteToFile(filename, []byte(result.Config))
+				err := utils.WriteToFile(options.filename, []byte(result.Config))
 				if err != nil {
 					return cli.NewExitError(err, 1)
 				}
