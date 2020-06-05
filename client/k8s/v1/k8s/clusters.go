@@ -2,6 +2,7 @@ package k8s
 
 import (
 	"fmt"
+	"strings"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v1/pools"
@@ -11,6 +12,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
+	"github.com/G-Core/gcorelabscloud-go/client/utils/k8sconfig"
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v1/clusters"
 
 	"github.com/urfave/cli/v2"
@@ -166,6 +168,7 @@ var clusterConfigSubCommand = cli.Command{
 			Name:     "file",
 			Aliases:  []string{"c"},
 			Usage:    "KUBECONFIG file",
+			EnvVars:  []string{"KUBECONFIG"},
 			Value:    "~/.kube/config",
 			Required: false,
 		},
@@ -191,31 +194,32 @@ var clusterConfigSubCommand = cli.Command{
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
+		config := strings.TrimSpace(result.Config)
 		if options.save {
 			if options.exists {
 				if options.force {
-					err := utils.WriteKubeconfigFile(options.filename, []byte(result.Config))
+					err := k8sconfig.WriteKubeconfigFile(options.filename, []byte(config))
 					if err != nil {
 						return cli.NewExitError(err, 1)
 					}
 					return nil
 				}
 				if options.merge {
-					err := utils.MergeKubeconfigFile(options.filename, []byte(result.Config))
+					err := k8sconfig.MergeKubeconfigFile(options.filename, []byte(config))
 					if err != nil {
 						return cli.NewExitError(err, 1)
 					}
 					return nil
 				}
 			} else {
-				err := utils.WriteToFile(options.filename, []byte(result.Config))
+				err := utils.WriteToFile(options.filename, []byte(config))
 				if err != nil {
 					return cli.NewExitError(err, 1)
 				}
 				return nil
 			}
 		} else {
-			utils.ShowResults(result, c.String("format"))
+			fmt.Println(strings.TrimSpace(config))
 		}
 		return nil
 	},
