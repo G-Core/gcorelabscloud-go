@@ -62,6 +62,7 @@ func TestCreateOpts(t *testing.T) {
 
 	_, err = options.ToVolumeCreateMap()
 	require.NoError(t, err)
+
 	options = volumes.CreateOpts{
 		Source:               volumes.Image,
 		Name:                 "test",
@@ -103,5 +104,26 @@ func TestCreateOpts(t *testing.T) {
 	_, err = options.ToVolumeCreateMap()
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "Snapshot")
+
+	options = volumes.CreateOpts{
+		Source: volumes.NewVolume,
+		Name:   "test",
+		Size:   10,
+	}
+
+	_, err = options.ToVolumeCreateMap()
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "TypeName is a required field")
+
+	options = volumes.CreateOpts{
+		Source:   volumes.NewVolume,
+		TypeName: "",
+		Name:     "test",
+		Size:     10,
+	}
+
+	_, err = options.ToVolumeCreateMap()
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "TypeName is a required field")
 
 }
