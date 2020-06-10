@@ -7,8 +7,7 @@ import (
 )
 
 func TestExtractToken(t *testing.T) {
-	result := getGetResult(t)
-
+	result := getTokenResult(t)
 	token, err := result.ExtractTokens()
 	require.NoError(t, err)
 	require.Equal(t, &expectedToken, token)

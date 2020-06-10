@@ -92,6 +92,17 @@ func init() { // nolint
 	})
 	FailOnErrorF(err, "Cannot register translation for tag: %s", "required_without_all")
 
+	err = Validate.RegisterTranslation("required_with", Trans, func(ut ut.Translator) error {
+		return nil
+	}, func(ut ut.Translator, fe validator.FieldError) string {
+		return fmt.Sprintf(
+			"%s should be set when the field %s are set",
+			fe.StructField(),
+			fe.Param(),
+		)
+	})
+	FailOnErrorF(err, "Cannot register translation for tag: %s", "required_with")
+
 	err = Validate.RegisterTranslation("allowed_without_all", Trans, func(ut ut.Translator) error {
 		return nil
 	}, func(ut ut.Translator, fe validator.FieldError) string {
