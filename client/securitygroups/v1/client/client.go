@@ -12,5 +12,5 @@ func NewSecurityGroupRuleClientV1(c *cli.Context) (*gcorecloud.ServiceClient, er
 }
 
 func NewSecurityGroupClientV1(c *cli.Context) (*gcorecloud.ServiceClient, error) {
-	return common.BuildClient(c, "securitygroup", "v1")
+	return common.BuildClient(c, "securitygroups", "v1")
 }
