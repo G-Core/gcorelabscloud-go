@@ -50,16 +50,16 @@ func getHealthMonitor(c *cli.Context) (*lbpools.CreateHealthMonitorOpts, error) 
 		Delay:          healthMonitorDelay,
 		MaxRetries:     healthMonitorMaxRetires,
 		Timeout:        healthMonitorTimeout,
-		MaxRetriesDown: utils.IntToPointer(c.Int("healthmonitor-max-retries-down")),
+		MaxRetriesDown: c.Int("healthmonitor-max-retries-down"),
 	}
 	if healthMonitorType.IsHTTPType() {
 		httpMethod := types.HTTPMethod(c.String("healthmonitor-http-method"))
 		if err := httpMethod.IsValid(); err != nil {
 			return nil, err
 		}
-		hm.HTTPMethod = &httpMethod
-		httpMethodURLPath := utils.StringToPointer(c.String("healthmonitor-url-path"))
-		if httpMethodURLPath == nil {
+		hm.HTTPMethod = httpMethod
+		httpMethodURLPath := c.String("healthmonitor-url-path")
+		if httpMethodURLPath == "" {
 			return nil, fmt.Errorf("--healthmonitor-url-path should be set for health monitor type %s", healthMonitorType)
 		}
 		hm.URLPath = httpMethodURLPath
@@ -74,14 +74,14 @@ func getSessionPersistence(c *cli.Context) (*lbpools.CreateSessionPersistenceOpt
 		return nil, err
 	}
 
-	sessionPersistenceCookiesName := utils.StringToPointer(c.String("session-cookies-name"))
-	if sessionPersistenceType.ISCookiesType() && sessionPersistenceCookiesName == nil {
+	sessionPersistenceCookiesName := c.String("session-cookies-name")
+	if sessionPersistenceType.ISCookiesType() && sessionPersistenceCookiesName == "" {
 		return nil, fmt.Errorf("--session-cookies-name should be set for session persistence type %s", sessionPersistenceType)
 	}
 
 	return &lbpools.CreateSessionPersistenceOpts{
-		PersistenceGranularity: utils.StringToPointer(c.String("session-persistence-granularity")),
-		PersistenceTimeout:     utils.IntToPointer(c.Int("session-persistence-timeout")),
+		PersistenceGranularity: c.String("session-persistence-granularity"),
+		PersistenceTimeout:     c.Int("session-persistence-timeout"),
 		Type:                   *sessionPersistenceType,
 		CookieName:             sessionPersistenceCookiesName,
 	}, nil
@@ -116,23 +116,23 @@ func getPoolMembers(c *cli.Context) ([]lbpools.CreatePoolMemberOpts, error) {
 		member := lbpools.CreatePoolMemberOpts{
 			Address:      memberAddr,
 			ProtocolPort: memberPorts[idx],
-			Weight: func(idx int) *int {
+			Weight: func(idx int) int {
 				if idx < len(memberWeights) {
-					return &memberWeights[idx]
+					return memberWeights[idx]
 				}
-				return nil
+				return 0
 			}(idx),
-			InstanceID: func(idx int) *string {
+			InstanceID: func(idx int) string {
 				if idx < len(memberInstanceIDs) {
-					return &memberInstanceIDs[idx]
+					return memberInstanceIDs[idx]
 				}
-				return nil
+				return ""
 			}(idx),
-			SubnetID: func(idx int) *string {
+			SubnetID: func(idx int) string {
 				if idx < len(memberSubnetIDs) {
-					return &memberInstanceIDs[idx]
+					return memberInstanceIDs[idx]
 				}
-				return nil
+				return ""
 			}(idx),
 		}
 		members = append(members, member)
@@ -467,8 +467,8 @@ var lbpoolCreateSubCommand = cli.Command{
 			Protocol:           pt,
 			LBPoolAlgorithm:    lba,
 			Members:            members,
-			LoadBalancerID:     utils.StringToPointer(c.String("loadbalancer")),
-			ListenerID:         utils.StringToPointer(c.String("listener")),
+			LoadBalancerID:     c.String("loadbalancer"),
+			ListenerID:         c.String("listener"),
 			HealthMonitor:      hm,
 			SessionPersistence: sp,
 		}
@@ -553,9 +553,9 @@ var lbpoolCreateMemberSubCommand = cli.Command{
 		opts := lbpools.CreatePoolMemberOpts{
 			Address:      address,
 			ProtocolPort: c.Int("port"),
-			Weight:       utils.IntToPointer(c.Int("weight")),
-			SubnetID:     utils.StringToPointer(c.String("subnet-id")),
-			InstanceID:   utils.StringToPointer(c.String("instance-id")),
+			Weight:       c.Int("weight"),
+			SubnetID:     c.String("subnet-id"),
+			InstanceID:   c.String("instance-id"),
 		}
 
 		results, err := lbpools.CreateMember(client, lbpoolID, opts).Extract()
@@ -787,7 +787,7 @@ var lbpoolUpdateSubCommand = cli.Command{
 		opts := lbpools.UpdateOpts{
 			Name:               c.String("name"),
 			Members:            members,
-			LBPoolAlgorithm:    lba,
+			LBPoolAlgorithm:    *lba,
 			HealthMonitor:      hm,
 			SessionPersistence: sp,
 		}

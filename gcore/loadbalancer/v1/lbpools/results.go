@@ -54,10 +54,10 @@ type UpdateResult struct {
 type PoolMember struct {
 	Address      *net.IP `json:"address,omitempty"`
 	ID           string  `json:"id"`
-	Weight       *int    `json:"weight,omitempty"`
-	SubnetID     *string `json:"subnet_id,omitempty"`
-	InstanceID   *string `json:"instance_id,omitempty"`
-	ProtocolPort *int    `json:"protocol_port,omitempty"`
+	Weight       int     `json:"weight,omitempty"`
+	SubnetID     string  `json:"subnet_id,omitempty"`
+	InstanceID   string  `json:"instance_id,omitempty"`
+	ProtocolPort int     `json:"protocol_port,omitempty"`
 }
 
 // Pool represents a pool structure.
@@ -73,8 +73,8 @@ type Pool struct {
 	HealthMonitor         *HealthMonitor              `json:"healthmonitor"`
 	ProvisioningStatus    types.ProvisioningStatus    `json:"provisioning_status"`
 	OperatingStatus       types.OperatingStatus       `json:"operating_status"`
-	CreatorTaskID         *string                     `json:"creator_task_id"`
-	TaskID                *string                     `json:"task_id"`
+	CreatorTaskID         string                      `json:"creator_task_id"`
+	TaskID                string                      `json:"task_id"`
 }
 
 // IsDeleted LB pool state.
@@ -89,17 +89,17 @@ type HealthMonitor struct {
 	Delay          int                     `json:"delay"`
 	MaxRetries     int                     `json:"max_retries"`
 	Timeout        int                     `json:"timeout"`
-	MaxRetriesDown *int                    `json:"max_retries_down,omitempty"`
+	MaxRetriesDown int                     `json:"max_retries_down,omitempty"`
 	HTTPMethod     types.HTTPMethod        `json:"http_method,omitempty"`
-	URLPath        *string                 `json:"url_path,omitempty"`
+	URLPath        string                  `json:"url_path,omitempty"`
 }
 
 // SessionPersistenceOpts represents options used to create a lbpool listener pool session persistence rules.
 type SessionPersistence struct {
-	PersistenceGranularity *string               `json:"persistence_granularity,omitempty"`
-	PersistenceTimeout     *int                  `json:"persistence_timeout,omitempty"`
+	PersistenceGranularity string                `json:"persistence_granularity,omitempty"`
+	PersistenceTimeout     int                   `json:"persistence_timeout,omitempty"`
 	Type                   types.PersistenceType `json:"type"`
-	CookieName             *string               `json:"cookie_name,omitempty"`
+	CookieName             string                `json:"cookie_name,omitempty"`
 }
 
 // PoolPage is the page returned by a pager when traversing over a collection of pools.

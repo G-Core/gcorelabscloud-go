@@ -169,21 +169,21 @@ func TestCreate(t *testing.T) {
 		Members: []lbpools.CreatePoolMemberOpts{
 			{
 				Address:      *Member1.Address,
-				ProtocolPort: *Member1.ProtocolPort,
+				ProtocolPort: Member1.ProtocolPort,
 				Weight:       Member1.Weight,
 				SubnetID:     Member1.SubnetID,
 				InstanceID:   Member1.InstanceID,
 			},
 			{
 				Address:      *Member2.Address,
-				ProtocolPort: *Member2.ProtocolPort,
+				ProtocolPort: Member2.ProtocolPort,
 				Weight:       Member2.Weight,
 				SubnetID:     Member2.SubnetID,
 				InstanceID:   Member2.InstanceID,
 			},
 		},
-		LoadBalancerID:     &LoadBalancerID,
-		ListenerID:         &ListenerID,
+		LoadBalancerID:     LoadBalancerID,
+		ListenerID:         ListenerID,
 		HealthMonitor:      nil,
 		SessionPersistence: nil,
 	}
@@ -295,7 +295,7 @@ func TestCreateMember(t *testing.T) {
 
 	options := lbpools.CreatePoolMemberOpts{
 		Address:      *Member1.Address,
-		ProtocolPort: *Member1.ProtocolPort,
+		ProtocolPort: Member1.ProtocolPort,
 		Weight:       Member1.Weight,
 		SubnetID:     Member1.SubnetID,
 		InstanceID:   Member1.InstanceID,

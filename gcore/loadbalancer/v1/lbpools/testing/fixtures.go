@@ -178,18 +178,18 @@ var (
 	Member1        = lbpools.PoolMember{
 		Address:      &ip1,
 		ID:           "65f4e0eb-7846-490e-b44d-726c8baf3c25",
-		Weight:       &width,
-		SubnetID:     &subnetID,
-		InstanceID:   nil,
-		ProtocolPort: &protocolPort,
+		Weight:       width,
+		SubnetID:     subnetID,
+		InstanceID:   "",
+		ProtocolPort: protocolPort,
 	}
 	Member2 = lbpools.PoolMember{
 		Address:      &ip2,
 		ID:           "f6a9c5dd-f8cc-448d-8e57-81de69d127cb",
-		Weight:       &width,
-		SubnetID:     &subnetID,
-		InstanceID:   nil,
-		ProtocolPort: &protocolPort,
+		Weight:       width,
+		SubnetID:     subnetID,
+		InstanceID:   "",
+		ProtocolPort: protocolPort,
 	}
 	LBPool1 = lbpools.Pool{
 		LoadBalancers: []gcorecloud.ItemID{
@@ -209,8 +209,8 @@ var (
 		},
 		ProvisioningStatus: types.ProvisioningStatusActive,
 		OperatingStatus:    types.OperatingStatusOnline,
-		CreatorTaskID:      &creatorTaskID,
-		TaskID:             nil,
+		CreatorTaskID:      creatorTaskID,
+		TaskID:             "",
 	}
 	Tasks1 = tasks.TaskResults{
 		Tasks: []tasks.TaskID{"50f53a35-42ed-40c4-82b2-5a37fb3e00bc"},

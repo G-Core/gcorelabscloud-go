@@ -64,10 +64,10 @@ type CreateMemberOptsBuilder interface {
 
 // CreateSessionPersistenceOpts represents options used to create a lbpool listener pool session persistence rules.
 type CreateSessionPersistenceOpts struct {
-	PersistenceGranularity *string               `json:"persistence_granularity,omitempty"`
-	PersistenceTimeout     *int                  `json:"persistence_timeout,omitempty"`
+	PersistenceGranularity string                `json:"persistence_granularity,omitempty"`
+	PersistenceTimeout     int                   `json:"persistence_timeout,omitempty"`
 	Type                   types.PersistenceType `json:"type" required:"true"`
-	CookieName             *string               `json:"cookie_name,omitempty"`
+	CookieName             string                `json:"cookie_name,omitempty"`
 }
 
 // CreateHealthMonitorOpts represents options used to create a lbpool health monitor.
@@ -76,18 +76,18 @@ type CreateHealthMonitorOpts struct {
 	Delay          int                     `json:"delay" required:"true"`
 	MaxRetries     int                     `json:"max_retries" required:"true"`
 	Timeout        int                     `json:"timeout" required:"true"`
-	MaxRetriesDown *int                    `json:"max_retries_down,omitempty"`
-	HTTPMethod     *types.HTTPMethod       `json:"http_method,omitempty"`
-	URLPath        *string                 `json:"url_path,omitempty"`
+	MaxRetriesDown int                     `json:"max_retries_down,omitempty"`
+	HTTPMethod     types.HTTPMethod        `json:"http_method,omitempty"`
+	URLPath        string                  `json:"url_path,omitempty"`
 }
 
 // CreatePoolMemberOpts represents options used to create a lbpool listener pool member.
 type CreatePoolMemberOpts struct {
-	Address      net.IP  `json:"address" required:"true"`
-	ProtocolPort int     `json:"protocol_port" required:"true"`
-	Weight       *int    `json:"weight,omitempty"`
-	SubnetID     *string `json:"subnet_id,omitempty"`
-	InstanceID   *string `json:"instance_id,omitempty"`
+	Address      net.IP `json:"address" required:"true"`
+	ProtocolPort int    `json:"protocol_port" required:"true"`
+	Weight       int    `json:"weight,omitempty"`
+	SubnetID     string `json:"subnet_id,omitempty"`
+	InstanceID   string `json:"instance_id,omitempty"`
 }
 
 // CreateOpts represents options used to create a lbpool.
@@ -95,9 +95,9 @@ type CreateOpts struct {
 	Name               string                        `json:"name" required:"true" validate:"required,name"`
 	Protocol           types.ProtocolType            `json:"protocol" required:"true"`
 	LBPoolAlgorithm    types.LoadBalancerAlgorithm   `json:"lb_algorithm" required:"true"`
-	Members            []CreatePoolMemberOpts        `json:"members"`
-	LoadBalancerID     *string                       `json:"loadbalancer_id,omitempty"`
-	ListenerID         *string                       `json:"listener_id,omitempty"`
+	Members            []CreatePoolMemberOpts        `json:"members,omitempty"`
+	LoadBalancerID     string                        `json:"loadbalancer_id,omitempty"`
+	ListenerID         string                        `json:"listener_id,omitempty"`
 	HealthMonitor      *CreateHealthMonitorOpts      `json:"healthmonitor,omitempty"`
 	SessionPersistence *CreateSessionPersistenceOpts `json:"session_persistence,omitempty"`
 }
@@ -135,7 +135,7 @@ type UpdateOptsBuilder interface {
 type UpdateOpts struct {
 	Name               string                        `json:"name,omitempty" validate:"required,name"`
 	Members            []CreatePoolMemberOpts        `json:"members,omitempty"`
-	LBPoolAlgorithm    *types.LoadBalancerAlgorithm  `json:"lb_algorithm,omitempty"`
+	LBPoolAlgorithm    types.LoadBalancerAlgorithm   `json:"lb_algorithm,omitempty"`
 	HealthMonitor      *CreateHealthMonitorOpts      `json:"healthmonitor,omitempty"`
 	SessionPersistence *CreateSessionPersistenceOpts `json:"session_persistence,omitempty"`
 }
