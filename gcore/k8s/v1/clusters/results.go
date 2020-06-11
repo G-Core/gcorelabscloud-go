@@ -198,7 +198,7 @@ func ExtractVersionInto(r pagination.Page, v interface{}) error {
 }
 
 type ClusterTaskResult struct {
-	Clusters []string `json:"clusters"`
+	K8sClusters []string `json:"k8s_clusters" mapstructure:"k8s_clusters"`
 }
 
 func ExtractClusterIDFromTask(task *tasks.Task) (string, error) {
@@ -207,8 +207,8 @@ func ExtractClusterIDFromTask(task *tasks.Task) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("cannot decode cluster information in task structure: %w", err)
 	}
-	if len(result.Clusters) == 0 {
+	if len(result.K8sClusters) == 0 {
 		return "", fmt.Errorf("cannot decode cluster information in task structure: %w", err)
 	}
-	return result.Clusters[0], nil
+	return result.K8sClusters[0], nil
 }

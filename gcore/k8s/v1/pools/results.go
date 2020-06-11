@@ -103,18 +103,18 @@ func ExtractClusterPoolsInto(r pagination.Page, v interface{}) error {
 	return r.(ClusterPoolPage).Result.ExtractIntoSlicePtr(v, "results")
 }
 
-type ClusterTaskResult struct {
-	Pools []string `json:"pools"`
+type PoolTaskResult struct {
+	K8sPools []string `json:"k8s_pools" mapstructure:"k8s_pools"`
 }
 
 func ExtractClusterPoolIDFromTask(task *tasks.Task) (string, error) {
-	var result ClusterTaskResult
+	var result PoolTaskResult
 	err := gcorecloud.NativeMapToStruct(task.CreatedResources, &result)
 	if err != nil {
 		return "", fmt.Errorf("cannot decode cluster information in task structure: %w", err)
 	}
-	if len(result.Pools) == 0 {
+	if len(result.K8sPools) == 0 {
 		return "", fmt.Errorf("cannot decode cluster information in task structure: %w", err)
 	}
-	return result.Pools[0], nil
+	return result.K8sPools[0], nil
 }
