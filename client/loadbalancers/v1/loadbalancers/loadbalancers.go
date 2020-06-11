@@ -49,7 +49,13 @@ var loadBalancerCreateSubCommand = cli.Command{
 		},
 		&cli.StringFlag{
 			Name:        "vip-network-id",
-			Usage:       "Loadbalancer name vip network ID",
+			Usage:       "Loadbalancer vip network ID",
+			DefaultText: "<nil>",
+			Required:    false,
+		},
+		&cli.StringFlag{
+			Name:        "vip-subnet-id",
+			Usage:       "Loadbalancer vip subnet ID",
 			DefaultText: "<nil>",
 			Required:    false,
 		},
@@ -64,7 +70,8 @@ var loadBalancerCreateSubCommand = cli.Command{
 		opts := loadbalancers.CreateOpts{
 			Name:         c.String("name"),
 			Listeners:    []loadbalancers.CreateListenerOpts{},
-			VipNetworkID: utils.StringToPointer(c.String("vip-network-id")),
+			VipNetworkID: c.String("vip-network-id"),
+			VipSubnetID:  c.String("vip-subnet-id"),
 		}
 
 		results, err := loadbalancers.Create(client, opts).Extract()

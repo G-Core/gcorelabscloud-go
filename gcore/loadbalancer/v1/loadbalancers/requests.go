@@ -32,10 +32,10 @@ type CreateOptsBuilder interface {
 
 // CreateSessionPersistenceOpts represents options used to create a loadbalancer listener pool session persistence rules.
 type CreateSessionPersistenceOpts struct {
-	PersistenceGranularity *string               `json:"persistence_granularity,omitempty"`
-	PersistenceTimeout     *int                  `json:"persistence_timeout,omitempty"`
+	PersistenceGranularity string                `json:"persistence_granularity,omitempty"`
+	PersistenceTimeout     int                   `json:"persistence_timeout,omitempty"`
 	Type                   types.PersistenceType `json:"type" required:"true"`
-	CookieName             *string               `json:"cookie_name,omitempty"`
+	CookieName             string                `json:"cookie_name,omitempty"`
 }
 
 // CreateHealthMonitorOpts represents options used to create a loadbalancer health monitor.
@@ -44,24 +44,24 @@ type CreateHealthMonitorOpts struct {
 	Delay          int                     `json:"delay" required:"true"`
 	MaxRetries     int                     `json:"max_retries" required:"true"`
 	Timeout        int                     `json:"timeout" required:"true"`
-	MaxRetriesDown *int                    `json:"max_retries_down,omitempty"`
+	MaxRetriesDown int                     `json:"max_retries_down,omitempty"`
 	HTTPMethod     types.HTTPMethod        `json:"http_method,omitempty"`
-	URLPath        *string                 `json:"url_path,omitempty"`
+	URLPath        string                  `json:"url_path,omitempty"`
 }
 
 // CreatePoolMemberOpts represents options used to create a loadbalancer listener pool member.
 type CreatePoolMemberOpts struct {
-	ID           string  `json:"id,omitempty"`
-	Address      net.IP  `json:"address" required:"true"`
-	ProtocolPort int     `json:"protocol_port" required:"true"`
-	Weight       *int    `json:"weight,omitempty"`
-	SubnetID     *string `json:"subnet_id,omitempty"`
-	InstanceID   *string `json:"instance_id,omitempty"`
+	ID           string `json:"id,omitempty"`
+	Address      net.IP `json:"address" required:"true"`
+	ProtocolPort int    `json:"protocol_port" required:"true"`
+	Weight       int    `json:"weight,omitempty"`
+	SubnetID     string `json:"subnet_id,omitempty"`
+	InstanceID   string `json:"instance_id,omitempty"`
 }
 
 // CreatePoolOpts represents options used to create a loadbalancer listener pool.
 type CreatePoolOpts struct {
-	Name                  string                        `json:"name" required:"true"`
+	Name                  string                        `json:"name" required:"true" validate:"required,name"`
 	Protocol              types.ProtocolType            `json:"protocol" required:"true"`
 	Members               []CreatePoolMemberOpts        `json:"members"`
 	HealthMonitor         *CreateHealthMonitorOpts      `json:"healthmonitor,omitempty"`
@@ -71,24 +71,28 @@ type CreatePoolOpts struct {
 
 // CreateListenerOpts represents options used to create a loadbalancer listener.
 type CreateListenerOpts struct {
-	Name             string             `json:"name" required:"true"`
+	Name             string             `json:"name" required:"true" validate:"required,name"`
 	ProtocolPort     int                `json:"protocol_port" required:"true"`
 	Protocol         types.ProtocolType `json:"protocol" required:"true"`
-	Certificate      *string            `json:"certificate,omitempty"`
-	CertificateChain *string            `json:"certificate_chain,omitempty"`
-	PrivateKey       *string            `json:"private_key,omitempty"`
-	Pools            []CreatePoolOpts   `json:"pools,omitempty"`
+	Certificate      string             `json:"certificate,omitempty"`
+	CertificateChain string             `json:"certificate_chain,omitempty"`
+	PrivateKey       string             `json:"private_key,omitempty"`
+	Pools            []CreatePoolOpts   `json:"pools,omitempty" validate:"omitempty,dive"`
 }
 
 // CreateOpts represents options used to create a loadbalancer.
 type CreateOpts struct {
-	Name         string               `json:"name" required:"true"`
-	Listeners    []CreateListenerOpts `json:"listeners" required:"true"`
-	VipNetworkID *string              `json:"vip_network_id,omitempty"`
+	Name         string               `json:"name" required:"true" validate:"required,name"`
+	Listeners    []CreateListenerOpts `json:"listeners" required:"true" validate:"required,dive"`
+	VipNetworkID string               `json:"vip_network_id,omitempty"`
+	VipSubnetID  string               `json:"vip_subnet_id,omitempty"`
 }
 
 // ToLoadBalancerCreateMap builds a request body from CreateOpts.
 func (opts CreateOpts) ToLoadBalancerCreateMap() (map[string]interface{}, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return nil, err
+	}
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
@@ -110,11 +114,14 @@ type UpdateOptsBuilder interface {
 
 // UpdateOpts represents options used to update a loadbalancer.
 type UpdateOpts struct {
-	Name string `json:"name,omitempty" required:"true"`
+	Name string `json:"name,omitempty" required:"true" validate:"required,name"`
 }
 
 // ToLoadBalancerUpdateMap builds a request body from UpdateOpts.
 func (opts UpdateOpts) ToLoadBalancerUpdateMap() (map[string]interface{}, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return nil, err
+	}
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 

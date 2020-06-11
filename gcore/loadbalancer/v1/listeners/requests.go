@@ -55,7 +55,7 @@ func (opts ListOpts) ToListenerListQuery() (string, error) {
 
 // CreateOpts represents options used to create a listener pool.
 type CreateOpts struct {
-	Name           string             `json:"name" required:"true"`
+	Name           string             `json:"name" required:"true" validate:"required,name"`
 	Protocol       types.ProtocolType `json:"protocol" required:"true"`
 	ProtocolPort   int                `json:"protocol_port" required:"true"`
 	LoadBalancerID string             `json:"loadbalancer_id" required:"true"`
@@ -63,6 +63,9 @@ type CreateOpts struct {
 
 // ToListenerCreateMap builds a request body from CreateOpts.
 func (opts CreateOpts) ToListenerCreateMap() (map[string]interface{}, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return nil, err
+	}
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
@@ -84,11 +87,14 @@ type UpdateOptsBuilder interface {
 
 // UpdateOpts represents options used to update a listener.
 type UpdateOpts struct {
-	Name string `json:"name" required:"true"`
+	Name string `json:"name" required:"true" validate:"required,name"`
 }
 
 // ToListenerUpdateMap builds a request body from UpdateOpts.
 func (opts UpdateOpts) ToListenerUpdateMap() (map[string]interface{}, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return nil, err
+	}
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 

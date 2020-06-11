@@ -240,7 +240,7 @@ func TestUpdate(t *testing.T) {
 	client := fake.ServiceTokenClient("lbpools", "v1")
 
 	opts := lbpools.UpdateOpts{
-		Name: &LBPool1.Name,
+		Name: LBPool1.Name,
 	}
 
 	tasks, err := lbpools.Update(client, LBPool1.ID, opts).Extract()

@@ -15,11 +15,13 @@ import (
 )
 
 const splitParamsRegexString = `'[^']*'|\S+`
+const nameRegexString = "^[a-zA-Z0-9][a-zA-Z 0-9._\\-]{1,61}[a-zA-Z0-9._]$"
 
 var (
 	Validate         *validator.Validate
 	Trans            ut.Translator
 	splitParamsRegex = regexp.MustCompile(splitParamsRegexString)
+	nameRegex        = regexp.MustCompile(nameRegexString)
 )
 
 type EnumValidator interface {
@@ -147,7 +149,19 @@ func init() { // nolint
 		t, _ := ut.T("sem", fe.Field())
 		return t
 	})
-	FailOnErrorF(err, "Cannot register translation for tag: %s", "sfe")
+	FailOnErrorF(err, "Cannot register translation for tag: %s", "sem")
+
+	err = Validate.RegisterTranslation("name", Trans, func(ut ut.Translator) error {
+		return nil
+	}, func(ut ut.Translator, fe validator.FieldError) string {
+		return fmt.Sprintf(
+			"%s is not valid: %v. Should match regex:: %s",
+			fe.StructField(),
+			fe.Value(),
+			nameRegexString,
+		)
+	})
+	FailOnErrorF(err, "Cannot register translation for tag: %s", "name")
 
 	Validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
 		name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
@@ -213,6 +227,14 @@ func init() { // nolint
 		return name
 	})
 
+	Validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
+		name := strings.SplitN(fld.Tag.Get("name"), ",", 2)[0]
+		if name == "-" {
+			return ""
+		}
+		return name
+	})
+
 	err = Validate.RegisterValidation("enum", enum)
 	FailOnErrorF(err, "Cannot register custom validator tag: %v", "enum")
 	err = Validate.RegisterValidation(`rfe`, requiredIfFieldEqual)
@@ -227,6 +249,8 @@ func init() { // nolint
 	FailOnErrorF(err, "Cannot register custom validation tag: %s", "regex")
 	err = Validate.RegisterValidation(`sem`, sem)
 	FailOnErrorF(err, "Cannot register custom validation tag: %s", "sem")
+	err = Validate.RegisterValidation(`name`, name)
+	FailOnErrorF(err, "Cannot register custom validation tag: %s", "name")
 
 }
 
@@ -374,6 +398,19 @@ func regex(fl validator.FieldLevel) bool {
 	if field.Kind() == reflect.String {
 		value := field.String()
 		return validRegex.MatchString(value)
+	}
+
+	panic(fmt.Sprintf("Bad field type %T", field.Interface()))
+}
+
+// name is the validation function for validating name regex.
+func name(fl validator.FieldLevel) bool {
+
+	field := fl.Field()
+
+	if field.Kind() == reflect.String {
+		value := field.String()
+		return nameRegex.MatchString(value)
 	}
 
 	panic(fmt.Sprintf("Bad field type %T", field.Interface()))

@@ -18,7 +18,7 @@ const ListResponse = `
     {
       "region": "RegionOne",
       "created_at": "2020-01-24T13:57:12+0000",
-      "name": "lb",
+      "name": "lbname",
       "id": "e8ab1be4-1521-4266-be69-28dad4148a30",
       "provisioning_status": "ACTIVE",
       "updated_at": "2020-01-24T13:57:35+0000",
@@ -42,7 +42,7 @@ const GetResponse = `
 {
   "region": "RegionOne",
   "created_at": "2020-01-24T13:57:12+0000",
-  "name": "lb",
+  "name": "lbname",
   "id": "e8ab1be4-1521-4266-be69-28dad4148a30",
   "provisioning_status": "ACTIVE",
   "updated_at": "2020-01-24T13:57:35+0000",
@@ -62,7 +62,7 @@ const GetResponse = `
 
 const CreateRequest = `
 {
-  "name": "lb",
+  "name": "lbname",
   "listeners": [
     {
       "name": "listener_name",
@@ -105,7 +105,7 @@ const CreateRequest = `
 
 const UpdateRequest = `
 {
-	"name": "lb"
+	"name": "lbname"
 }	
 `
 
@@ -135,7 +135,7 @@ var (
 	creatorTaskID        = "9f3ec11e-bcd4-4fe6-924a-a4439a56ad22"
 
 	LoadBalancer1 = loadbalancers.LoadBalancer{
-		Name:               "lb",
+		Name:               "lbname",
 		ID:                 "e8ab1be4-1521-4266-be69-28dad4148a30",
 		ProvisioningStatus: types.ProvisioningStatusActive,
 		OperationStatus:    types.OperatingStatusOnline,

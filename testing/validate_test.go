@@ -84,3 +84,25 @@ func TestAllowedWithoutAllTag(t *testing.T) {
 	err = gcorecloud.Validate.Struct(ts6)
 	require.Error(t, err)
 }
+
+func TestName(t *testing.T) {
+	name1 := "listener_0_kube_service_17703920-7e07-47e1-9cce-3d25af1cb2e3_default_nginx"
+	name2 := "kube_service_17703920-7e07-47e1-9cce-3d25af1cb2e3_default_nginx"
+	name3 := "1"
+
+	type name struct {
+		Name string `validate:"required,name"`
+	}
+
+	struct1 := name{Name: name1}
+	struct2 := name{Name: name2}
+	struct3 := name{Name: name3}
+
+	err := gcorecloud.ValidateStruct(struct1)
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "Name")
+	require.NoError(t, gcorecloud.ValidateStruct(struct2))
+	struct1.Name = struct1.Name[:63]
+	require.NoError(t, gcorecloud.ValidateStruct(struct1))
+	require.Error(t, gcorecloud.ValidateStruct(struct3))
+}

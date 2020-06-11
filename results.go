@@ -554,19 +554,19 @@ It attempts to extract the "next" URL from slice of Link structs, or
 "" if no such URL is present.
 */
 func ExtractNextURL(links []Link) (string, error) {
-	var url string
+	var nextURL string
 
 	for _, l := range links {
 		if l.Rel == "next" {
-			url = l.Href
+			nextURL = l.Href
 		}
 	}
 
-	if url == "" {
+	if nextURL == "" {
 		return "", nil
 	}
 
-	return url, nil
+	return nextURL, nil
 }
 
 type CIDR struct {

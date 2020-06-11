@@ -785,7 +785,7 @@ var lbpoolUpdateSubCommand = cli.Command{
 		}
 
 		opts := lbpools.UpdateOpts{
-			Name:               utils.StringToPointer(c.String("name")),
+			Name:               c.String("name"),
 			Members:            members,
 			LBPoolAlgorithm:    lba,
 			HealthMonitor:      hm,

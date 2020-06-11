@@ -92,7 +92,7 @@ type CreatePoolMemberOpts struct {
 
 // CreateOpts represents options used to create a lbpool.
 type CreateOpts struct {
-	Name               string                        `json:"name" required:"true"`
+	Name               string                        `json:"name" required:"true" validate:"required,name"`
 	Protocol           types.ProtocolType            `json:"protocol" required:"true"`
 	LBPoolAlgorithm    types.LoadBalancerAlgorithm   `json:"lb_algorithm" required:"true"`
 	Members            []CreatePoolMemberOpts        `json:"members"`
@@ -104,6 +104,9 @@ type CreateOpts struct {
 
 // ToLBPoolCreateMap builds a request body from CreateOpts.
 func (opts CreateOpts) ToLBPoolCreateMap() (map[string]interface{}, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return nil, err
+	}
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
@@ -130,7 +133,7 @@ type UpdateOptsBuilder interface {
 
 // UpdateOpts represents options used to update a lbpool.
 type UpdateOpts struct {
-	Name               *string                       `json:"name,omitempty"`
+	Name               string                        `json:"name,omitempty" validate:"required,name"`
 	Members            []CreatePoolMemberOpts        `json:"members,omitempty"`
 	LBPoolAlgorithm    *types.LoadBalancerAlgorithm  `json:"lb_algorithm,omitempty"`
 	HealthMonitor      *CreateHealthMonitorOpts      `json:"healthmonitor,omitempty"`
@@ -139,6 +142,9 @@ type UpdateOpts struct {
 
 // ToLBPoolUpdateMap builds a request body from UpdateOpts.
 func (opts UpdateOpts) ToLBPoolUpdateMap() (map[string]interface{}, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return nil, err
+	}
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
