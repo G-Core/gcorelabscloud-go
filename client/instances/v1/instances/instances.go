@@ -27,18 +27,22 @@ var (
 	volumeType                = volumes.VolumeType("").StringList()
 	interfaceTypes            = types.InterfaceType("").StringList()
 	interfaceFloatingIPSource = types.FloatingIPSource("").StringList()
+	bootableIndex             = 0
 )
 
-func StringSliceToMetadataSetOpts(slice []string) (instances.MetadataSetOpts, error) {
+func StringSliceToMetadataSetOpts(slice []string) (*instances.MetadataSetOpts, error) {
+	if len(slice) == 0 {
+		return nil, nil
+	}
 	var m instances.MetadataSetOpts
 	for _, s := range slice {
 		parts := strings.SplitN(s, "=", 2)
 		if len(parts) != 2 {
-			return m, fmt.Errorf("wrong label format: %s", s)
+			return &m, fmt.Errorf("wrong label format: %s", s)
 		}
 		m.Metadata = append(m.Metadata, instances.MetadataOpts{Key: parts[0], Value: parts[1]})
 	}
-	return m, nil
+	return &m, nil
 }
 
 func getUserData(c *cli.Context) (string, error) {
@@ -107,6 +111,7 @@ func getInstanceVolumes(c *cli.Context) ([]instances.CreateVolumeOpts, error) {
 	})
 
 	minOrder := 0
+	bootableExists := false
 
 	for _, opts := range res {
 		if opts.BootIndex < 0 {
@@ -116,6 +121,13 @@ func getInstanceVolumes(c *cli.Context) ([]instances.CreateVolumeOpts, error) {
 			opts.BootIndex = minOrder
 		}
 		minOrder++
+		if opts.BootIndex == bootableIndex {
+			bootableExists = true
+		}
+	}
+
+	if !bootableExists {
+		return res, fmt.Errorf("set bootable volume with source from next list: %s, %s", types.Image, types.Snapshot)
 	}
 
 	return res, nil
@@ -552,8 +564,10 @@ var instanceCreateCommandV2 = cli.Command{
 			Password:       c.String("password"),
 			Username:       c.String("username"),
 			UserData:       userData,
-			Metadata:       &metadata,
+			Metadata:       metadata,
 		}
+
+		fmt.Printf("%#v", opts)
 
 		err = gcorecloud.TranslateValidationError(opts.Validate())
 		if err != nil {
@@ -988,7 +1002,7 @@ var metadataCreateCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		err = instances.MetadataCreate(client, instanceID, opts).ExtractErr()
+		err = instances.MetadataCreate(client, instanceID, *opts).ExtractErr()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -1025,7 +1039,7 @@ var metadataUpdateCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		err = instances.MetadataUpdate(client, instanceID, opts).ExtractErr()
+		err = instances.MetadataUpdate(client, instanceID, *opts).ExtractErr()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}

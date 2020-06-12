@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"strings"
+	"sync"
 	"time"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
@@ -361,4 +362,37 @@ func ValidateEqualSlicesLength(slices ...interface{}) error {
 		}
 	}
 	return nil
+}
+
+type Item interface {
+}
+
+type Result struct {
+	Item    Item
+	Request string
+	Err     error
+}
+
+func GetItemsByIDs(items []string, getter func(item string) (Item, error)) chan Result {
+
+	var wg sync.WaitGroup
+	wg.Add(len(items))
+
+	ch := make(chan Result)
+
+	for _, item := range items {
+		go func(item string, wg *sync.WaitGroup) {
+			defer wg.Done()
+			res, err := getter(item)
+			ch <- Result{res, item, err}
+		}(item, &wg)
+	}
+
+	go func() {
+		wg.Wait()
+		defer close(ch)
+	}()
+
+	return ch
+
 }
