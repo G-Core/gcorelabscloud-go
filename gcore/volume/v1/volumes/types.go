@@ -7,15 +7,128 @@ import (
 
 type VolumeSource string
 type VolumeType string
+type VolumeStatus string
 
 const (
-	NewVolume VolumeSource = "new-volume"
-	Image     VolumeSource = "image"
-	Snapshot  VolumeSource = "snapshot"
-	Standard  VolumeType   = "standard"
-	SsdHiIops VolumeType   = "ssd_hiiops"
-	Cold      VolumeType   = "cold"
+	NewVolume        VolumeSource = "new-volume"
+	Image            VolumeSource = "image"
+	Snapshot         VolumeSource = "snapshot"
+	Standard         VolumeType   = "standard"
+	SsdHiIops        VolumeType   = "ssd_hiiops"
+	Cold             VolumeType   = "cold"
+	Creating         VolumeStatus = "creating"
+	Available        VolumeStatus = "available"
+	Reserved         VolumeStatus = "reserved"
+	Attaching        VolumeStatus = "attaching"
+	Detaching        VolumeStatus = "detaching"
+	InUse            VolumeStatus = "in-use"
+	Maintenance      VolumeStatus = "maintenance"
+	Deleting         VolumeStatus = "deleting"
+	AwaitingTransfer VolumeStatus = "awaiting-transfer"
+	Error            VolumeStatus = "error"
+	ErrorDeleting    VolumeStatus = "error_deleting"
+	RestoringBackup  VolumeStatus = "restoring-backup"
+	ErrorBackingUp   VolumeStatus = "error_backing-up"
+	ErrorRestoring   VolumeStatus = "error_restoring"
+	ErrorExtending   VolumeStatus = "error_extending"
+	Downloading      VolumeStatus = "downloading"
+	Uploading        VolumeStatus = "uploading"
+	Retyping         VolumeStatus = "retyping"
+	Extending        VolumeStatus = "extending"
 )
+
+func (vs VolumeStatus) IsValid() error {
+	switch vs {
+	case Creating,
+		Available,
+		Reserved,
+		Attaching,
+		Detaching,
+		InUse,
+		Maintenance,
+		Deleting,
+		AwaitingTransfer,
+		Error,
+		ErrorDeleting,
+		RestoringBackup,
+		ErrorBackingUp,
+		ErrorRestoring,
+		ErrorExtending,
+		Downloading,
+		Uploading,
+		Retyping,
+		Extending:
+		return nil
+	}
+	return fmt.Errorf("invalid VolumeStatus type: %v", vs)
+}
+
+func (vs VolumeStatus) ValidOrNil() (*VolumeStatus, error) {
+	if vs.String() == "" {
+		return nil, nil
+	}
+	err := vs.IsValid()
+	if err != nil {
+		return &vs, err
+	}
+	return &vs, nil
+}
+
+func (vs VolumeStatus) String() string {
+	return string(vs)
+}
+
+func (vs VolumeStatus) List() []VolumeStatus {
+	return []VolumeStatus{
+		Creating,
+		Available,
+		Reserved,
+		Attaching,
+		Detaching,
+		InUse,
+		Maintenance,
+		Deleting,
+		AwaitingTransfer,
+		Error,
+		ErrorDeleting,
+		RestoringBackup,
+		ErrorBackingUp,
+		ErrorRestoring,
+		ErrorExtending,
+		Downloading,
+		Uploading,
+		Retyping,
+		Extending,
+	}
+}
+
+func (vs VolumeStatus) StringList() []string {
+	var s []string
+	for _, v := range vs.List() {
+		s = append(s, v.String())
+	}
+	return s
+}
+
+// UnmarshalJSON - implements Unmarshaler interface for VolumeStatus
+func (vs *VolumeStatus) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	v := VolumeStatus(s)
+	err := v.IsValid()
+	if err != nil {
+		return err
+	}
+	*vs = v
+	return nil
+}
+
+// MarshalJSON - implements Marshaler interface for VolumeStatus
+func (vs *VolumeStatus) MarshalJSON() ([]byte, error) {
+	return json.Marshal(vs.String())
+}
 
 func (vs VolumeSource) IsValid() error {
 	switch vs {
