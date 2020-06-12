@@ -22,10 +22,17 @@ type ListOptsBuilder interface {
 type ListOpts struct {
 	ExcludeSecGroup   string `q:"exclude_secgroup"`
 	AvailableFloating bool   `q:"available_floating"`
+	Name              string `q:"name"`
+	FlavorID          string `q:"flavor_id"`
+	Limit             int    `q:"limit" validate:"omitempty,gt=0"`
+	Offset            int    `q:"offset" validate:"omitempty,gt=0"`
 }
 
 // ToInstanceListQuery formats a ListOpts into a query string.
 func (opts ListOpts) ToInstanceListQuery() (string, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return "", err
+	}
 	q, err := gcorecloud.BuildQueryString(opts)
 	if err != nil {
 		return "", err

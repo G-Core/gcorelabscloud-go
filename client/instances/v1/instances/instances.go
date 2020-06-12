@@ -191,6 +191,30 @@ var instanceListCommand = cli.Command{
 			Usage:    "show only instances which are able to handle floating address",
 			Required: false,
 		},
+		&cli.StringFlag{
+			Name:     "name",
+			Aliases:  []string{"n"},
+			Usage:    "filter out instances by name",
+			Required: false,
+		},
+		&cli.StringFlag{
+			Name:     "flavor_id",
+			Aliases:  []string{"fid"},
+			Usage:    "filter out instances by flavor id",
+			Required: false,
+		},
+		&cli.IntFlag{
+			Name:     "limit",
+			Aliases:  []string{"l"},
+			Usage:    "limit the number of returned instances",
+			Required: false,
+		},
+		&cli.IntFlag{
+			Name:     "offset",
+			Aliases:  []string{"o"},
+			Usage:    "offset value is used to exclude the first set of records from the result",
+			Required: false,
+		},
 	},
 	Action: func(c *cli.Context) error {
 		client, err := client.NewInstanceClientV1(c)
@@ -201,6 +225,10 @@ var instanceListCommand = cli.Command{
 		opts := instances.ListOpts{
 			ExcludeSecGroup:   c.String("exclude-security-group"),
 			AvailableFloating: c.Bool("available-floating"),
+			Name:              c.String("name"),
+			FlavorID:          c.String("flavor_id"),
+			Limit:             c.Int("limit"),
+			Offset:            c.Int("offset"),
 		}
 		results, err := instances.ListAll(client, opts)
 		if err != nil {

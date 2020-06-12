@@ -35,6 +35,27 @@ func TestListQueryBoolParam(t *testing.T) {
 	require.Contains(t, res, "available_floating")
 }
 
+func TestListQueryWrongLimitParam(t *testing.T) {
+	opts := instances.ListOpts{
+		ExcludeSecGroup:   "",
+		AvailableFloating: true,
+		Limit:             -2,
+	}
+	_, err := opts.ToInstanceListQuery()
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "Limit must be greater")
+}
+
+func TestListQueryFlavorID(t *testing.T) {
+	opts := instances.ListOpts{
+		AvailableFloating: true,
+		FlavorID:          "g1-standard-1-2",
+	}
+	res, err := opts.ToInstanceListQuery()
+	require.NoError(t, err)
+	require.Equal(t, res, "?available_floating=true&flavor_id=g1-standard-1-2")
+}
+
 func TestValidateCreateVolumeBlankVolumeIDOpts(t *testing.T) {
 	opts := instances.CreateVolumeOpts{
 		Source:     types.ExistingVolume,
