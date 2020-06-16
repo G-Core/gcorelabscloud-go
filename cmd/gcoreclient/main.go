@@ -11,8 +11,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/client/images/v1/images"
 	"github.com/G-Core/gcorelabscloud-go/client/instances/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/client/k8s/v1/k8s"
-	"github.com/G-Core/gcorelabscloud-go/client/keypairs/v1/keypairs"
-	keypairs2 "github.com/G-Core/gcorelabscloud-go/client/keypairs/v2/keypairs"
+	"github.com/G-Core/gcorelabscloud-go/client/keypairs/v2/keypairs"
 	"github.com/G-Core/gcorelabscloud-go/client/keystones/v1/keystones"
 	"github.com/G-Core/gcorelabscloud-go/client/limits/v1/limits"
 	"github.com/G-Core/gcorelabscloud-go/client/loadbalancers/v1/loadbalancers"
@@ -35,7 +34,6 @@ var commands = []*cli.Command{
 	&networks.NetworkCommands,
 	&tasks.TaskCommands,
 	&keypairs.KeypairCommands,
-	&keypairs2.KeypairCommands,
 	&volumes.VolumeCommands,
 	&subnets.SubnetCommands,
 	&flavors.FlavorCommands,
