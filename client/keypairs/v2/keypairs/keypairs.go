@@ -151,7 +151,7 @@ var keypairCreateCommand = cli.Command{
 }
 
 var KeypairCommands = cli.Command{
-	Name:  "keypair2",
+	Name:  "keypair",
 	Usage: "GCloud keypairs V2 API",
 	Subcommands: []*cli.Command{
 		&keypairListCommand,
