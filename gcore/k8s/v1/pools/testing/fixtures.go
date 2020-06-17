@@ -3,6 +3,8 @@ package testing
 import (
 	"net"
 
+	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
+
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v1/pools"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 )
@@ -20,7 +22,9 @@ const ListResponse = `
       "role": "worker",
       "status": "CREATE_COMPLETE",
       "is_default": true,
-      "max_node_count": null,
+	  "docker_volume_size": 10,
+	  "docker_volume_type": "standard",
+      "max_node_count": 5,
       "node_count": 1,
       "name": "test1"
     }
@@ -35,6 +39,7 @@ const GetResponse1 = `
   "image_id": "fedora-coreos",
   "flavor_id": "g1-standard-1-2",
   "docker_volume_size": 10,
+  "docker_volume_type": "standard",
   "min_node_count": 1,
   "labels": {
 	"gcloud_project_id":    "1",
@@ -51,7 +56,7 @@ const GetResponse1 = `
   "node_addresses": [
     "192.168.0.5"
   ],
-  "max_node_count": null,
+  "max_node_count": 5,
   "node_count": 1,
   "name": "test1"
 }
@@ -102,26 +107,27 @@ var (
 		"gcloud_refresh_token": "token",
 	}
 	PoolList1 = pools.ClusterListPool{
-		UUID:         "908338b2-9217-4673-af0e-f0093139fbac",
-		Name:         "test1",
-		FlavorID:     "g1-standard-1-2",
-		ImageID:      "fedora-coreos",
-		NodeCount:    1,
-		MinNodeCount: 1,
-		MaxNodeCount: nil,
-		IsDefault:    true,
-		StackID:      "2f0d5d97-fb3c-4218-9201-34f804299510",
-		Status:       "CREATE_COMPLETE",
-		Role:         "worker",
+		UUID:             "908338b2-9217-4673-af0e-f0093139fbac",
+		Name:             "test1",
+		FlavorID:         "g1-standard-1-2",
+		ImageID:          "fedora-coreos",
+		NodeCount:        1,
+		MinNodeCount:     1,
+		MaxNodeCount:     5,
+		DockerVolumeSize: 10,
+		DockerVolumeType: volumes.Standard,
+		IsDefault:        true,
+		StackID:          "2f0d5d97-fb3c-4218-9201-34f804299510",
+		Status:           "CREATE_COMPLETE",
+		Role:             "worker",
 	}
 	Pool1 = pools.ClusterPool{
-		ClusterID:        "5e09faed-e742-404f-8a75-0ea5eb3c435f",
-		ProjectID:        "46beed3938e6474390b530fefd6173d2",
-		Labels:           labels,
-		NodeAddresses:    []net.IP{nodeAddress},
-		StatusReason:     "Stack CREATE completed successfully",
-		DockerVolumeSize: 10,
-		ClusterListPool:  &PoolList1,
+		ClusterID:       "5e09faed-e742-404f-8a75-0ea5eb3c435f",
+		ProjectID:       "46beed3938e6474390b530fefd6173d2",
+		Labels:          labels,
+		NodeAddresses:   []net.IP{nodeAddress},
+		StatusReason:    "Stack CREATE completed successfully",
+		ClusterListPool: &PoolList1,
 	}
 	UpdatedPool1                 = Pool1
 	ExpectedClusterListPoolSlice = []pools.ClusterListPool{PoolList1}

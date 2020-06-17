@@ -103,7 +103,7 @@ type CreateOpts struct {
 	AutoHealingEnabled        bool               `json:"auto_healing_enabled"`
 	MasterLBFloatingIPEnabled bool               `json:"master_lb_floating_ip_enabled,omitempty"`
 	Version                   string             `json:"version,omitempty" validate:"omitempty,sem"`
-	Pools                     []pools.CreateOpts `json:"pools" required:"true" validate:"required,min=1"`
+	Pools                     []pools.CreateOpts `json:"pools" required:"true" validate:"required,min=1,dive"`
 }
 
 // ToClusterCreateMap builds a request body from CreateOpts.

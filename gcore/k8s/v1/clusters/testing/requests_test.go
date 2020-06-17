@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
+
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v1/pools"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v1/clusters"
@@ -206,6 +208,7 @@ func TestCreate(t *testing.T) {
 			FlavorID:         Cluster1.Pools[0].FlavorID,
 			NodeCount:        Cluster1.Pools[0].NodeCount,
 			DockerVolumeSize: 10,
+			DockerVolumeType: volumes.Standard,
 			MinNodeCount:     Cluster1.Pools[0].MinNodeCount,
 			MaxNodeCount:     Cluster1.Pools[0].MinNodeCount + 1,
 		}},

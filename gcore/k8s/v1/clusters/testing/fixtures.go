@@ -6,6 +6,8 @@ import (
 	"net"
 	"time"
 
+	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	uuid "github.com/satori/go.uuid"
 
@@ -38,9 +40,11 @@ const ListResponse = `
         {
           "stack_id": "2f0d5d97-fb3c-4218-9201-34f804299510",
           "name": "test1",
-          "max_node_count": null,
+          "max_node_count": 5,
           "min_node_count": 1,
           "is_default": true,
+		  "docker_volume_size": 10,
+		  "docker_volume_type": "standard",
           "flavor_id": "g1-standard-1-2",
           "uuid": "908338b2-9217-4673-af0e-f0093139fbac",
           "status": "CREATE_COMPLETE",
@@ -93,12 +97,13 @@ const GetResponse = `
     {
       "stack_id": "2f0d5d97-fb3c-4218-9201-34f804299510",
       "name": "test1",
-      "max_node_count": null,
+      "max_node_count": 5,
       "cluster_id": "5e09faed-e742-404f-8a75-0ea5eb3c435f",
       "role": "worker",
       "min_node_count": 1,
       "is_default": true,
-      "docker_volume_size": 10,
+	  "docker_volume_size": 10,
+	  "docker_volume_type": "standard",
       "uuid": "908338b2-9217-4673-af0e-f0093139fbac",
       "labels": {
         "gcloud_project_id": "1",
@@ -171,6 +176,7 @@ var CreateRequest = fmt.Sprintf(`
   "pools": [
 	{
 	  "docker_volume_size": 10,
+	  "docker_volume_type": "standard",
 	  "flavor_id": "g1-standard-1-2",
 	  "max_node_count": 2,
 	  "min_node_count": 1,
@@ -282,17 +288,19 @@ var (
 	}
 
 	listPool = pools.ClusterListPool{
-		StackID:      "2f0d5d97-fb3c-4218-9201-34f804299510",
-		Name:         "test1",
-		MaxNodeCount: nil,
-		MinNodeCount: 1,
-		IsDefault:    true,
-		FlavorID:     "g1-standard-1-2",
-		UUID:         "908338b2-9217-4673-af0e-f0093139fbac",
-		Status:       "CREATE_COMPLETE",
-		Role:         "worker",
-		ImageID:      "fedora-coreos",
-		NodeCount:    1,
+		StackID:          "2f0d5d97-fb3c-4218-9201-34f804299510",
+		Name:             "test1",
+		MaxNodeCount:     5,
+		MinNodeCount:     1,
+		IsDefault:        true,
+		FlavorID:         "g1-standard-1-2",
+		UUID:             "908338b2-9217-4673-af0e-f0093139fbac",
+		Status:           "CREATE_COMPLETE",
+		Role:             "worker",
+		ImageID:          "fedora-coreos",
+		DockerVolumeSize: 10,
+		DockerVolumeType: volumes.Standard,
+		NodeCount:        1,
 	}
 	clusterList = &clusters.ClusterList{
 		UUID:              "5e09faed-e742-404f-8a75-0ea5eb3c435f",
@@ -340,13 +348,12 @@ var (
 			ClusterList:       clusterList,
 		},
 		Pools: []pools.ClusterPool{{
-			ClusterID:        "5e09faed-e742-404f-8a75-0ea5eb3c435f",
-			ProjectID:        "46beed3938e6474390b530fefd6173d2",
-			Labels:           labels,
-			NodeAddresses:    nodeAddresses,
-			StatusReason:     "Stack CREATE completed successfully",
-			DockerVolumeSize: 10,
-			ClusterListPool:  &listPool,
+			ClusterID:       "5e09faed-e742-404f-8a75-0ea5eb3c435f",
+			ProjectID:       "46beed3938e6474390b530fefd6173d2",
+			Labels:          labels,
+			NodeAddresses:   nodeAddresses,
+			StatusReason:    "Stack CREATE completed successfully",
+			ClusterListPool: &listPool,
 		},
 		},
 	}

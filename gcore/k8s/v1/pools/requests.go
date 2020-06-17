@@ -82,12 +82,13 @@ type CreateOptsBuilder interface {
 
 // CreateOpts represents options used to create a cluster Pool.
 type CreateOpts struct {
-	Name             string `json:"name" required:"true" validate:"required"`
-	FlavorID         string `json:"flavor_id" required:"true" validate:"required"`
-	NodeCount        int    `json:"node_count" required:"true" validate:"required,gt=0"`
-	DockerVolumeSize int    `json:"docker_volume_size,omitempty" validate:"omitempty,required,gt=0"`
-	MinNodeCount     int    `json:"min_node_count,omitempty" validate:"omitempty,required,gt=0,ltefield=NodeCount"`
-	MaxNodeCount     int    `json:"max_node_count,omitempty" validate:"omitempty,required,gt=0,gtefield=MinNodeCount,gtefield=NodeCount"`
+	Name             string             `json:"name" required:"true" validate:"required"`
+	FlavorID         string             `json:"flavor_id" required:"true" validate:"required"`
+	NodeCount        int                `json:"node_count" required:"true" validate:"required,gt=0"`
+	DockerVolumeSize int                `json:"docker_volume_size,omitempty" validate:"omitempty,gt=0"`
+	DockerVolumeType volumes.VolumeType `json:"docker_volume_type,omitempty" validate:"omitempty,enum"`
+	MinNodeCount     int                `json:"min_node_count,omitempty" validate:"omitempty,gt=0,ltefield=NodeCount"`
+	MaxNodeCount     int                `json:"max_node_count,omitempty" validate:"omitempty,gt=0,gtefield=MinNodeCount,gtefield=NodeCount"`
 }
 
 // ToClusterPoolCreateMap builds a request body from CreateOpts.

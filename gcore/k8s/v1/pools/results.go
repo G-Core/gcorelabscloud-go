@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
+
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v1/types"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
@@ -40,28 +42,29 @@ type UpdateResult struct {
 
 // ClusterPool represents a cluster Pool.
 type ClusterPool struct {
-	ClusterID        string            `json:"cluster_id"`
-	ProjectID        string            `json:"project_id"`
-	Labels           map[string]string `json:"labels"`
-	NodeAddresses    []net.IP          `json:"node_addresses"`
-	StatusReason     string            `json:"status_reason"`
-	DockerVolumeSize int               `json:"docker_volume_size"`
+	ClusterID     string            `json:"cluster_id"`
+	ProjectID     string            `json:"project_id"`
+	Labels        map[string]string `json:"labels"`
+	NodeAddresses []net.IP          `json:"node_addresses"`
+	StatusReason  string            `json:"status_reason"`
 	*ClusterListPool
 }
 
 // ClusterListPool represents a cluster Pool in the list response.
 type ClusterListPool struct {
-	UUID         string         `json:"uuid"`
-	Name         string         `json:"name"`
-	FlavorID     string         `json:"flavor_id"`
-	ImageID      string         `json:"image_id"`
-	NodeCount    int            `json:"node_count"`
-	MinNodeCount int            `json:"min_node_count"`
-	MaxNodeCount *int           `json:"max_node_count"`
-	IsDefault    bool           `json:"is_default"`
-	StackID      string         `json:"stack_id"`
-	Status       string         `json:"status"`
-	Role         types.PoolRole `json:"role"`
+	UUID             string             `json:"uuid"`
+	Name             string             `json:"name"`
+	FlavorID         string             `json:"flavor_id"`
+	ImageID          string             `json:"image_id"`
+	NodeCount        int                `json:"node_count"`
+	MinNodeCount     int                `json:"min_node_count"`
+	MaxNodeCount     int                `json:"max_node_count"`
+	DockerVolumeSize int                `json:"docker_volume_size"`
+	DockerVolumeType volumes.VolumeType `json:"docker_volume_type"`
+	IsDefault        bool               `json:"is_default"`
+	StackID          string             `json:"stack_id"`
+	Status           string             `json:"status"`
+	Role             types.PoolRole     `json:"role"`
 }
 
 // ClusterPoolPage is the page returned by a pager when traversing over a

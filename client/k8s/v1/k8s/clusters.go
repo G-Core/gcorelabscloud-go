@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v1/pools"
 
@@ -19,7 +21,8 @@ import (
 )
 
 var (
-	clusterIDText = "cluster_id is mandatory argument"
+	clusterIDText   = "cluster_id is mandatory argument"
+	volumeTypeNames = volumes.VolumeType("").StringList()
 )
 
 func getPools(c *cli.Context) ([]pools.CreateOpts, error) {
@@ -30,6 +33,7 @@ func getPools(c *cli.Context) ([]pools.CreateOpts, error) {
 	poolMinNodesCount := c.IntSlice("min-node-count")
 	poolMaxNodesCount := c.IntSlice("max-node-count")
 	poolDockerVolumeSizes := c.IntSlice("docker-volume-size")
+	poolDockerVolumeTypes := utils.GetEnumStringSliceValue(c, "docker-volume-type")
 
 	if err := utils.ValidateEqualSlicesLength(poolNames, poolFlavors, poolNodesCount, poolMinNodesCount, poolMaxNodesCount); err != nil {
 		return nil, fmt.Errorf("parameters number should be same for pool names, flavors, node-count, min-node-count and max_node_count: %w", err)
@@ -47,6 +51,12 @@ func getPools(c *cli.Context) ([]pools.CreateOpts, error) {
 					return poolDockerVolumeSizes[idx]
 				}
 				return 0
+			}(idx),
+			DockerVolumeType: func(idx int) volumes.VolumeType {
+				if idx < len(poolDockerVolumeTypes) {
+					return volumes.VolumeType(poolDockerVolumeTypes[idx])
+				}
+				return ""
 			}(idx),
 			MinNodeCount: poolMinNodesCount[idx],
 			MaxNodeCount: poolMaxNodesCount[idx],
@@ -275,6 +285,18 @@ var clusterCreateSubCommand = cli.Command{
 			Usage:    "use load balancer for K8s API",
 			Required: false,
 		},
+		&cli.StringFlag{
+			Name:        "pods-ip-pool",
+			Usage:       "cluster pods ip pool in CIDR notation",
+			DefaultText: "nil",
+			Required:    false,
+		},
+		&cli.StringFlag{
+			Name:        "services-ip-pool",
+			Usage:       "cluster services ip pool in CIDR notation",
+			DefaultText: "nil",
+			Required:    false,
+		},
 
 		// pools parameters
 		&cli.StringSliceFlag{
@@ -308,17 +330,14 @@ var clusterCreateSubCommand = cli.Command{
 			Usage:    "maximum number of pool nodes",
 			Required: true,
 		},
-		&cli.StringFlag{
-			Name:        "pods-ip-pool",
-			Usage:       "cluster pods ip pool in CIDR notation",
-			DefaultText: "nil",
-			Required:    false,
-		},
-		&cli.StringFlag{
-			Name:        "services-ip-pool",
-			Usage:       "cluster services ip pool in CIDR notation",
-			DefaultText: "nil",
-			Required:    false,
+		&cli.GenericFlag{
+			Name: "docker-volume-type",
+			Value: &utils.EnumStringSliceValue{
+				Enum:    volumeTypeNames,
+				Default: volumeTypeNames[0],
+			},
+			Usage:    fmt.Sprintf("output in %s", strings.Join(volumeTypeNames, ", ")),
+			Required: false,
 		},
 	}, flags.WaitCommandFlags...,
 	),
