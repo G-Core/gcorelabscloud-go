@@ -1,6 +1,8 @@
 package subnets
 
 import (
+	"net"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
@@ -37,6 +39,13 @@ type ListOptsBuilder interface {
 	ToSubnetListQuery() (string, error)
 }
 
+// HostRoute represents a route that should be used by devices with IPs from
+// a subnet (not including local subnet route).
+type HostRoute struct {
+	DestinationCIDR gcorecloud.CIDR `json:"destination"`
+	NextHop         net.IP          `json:"nexthop"`
+}
+
 // CreateOpts represents options used to create a subnet.
 type CreateOpts struct {
 	Name                   string          `json:"name" required:"true"`
@@ -44,6 +53,8 @@ type CreateOpts struct {
 	CIDR                   gcorecloud.CIDR `json:"cidr" required:"true"`
 	NetworkID              string          `json:"network_id" required:"true"`
 	ConnectToNetworkRouter bool            `json:"connect_to_network_router"`
+	DNSNameservers         []net.IP        `json:"dns_nameservers,omitempty"`
+	HostRoutes             []HostRoute     `json:"host_routes,omitempty"`
 }
 
 // ListOpts allows the filtering and sorting List API response.
@@ -53,6 +64,9 @@ type ListOpts struct {
 
 // ToSubnetCreateMap builds a request body from CreateOpts.
 func (opts CreateOpts) ToSubnetCreateMap() (map[string]interface{}, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return nil, err
+	}
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
@@ -88,11 +102,16 @@ type UpdateOptsBuilder interface {
 
 // UpdateOpts represents options used to update a subnet.
 type UpdateOpts struct {
-	Name string `json:"name,omitempty"`
+	Name           string      `json:"name,omitempty" validate:"required_without_all=DNSNameservers HostRoutes"`
+	DNSNameservers []net.IP    `json:"dns_nameservers,omitempty" validate:"required_without_all=Name HostRoutes"`
+	HostRoutes     []HostRoute `json:"host_routes,omitempty" validate:"required_without_all=Name DNSNameservers"`
 }
 
 // ToSubnetUpdateMap builds a request body from UpdateOpts.
 func (opts UpdateOpts) ToSubnetUpdateMap() (map[string]interface{}, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return nil, err
+	}
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 

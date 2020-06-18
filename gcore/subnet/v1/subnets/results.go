@@ -2,6 +2,7 @@ package subnets
 
 import (
 	"fmt"
+	"net"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
@@ -37,22 +38,24 @@ type UpdateResult struct {
 
 // Subnet represents a subnet structure.
 type Subnet struct {
-	ID                     string                  `json:"id"`
-	Name                   string                  `json:"name"`
-	IPVersion              int                     `json:"ip_version"`
-	EnableDHCP             bool                    `json:"enable_dhcp"`
-	CIDR                   gcorecloud.CIDR         `json:"cidr"`
-	CreatedAt              gcorecloud.JSONRFC3339Z `json:"created_at"`
-	UpdatedAt              gcorecloud.JSONRFC3339Z `json:"updated_at"`
-	NetworkID              string                  `json:"network_id"`
-	TaskID                 *string                 `json:"task_id"`
-	CreatorTaskID          *string                 `json:"creator_task_id"`
-	Region                 string                  `json:"region"`
-	ConnectToNetworkRouter *bool                   `json:"connect_to_network_router,omitempty"`
-	ProjectID              int                     `json:"project_id"`
-	RegionID               int                     `json:"region_id"`
-	AvailableIps           int                     `json:"available_ips"`
-	TotalIps               int                     `json:"total_ips"`
+	ID             string                  `json:"id"`
+	Name           string                  `json:"name"`
+	IPVersion      int                     `json:"ip_version"`
+	EnableDHCP     bool                    `json:"enable_dhcp"`
+	CIDR           gcorecloud.CIDR         `json:"cidr"`
+	CreatedAt      gcorecloud.JSONRFC3339Z `json:"created_at"`
+	UpdatedAt      gcorecloud.JSONRFC3339Z `json:"updated_at"`
+	NetworkID      string                  `json:"network_id"`
+	TaskID         string                  `json:"task_id"`
+	CreatorTaskID  string                  `json:"creator_task_id"`
+	Region         string                  `json:"region"`
+	ProjectID      int                     `json:"project_id"`
+	RegionID       int                     `json:"region_id"`
+	AvailableIps   int                     `json:"available_ips"`
+	TotalIps       int                     `json:"total_ips"`
+	HasRouter      bool                    `json:"has_router"`
+	DNSNameservers []net.IP                `json:"dns_nameservers"`
+	HostRoutes     []HostRoute             `json:"host_routes"`
 }
 
 // SubnetPage is the page returned by a pager when traversing over a

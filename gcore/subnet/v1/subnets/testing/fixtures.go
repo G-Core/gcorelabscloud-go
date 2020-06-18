@@ -30,7 +30,17 @@ var ListResponse = fmt.Sprintf(`
 	  "available_ips": %d,
 	  "total_ips": %d,
       "project_id": 1,
-      "region_id": 1
+      "region_id": 1,
+	  "dns_nameservers": [
+		"10.0.0.13"
+	  ],
+	  "has_router": true,
+	  "host_routes": [
+		{
+		  "destination": "10.0.3.0/24",
+		  "nexthop": "10.0.0.13"
+		}
+	  ]	
     }
   ]
 }
@@ -52,7 +62,17 @@ var GetResponse = fmt.Sprintf(`
   "project_id": 1,
   "region_id": 1,
   "available_ips": %d,
-  "total_ips": %d
+  "total_ips": %d,
+  "dns_nameservers": [
+	"10.0.0.13"
+  ],
+  "has_router": true,
+  "host_routes": [
+    {
+      "destination": "10.0.3.0/24",
+      "nexthop": "10.0.0.13"
+    }
+  ]	
 }
 `, availableIps, totalIps)
 
@@ -94,29 +114,35 @@ var createdTimeParsed, _ = time.Parse(gcorecloud.RFC3339Z, createdTimeString)
 var createdTime = gcorecloud.JSONRFC3339Z{Time: createdTimeParsed}
 var updatedTimeParsed, _ = time.Parse(gcorecloud.RFC3339Z, updatedTimeString)
 var updatedTime = gcorecloud.JSONRFC3339Z{Time: updatedTimeParsed}
-var _, nt, _ = net.ParseCIDR("192.168.10.0/24")
-var cidr = gcorecloud.CIDR{IPNet: *nt}
+var cidr, _ = gcorecloud.ParseCIDRString("192.168.10.0/24")
 var taskID = "50f53a35-42ed-40c4-82b2-5a37fb3e00bc"
 var availableIps = 241
 var totalIps = 243
+var ip = net.ParseIP("10.0.0.13")
+var routeCidr, _ = gcorecloud.ParseCIDRString("10.0.3.0/24")
 
 var (
 	Subnet1 = subnets.Subnet{
-		ID:            "e7944e55-f957-413d-aa56-fdc876543113",
-		Name:          "subnet",
-		IPVersion:     4,
-		EnableDHCP:    true,
-		CIDR:          cidr,
-		CreatedAt:     createdTime,
-		UpdatedAt:     updatedTime,
-		NetworkID:     "ee2402d0-f0cd-4503-9b75-69be1d11c5f1",
-		TaskID:        &taskID,
-		CreatorTaskID: &taskID,
-		Region:        "RegionOne",
-		ProjectID:     fake.ProjectID,
-		RegionID:      fake.RegionID,
-		AvailableIps:  availableIps,
-		TotalIps:      totalIps,
+		ID:             "e7944e55-f957-413d-aa56-fdc876543113",
+		Name:           "subnet",
+		IPVersion:      4,
+		EnableDHCP:     true,
+		CIDR:           *cidr,
+		CreatedAt:      createdTime,
+		UpdatedAt:      updatedTime,
+		NetworkID:      "ee2402d0-f0cd-4503-9b75-69be1d11c5f1",
+		TaskID:         taskID,
+		CreatorTaskID:  taskID,
+		Region:         "RegionOne",
+		ProjectID:      fake.ProjectID,
+		RegionID:       fake.RegionID,
+		AvailableIps:   availableIps,
+		TotalIps:       totalIps,
+		HasRouter:      true,
+		DNSNameservers: []net.IP{ip},
+		HostRoutes: []subnets.HostRoute{
+			{DestinationCIDR: *routeCidr, NextHop: ip},
+		},
 	}
 	Tasks1 = tasks.TaskResults{
 		Tasks: []tasks.TaskID{"50f53a35-42ed-40c4-82b2-5a37fb3e00bc"},

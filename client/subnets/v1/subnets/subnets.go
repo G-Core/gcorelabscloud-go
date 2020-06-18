@@ -2,6 +2,7 @@ package subnets
 
 import (
 	"fmt"
+	"net"
 
 	"github.com/G-Core/gcorelabscloud-go/client/subnets/v1/client"
 
@@ -15,6 +16,43 @@ import (
 )
 
 var subnetIDText = "subnet_id is mandatory argument"
+
+func getDNSNameservers(c *cli.Context) ([]net.IP, error) {
+	dns := c.StringSlice("dns-nameserver")
+	var result []net.IP
+	for _, server := range dns {
+		ip := net.ParseIP(server)
+		if ip == nil {
+			return result, fmt.Errorf("cannot parse dns nameserver ip: %s", server)
+		}
+		result = append(result, ip)
+	}
+	return result, nil
+}
+
+func getHostRoutes(c *cli.Context) ([]subnets.HostRoute, error) {
+	destinations := c.StringSlice("route-destination")
+	hops := c.StringSlice("route-nexthop")
+	if len(destinations) > 0 && len(destinations) != len(hops) {
+		return nil, fmt.Errorf("should be equal number of route-destination and route-nexthop arguments")
+	}
+	var result []subnets.HostRoute
+	for idx, desc := range destinations {
+		dst, err := gcorecloud.ParseCIDRString(desc)
+		if err != nil {
+			return result, fmt.Errorf("cannot parse route destination: %s: %w", desc, err)
+		}
+		hop := net.ParseIP(hops[idx])
+		if hop == nil {
+			return result, fmt.Errorf("cannot parse route nexthop: %s", hops[idx])
+		}
+		result = append(result, subnets.HostRoute{
+			DestinationCIDR: *dst,
+			NextHop:         hop,
+		})
+	}
+	return result, nil
+}
 
 var subnetListCommand = cli.Command{
 	Name:     "list",
@@ -132,6 +170,18 @@ var subnetUpdateCommand = cli.Command{
 			Usage:    "Subnet name",
 			Required: true,
 		},
+		&cli.StringSliceFlag{
+			Name:     "route-destination",
+			Aliases:  []string{"rd"},
+			Usage:    "Subnet route destination",
+			Required: false,
+		},
+		&cli.StringSliceFlag{
+			Name:     "route-nexthop",
+			Aliases:  []string{"rh"},
+			Usage:    "Subnet route next hop",
+			Required: false,
+		},
 	},
 	Action: func(c *cli.Context) error {
 		subnetID, err := flags.GetFirstStringArg(c, subnetIDText)
@@ -145,8 +195,18 @@ var subnetUpdateCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
+		dns, err := getDNSNameservers(c)
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		hostRoutes, err := getHostRoutes(c)
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
 		opts := subnets.UpdateOpts{
-			Name: c.String("name"),
+			Name:           c.String("name"),
+			DNSNameservers: dns,
+			HostRoutes:     hostRoutes,
 		}
 
 		subnet, err := subnets.Update(client, subnetID, opts).Extract()
@@ -195,6 +255,24 @@ var subnetCreateCommand = cli.Command{
 			Usage:    "Connect subnet to router",
 			Required: false,
 		},
+		&cli.StringSliceFlag{
+			Name:     "dns-nameserver",
+			Aliases:  []string{"dns"},
+			Usage:    "Subnet dns nameserver",
+			Required: false,
+		},
+		&cli.StringSliceFlag{
+			Name:     "route-destination",
+			Aliases:  []string{"rd"},
+			Usage:    "Subnet route destination",
+			Required: false,
+		},
+		&cli.StringSliceFlag{
+			Name:     "route-nexthop",
+			Aliases:  []string{"rh"},
+			Usage:    "Subnet route next hop",
+			Required: false,
+		},
 	}, flags.WaitCommandFlags...,
 	),
 	Action: func(c *cli.Context) error {
@@ -207,12 +285,22 @@ var subnetCreateCommand = cli.Command{
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
+		dns, err := getDNSNameservers(c)
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		hostRoutes, err := getHostRoutes(c)
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
 		opts := subnets.CreateOpts{
 			Name:                   c.String("name"),
 			EnableDHCP:             c.Bool("enable-dhcp"),
 			CIDR:                   *cidr,
 			NetworkID:              c.String("network-id"),
 			ConnectToNetworkRouter: c.Bool("connect-to-router"),
+			DNSNameservers:         dns,
+			HostRoutes:             hostRoutes,
 		}
 		results, err := subnets.Create(client, opts).Extract()
 		if err != nil {
