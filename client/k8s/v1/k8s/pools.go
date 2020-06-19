@@ -2,6 +2,9 @@ package k8s
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
@@ -209,6 +212,15 @@ var poolCreateSubCommand = cli.Command{
 			DefaultText: "nil",
 			Required:    false,
 		},
+		&cli.GenericFlag{
+			Name: "docker-volume-type",
+			Value: &utils.EnumValue{
+				Enum:    volumeTypeNames,
+				Default: volumeTypeNames[0],
+			},
+			Usage:    fmt.Sprintf("output in %s", strings.Join(volumeTypeNames, ", ")),
+			Required: false,
+		},
 		&cli.IntFlag{
 			Name:     "min-node-count",
 			Usage:    "minimum number of pool nodes",
@@ -234,6 +246,9 @@ var poolCreateSubCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
+
+		dockerVolumeType := volumes.VolumeType(c.String("docker-volume-type"))
+
 		opts := pools.CreateOpts{
 			Name:             c.String("name"),
 			FlavorID:         c.String("flavor-id"),
@@ -241,6 +256,7 @@ var poolCreateSubCommand = cli.Command{
 			DockerVolumeSize: c.Int("docker-volume-size"),
 			MinNodeCount:     c.Int("min-node-count"),
 			MaxNodeCount:     c.Int("max-node-count"),
+			DockerVolumeType: dockerVolumeType,
 		}
 
 		results, err := pools.Create(client, clusterID, opts).Extract()
