@@ -5,10 +5,10 @@ Installation
 ------------------------------------
 
     GOPRIVATE=github.com/G-Core go get github.com/G-Core/gcorelabscloud-go
-    GOPRIVATE=github.com/G-Core go intsall github.com/G-Core/gcorelabscloud-go/gcoreclient
+    GOPRIVATE=github.com/G-Core go get -v -u github.com/G-Core/gcorelabscloud-go/cmd/gcoreclient    
 
 
 Tests, build, install
 ------------------------------------
     
-    make check test build install clean
+    make install
