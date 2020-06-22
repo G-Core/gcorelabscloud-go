@@ -3,6 +3,7 @@ package pools
 import (
 	"fmt"
 	"net"
+	"time"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
 
@@ -65,6 +66,8 @@ type ClusterListPool struct {
 	StackID          string             `json:"stack_id"`
 	Status           string             `json:"status"`
 	Role             types.PoolRole     `json:"role"`
+	CreatedAt        time.Time          `json:"created_at"`
+	UpdatedAt        *time.Time         `json:"updated_at"`
 }
 
 // ClusterPoolPage is the page returned by a pager when traversing over a

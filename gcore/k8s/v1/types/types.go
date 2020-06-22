@@ -6,10 +6,14 @@ import (
 )
 
 type PoolRole string
+type HealthStatus string
 
 const (
-	NodegroupMasterRole PoolRole = "master"
-	NodegroupWorkerRole PoolRole = "worker"
+	NodegroupMasterRole   PoolRole     = "master"
+	NodegroupWorkerRole   PoolRole     = "worker"
+	HealthStatusUnknown   HealthStatus = "UNKNOWN"
+	HealthStatusHealthy   HealthStatus = "HEALTHY"
+	HealthStatusUnHealthy HealthStatus = "UNHEALTHY"
 )
 
 func (ng PoolRole) IsValid() error {
@@ -69,4 +73,65 @@ func (ng *PoolRole) UnmarshalJSON(data []byte) error {
 // MarshalJSON - implements Marshaler interface
 func (ng *PoolRole) MarshalJSON() ([]byte, error) {
 	return json.Marshal(ng.String())
+}
+
+func (hs HealthStatus) IsValid() error {
+	switch hs {
+	case HealthStatusHealthy,
+		HealthStatusUnHealthy,
+		HealthStatusUnknown:
+		return nil
+	}
+	return fmt.Errorf("invalid HealthStatus type: %v", hs)
+}
+
+func (hs HealthStatus) ValidOrNil() (*HealthStatus, error) {
+	if hs.String() == "" {
+		return nil, nil
+	}
+	err := hs.IsValid()
+	if err != nil {
+		return &hs, err
+	}
+	return &hs, nil
+}
+
+func (hs HealthStatus) String() string {
+	return string(hs)
+}
+
+func (hs HealthStatus) List() []HealthStatus {
+	return []HealthStatus{
+		HealthStatusUnHealthy,
+		HealthStatusUnknown,
+		HealthStatusUnHealthy,
+	}
+}
+
+func (hs HealthStatus) StringList() []string {
+	var s []string
+	for _, v := range hs.List() {
+		s = append(s, v.String())
+	}
+	return s
+}
+
+// UnmarshalJSON - implements Unmarshaler interface
+func (hs *HealthStatus) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	v := HealthStatus(s)
+	err := v.IsValid()
+	if err != nil {
+		return err
+	}
+	*hs = v
+	return nil
+}
+
+// MarshalJSON - implements Marshaler interface
+func (hs *HealthStatus) MarshalJSON() ([]byte, error) {
+	return json.Marshal(hs.String())
 }

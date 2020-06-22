@@ -50,9 +50,13 @@ const ListResponse = `
           "status": "CREATE_COMPLETE",
           "role": "worker",
           "image_id": "fedora-coreos",
-          "node_count": 1
+          "node_count": 1,
+		  "updated_at": "2020-04-20T14:27:44+00:00",
+		  "created_at": "2020-04-20T08:32:33+00:00"
         }
       ],
+	  "updated_at": "2020-04-20T14:27:44+00:00",
+	  "created_at": "2020-04-20T08:32:33+00:00",
       "master_flavor_id": "g1-standard-1-2",
       "status": "UPDATE_COMPLETE",
       "keypair": "keypair",
@@ -120,7 +124,9 @@ const GetResponse = `
       "node_count": 1,
       "image_id": "fedora-coreos",
       "status_reason": "Stack CREATE completed successfully",
-      "flavor_id": "g1-standard-1-2"
+      "flavor_id": "g1-standard-1-2",
+	  "updated_at": "2020-04-20T14:27:44+00:00",
+	  "created_at": "2020-04-20T08:32:33+00:00"
     }
   ],
   "updated_at": "2020-04-20T14:27:44+00:00",
@@ -301,6 +307,8 @@ var (
 		DockerVolumeSize: 10,
 		DockerVolumeType: volumes.Standard,
 		NodeCount:        1,
+		CreatedAt:        createdTime,
+		UpdatedAt:        &updatedTime,
 	}
 	clusterList = &clusters.ClusterList{
 		UUID:              "5e09faed-e742-404f-8a75-0ea5eb3c435f",
@@ -318,6 +326,8 @@ var (
 		Status:            "UPDATE_COMPLETE",
 		HealthStatus:      "HEALTHY",
 		Version:           version,
+		CreatedAt:         createdTime,
+		UpdatedAt:         &updatedTime,
 	}
 	apiAddress, _   = gcorecloud.ParseURL("https://172.24.4.3:6443")
 	discoveryURL, _ = gcorecloud.ParseURL("https://discovery.etcd.io/6fba601fce5c2b84eebd7c472ab36650")
@@ -342,8 +352,6 @@ var (
 			FixedNetwork:      "46beed39-38e6-4743-90b5-30fefd6173d2",
 			FixedSubnet:       "46beed39-38e6-4743-90b5-30fefd6173d2",
 			FloatingIPEnabled: true,
-			CreatedAt:         createdTime,
-			UpdatedAt:         &updatedTime,
 			Faults:            nil,
 			ClusterList:       clusterList,
 		},

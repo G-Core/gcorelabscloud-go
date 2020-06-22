@@ -7,6 +7,7 @@ import (
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v1/pools"
+	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
@@ -96,8 +97,6 @@ type Cluster struct {
 	FixedNetwork       string            `json:"fixed_network"`
 	FixedSubnet        string            `json:"fixed_subnet"`
 	FloatingIPEnabled  bool              `json:"floating_ip_enabled"`
-	CreatedAt          time.Time         `json:"created_at"`
-	UpdatedAt          *time.Time        `json:"updated_at"`
 	Faults             map[string]string `json:"faults"`
 	*ClusterList
 }
@@ -114,21 +113,23 @@ type Config struct {
 
 // Cluster represents a cluster structure in list response.
 type ClusterList struct {
-	UUID              string            `json:"uuid"`
-	Name              string            `json:"name"`
-	ClusterTemplateID string            `json:"cluster_template_id"`
-	KeyPair           string            `json:"keypair"`
-	NodeCount         int               `json:"node_count"`
-	MasterCount       int               `json:"master_count"`
-	DockerVolumeSize  int               `json:"docker_volume_size"`
-	Labels            map[string]string `json:"labels"`
-	MasterFlavorID    string            `json:"master_flavor_id"`
-	FlavorID          string            `json:"flavor_id"`
-	CreateTimeout     int               `json:"create_timeout"`
-	StackID           string            `json:"stack_id"`
-	Status            string            `json:"status"`
-	HealthStatus      string            `json:"health_status"`
-	Version           string            `json:"version"`
+	UUID              string             `json:"uuid"`
+	Name              string             `json:"name"`
+	ClusterTemplateID string             `json:"cluster_template_id"`
+	KeyPair           string             `json:"keypair"`
+	NodeCount         int                `json:"node_count"`
+	MasterCount       int                `json:"master_count"`
+	DockerVolumeSize  int                `json:"docker_volume_size"`
+	Labels            map[string]string  `json:"labels"`
+	MasterFlavorID    string             `json:"master_flavor_id"`
+	FlavorID          string             `json:"flavor_id"`
+	CreateTimeout     int                `json:"create_timeout"`
+	StackID           string             `json:"stack_id"`
+	Status            string             `json:"status"`
+	HealthStatus      types.HealthStatus `json:"health_status"`
+	Version           string             `json:"version"`
+	CreatedAt         time.Time          `json:"created_at"`
+	UpdatedAt         *time.Time         `json:"updated_at"`
 }
 
 type ClusterListWithPool struct {
