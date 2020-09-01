@@ -184,7 +184,7 @@ func TestCreate(t *testing.T) {
 					MaxRetries:     3,
 					Timeout:        5,
 					MaxRetriesDown: maxRetriesDown,
-					HTTPMethod:     types.HTTPMethodGET,
+					HTTPMethod:     types.HTTPMethodPointer(types.HTTPMethodGET),
 					URLPath:        urlPath,
 				},
 				LoadBalancerAlgorithm: types.LoadBalancerAlgorithmRoundRobin,

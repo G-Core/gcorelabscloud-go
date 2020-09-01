@@ -515,3 +515,7 @@ func (m *HTTPMethod) UnmarshalJSON(data []byte) error {
 func (m *HTTPMethod) MarshalJSON() ([]byte, error) {
 	return json.Marshal(m.String())
 }
+
+func HTTPMethodPointer(m HTTPMethod) *HTTPMethod {
+	return &m
+}

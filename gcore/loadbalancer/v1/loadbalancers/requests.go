@@ -45,7 +45,7 @@ type CreateHealthMonitorOpts struct {
 	MaxRetries     int                     `json:"max_retries" required:"true"`
 	Timeout        int                     `json:"timeout" required:"true"`
 	MaxRetriesDown int                     `json:"max_retries_down,omitempty"`
-	HTTPMethod     types.HTTPMethod        `json:"http_method,omitempty"`
+	HTTPMethod     *types.HTTPMethod       `json:"http_method,omitempty"`
 	URLPath        string                  `json:"url_path,omitempty"`
 }
 

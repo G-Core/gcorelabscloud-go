@@ -90,7 +90,7 @@ type HealthMonitor struct {
 	MaxRetries     int                     `json:"max_retries"`
 	Timeout        int                     `json:"timeout"`
 	MaxRetriesDown int                     `json:"max_retries_down,omitempty"`
-	HTTPMethod     types.HTTPMethod        `json:"http_method,omitempty"`
+	HTTPMethod     *types.HTTPMethod       `json:"http_method,omitempty"`
 	URLPath        string                  `json:"url_path,omitempty"`
 }
 

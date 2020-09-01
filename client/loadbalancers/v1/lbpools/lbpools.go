@@ -57,7 +57,7 @@ func getHealthMonitor(c *cli.Context) (*lbpools.CreateHealthMonitorOpts, error) 
 		if err := httpMethod.IsValid(); err != nil {
 			return nil, err
 		}
-		hm.HTTPMethod = httpMethod
+		hm.HTTPMethod = types.HTTPMethodPointer(httpMethod)
 		httpMethodURLPath := c.String("healthmonitor-url-path")
 		if httpMethodURLPath == "" {
 			return nil, fmt.Errorf("--healthmonitor-url-path should be set for health monitor type %s", healthMonitorType)
