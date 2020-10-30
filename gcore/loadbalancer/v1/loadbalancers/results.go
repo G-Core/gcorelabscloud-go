@@ -44,6 +44,7 @@ type LoadBalancer struct {
 	ProvisioningStatus types.ProvisioningStatus `json:"provisioning_status"`
 	OperationStatus    types.OperatingStatus    `json:"operating_status"`
 	VipAddress         net.IP                   `json:"vip_address"`
+	VipPortID          string                   `json:"vip_port_id"`
 	Listeners          []gcorecloud.ItemID      `json:"listeners"`
 	CreatorTaskID      *string                  `json:"creator_task_id"`
 	TaskID             *string                  `json:"task_id"`
