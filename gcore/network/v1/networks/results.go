@@ -41,6 +41,7 @@ type Network struct {
 	ID        string                   `json:"id"`
 	Subnets   []string                 `json:"subnets"`
 	MTU       int                      `json:"mtu"`
+	Type      string                   `json:"type"`
 	CreatedAt gcorecloud.JSONRFC3339Z  `json:"created_at"`
 	UpdatedAt *gcorecloud.JSONRFC3339Z `json:"updated_at"`
 	External  bool                     `json:"external"`

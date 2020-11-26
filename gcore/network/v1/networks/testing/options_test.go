@@ -10,9 +10,9 @@ import (
 
 func TestCreateOpts(t *testing.T) {
 	options := networks.CreateOpts{
-		Name:         Network1.Name,
-		Mtu:          1450,
-		CreateRouter: true,
+		Name: Network1.Name,
+		Mtu:  1450,
+		Type: "vxlan",
 	}
 	_, err := options.ToNetworkCreateMap()
 	require.NoError(t, err)

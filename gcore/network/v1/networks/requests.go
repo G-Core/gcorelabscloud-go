@@ -30,7 +30,8 @@ type CreateOptsBuilder interface {
 type CreateOpts struct {
 	Name         string `json:"name" required:"true" validate:"required"`
 	Mtu          int    `json:"mtu,omitempty" validate:"omitempty,lte=1500"`
-	CreateRouter bool   `json:"create_router,omitempty"`
+	CreateRouter bool   `json:"create_router"`
+	Type         string `json:"type,omitempty" validate:"omitempty"`
 }
 
 // ToNetworkCreateMap builds a request body from CreateOpts.
