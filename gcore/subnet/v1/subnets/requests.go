@@ -8,6 +8,8 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
+// List returns a Pager which allows you to iterate over a collection of
+// subnets.
 func List(c *gcorecloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
 	url := listURL(c)
 	if opts != nil {
@@ -42,19 +44,21 @@ type ListOptsBuilder interface {
 // HostRoute represents a route that should be used by devices with IPs from
 // a subnet (not including local subnet route).
 type HostRoute struct {
-	DestinationCIDR gcorecloud.CIDR `json:"destination"`
-	NextHop         net.IP          `json:"nexthop"`
+	Destination gcorecloud.CIDR `json:"destination"`
+	NextHop     net.IP          `json:"nexthop"`
 }
 
 // CreateOpts represents options used to create a subnet.
+// GatewayIP must be null in json because an empty key creates a gateway in the neutron API.
 type CreateOpts struct {
 	Name                   string          `json:"name" required:"true"`
-	EnableDHCP             bool            `json:"enable_dhcp"`
+	EnableDHCP             bool            `json:"enable_dhcp,omitempty"`
 	CIDR                   gcorecloud.CIDR `json:"cidr" required:"true"`
 	NetworkID              string          `json:"network_id" required:"true"`
 	ConnectToNetworkRouter bool            `json:"connect_to_network_router"`
 	DNSNameservers         []net.IP        `json:"dns_nameservers,omitempty"`
 	HostRoutes             []HostRoute     `json:"host_routes,omitempty"`
+	GatewayIP              *net.IP         `json:"gateway_ip"`
 }
 
 // ListOpts allows the filtering and sorting List API response.
@@ -67,12 +71,11 @@ func (opts CreateOpts) ToSubnetCreateMap() (map[string]interface{}, error) {
 	if err := gcorecloud.ValidateStruct(opts); err != nil {
 		return nil, err
 	}
-	return gcorecloud.BuildRequestBody(opts, "")
-}
-
-// DeleteOpts allows set additional parameters during volume deletion.
-type DeleteOpts struct {
-	NetworkID string `q:"network_id"`
+	body, err := gcorecloud.BuildRequestBody(opts, "")
+	if body["gateway_ip"] == "" {
+		delete(body, "gateway_ip")
+	}
+	return body, err
 }
 
 // ToSubnetListQuery formats a ListOpts into a query string.
@@ -101,10 +104,13 @@ type UpdateOptsBuilder interface {
 }
 
 // UpdateOpts represents options used to update a subnet.
+// GatewayIP must be null in json because an empty key creates a gateway in the neutron API.
 type UpdateOpts struct {
-	Name           string      `json:"name,omitempty" validate:"required_without_all=DNSNameservers HostRoutes"`
-	DNSNameservers []net.IP    `json:"dns_nameservers,omitempty" validate:"required_without_all=Name HostRoutes"`
-	HostRoutes     []HostRoute `json:"host_routes,omitempty" validate:"required_without_all=Name DNSNameservers"`
+	Name           string      `json:"name,omitempty"`
+	DNSNameservers []net.IP    `json:"dns_nameservers"`
+	HostRoutes     []HostRoute `json:"host_routes"`
+	EnableDHCP     bool        `json:"enable_dhcp"`
+	GatewayIP      *net.IP     `json:"gateway_ip"`
 }
 
 // ToSubnetUpdateMap builds a request body from UpdateOpts.
@@ -112,7 +118,11 @@ func (opts UpdateOpts) ToSubnetUpdateMap() (map[string]interface{}, error) {
 	if err := gcorecloud.ValidateStruct(opts); err != nil {
 		return nil, err
 	}
-	return gcorecloud.BuildRequestBody(opts, "")
+	body, err := gcorecloud.BuildRequestBody(opts, "")
+	if body["gateway_ip"] == "" {
+		delete(body, "gateway_ip")
+	}
+	return body, err
 }
 
 // Update accepts a UpdateOpts struct and updates an existing subnet using the

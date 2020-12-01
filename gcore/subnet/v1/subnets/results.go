@@ -56,6 +56,7 @@ type Subnet struct {
 	HasRouter      bool                    `json:"has_router"`
 	DNSNameservers []net.IP                `json:"dns_nameservers"`
 	HostRoutes     []HostRoute             `json:"host_routes"`
+	GatewayIP      net.IP                  `json:"gateway_ip"`
 }
 
 // SubnetPage is the page returned by a pager when traversing over a

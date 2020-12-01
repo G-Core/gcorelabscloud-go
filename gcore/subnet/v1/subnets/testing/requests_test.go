@@ -2,6 +2,7 @@ package testing
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"testing"
 
@@ -133,7 +134,7 @@ func TestGet(t *testing.T) {
 
 }
 
-func TestCreate(t *testing.T) {
+func TestCreateNoGW(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
 
@@ -142,7 +143,7 @@ func TestCreate(t *testing.T) {
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 		th.TestHeader(t, r, "Content-Type", "application/json")
 		th.TestHeader(t, r, "Accept", "application/json")
-		th.TestJSONRequest(t, r, CreateRequest)
+		th.TestJSONRequest(t, r, CreateRequestNoGW)
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
 
@@ -158,6 +159,41 @@ func TestCreate(t *testing.T) {
 		CIDR:                   Subnet1.CIDR,
 		NetworkID:              Subnet1.NetworkID,
 		ConnectToNetworkRouter: true,
+	}
+
+	client := fake.ServiceTokenClient("subnets", "v1")
+	tasks, err := subnets.Create(client, options).Extract()
+	require.NoError(t, err)
+	require.Equal(t, Tasks1, *tasks)
+}
+
+func TestCreateGW(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareListTestURL(), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestJSONRequest(t, r, CreateRequestGW)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+
+		_, err := fmt.Fprint(w, CreateResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	gw := net.IP{}
+	options := subnets.CreateOpts{
+		Name:                   Subnet1.Name,
+		EnableDHCP:             true,
+		CIDR:                   Subnet1.CIDR,
+		NetworkID:              Subnet1.NetworkID,
+		ConnectToNetworkRouter: true,
+		GatewayIP:              &gw,
 	}
 
 	client := fake.ServiceTokenClient("subnets", "v1")
@@ -187,7 +223,7 @@ func TestDelete(t *testing.T) {
 
 }
 
-func TestUpdate(t *testing.T) {
+func TestUpdateNoGW(t *testing.T) {
 
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
@@ -199,7 +235,7 @@ func TestUpdate(t *testing.T) {
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 		th.TestHeader(t, r, "Content-Type", "application/json")
 		th.TestHeader(t, r, "Accept", "application/json")
-		th.TestJSONRequest(t, r, UpdateRequest)
+		th.TestJSONRequest(t, r, UpdateRequestNoGW)
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 
@@ -223,4 +259,44 @@ func TestUpdate(t *testing.T) {
 	require.Equal(t, createdTime, ct.CreatedAt)
 	require.Equal(t, updatedTime, ct.UpdatedAt)
 
+}
+
+func TestUpdateGW(t *testing.T) {
+
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	testURL := prepareGetTestURL(Subnet1.ID)
+
+	th.Mux.HandleFunc(testURL, func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "PATCH")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestJSONRequest(t, r, UpdateRequestGW)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, GetResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("subnets", "v1")
+
+	gw := net.IP{}
+	opts := subnets.UpdateOpts{
+		Name:       Subnet1.Name,
+		GatewayIP:  &gw,
+		EnableDHCP: true,
+	}
+
+	ct, err := subnets.Update(client, Subnet1.ID, opts).Extract()
+
+	require.NoError(t, err)
+	require.Equal(t, Subnet1, *ct)
+	require.Equal(t, Subnet1.Name, ct.Name)
+	require.Equal(t, createdTime, ct.CreatedAt)
+	require.Equal(t, updatedTime, ct.UpdatedAt)
 }
