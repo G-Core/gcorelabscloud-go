@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
+	"github.com/fatih/structs"
 	"github.com/stretchr/testify/require"
 )
 
@@ -11,7 +12,6 @@ func TestCreateOpts(t *testing.T) {
 	options := volumes.CreateOpts{
 		Source:               volumes.NewVolume,
 		Name:                 "test",
-		Size:                 0,
 		TypeName:             volumes.Standard,
 		ImageID:              "",
 		SnapshotID:           "",
@@ -19,8 +19,8 @@ func TestCreateOpts(t *testing.T) {
 	}
 
 	_, err := options.ToVolumeCreateMap()
-	require.Error(t, err)
-	require.Contains(t, err.Error(), "Size")
+	require.NoError(t, err)
+	require.Contains(t, structs.Names(options), "Size")
 
 	options = volumes.CreateOpts{
 		Source:               volumes.NewVolume,
@@ -47,8 +47,7 @@ func TestCreateOpts(t *testing.T) {
 
 	_, err = options.ToVolumeCreateMap()
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "Size")
-	require.Contains(t, err.Error(), "Snapshot")
+	require.Contains(t, err.Error(), "SnapshotID")
 
 	options = volumes.CreateOpts{
 		Source:               volumes.Snapshot,
@@ -75,7 +74,6 @@ func TestCreateOpts(t *testing.T) {
 
 	_, err = options.ToVolumeCreateMap()
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "Size")
 	require.Contains(t, err.Error(), "ImageID")
 
 	options = volumes.CreateOpts{
