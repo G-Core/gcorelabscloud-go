@@ -46,6 +46,14 @@ func deleteSecurityGroupsURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceActionURL(c, id, "delsecuritygroup")
 }
 
+func attachInterfaceURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "attach_interface")
+}
+
+func detachInterfaceURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "detach_interface")
+}
+
 func startInstanceURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceActionURL(c, id, "start")
 }

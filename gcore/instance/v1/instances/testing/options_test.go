@@ -126,14 +126,15 @@ func TestValidateCreateVolumeBlankSnapshotIDOpts(t *testing.T) {
 func TestValidateCreateVolumeOpts(t *testing.T) {
 
 	opts := instances.CreateVolumeOpts{
-		Source:     types.NewVolume,
-		BootIndex:  0,
-		Size:       0,
-		TypeName:   volumes.Standard,
-		Name:       "name",
-		ImageID:    "",
-		SnapshotID: "",
-		VolumeID:   "",
+		Source:        types.NewVolume,
+		BootIndex:     0,
+		Size:          0,
+		TypeName:      volumes.Standard,
+		Name:          "name",
+		ImageID:       "",
+		SnapshotID:    "",
+		VolumeID:      "",
+		AttachmentTag: "",
 	}
 
 	err := gcorecloud.TranslateValidationError(opts.Validate())
@@ -141,28 +142,30 @@ func TestValidateCreateVolumeOpts(t *testing.T) {
 	require.Contains(t, err.Error(), "Size")
 
 	opts = instances.CreateVolumeOpts{
-		Source:     types.NewVolume,
-		BootIndex:  0,
-		Size:       1,
-		TypeName:   volumes.Standard,
-		Name:       "name",
-		ImageID:    "",
-		SnapshotID: "",
-		VolumeID:   "",
+		Source:        types.NewVolume,
+		BootIndex:     0,
+		Size:          1,
+		TypeName:      volumes.Standard,
+		Name:          "name",
+		ImageID:       "",
+		SnapshotID:    "",
+		VolumeID:      "",
+		AttachmentTag: "",
 	}
 
 	err = gcorecloud.TranslateValidationError(opts.Validate())
 	require.NoError(t, err)
 
 	opts = instances.CreateVolumeOpts{
-		Source:     types.NewVolume,
-		BootIndex:  0,
-		Size:       1,
-		TypeName:   volumes.Standard,
-		Name:       "name",
-		ImageID:    "28bfe198-a003-4283-8dca-ab5da4a71b62",
-		SnapshotID: "",
-		VolumeID:   "",
+		Source:        types.NewVolume,
+		BootIndex:     0,
+		Size:          1,
+		TypeName:      volumes.Standard,
+		Name:          "name",
+		ImageID:       "28bfe198-a003-4283-8dca-ab5da4a71b62",
+		SnapshotID:    "",
+		VolumeID:      "",
+		AttachmentTag: "",
 	}
 
 	err = gcorecloud.TranslateValidationError(opts.Validate())
@@ -170,14 +173,15 @@ func TestValidateCreateVolumeOpts(t *testing.T) {
 	require.Contains(t, err.Error(), "ImageID")
 
 	opts = instances.CreateVolumeOpts{
-		Source:     types.ExistingVolume,
-		BootIndex:  0,
-		Size:       1,
-		TypeName:   volumes.Standard,
-		Name:       "name",
-		ImageID:    "28bfe198-a003-4283-8dca-ab5da4a71b62",
-		SnapshotID: "28bfe198-a003-4283-8dca-ab5da4a71b62",
-		VolumeID:   "",
+		Source:        types.ExistingVolume,
+		BootIndex:     0,
+		Size:          1,
+		TypeName:      volumes.Standard,
+		Name:          "name",
+		ImageID:       "28bfe198-a003-4283-8dca-ab5da4a71b62",
+		SnapshotID:    "28bfe198-a003-4283-8dca-ab5da4a71b62",
+		VolumeID:      "",
+		AttachmentTag: "",
 	}
 
 	err = gcorecloud.TranslateValidationError(opts.Validate())
@@ -222,7 +226,7 @@ func TestValidateCreateInstanceBlankSnapshotIDOpts(t *testing.T) {
 		Names:         []string{"name"},
 		NameTemplates: nil,
 		Volumes:       volumeOpts,
-		Interfaces: []instances.CreateInterfaceOpts{{
+		Interfaces: []instances.InterfaceOpts{{
 			Type:      types.SubnetInterfaceType,
 			NetworkID: "28bfe198-a003-4283-8dca-ab5da4a71b62",
 			SubnetID:  "28bfe198-a003-4283-8dca-ab5da4a71b62",
@@ -358,4 +362,22 @@ func TestMetadataSetOpts(t *testing.T) {
 	data, err := opts.ToMetadataMap()
 	require.NoError(t, err)
 	require.Equal(t, map[string]interface{}{"test1": "test1", "test2": "test2"}, data)
+}
+
+func TestInterfaceOpts(t *testing.T) {
+	opts := instances.InterfaceOpts{
+		Type:     types.SubnetInterfaceType,
+		SubnetID: "9bc36cf6-407c-4a74-bc83-ce3aa3854c3d",
+	}
+	err := opts.Validate()
+	require.NoError(t, err)
+
+	opts = instances.InterfaceOpts{
+		Type:     types.SubnetInterfaceType,
+		SubnetID: "9bc36cf6-407c-4a74-bc83-ce3aa3854c3d",
+		PortID:   "9bc36cf6-407c-4a74-bc83-ce3aa3854c3d",
+	}
+	err = opts.Validate()
+	require.Error(t, err)
+
 }

@@ -297,6 +297,20 @@ const UnAssignSecurityGroupsRequest = `
 }
 `
 
+const AttachInterfaceRequest = `
+{
+  "type": "subnet",
+  "subnet_id": "9bc36cf6-407c-4a74-bc83-ce3aa3854c3d"
+}
+`
+
+const DetachInterfaceRequest = `
+{
+  "ip_address": "192.168.0.23",
+  "port_id": "9bc36cf6-407c-4a74-bc83-ce3aa3854c3d"
+}
+`
+
 const CreateResponse = `
 {
   "tasks": [

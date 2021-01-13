@@ -11,16 +11,18 @@ type FloatingIPSource string
 type InterfaceType string
 
 const (
-	AddressTypeFixed      AddressType      = "fixed"
-	AddressTypeFloating   AddressType      = "floating"
-	NewVolume             VolumeSource     = "new-volume"
-	ExistingVolume        VolumeSource     = "existing-volume"
-	Image                 VolumeSource     = "image"
-	Snapshot              VolumeSource     = "snapshot"
-	NewFloatingIP         FloatingIPSource = "new"
-	ExistingFloatingIP    FloatingIPSource = "existing"
-	SubnetInterfaceType   InterfaceType    = "subnet"
-	ExternalInterfaceType InterfaceType    = "external"
+	AddressTypeFixed       AddressType      = "fixed"
+	AddressTypeFloating    AddressType      = "floating"
+	NewVolume              VolumeSource     = "new-volume"
+	ExistingVolume         VolumeSource     = "existing-volume"
+	Image                  VolumeSource     = "image"
+	Snapshot               VolumeSource     = "snapshot"
+	NewFloatingIP          FloatingIPSource = "new"
+	ExistingFloatingIP     FloatingIPSource = "existing"
+	SubnetInterfaceType    InterfaceType    = "subnet"
+	AnySubnetInterfaceType InterfaceType    = "any_subnet"
+	ExternalInterfaceType  InterfaceType    = "external"
+	ReservedFixedIpType    InterfaceType    = "reserved_fixed_ip"
 )
 
 func (vs VolumeSource) IsValid() error {
@@ -204,7 +206,7 @@ func (at *AddressType) MarshalJSON() ([]byte, error) {
 
 func (it InterfaceType) IsValid() error {
 	switch it {
-	case ExternalInterfaceType, SubnetInterfaceType:
+	case ExternalInterfaceType, SubnetInterfaceType, AnySubnetInterfaceType, ReservedFixedIpType:
 		return nil
 	}
 	return fmt.Errorf("invalid InterfaceType type: %v", it)
@@ -229,6 +231,8 @@ func (it InterfaceType) List() []InterfaceType {
 	return []InterfaceType{
 		ExternalInterfaceType,
 		SubnetInterfaceType,
+		AnySubnetInterfaceType,
+		ReservedFixedIpType,
 	}
 }
 

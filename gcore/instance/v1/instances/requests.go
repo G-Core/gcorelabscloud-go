@@ -75,14 +75,15 @@ type CreateOptsBuilder interface {
 
 // CreateVolumeOpts represents options used to create a volume.
 type CreateVolumeOpts struct {
-	Source     types.VolumeSource `json:"source" required:"true" validate:"required,enum"`
-	BootIndex  int                `json:"boot_index"`
-	Size       int                `json:"size,omitempty" validate:"rfe=Source:image;new-volume,sfe=Source:snapshot;existing-volume"`
-	TypeName   volumes.VolumeType `json:"type_name" required:"true" validate:"required,enum"`
-	Name       string             `json:"name,omitempty" validate:"omitempty"`
-	ImageID    string             `json:"image_id,omitempty" validate:"rfe=Source:image,sfe=Source:snapshot;existing-volume;new-volume,allowed_without_all=SnapshotID VolumeID,omitempty,uuid4"`
-	SnapshotID string             `json:"snapshot_id,omitempty" validate:"rfe=Source:snapshot,sfe=Source:image;existing-volume;new-volume,allowed_without_all=ImageID VolumeID,omitempty,uuid4"`
-	VolumeID   string             `json:"volume_id,omitempty" validate:"rfe=Source:existing-volume,sfe=Source:image;shapshot;new-volume,allowed_without_all=ImageID SnapshotID,omitempty,uuid4"`
+	Source        types.VolumeSource `json:"source" required:"true" validate:"required,enum"`
+	BootIndex     int                `json:"boot_index"`
+	Size          int                `json:"size,omitempty" validate:"rfe=Source:image;new-volume,sfe=Source:snapshot;existing-volume"`
+	TypeName      volumes.VolumeType `json:"type_name,omitempty" validate:"omitempty"`
+	AttachmentTag string             `json:"attachment_tag,omitempty" validate:"omitempty"`
+	Name          string             `json:"name,omitempty" validate:"omitempty"`
+	ImageID       string             `json:"image_id,omitempty" validate:"rfe=Source:image,sfe=Source:snapshot;existing-volume;new-volume,allowed_without_all=SnapshotID VolumeID,omitempty,uuid4"`
+	SnapshotID    string             `json:"snapshot_id,omitempty" validate:"rfe=Source:snapshot,sfe=Source:image;existing-volume;new-volume,allowed_without_all=ImageID VolumeID,omitempty,uuid4"`
+	VolumeID      string             `json:"volume_id,omitempty" validate:"rfe=Source:existing-volume,sfe=Source:image;shapshot;new-volume,allowed_without_all=ImageID SnapshotID,omitempty,uuid4"`
 }
 
 func (opts *CreateVolumeOpts) Validate() error {
@@ -99,31 +100,35 @@ func (opts CreateNewInterfaceFloatingIPOpts) Validate() error {
 	return gcorecloud.ValidateStruct(opts)
 }
 
-type CreateInterfaceOpts struct {
-	Type       types.InterfaceType               `json:"type" required:"true" validate:"required,enum"`
-	NetworkID  string                            `json:"network_id,omitempty" validate:"rfe=Type:subnet,sfe=Type:external,omitempty,uuid4"`
-	SubnetID   string                            `json:"subnet_id,omitempty" validate:"rfe=Type:subnet,sfe=Type:external,omitempty,uuid4"`
-	FloatingIP *CreateNewInterfaceFloatingIPOpts `json:"floating_ip,omitempty" validate:"omitempty,sfe=Type:external,dive"`
+type InterfaceOpts struct {
+	Type       types.InterfaceType               `json:"type,omitempty" validate:"omitempty,enum"`
+	NetworkID  string                            `json:"network_id,omitempty" validate:"omitempty,uuid4"`
+	SubnetID   string                            `json:"subnet_id,omitempty" validate:"omitempty,uuid4"`
+	PortID     string                            `json:"port_id,omitempty" validate:"allowed_without_all=NetworkID SubnetID FloatingIP,omitempty,uuid4"`
+	IpAddress  string                            `json:"ip_address,omitempty"`
+	FloatingIP *CreateNewInterfaceFloatingIPOpts `json:"floating_ip,omitempty" validate:"omitempty,dive"`
 }
 
 // Validate
-func (opts CreateInterfaceOpts) Validate() error {
+func (opts InterfaceOpts) Validate() error {
 	return gcorecloud.ValidateStruct(opts)
 }
 
 // CreateOpts represents options used to create a instance.
 type CreateOpts struct {
-	Flavor         string                `json:"flavor" required:"true"`
-	Names          []string              `json:"names,omitempty" validate:"required_without=NameTemplates"`
-	NameTemplates  []string              `json:"name_templates,omitempty" validate:"required_without=Names"`
-	Volumes        []CreateVolumeOpts    `json:"volumes" required:"true" validate:"required,dive"`
-	Interfaces     []CreateInterfaceOpts `json:"interfaces" required:"true" validate:"required,dive"`
-	SecurityGroups []gcorecloud.ItemID   `json:"security_groups" validate:"omitempty,dive,uuid4"`
-	Keypair        string                `json:"keypair_name"`
-	Password       string                `json:"password" validate:"omitempty,required_with=Username"`
-	Username       string                `json:"username" validate:"omitempty,required_with=Password"`
-	UserData       string                `json:"user_data" validate:"omitempty,base64"`
-	Metadata       *MetadataSetOpts      `json:"metadata,omitempty" validate:"omitempty,dive"`
+	Flavor         string              `json:"flavor" required:"true"`
+	Names          []string            `json:"names,omitempty" validate:"required_without=NameTemplates"`
+	NameTemplates  []string            `json:"name_templates,omitempty" validate:"required_without=Names"`
+	Volumes        []CreateVolumeOpts  `json:"volumes" required:"true" validate:"required,dive"`
+	Interfaces     []InterfaceOpts     `json:"interfaces" required:"true" validate:"required,dive"`
+	SecurityGroups []gcorecloud.ItemID `json:"security_groups" validate:"omitempty,dive,uuid4"`
+	Keypair        string              `json:"keypair_name"`
+	Password       string              `json:"password" validate:"omitempty,required_with=Username"`
+	Username       string              `json:"username" validate:"omitempty,required_with=Password"`
+	UserData       string              `json:"user_data" validate:"omitempty,base64"`
+	Metadata       *MetadataSetOpts    `json:"metadata,omitempty" validate:"omitempty,dive"`
+	Configuration  *MetadataSetOpts    `json:"configuration,omitempty" validate:"omitempty,dive"`
+	AllowAppPorts  bool                `json:"allow_app_ports,omitempty"`
 }
 
 // Validate
@@ -138,8 +143,15 @@ func (opts CreateOpts) ToInstanceCreateMap() (map[string]interface{}, error) {
 	}
 	var err error
 	var metadata map[string]interface{}
+	var configuration map[string]interface{}
 	if opts.Metadata != nil {
 		metadata, err = opts.Metadata.ToMetadataMap()
+		if err != nil {
+			return nil, err
+		}
+	}
+	if opts.Configuration != nil {
+		configuration, err = opts.Configuration.ToMetadataMap()
 		if err != nil {
 			return nil, err
 		}
@@ -152,6 +164,11 @@ func (opts CreateOpts) ToInstanceCreateMap() (map[string]interface{}, error) {
 		mp["metadata"] = metadata
 	} else {
 		delete(mp, "metadata")
+	}
+	if len(configuration) > 0 {
+		mp["configuration"] = configuration
+	} else {
+		delete(mp, "configuration")
 	}
 	return mp, nil
 }
@@ -172,6 +189,19 @@ func (opts SecurityGroupOpts) Validate() error {
 
 // ToSecurityGroupActionMap builds a request body from SecurityGroupOpts.
 func (opts SecurityGroupOpts) ToSecurityGroupActionMap() (map[string]interface{}, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, err
+	}
+	return gcorecloud.BuildRequestBody(opts, "")
+}
+
+// InterfaceOptsBuilder allows extensions to add parameters to the interface request.
+type InterfaceOptsBuilder interface {
+	ToInterfaceActionMap() (map[string]interface{}, error)
+}
+
+// ToInterfaceActionMap builds a request body from CreateInterfaceOpts.
+func (opts InterfaceOpts) ToInterfaceActionMap() (map[string]interface{}, error) {
 	if err := opts.Validate(); err != nil {
 		return nil, err
 	}
@@ -304,6 +334,32 @@ func UnAssignSecurityGroup(client *gcorecloud.ServiceClient, id string, opts Sec
 		return
 	}
 	_, r.Err = client.Post(deleteSecurityGroupsURL(client, id), b, nil, &gcorecloud.RequestOpts{ // nolint
+		OkCodes: []int{http.StatusNoContent, http.StatusOK},
+	})
+	return
+}
+
+// AttachInterface adds a interface to the instance.
+func AttachInterface(client *gcorecloud.ServiceClient, id string, opts InterfaceOptsBuilder) (r InterfaceActionResult) {
+	b, err := opts.ToInterfaceActionMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = client.Post(attachInterfaceURL(client, id), b, nil, &gcorecloud.RequestOpts{ // nolint
+		OkCodes: []int{http.StatusNoContent, http.StatusOK},
+	})
+	return
+}
+
+// DetachInterface removes a interface from the instance.
+func DetachInterface(client *gcorecloud.ServiceClient, id string, opts InterfaceOptsBuilder) (r InterfaceActionResult) {
+	b, err := opts.ToInterfaceActionMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = client.Post(detachInterfaceURL(client, id), b, nil, &gcorecloud.RequestOpts{ // nolint
 		OkCodes: []int{http.StatusNoContent, http.StatusOK},
 	})
 	return

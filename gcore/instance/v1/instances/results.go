@@ -69,6 +69,11 @@ type SecurityGroupActionResult struct {
 	gcorecloud.ErrResult
 }
 
+//  InterfaceActionResult represents the result of a actions operation(no content)
+type InterfaceActionResult struct {
+	gcorecloud.ErrResult
+}
+
 type InstanceVolume struct {
 	ID                  string `json:"id"`
 	DeleteOnTermination bool   `json:"delete_on_termination"`

@@ -58,6 +58,14 @@ func prepareUnAssignSecurityGroupsTestURL(id string) string {
 	return prepareGetActionTestURLParams("v1", id, "delsecuritygroup")
 }
 
+func prepareAttachInterfaceTestURL(id string) string {
+	return prepareGetActionTestURLParams("v1", id, "attach_interface")
+}
+
+func prepareDetachInterfaceTestURL(id string) string {
+	return prepareGetActionTestURLParams("v1", id, "detach_interface")
+}
+
 func prepareStartTestURL(id string) string {
 	return prepareGetActionTestURLParams("v1", id, "start")
 }
@@ -295,6 +303,54 @@ func TestAssignSecurityGroups(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestAttachInterface(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareAttachInterfaceTestURL(Instance1.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestJSONRequest(t, r, AttachInterfaceRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	client := fake.ServiceTokenClient("instances", "v1")
+
+	opts := instances.InterfaceOpts{
+		Type:     types.SubnetInterfaceType,
+		SubnetID: "9bc36cf6-407c-4a74-bc83-ce3aa3854c3d",
+	}
+
+	err := instances.AttachInterface(client, instanceID, opts).ExtractErr()
+
+	require.NoError(t, err)
+}
+
+func TestDetachInterface(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareDetachInterfaceTestURL(Instance1.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestJSONRequest(t, r, DetachInterfaceRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	client := fake.ServiceTokenClient("instances", "v1")
+
+	opts := instances.InterfaceOpts{
+		PortID:    "9bc36cf6-407c-4a74-bc83-ce3aa3854c3d",
+		IpAddress: "192.168.0.23",
+	}
+
+	err := instances.DetachInterface(client, instanceID, opts).ExtractErr()
+
+	require.NoError(t, err)
+}
+
 func TestCreate(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
@@ -331,7 +387,7 @@ func TestCreate(t *testing.T) {
 		SecurityGroups: []gcorecloud.ItemID{{
 			ID: "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c",
 		}},
-		Interfaces: []instances.CreateInterfaceOpts{{
+		Interfaces: []instances.InterfaceOpts{{
 			Type:      types.SubnetInterfaceType,
 			NetworkID: "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c",
 			SubnetID:  "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c",
