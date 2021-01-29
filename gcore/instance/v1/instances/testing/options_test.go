@@ -366,18 +366,52 @@ func TestMetadataSetOpts(t *testing.T) {
 
 func TestInterfaceOpts(t *testing.T) {
 	opts := instances.InterfaceOpts{
-		Type:     types.SubnetInterfaceType,
-		SubnetID: "9bc36cf6-407c-4a74-bc83-ce3aa3854c3d",
+		Type:      types.SubnetInterfaceType,
+		SubnetID:  "9bc36cf6-407c-4a74-bc83-ce3aa3854c3d",
+		NetworkID: "9bc36cf6-407c-4a74-bc83-ce3aa3854c3d",
 	}
 	err := opts.Validate()
 	require.NoError(t, err)
 
 	opts = instances.InterfaceOpts{
-		Type:     types.SubnetInterfaceType,
-		SubnetID: "9bc36cf6-407c-4a74-bc83-ce3aa3854c3d",
-		PortID:   "9bc36cf6-407c-4a74-bc83-ce3aa3854c3d",
+		Type: types.SubnetInterfaceType,
 	}
 	err = opts.Validate()
 	require.Error(t, err)
+	require.Contains(t, err.Error(), "SubnetID")
 
+	opts = instances.InterfaceOpts{
+		Type: types.AnySubnetInterfaceType,
+	}
+	err = opts.Validate()
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "NetworkID")
+
+	opts = instances.InterfaceOpts{
+		Type: types.ReservedFixedIpType,
+	}
+	err = opts.Validate()
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "PortID")
+
+	opts = instances.InterfaceOpts{
+		Type:      types.ReservedFixedIpType,
+		SubnetID:  "9bc36cf6-407c-4a74-bc83-ce3aa3854c3d",
+		NetworkID: "9bc36cf6-407c-4a74-bc83-ce3aa3854c3d",
+		PortID:    "9bc36cf6-407c-4a74-bc83-ce3aa3854c3d",
+	}
+	err = opts.Validate()
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "NetworkID SubnetID FloatingIP")
+
+	opts = instances.InterfaceOpts{
+		Type:      types.SubnetInterfaceType,
+		SubnetID:  "9bc36cf6-407c-4a74-bc83-ce3aa3854c3d",
+		NetworkID: "9bc36cf6-407c-4a74-bc83-ce3aa3854c3d",
+		PortID:    "9bc36cf6-407c-4a74-bc83-ce3aa3854c3d",
+		IpAddress: "192.168.100.2",
+	}
+	err = opts.Validate()
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "Type NetworkID SubnetID FloatingIP")
 }
