@@ -123,7 +123,7 @@ func ExtractReservedFixedIPInto(r pagination.Page, v interface{}) error {
 }
 
 type ReservedFixedIPTaskResult struct {
-	ReservedFixedIPs []string `json:"reserved_fixed_ips"`
+	Ports []string `json:"ports"`
 }
 
 func ExtractReservedFixedIPIDFromTask(task *tasks.Task) (string, error) {
@@ -132,10 +132,10 @@ func ExtractReservedFixedIPIDFromTask(task *tasks.Task) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("cannot decode reserved_fixed_ip information in task structure: %w", err)
 	}
-	if len(result.ReservedFixedIPs) == 0 {
+	if len(result.Ports) == 0 {
 		return "", fmt.Errorf("cannot decode reserved_fixed_ip information in task structure: %w", err)
 	}
-	return result.ReservedFixedIPs[0], nil
+	return result.Ports[0], nil
 }
 
 // IPAssignment represents a IPAssignment structure.
