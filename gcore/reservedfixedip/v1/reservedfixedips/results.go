@@ -1,11 +1,13 @@
 package reservedfixedips
 
 import (
+	"fmt"
 	"net"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/network/v1/networks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/subnet/v1/subnets"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
@@ -118,6 +120,22 @@ func ExtractReservedFixedIPs(r pagination.Page) ([]ReservedFixedIP, error) {
 
 func ExtractReservedFixedIPInto(r pagination.Page, v interface{}) error {
 	return r.(ReservedFixedIPPage).Result.ExtractIntoSlicePtr(v, "results")
+}
+
+type ReservedFixedIPTaskResult struct {
+	ReservedFixedIPs []string `json:"reserved_fixed_ips"`
+}
+
+func ExtractReservedFixedIPIDFromTask(task *tasks.Task) (string, error) {
+	var result ReservedFixedIPTaskResult
+	err := gcorecloud.NativeMapToStruct(task.CreatedResources, &result)
+	if err != nil {
+		return "", fmt.Errorf("cannot decode reserved_fixed_ip information in task structure: %w", err)
+	}
+	if len(result.ReservedFixedIPs) == 0 {
+		return "", fmt.Errorf("cannot decode reserved_fixed_ip information in task structure: %w", err)
+	}
+	return result.ReservedFixedIPs[0], nil
 }
 
 // IPAssignment represents a IPAssignment structure.
