@@ -123,7 +123,7 @@ func ExtractReservedFixedIPInto(r pagination.Page, v interface{}) error {
 }
 
 type ReservedFixedIPTaskResult struct {
-	ReservedFixedIPs []string `json:"reserved_fixed_ips"`
+	ReservedFixedIPs []string `json:"ports"`
 }
 
 func ExtractReservedFixedIPIDFromTask(task *tasks.Task) (string, error) {
