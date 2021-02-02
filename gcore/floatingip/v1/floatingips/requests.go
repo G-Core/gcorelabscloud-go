@@ -30,7 +30,7 @@ type CreateOptsBuilder interface {
 
 // CreateOpts represents options used to create a floating ip.
 type CreateOpts struct {
-	PortID         string `json:"port_id" required:"true"`
+	PortID         string `json:"port_id,omitempty"`
 	FixedIPAddress net.IP `json:"fixed_ip_address,omitempty"`
 }
 
