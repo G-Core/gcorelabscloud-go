@@ -47,8 +47,8 @@ func getHostRoutes(c *cli.Context) ([]subnets.HostRoute, error) {
 			return result, fmt.Errorf("cannot parse route nexthop: %s", hops[idx])
 		}
 		result = append(result, subnets.HostRoute{
-			DestinationCIDR: *dst,
-			NextHop:         hop,
+			Destination: *dst,
+			NextHop:     hop,
 		})
 	}
 	return result, nil

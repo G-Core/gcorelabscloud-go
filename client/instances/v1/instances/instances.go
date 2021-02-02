@@ -134,14 +134,14 @@ func getInstanceVolumes(c *cli.Context) ([]instances.CreateVolumeOpts, error) {
 
 }
 
-func getInterfaces(c *cli.Context) ([]instances.CreateInterfaceOpts, error) {
+func getInterfaces(c *cli.Context) ([]instances.InterfaceOpts, error) {
 	interfaceTypes := utils.GetEnumStringSliceValue(c, "interface-type")
 	interfaceNetworkIDs := c.StringSlice("interface-network-id")
 	interfaceSubnetIDs := c.StringSlice("interface-subnet-id")
 	interfaceFloatingSources := utils.GetEnumStringSliceValue(c, "interface-floating-source")
 	interfaceFloatingIPs := c.StringSlice("interface-floating-ip")
 
-	res := make([]instances.CreateInterfaceOpts, 0, len(interfaceTypes))
+	res := make([]instances.InterfaceOpts, 0, len(interfaceTypes))
 
 	for idx, t := range interfaceTypes {
 		interfaceType := types.InterfaceType(t)
@@ -156,7 +156,7 @@ func getInterfaces(c *cli.Context) ([]instances.CreateInterfaceOpts, error) {
 			}
 		}
 
-		opts := instances.CreateInterfaceOpts{
+		opts := instances.InterfaceOpts{
 			Type:       interfaceType,
 			NetworkID:  utils.StringFromIndex(interfaceNetworkIDs, idx, ""),
 			SubnetID:   utils.StringFromIndex(interfaceSubnetIDs, idx, ""),
