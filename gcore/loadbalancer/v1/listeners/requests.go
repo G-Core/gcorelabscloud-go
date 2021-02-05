@@ -55,10 +55,11 @@ func (opts ListOpts) ToListenerListQuery() (string, error) {
 
 // CreateOpts represents options used to create a listener pool.
 type CreateOpts struct {
-	Name           string             `json:"name" required:"true" validate:"required,name"`
-	Protocol       types.ProtocolType `json:"protocol" required:"true"`
-	ProtocolPort   int                `json:"protocol_port" required:"true"`
-	LoadBalancerID string             `json:"loadbalancer_id" required:"true"`
+	Name             string             `json:"name" required:"true" validate:"required,name"`
+	Protocol         types.ProtocolType `json:"protocol" required:"true"`
+	ProtocolPort     int                `json:"protocol_port" required:"true"`
+	LoadBalancerID   string             `json:"loadbalancer_id" required:"true"`
+	InsertXForwarded bool               `json:"insert_x_forwarded"`
 }
 
 // ToListenerCreateMap builds a request body from CreateOpts.

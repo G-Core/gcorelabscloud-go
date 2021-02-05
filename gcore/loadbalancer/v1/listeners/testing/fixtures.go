@@ -44,7 +44,8 @@ const CreateRequest = `
   "name": "lbaas_test_listener",
   "protocol_port": 80,
   "protocol": "TCP",
-  "loadbalancer_id": "43658ea9-54bd-4807-90b1-925921c9a0d1"
+  "loadbalancer_id": "43658ea9-54bd-4807-90b1-925921c9a0d1",
+  "insert_x_forwarded": false
 }
 `
 

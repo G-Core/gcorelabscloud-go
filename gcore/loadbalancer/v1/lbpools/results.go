@@ -52,12 +52,13 @@ type UpdateResult struct {
 
 // PoolMember represents a pool member structure.
 type PoolMember struct {
-	Address      *net.IP `json:"address,omitempty"`
-	ID           string  `json:"id"`
-	Weight       int     `json:"weight,omitempty"`
-	SubnetID     string  `json:"subnet_id,omitempty"`
-	InstanceID   string  `json:"instance_id,omitempty"`
-	ProtocolPort int     `json:"protocol_port,omitempty"`
+	Address         *net.IP               `json:"address,omitempty"`
+	ID              string                `json:"id"`
+	Weight          int                   `json:"weight,omitempty"`
+	SubnetID        string                `json:"subnet_id,omitempty"`
+	InstanceID      string                `json:"instance_id,omitempty"`
+	ProtocolPort    int                   `json:"protocol_port,omitempty"`
+	OperatingStatus types.OperatingStatus `json:"operating_status,omitempty"`
 }
 
 // Pool represents a pool structure.

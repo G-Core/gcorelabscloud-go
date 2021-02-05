@@ -72,6 +72,7 @@ type CreateSessionPersistenceOpts struct {
 
 // CreateHealthMonitorOpts represents options used to create a lbpool health monitor.
 type CreateHealthMonitorOpts struct {
+	ID             string                  `json:"id,omitempty"`
 	Type           types.HealthMonitorType `json:"type" required:"true"`
 	Delay          int                     `json:"delay" required:"true"`
 	MaxRetries     int                     `json:"max_retries" required:"true"`
@@ -83,6 +84,7 @@ type CreateHealthMonitorOpts struct {
 
 // CreatePoolMemberOpts represents options used to create a lbpool listener pool member.
 type CreatePoolMemberOpts struct {
+	ID           string `json:"id,omitempty"`
 	Address      net.IP `json:"address" required:"true"`
 	ProtocolPort int    `json:"protocol_port" required:"true"`
 	Weight       int    `json:"weight,omitempty"`
