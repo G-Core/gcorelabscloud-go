@@ -322,7 +322,7 @@ func TestAttachInterface(t *testing.T) {
 		SubnetID: "9bc36cf6-407c-4a74-bc83-ce3aa3854c3d",
 	}
 
-	err := instances.AttachInterface(client, instanceID, opts).ExtractErr()
+	err := instances.AttachInterface(client, instanceID, opts).Err
 
 	require.NoError(t, err)
 }
