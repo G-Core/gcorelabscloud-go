@@ -23,7 +23,7 @@ const (
 	ProtocolEGP          Protocol      = "egp"
 	ProtocolESP          Protocol      = "esp"
 	ProtocolGRE          Protocol      = "gre"
-	ProtocolIGMP         Protocol      = "imgp"
+	ProtocolIGMP         Protocol      = "igmp"
 	ProtocolOSPF         Protocol      = "ospf"
 	ProtocolPGM          Protocol      = "pgm"
 	ProtocolRSVP         Protocol      = "rsvp"
