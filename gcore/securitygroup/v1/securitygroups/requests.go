@@ -59,7 +59,7 @@ type CreateSecurityGroupOpts struct {
 // CreateOpts represents options used to create a security group.
 type CreateOpts struct {
 	SecurityGroup CreateSecurityGroupOpts `json:"security_group" required:"true"`
-	Instances     []string                `json:"instances" required:"true"`
+	Instances     []string                `json:"instances"`
 }
 
 // ToFloatingIPCreateMap builds a request body from CreateOpts.
