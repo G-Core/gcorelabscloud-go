@@ -18,6 +18,18 @@ const (
 	ProtocolUDP          Protocol      = "udp"
 	ProtocolICMP         Protocol      = "icmp"
 	ProtocolAny          Protocol      = "any"
+	ProtocolAH           Protocol      = "ah"
+	ProtocolDCCP         Protocol      = "dccp"
+	ProtocolEGP          Protocol      = "egp"
+	ProtocolESP          Protocol      = "esp"
+	ProtocolGRE          Protocol      = "gre"
+	ProtocolIGMP         Protocol      = "imgp"
+	ProtocolOSPF         Protocol      = "ospf"
+	ProtocolPGM          Protocol      = "pgm"
+	ProtocolRSVP         Protocol      = "rsvp"
+	ProtocolSCTP         Protocol      = "sctp"
+	ProtocolUDPLITE      Protocol      = "udplite"
+	ProtocolVRRP         Protocol      = "vrrp"
 )
 
 func (rd RuleDirection) IsValid() error {
@@ -143,7 +155,19 @@ func (p Protocol) IsValid() error {
 	case ProtocolICMP,
 		ProtocolAny,
 		ProtocolTCP,
-		ProtocolUDP:
+		ProtocolUDP,
+		ProtocolAH,
+		ProtocolDCCP,
+		ProtocolEGP,
+		ProtocolESP,
+		ProtocolGRE,
+		ProtocolIGMP,
+		ProtocolOSPF,
+		ProtocolPGM,
+		ProtocolRSVP,
+		ProtocolSCTP,
+		ProtocolUDPLITE,
+		ProtocolVRRP:
 		return nil
 	}
 	return fmt.Errorf("invalid Protocol: %v", p)
@@ -170,6 +194,18 @@ func (p Protocol) List() []Protocol {
 		ProtocolTCP,
 		ProtocolAny,
 		ProtocolICMP,
+		ProtocolAH,
+		ProtocolDCCP,
+		ProtocolEGP,
+		ProtocolESP,
+		ProtocolGRE,
+		ProtocolIGMP,
+		ProtocolOSPF,
+		ProtocolPGM,
+		ProtocolRSVP,
+		ProtocolSCTP,
+		ProtocolUDPLITE,
+		ProtocolVRRP,
 	}
 }
 
