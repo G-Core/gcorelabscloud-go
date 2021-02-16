@@ -29,6 +29,12 @@ type GetResult struct {
 	commonResult
 }
 
+// UpdateResult represents the result of an update operation. Call its Extract
+// method to interpret it as a Snapshot.
+type UpdateResult struct {
+	commonResult
+}
+
 // Snapshot represents a snapshot.
 type Snapshot struct {
 	ID            string                   `json:"id"`
