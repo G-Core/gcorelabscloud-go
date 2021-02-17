@@ -116,6 +116,19 @@ type Interface struct {
 	IPAssignments     []PortIP       `json:"ip_assignments"`
 	NetworkDetails    NetworkDetail  `json:"network_details"`
 	FloatingIPDetails []FloatingIP   `json:"floatingip_details"`
+	SubPorts          []SubPort      `json:"sub_ports"`
+}
+
+// SubPort represent a instance sub port interface
+type SubPort struct {
+	PortID            string         `json:"port_id"`
+	MacAddress        gcorecloud.MAC `json:"mac_address"`
+	NetworkID         string         `json:"network_id"`
+	IPAssignments     []PortIP       `json:"ip_assignments"`
+	NetworkDetails    NetworkDetail  `json:"network_details"`
+	FloatingIPDetails []FloatingIP   `json:"floatingip_details"`
+	SegmentationID    int            `json:"segmentation_id"`
+	SegmentationType  string         `json:"segmentation_type"`
 }
 
 // PortIP
