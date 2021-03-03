@@ -110,13 +110,14 @@ type Instance struct {
 
 // Interface represents a instance port interface.
 type Interface struct {
-	PortID            string         `json:"port_id"`
-	MacAddress        gcorecloud.MAC `json:"mac_address"`
-	NetworkID         string         `json:"network_id"`
-	IPAssignments     []PortIP       `json:"ip_assignments"`
-	NetworkDetails    NetworkDetail  `json:"network_details"`
-	FloatingIPDetails []FloatingIP   `json:"floatingip_details"`
-	SubPorts          []SubPort      `json:"sub_ports"`
+	PortID              string         `json:"port_id"`
+	MacAddress          gcorecloud.MAC `json:"mac_address"`
+	NetworkID           string         `json:"network_id"`
+	PortSecurityEnabled bool           `json:"port_security_enabled"`
+	IPAssignments       []PortIP       `json:"ip_assignments"`
+	NetworkDetails      NetworkDetail  `json:"network_details"`
+	FloatingIPDetails   []FloatingIP   `json:"floatingip_details"`
+	SubPorts            []SubPort      `json:"sub_ports"`
 }
 
 // SubPort represent a instance sub port interface
