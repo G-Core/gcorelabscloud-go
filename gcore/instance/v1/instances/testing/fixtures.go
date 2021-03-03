@@ -150,6 +150,7 @@ const InterfacesResponse = `
       "port_id": "1f0ca628-a73b-42c0-bdac-7b10d023e097",
       "mac_address": "00:16:3e:f2:87:16",
       "network_id": "bc688791-f1b0-44eb-97d4-07697294b1e1",
+	  "port_security_enabled": true,
       "ip_assignments": [
         {
           "ip_address": "192.168.123.20",
@@ -461,9 +462,10 @@ var (
 		Name: "Test",
 	}
 	InstanceInterface1 = instances.Interface{
-		PortID:     PortID,
-		MacAddress: *PortMac,
-		NetworkID:  "bc688791-f1b0-44eb-97d4-07697294b1e1",
+		PortID:              PortID,
+		MacAddress:          *PortMac,
+		PortSecurityEnabled: true,
+		NetworkID:           "bc688791-f1b0-44eb-97d4-07697294b1e1",
 		IPAssignments: []instances.PortIP{{
 			IPAddress: PortIP1,
 			SubnetID:  "351b0dd7-ca09-431c-be53-935db3785067",

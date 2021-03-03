@@ -17,6 +17,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/client/loadbalancers/v1/loadbalancers"
 	"github.com/G-Core/gcorelabscloud-go/client/networks/v1/networks"
 	"github.com/G-Core/gcorelabscloud-go/client/projects/v1/projects"
+	"github.com/G-Core/gcorelabscloud-go/client/ports/v1/ports"
 	"github.com/G-Core/gcorelabscloud-go/client/quotas/v1/quotas"
 	"github.com/G-Core/gcorelabscloud-go/client/regions/v1/regions"
 	"github.com/G-Core/gcorelabscloud-go/client/securitygroups/v1/securitygroups"
@@ -42,6 +43,7 @@ var commands = []*cli.Command{
 	&heat.HeatsCommand,
 	&securitygroups.SecurityGroupCommands,
 	&floatingips.FloatingIPCommands,
+	&ports.PortCommands,
 	&snapshots.SnapshotCommands,
 	&images.ImageCommands,
 	&regions.RegionCommands,
