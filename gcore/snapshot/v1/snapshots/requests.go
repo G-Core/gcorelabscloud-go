@@ -90,20 +90,6 @@ func (opts UpdateOpts) ToSnapshotUpdateMap() (map[string]interface{}, error) {
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
-// Update accepts a UpdateOpts struct and updates an existing snapshot using the
-// values provided. For more information, see the Create function.
-func Update(c *gcorecloud.ServiceClient, snapshotID string, opts UpdateOptsBuilder) (r UpdateResult) {
-	b, err := opts.ToSnapshotUpdateMap()
-	if err != nil {
-		r.Err = err
-		return
-	}
-	_, r.Err = c.Patch(updateURL(c, snapshotID), b, &r.Body, &gcorecloud.RequestOpts{
-		OkCodes: []int{200, 201},
-	})
-	return
-}
-
 // Delete accepts a unique ID and deletes the snapshot associated with it.
 func Delete(c *gcorecloud.ServiceClient, snapshotID string) (r tasks.Result) {
 	_, r.Err = c.DeleteWithResponse(deleteURL(c, snapshotID), &r.Body, nil)
