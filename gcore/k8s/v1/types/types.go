@@ -7,13 +7,17 @@ import (
 
 type PoolRole string
 type HealthStatus string
+type IngressController string
 
 const (
-	NodegroupMasterRole   PoolRole     = "master"
-	NodegroupWorkerRole   PoolRole     = "worker"
-	HealthStatusUnknown   HealthStatus = "UNKNOWN"
-	HealthStatusHealthy   HealthStatus = "HEALTHY"
-	HealthStatusUnHealthy HealthStatus = "UNHEALTHY"
+	NodegroupMasterRole      PoolRole          = "master"
+	NodegroupWorkerRole      PoolRole          = "worker"
+	HealthStatusUnknown      HealthStatus      = "UNKNOWN"
+	HealthStatusHealthy      HealthStatus      = "HEALTHY"
+	HealthStatusUnHealthy    HealthStatus      = "UNHEALTHY"
+	IngressControllerOctavia IngressController = "octavia"
+	IngressControllerNginx   IngressController = "nginx"
+	IngressControllerTraefik IngressController = "traefik"
 )
 
 func (ng PoolRole) IsValid() error {
@@ -134,4 +138,65 @@ func (hs *HealthStatus) UnmarshalJSON(data []byte) error {
 // MarshalJSON - implements Marshaler interface
 func (hs *HealthStatus) MarshalJSON() ([]byte, error) {
 	return json.Marshal(hs.String())
+}
+
+func (ic IngressController) IsValid() error {
+	switch ic {
+	case IngressControllerOctavia,
+		IngressControllerNginx,
+		IngressControllerTraefik:
+		return nil
+	}
+	return fmt.Errorf("invalid IngressController type: %v", ic)
+}
+
+func (ic IngressController) ValidOrNil() (*IngressController, error) {
+	if ic.String() == "" {
+		return nil, nil
+	}
+	err := ic.IsValid()
+	if err != nil {
+		return &ic, err
+	}
+	return &ic, nil
+}
+
+func (ic IngressController) String() string {
+	return string(ic)
+}
+
+func (ic IngressController) List() []IngressController {
+	return []IngressController{
+		IngressControllerOctavia,
+		IngressControllerNginx,
+		IngressControllerTraefik,
+	}
+}
+
+func (ic IngressController) StringList() []string {
+	var s []string
+	for _, v := range ic.List() {
+		s = append(s, v.String())
+	}
+	return s
+}
+
+// UnmarshalJSON - implements Unmarshaler interface
+func (ic *IngressController) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	v := IngressController(s)
+	err := v.IsValid()
+	if err != nil {
+		return err
+	}
+	*ic = v
+	return nil
+}
+
+// MarshalJSON - implements Marshaler interface
+func (ic *IngressController) MarshalJSON() ([]byte, error) {
+	return json.Marshal(ic.String())
 }
