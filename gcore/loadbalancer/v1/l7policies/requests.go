@@ -47,31 +47,6 @@ type CreateRuleOpts struct {
 	Value       string      `json:"value" required:"true"`
 }
 
-// ListOpts allows the filtering and sorting of paginated collections through
-// the API.
-type ListOpts struct {
-	Name           string `q:"name"`
-	ListenerID     string `q:"listener_id"`
-	Action         string `q:"action"`
-	Position       int32  `q:"position"`
-	Description    string `q:"description"`
-	RedirectPoolID string `q:"redirect_pool_id"`
-}
-
-// ListOptsBuilder allows extensions to add additional parameters to the List request.
-type ListOptsBuilder interface {
-	ToL7PolicesListQuery() (string, error)
-}
-
-// ToL7PolicesListQuery formats a ListOpts into a query string.
-func (opts ListOpts) ToL7PolicesListQuery() (string, error) {
-	q, err := gcorecloud.BuildQueryString(opts)
-	if err != nil {
-		return "", err
-	}
-	return q.String(), err
-}
-
 // ToL7PolicyCreateMap builds a request body from CreateOpts.
 func (opts CreateOpts) ToL7PolicyCreateMap() (map[string]interface{}, error) {
 	if err := gcorecloud.ValidateStruct(opts); err != nil {
@@ -88,15 +63,8 @@ func (opts CreateRuleOpts) ToRuleCreateMap() (map[string]interface{}, error) {
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
-func List(c *gcorecloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
+func List(c *gcorecloud.ServiceClient) pagination.Pager {
 	url := listURL(c)
-	if opts != nil {
-		query, err := opts.ToL7PolicesListQuery()
-		if err != nil {
-			return pagination.Pager{Err: err}
-		}
-		url += query
-	}
 	return pagination.NewPager(c, url, func(r pagination.PageResult) pagination.Page {
 		return L7PolicyPage{pagination.LinkedPageBase{PageResult: r}}
 	})
