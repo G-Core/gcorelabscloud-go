@@ -16,6 +16,7 @@ const (
 	Standard         VolumeType   = "standard"
 	SsdHiIops        VolumeType   = "ssd_hiiops"
 	Cold             VolumeType   = "cold"
+	Ultra            VolumeType   = "ultra"
 	Creating         VolumeStatus = "creating"
 	Available        VolumeStatus = "available"
 	Reserved         VolumeStatus = "reserved"
@@ -190,7 +191,7 @@ func (vt VolumeType) String() string {
 }
 
 func (vt VolumeType) List() []VolumeType {
-	return []VolumeType{Standard, SsdHiIops, Cold}
+	return []VolumeType{Standard, SsdHiIops, Cold, Ultra}
 }
 
 func (vt VolumeType) StringList() []string {
@@ -203,7 +204,7 @@ func (vt VolumeType) StringList() []string {
 
 func (vt VolumeType) IsValid() error {
 	switch vt {
-	case Standard, Cold, SsdHiIops:
+	case Standard, Cold, SsdHiIops, Ultra:
 		return nil
 	}
 	return fmt.Errorf("invalid VolumeType type: %v", vt)
