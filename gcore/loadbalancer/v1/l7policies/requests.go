@@ -34,7 +34,6 @@ type CreateOpts struct {
 	ListenerID     string `json:"listener_id" required:"true"`
 	Action         Action `json:"action" required:"true"`
 	Position       int32  `json:"position,omitempty"`
-	Description    string `json:"description,omitempty"`
 	RedirectPoolID string `json:"redirect_pool_id,omitempty"`
 }
 
