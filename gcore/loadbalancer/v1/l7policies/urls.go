@@ -22,18 +22,34 @@ func createURL(c *gcorecloud.ServiceClient) string {
 	return rootURL(c)
 }
 
+func replaceURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceURL(c, id)
+}
+
 func deleteURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceURL(c, id)
 }
 
-func rulesrootURL(c *gcorecloud.ServiceClient, id string) string {
+func rulesRootURL(c *gcorecloud.ServiceClient, id string) string {
 	return c.ServiceURL(id, "rules")
 }
 
-func rulescreateURL(c *gcorecloud.ServiceClient, id string) string {
-	return rulesrootURL(c, id)
+func rulesCreateURL(c *gcorecloud.ServiceClient, id string) string {
+	return rulesRootURL(c, id)
 }
 
-func rulesgetURL(c *gcorecloud.ServiceClient, plid string, rlid string) string {
+func rulesGetURL(c *gcorecloud.ServiceClient, plid string, rlid string) string {
+	return c.ServiceURL(plid, "rules", rlid)
+}
+
+func rulesListURL(c *gcorecloud.ServiceClient, id string) string {
+	return rulesRootURL(c, id)
+}
+
+func rulesDeleteURL(c *gcorecloud.ServiceClient, plid string, rlid string) string {
+	return c.ServiceURL(plid, "rules", rlid)
+}
+
+func rulesReplaceURL(c *gcorecloud.ServiceClient, plid string, rlid string) string {
 	return c.ServiceURL(plid, "rules", rlid)
 }
