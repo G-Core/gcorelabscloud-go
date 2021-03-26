@@ -26,13 +26,30 @@ func (r commonResult) Extract() (*L7Policy, error) {
 }
 
 // Extract is a function that accepts a result and extracts a rule policy resource.
-func (r commonResult) ExtractRule() (*Rule, error) {
-	var s Rule
+func (r commonResult) ExtractRule() (*L7Rule, error) {
+	var s L7Rule
 	err := r.ExtractInto(&s)
 	return &s, err
 }
 
-func (r commonResult) ExtractInto(v interface{}) error {
+type commonRuleResult struct {
+	gcorecloud.Result
+}
+
+// GetRuleResult represents the result of a get operation. Call its Extract
+// method to interpret it as a L7Rule.
+type GetRuleResult struct {
+	commonRuleResult
+}
+
+// Extract is a function that accepts a result and extracts a l7 rule resource.
+func (r commonRuleResult) Extract() (*L7Rule, error) {
+	var s L7Rule
+	err := r.ExtractInto(&s)
+	return &s, err
+}
+
+func (r commonRuleResult) ExtractInto(v interface{}) error {
 	return r.Result.ExtractIntoStructPtr(v, "")
 }
 
@@ -40,31 +57,40 @@ func (r commonResult) ExtractInto(v interface{}) error {
 type L7Policy struct {
 	ID                 string                   `json:"id"`
 	Name               string                   `json:"name"`
-	Description        string                   `json:"description"`
-	Action             string                   `json:"action"`
+	Action             Action                   `json:"action"`
 	ListenerID         string                   `json:"listener_id"`
 	RedirectPoolID     string                   `json:"redirect_pool_id"`
 	Position           int32                    `json:"position"`
 	ProjectID          int32                    `json:"project_id"`
+	RegionID           int                      `json:"region_id"`
+	Region             string                   `json:"region"`
 	OperatingStatus    string                   `json:"operating_status"`
 	ProvisioningStatus string                   `json:"provisioning_status"`
+	RedirectHttpCode   *int                     `json:"redirect_http_code"`
+	RedirectPrefix     *string                  `json:"redirect_prefix"`
+	RedirectURL        *string                  `json:"redirect_url"`
+	Tags               []string                 `json:"tags"`
 	CreatedAt          gcorecloud.JSONRFC3339Z  `json:"created_at"`
 	UpdatedAt          *gcorecloud.JSONRFC3339Z `json:"updated_at"`
-	Rules              []Rule                   `json:"rules"`
+	Rules              []L7Rule                 `json:"rules"`
 }
 
-// Rule represents layer 7 load balancing rule.
-type Rule struct {
+// L7Rule represents layer 7 load balancing rule.
+type L7Rule struct {
 	ID                 string                   `json:"id"`
-	CompareType        string                   `json:"compare_type"`
+	CompareType        CompareType              `json:"compare_type"`
 	Invert             bool                     `json:"invert"`
-	Key                string                   `json:"key"`
+	Key                *string                  `json:"key"`
 	OperatingStatus    string                   `json:"operating_status"`
 	ProvisioningStatus string                   `json:"provisioning_status"`
 	CreatedAt          gcorecloud.JSONRFC3339Z  `json:"created_at"`
 	UpdatedAt          *gcorecloud.JSONRFC3339Z `json:"updated_at"`
-	Type               string                   `json:"type"`
+	Type               RuleType                 `json:"type"`
 	Value              string                   `json:"value"`
+	Tags               []string                 `json:"tags"`
+	ProjectID          int                      `json:"project_id"`
+	RegionID           int                      `json:"region_id"`
+	Region             string                   `json:"region"`
 }
 
 // L7PolicyPage is the page returned by a pager when traversing over a
@@ -135,12 +161,12 @@ func (r RulePage) NextPageURL() (string, error) {
 
 // IsEmpty checks whether a RulePage struct is empty.
 func (r RulePage) IsEmpty() (bool, error) {
-	is, err := ExtractRule(r)
+	is, err := ExtractL7Rules(r)
 	return len(is) == 0, err
 }
 
-func ExtractRule(r pagination.Page) ([]Rule, error) {
-	var s []Rule
+func ExtractL7Rules(r pagination.Page) ([]L7Rule, error) {
+	var s []L7Rule
 	err := ExtractRuleInto(r, &s)
 	return s, err
 }
