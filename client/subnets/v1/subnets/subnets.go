@@ -30,7 +30,7 @@ func getDNSNameservers(c *cli.Context) ([]net.IP, error) {
 	return result, nil
 }
 
-func getHostRoutes(c *cli.Context) ([]subnets.HostRoute, error) {
+func GetHostRoutes(c *cli.Context) ([]subnets.HostRoute, error) {
 	destinations := c.StringSlice("route-destination")
 	hops := c.StringSlice("route-nexthop")
 	if len(destinations) > 0 && len(destinations) != len(hops) {
@@ -199,7 +199,7 @@ var subnetUpdateCommand = cli.Command{
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
-		hostRoutes, err := getHostRoutes(c)
+		hostRoutes, err := GetHostRoutes(c)
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -289,7 +289,7 @@ var subnetCreateCommand = cli.Command{
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
-		hostRoutes, err := getHostRoutes(c)
+		hostRoutes, err := GetHostRoutes(c)
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}

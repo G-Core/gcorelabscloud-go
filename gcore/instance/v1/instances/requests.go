@@ -353,13 +353,13 @@ func AttachInterface(client *gcorecloud.ServiceClient, id string, opts Interface
 }
 
 // DetachInterface removes a interface from the instance.
-func DetachInterface(client *gcorecloud.ServiceClient, id string, opts InterfaceOptsBuilder) (r InterfaceActionResult) {
+func DetachInterface(client *gcorecloud.ServiceClient, id string, opts InterfaceOptsBuilder) (r tasks.Result) {
 	b, err := opts.ToInterfaceActionMap()
 	if err != nil {
 		r.Err = err
 		return
 	}
-	_, r.Err = client.Post(detachInterfaceURL(client, id), b, nil, &gcorecloud.RequestOpts{ // nolint
+	_, r.Err = client.Post(detachInterfaceURL(client, id), b, &r.Body, &gcorecloud.RequestOpts{ // nolint
 		OkCodes: []int{http.StatusNoContent, http.StatusOK},
 	})
 	return

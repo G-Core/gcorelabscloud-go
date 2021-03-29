@@ -312,7 +312,11 @@ func TestAttachInterface(t *testing.T) {
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 		th.TestJSONRequest(t, r, AttachInterfaceRequest)
 		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNoContent)
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, CreateResponse)
+		if err != nil {
+			log.Error(err)
+		}
 	})
 
 	client := fake.ServiceTokenClient("instances", "v1")
@@ -322,9 +326,10 @@ func TestAttachInterface(t *testing.T) {
 		SubnetID: "9bc36cf6-407c-4a74-bc83-ce3aa3854c3d",
 	}
 
-	err := instances.AttachInterface(client, instanceID, opts).Err
+	tasks, err := instances.AttachInterface(client, instanceID, opts).Extract()
 
 	require.NoError(t, err)
+	require.Equal(t, Tasks1, *tasks)
 }
 
 func TestDetachInterface(t *testing.T) {
@@ -336,7 +341,11 @@ func TestDetachInterface(t *testing.T) {
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 		th.TestJSONRequest(t, r, DetachInterfaceRequest)
 		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNoContent)
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, CreateResponse)
+		if err != nil {
+			log.Error(err)
+		}
 	})
 
 	client := fake.ServiceTokenClient("instances", "v1")
@@ -346,9 +355,10 @@ func TestDetachInterface(t *testing.T) {
 		IpAddress: "192.168.0.23",
 	}
 
-	err := instances.DetachInterface(client, instanceID, opts).ExtractErr()
+	tasks, err := instances.DetachInterface(client, instanceID, opts).Extract()
 
 	require.NoError(t, err)
+	require.Equal(t, Tasks1, *tasks)
 }
 
 func TestCreate(t *testing.T) {

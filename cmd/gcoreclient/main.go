@@ -13,18 +13,22 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/client/k8s/v1/k8s"
 	"github.com/G-Core/gcorelabscloud-go/client/keypairs/v2/keypairs"
 	"github.com/G-Core/gcorelabscloud-go/client/keystones/v1/keystones"
+	"github.com/G-Core/gcorelabscloud-go/client/l7policies/v1/l7policies"
 	"github.com/G-Core/gcorelabscloud-go/client/limits/v1/limits"
 	"github.com/G-Core/gcorelabscloud-go/client/loadbalancers/v1/loadbalancers"
 	"github.com/G-Core/gcorelabscloud-go/client/networks/v1/networks"
-	"github.com/G-Core/gcorelabscloud-go/client/projects/v1/projects"
 	"github.com/G-Core/gcorelabscloud-go/client/ports/v1/ports"
+	"github.com/G-Core/gcorelabscloud-go/client/projects/v1/projects"
 	"github.com/G-Core/gcorelabscloud-go/client/quotas/v1/quotas"
 	"github.com/G-Core/gcorelabscloud-go/client/regions/v1/regions"
+	"github.com/G-Core/gcorelabscloud-go/client/reservedfixedips/v1/reservedfixedips"
+	"github.com/G-Core/gcorelabscloud-go/client/routers/v1/routers"
 	"github.com/G-Core/gcorelabscloud-go/client/securitygroups/v1/securitygroups"
 	"github.com/G-Core/gcorelabscloud-go/client/snapshots/v1/snapshots"
 	"github.com/G-Core/gcorelabscloud-go/client/subnets/v1/subnets"
 	"github.com/G-Core/gcorelabscloud-go/client/tasks/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/client/volumes/v1/volumes"
+
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
@@ -53,6 +57,9 @@ var commands = []*cli.Command{
 	&limits.LimitCommands,
 	&k8s.ClusterCommands,
 	&k8s.ClusterPoolCommands,
+	&l7policies.L7PolicyCommands,
+	&routers.RouterCommands,
+	&reservedfixedips.ReservedFixedIPCommands,
 }
 
 type clientCommands struct {

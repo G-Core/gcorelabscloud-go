@@ -44,7 +44,7 @@ build:
 	-o $(BINARY) \
 	$(CMD_PACKAGE)
 
-install: check test
+install:
 	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) go install \
 	-ldflags $(LDFLAGS) \
 	$(CMD_PACKAGE)
