@@ -10,3 +10,7 @@ import (
 func NewInstanceClientV1(c *cli.Context) (*gcorecloud.ServiceClient, error) {
 	return common.BuildClient(c, "instances", "v1")
 }
+
+func NewBmInstanceClientV1(c *cli.Context) (*gcorecloud.ServiceClient, error) {
+	return common.BuildClient(c, "bminstances", "v1")
+}

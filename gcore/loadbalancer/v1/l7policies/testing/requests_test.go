@@ -149,7 +149,7 @@ func TestPolicyCreate(t *testing.T) {
 		th.TestHeader(t, r, "Accept", "application/json")
 		th.TestJSONRequest(t, r, CreatePolicyRequest)
 		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
+		w.WriteHeader(http.StatusOK)
 
 		_, err := fmt.Fprint(w, TaskResponse)
 		if err != nil {
@@ -184,7 +184,7 @@ func TestPolicyReplace(t *testing.T) {
 		th.TestHeader(t, r, "Accept", "application/json")
 		th.TestJSONRequest(t, r, ReplacePolicyRequest)
 		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
+		w.WriteHeader(http.StatusOK)
 
 		_, err := fmt.Fprint(w, TaskResponse)
 		if err != nil {
@@ -331,7 +331,7 @@ func TestRuleCreate(t *testing.T) {
 		th.TestHeader(t, r, "Accept", "application/json")
 		th.TestJSONRequest(t, r, CreateRuleRequest)
 		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
+		w.WriteHeader(http.StatusOK)
 
 		_, err := fmt.Fprint(w, TaskResponse)
 		if err != nil {
@@ -388,7 +388,7 @@ func TestRuleReplace(t *testing.T) {
 		th.TestHeader(t, r, "Accept", "application/json")
 		th.TestJSONRequest(t, r, CreateRuleRequest)
 		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
+		w.WriteHeader(http.StatusOK)
 
 		_, err := fmt.Fprint(w, TaskResponse)
 		if err != nil {

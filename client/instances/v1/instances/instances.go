@@ -9,6 +9,7 @@ import (
 
 	"github.com/G-Core/gcorelabscloud-go/client/instances/v1/client"
 	client2 "github.com/G-Core/gcorelabscloud-go/client/instances/v2/client"
+	"github.com/G-Core/gcorelabscloud-go/gcore/baremetal/v1/bminstances"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 
@@ -30,6 +31,52 @@ var (
 	bootableIndex             = 0
 )
 
+var InstanceCommands = cli.Command{
+	Name:  "instance",
+	Usage: "GCloud instances API",
+	Subcommands: []*cli.Command{
+		&instanceGetCommand,
+		&instanceListCommand,
+		&instanceCreateCommandV2,
+		&instanceDeleteCommand,
+		&instanceStartCommand,
+		&instanceStopCommand,
+		&instancePowerCycleCommand,
+		&instanceRebootCommand,
+		&instanceSuspendCommand,
+		&instanceResumeCommand,
+		&instanceResizeCommand,
+		&instanceCreateBaremetalCommand,
+		{
+			Name:  "interface",
+			Usage: "Instance interfaces",
+			Subcommands: []*cli.Command{
+				&instanceListInterfacesCommand,
+			},
+		},
+		{
+			Name:  "securitygroup",
+			Usage: "Instance security groups",
+			Subcommands: []*cli.Command{
+				&instanceListSecurityGroupsCommand,
+				&instanceAssignSecurityGroupsCommand,
+				&instanceUnAssignSecurityGroupsCommand,
+			},
+		},
+		{
+			Name:  "metadata",
+			Usage: "Instance metadata",
+			Subcommands: []*cli.Command{
+				&metadataListCommand,
+				&metadataGetCommand,
+				&metadataCreateCommand,
+				&metadataUpdateCommand,
+				&metadataDeleteCommand,
+			},
+		},
+	},
+}
+
 func StringSliceToMetadataSetOpts(slice []string) (*instances.MetadataSetOpts, error) {
 	if len(slice) == 0 {
 		return nil, nil
@@ -43,6 +90,21 @@ func StringSliceToMetadataSetOpts(slice []string) (*instances.MetadataSetOpts, e
 		m.Metadata = append(m.Metadata, instances.MetadataOpts{Key: parts[0], Value: parts[1]})
 	}
 	return &m, nil
+}
+
+func StringSliceToAppConfigSetOpts(slice []string) (map[string]interface{}, error) {
+	if len(slice) == 0 {
+		return nil, nil
+	}
+	m := make(map[string]interface{}, len(slice))
+	for _, s := range slice {
+		parts := strings.SplitN(s, "=", 2)
+		if len(parts) != 2 {
+			return m, fmt.Errorf("wrong label format: %s", s)
+		}
+		m[parts[0]] = parts[1]
+	}
+	return m, nil
 }
 
 func getUserData(c *cli.Context) (string, error) {
@@ -157,6 +219,49 @@ func getInterfaces(c *cli.Context) ([]instances.InterfaceOpts, error) {
 		}
 
 		opts := instances.InterfaceOpts{
+			Type:       interfaceType,
+			NetworkID:  utils.StringFromIndex(interfaceNetworkIDs, idx, ""),
+			SubnetID:   utils.StringFromIndex(interfaceSubnetIDs, idx, ""),
+			FloatingIP: fIP,
+		}
+
+		err := gcorecloud.TranslateValidationError(opts.Validate())
+
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, opts)
+
+	}
+
+	return res, nil
+
+}
+
+func getBaremetalInterfaces(c *cli.Context) ([]bminstances.InterfaceOpts, error) {
+	interfaceTypes := utils.GetEnumStringSliceValue(c, "interface-type")
+	interfaceNetworkIDs := c.StringSlice("interface-network-id")
+	interfaceSubnetIDs := c.StringSlice("interface-subnet-id")
+	interfaceFloatingSources := utils.GetEnumStringSliceValue(c, "interface-floating-source")
+	interfaceFloatingIPs := c.StringSlice("interface-floating-ip")
+
+	res := make([]bminstances.InterfaceOpts, 0, len(interfaceTypes))
+
+	for idx, t := range interfaceTypes {
+		interfaceType := types.InterfaceType(t)
+		var fIP *bminstances.CreateNewInterfaceFloatingIPOpts = nil
+		if interfaceType == types.SubnetInterfaceType {
+			source := types.FloatingIPSource(utils.StringFromIndex(interfaceFloatingSources, idx, ""))
+			if source != "" {
+				fIP = &bminstances.CreateNewInterfaceFloatingIPOpts{
+					Source:             types.FloatingIPSource(utils.StringFromIndex(interfaceFloatingSources, idx, "")),
+					ExistingFloatingID: utils.StringFromIndex(interfaceFloatingIPs, idx, ""),
+				}
+			}
+		}
+
+		opts := bminstances.InterfaceOpts{
 			Type:       interfaceType,
 			NetworkID:  utils.StringFromIndex(interfaceNetworkIDs, idx, ""),
 			SubnetID:   utils.StringFromIndex(interfaceSubnetIDs, idx, ""),
@@ -1047,47 +1152,146 @@ var metadataUpdateCommand = cli.Command{
 	},
 }
 
-var InstanceCommands = cli.Command{
-	Name:  "instance",
-	Usage: "GCloud instances API",
-	Subcommands: []*cli.Command{
-		&instanceGetCommand,
-		&instanceListCommand,
-		&instanceCreateCommandV2,
-		&instanceDeleteCommand,
-		&instanceStartCommand,
-		&instanceStopCommand,
-		&instancePowerCycleCommand,
-		&instanceRebootCommand,
-		&instanceSuspendCommand,
-		&instanceResumeCommand,
-		&instanceResizeCommand,
-		{
-			Name:  "interface",
-			Usage: "Instance interfaces",
-			Subcommands: []*cli.Command{
-				&instanceListInterfacesCommand,
-			},
+var instanceCreateBaremetalCommand = cli.Command{
+	Name: "create_baremetal",
+	Usage: `
+	Create baremetal instance. 
+	Example: gcoreclient instance create_baremetal --flavor bm1-infrastructure-small --name test1 --keypair keypair --image-id 1ee7ccee-5003-48c9-8ae0-d96063af75b2 --interface-type external`,
+	Category: "instance",
+	Flags: append([]cli.Flag{
+		&cli.StringSliceFlag{
+			Name:    "name",
+			Aliases: []string{"n"},
+			Usage:   "Baremetal instance name",
 		},
-		{
-			Name:  "securitygroup",
-			Usage: "Instance security groups",
-			Subcommands: []*cli.Command{
-				&instanceListSecurityGroupsCommand,
-				&instanceAssignSecurityGroupsCommand,
-				&instanceUnAssignSecurityGroupsCommand,
-			},
+		&cli.StringSliceFlag{
+			Name:  "name-template",
+			Usage: "Baremetal instance name templates",
 		},
-		{
-			Name:  "metadata",
-			Usage: "Instance metadata",
-			Subcommands: []*cli.Command{
-				&metadataListCommand,
-				&metadataGetCommand,
-				&metadataCreateCommand,
-				&metadataUpdateCommand,
-				&metadataDeleteCommand,
-			},
+		&cli.StringFlag{
+			Name:     "flavor",
+			Usage:    "Baremetal instance flavor",
+			Required: true,
 		},
+		&cli.StringFlag{
+			Name:    "keypair",
+			Aliases: []string{"k"},
+			Usage:   "Baremetal instance ssh keypair",
+		},
+		&cli.StringFlag{
+			Name:    "password",
+			Aliases: []string{"p"},
+			Usage:   "Baremetal instance password",
+		},
+		&cli.StringFlag{
+			Name:    "username",
+			Aliases: []string{"u"},
+			Usage:   "Baremetal instance username",
+		},
+		&cli.StringFlag{
+			Name:  "user-data",
+			Usage: "Baremetal instance user data",
+		},
+		&cli.StringFlag{
+			Name:  "image-id",
+			Usage: "Baremetal instance volume image id",
+		},
+		&cli.StringFlag{
+			Name:  "apptemplate-id",
+			Usage: "Baremetal instance volume apptemplate id",
+		},
+		&cli.GenericFlag{
+			Name:    "interface-type",
+			Aliases: []string{"it"},
+			Value: &utils.EnumStringSliceValue{
+				Enum: interfaceTypes,
+			},
+			Usage:    fmt.Sprintf("Baremetal instance interface type. output in %s", strings.Join(interfaceTypes, ", ")),
+			Required: true,
+		},
+		&cli.StringSliceFlag{
+			Name:  "interface-network-id",
+			Usage: "Baremetal instance interface network id",
+		},
+		&cli.StringSliceFlag{
+			Name:  "interface-subnet-id",
+			Usage: "Baremetal instance interface subnet id",
+		},
+		&cli.GenericFlag{
+			Name:    "interface-floating-source",
+			Aliases: []string{"ifs"},
+			Value: &utils.EnumStringSliceValue{
+				Enum: interfaceFloatingIPSource,
+			},
+			Usage: fmt.Sprintf("Baremetal instance floating ip source. output in %s", strings.Join(interfaceFloatingIPSource, ", ")),
+		},
+		&cli.StringSliceFlag{
+			Name:  "interface-floating-ip",
+			Usage: "Baremetal instance interface existing floating ip. Required when --interface-floating-source set as `existing`",
+		},
+		&cli.StringSliceFlag{
+			Name:  "appconfig",
+			Usage: "Baremetal instance appconfig. Example: --appconfig one=two --appconfig three=four",
+		},
+	}, flags.WaitCommandFlags...),
+	Action: func(c *cli.Context) error {
+		clientV1, err := client.NewBmInstanceClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		userData, err := getUserData(c)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "create_baremetal")
+			return cli.NewExitError(err, 1)
+		}
+
+		instanceInterfaces, err := getBaremetalInterfaces(c)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "create_baremetal")
+			return cli.NewExitError(err, 1)
+		}
+
+		appCfg, err := StringSliceToAppConfigSetOpts(c.StringSlice("appconfig"))
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "create_baremetal")
+			return cli.NewExitError(err, 1)
+		}
+
+		opts := bminstances.CreateOpts{
+			Flavor:        c.String("flavor"),
+			Names:         c.StringSlice("name"),
+			NameTemplates: c.StringSlice("name-template"),
+			ImageID:       c.String("image-id"),
+			AppTemplateID: c.String("apptemplate-id"),
+			Interfaces:    instanceInterfaces,
+			Keypair:       c.String("keypair"),
+			Password:      c.String("password"),
+			Username:      c.String("username"),
+			UserData:      userData,
+			AppConfig:     appCfg,
+		}
+
+		results, err := bminstances.Create(clientV1, opts).Extract()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+
+		return utils.WaitTaskAndShowResult(c, clientV1, results, true, func(task tasks.TaskID) (interface{}, error) {
+			taskInfo, err := tasks.Get(clientV1, string(task)).Extract()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
+			}
+			instanceID, err := instances.ExtractInstanceIDFromTask(taskInfo)
+			if err != nil {
+				return nil, fmt.Errorf("cannot retrieve instance ID from task info: %w", err)
+			}
+			instance, err := instances.Get(clientV1, instanceID).Extract()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get instance with ID: %s. Error: %w", instanceID, err)
+			}
+			return instance, nil
+		})
 	},
 }

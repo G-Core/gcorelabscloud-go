@@ -1,6 +1,8 @@
 package l7policies
 
 import (
+	"net/http"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
@@ -121,7 +123,7 @@ func Replace(c *gcorecloud.ServiceClient, policyID string, opts ReplaceOptsBuild
 		r.Err = err
 		return
 	}
-	_, r.Err = c.Put(replaceURL(c, policyID), b, &r.Body, nil)
+	_, r.Err = c.Put(replaceURL(c, policyID), b, &r.Body, &gcorecloud.RequestOpts{OkCodes: []int{http.StatusOK}})
 	return
 }
 
@@ -157,7 +159,7 @@ func ReplaceRule(c *gcorecloud.ServiceClient, policyID, ruleID string, opts Crea
 		r.Err = err
 		return
 	}
-	_, r.Err = c.Put(rulesReplaceURL(c, policyID, ruleID), b, &r.Body, nil)
+	_, r.Err = c.Put(rulesReplaceURL(c, policyID, ruleID), b, &r.Body, &gcorecloud.RequestOpts{OkCodes: []int{http.StatusOK}})
 	return
 }
 
