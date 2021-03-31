@@ -15,7 +15,7 @@ Getting started
 
 You will need to set the following env:
 ```bash
-export GCLOUD_USERNAM=username
+export GCLOUD_USERNAME=username
 export GCLOUD_PASSWORD=secret
 export GCLOUD_PROJECT=1
 export GCLOUD_REGION=1
