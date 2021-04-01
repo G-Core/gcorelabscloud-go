@@ -200,7 +200,7 @@ var listenerUpdateSubCommand = cli.Command{
 		&cli.StringFlag{
 			Name:     "name",
 			Aliases:  []string{"n"},
-			Usage:    "Loadbalancer name",
+			Usage:    "listener name",
 			Required: true,
 		},
 	},

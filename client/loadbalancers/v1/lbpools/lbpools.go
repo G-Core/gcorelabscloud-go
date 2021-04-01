@@ -51,6 +51,7 @@ func getHealthMonitor(c *cli.Context) (*lbpools.CreateHealthMonitorOpts, error) 
 		MaxRetries:     healthMonitorMaxRetires,
 		Timeout:        healthMonitorTimeout,
 		MaxRetriesDown: c.Int("healthmonitor-max-retries-down"),
+		ExpectedCodes:  c.String("healthmonitor-expected-codes"),
 	}
 	if healthMonitorType.IsHTTPType() {
 		httpMethod := types.HTTPMethod(c.String("healthmonitor-http-method"))
@@ -353,6 +354,12 @@ var lbpoolCreateSubCommand = cli.Command{
 			Name:     "healthmonitor-url-path",
 			Aliases:  []string{"hmup"},
 			Usage:    "health monitor checking url path",
+			Required: false,
+		},
+		&cli.StringFlag{
+			Name:     "healthmonitor-expected-codes",
+			Aliases:  []string{"hmec"},
+			Usage:    "health monitor checking expected codes",
 			Required: false,
 		},
 		&cli.GenericFlag{
@@ -688,6 +695,12 @@ var lbpoolUpdateSubCommand = cli.Command{
 				Default: types.HTTPMethodGET.String(),
 			},
 			Usage:    fmt.Sprintf("output in %s", strings.Join(httpMethods, ", ")),
+			Required: false,
+		},
+		&cli.StringFlag{
+			Name:     "healthmonitor-expected-codes",
+			Aliases:  []string{"hmec"},
+			Usage:    "health monitor checking expected codes",
 			Required: false,
 		},
 		&cli.StringFlag{

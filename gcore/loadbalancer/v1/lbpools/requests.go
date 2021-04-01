@@ -80,6 +80,7 @@ type CreateHealthMonitorOpts struct {
 	MaxRetriesDown int                     `json:"max_retries_down,omitempty"`
 	HTTPMethod     *types.HTTPMethod       `json:"http_method,omitempty"`
 	URLPath        string                  `json:"url_path,omitempty"`
+	ExpectedCodes  string                  `json:"expected_codes,omitempty"`
 }
 
 // CreatePoolMemberOpts represents options used to create a lbpool listener pool member.
