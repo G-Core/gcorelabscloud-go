@@ -53,6 +53,7 @@ type LoadBalancer struct {
 	ProjectID          int                      `json:"project_id"`
 	RegionID           int                      `json:"region_id"`
 	Region             string                   `json:"region"`
+	Tags               []string                 `json:"tags"`
 }
 
 func (lb LoadBalancer) IsDeleted() bool {

@@ -59,6 +59,11 @@ var loadBalancerCreateSubCommand = cli.Command{
 			DefaultText: "<nil>",
 			Required:    false,
 		},
+		&cli.StringSliceFlag{
+			Name:    "tags",
+			Aliases: []string{"t"},
+			Usage:   "Loadbalancer tags",
+		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
 		client, err := client.NewLoadbalancerClientV1(c)
@@ -72,6 +77,7 @@ var loadBalancerCreateSubCommand = cli.Command{
 			Listeners:    []loadbalancers.CreateListenerOpts{},
 			VipNetworkID: c.String("vip-network-id"),
 			VipSubnetID:  c.String("vip-subnet-id"),
+			Tags:         c.StringSlice("tags"),
 		}
 
 		results, err := loadbalancers.Create(client, opts).Extract()

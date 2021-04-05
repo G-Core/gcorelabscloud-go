@@ -86,6 +86,7 @@ type CreateOpts struct {
 	Listeners    []CreateListenerOpts `json:"listeners" required:"true" validate:"required,dive"`
 	VipNetworkID string               `json:"vip_network_id,omitempty"`
 	VipSubnetID  string               `json:"vip_subnet_id,omitempty"`
+	Tags         []string             `json:"tags,omitempty"`
 }
 
 // ToLoadBalancerCreateMap builds a request body from CreateOpts.
