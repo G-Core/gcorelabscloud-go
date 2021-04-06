@@ -42,13 +42,14 @@ type ListOpts struct {
 
 // CreateOpts represents options used to create a volume.
 type CreateOpts struct {
-	Source               VolumeSource `json:"source" required:"true" validate:"required,enum"`
-	Name                 string       `json:"name" required:"true" validate:"required"`
-	Size                 int          `json:"size,omitempty"`
-	TypeName             VolumeType   `json:"type_name" required:"true" validate:"required,enum"`
-	ImageID              string       `json:"image_id,omitempty" validate:"rfe=Source:image,allowed_without=SnapshotID,omitempty,uuid4"`
-	SnapshotID           string       `json:"snapshot_id,omitempty" validate:"rfe=Source:snapshot,allowed_without=ImageID,omitempty,uuid4"`
-	InstanceIDToAttachTo string       `json:"instance_id_to_attach_to,omitempty" validate:"omitempty,uuid4"`
+	Source               VolumeSource      `json:"source" required:"true" validate:"required,enum"`
+	Name                 string            `json:"name" required:"true" validate:"required"`
+	Size                 int               `json:"size,omitempty"`
+	TypeName             VolumeType        `json:"type_name" required:"true" validate:"required,enum"`
+	ImageID              string            `json:"image_id,omitempty" validate:"rfe=Source:image,allowed_without=SnapshotID,omitempty,uuid4"`
+	SnapshotID           string            `json:"snapshot_id,omitempty" validate:"rfe=Source:snapshot,allowed_without=ImageID,omitempty,uuid4"`
+	InstanceIDToAttachTo string            `json:"instance_id_to_attach_to,omitempty" validate:"omitempty,uuid4"`
+	Metadata             map[string]string `json:"metadata,omitempty"`
 }
 
 func (opts *CreateOpts) Validate() error {

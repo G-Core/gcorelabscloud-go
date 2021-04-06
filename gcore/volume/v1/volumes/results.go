@@ -49,6 +49,7 @@ type DeleteResult struct {
 // Metadata represents a metadata of volume.
 type Metadata struct {
 	TaskID       string `json:"task_id"`
+	ClusterID    string `json:"cluster_id"`
 	AttachedMode string `json:"attached_mode"`
 }
 
