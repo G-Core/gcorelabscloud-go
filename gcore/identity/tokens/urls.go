@@ -11,3 +11,6 @@ func refreshURL(c *gcorecloud.ServiceClient) string {
 func refreshGCloudURL(c *gcorecloud.ServiceClient) string {
 	return c.ServiceURL("v1", "token", "refresh")
 }
+func selectAccountURL(c *gcorecloud.ServiceClient, clientID string) string {
+	return c.ServiceURL("auth", "jwt", "clients", clientID, "login")
+}

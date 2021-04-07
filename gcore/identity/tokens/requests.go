@@ -28,3 +28,10 @@ func RefreshPlatform(c *gcorecloud.ServiceClient, opts gcorecloud.TokenOptionsBu
 func RefreshGCloud(c *gcorecloud.ServiceClient, opts gcorecloud.TokenOptionsBuilder) (r TokenResult) {
 	return processToken(c, opts, refreshGCloudURL(c))
 }
+
+// SelectAccount select an account which you want to get access to
+func SelectAccount(c *gcorecloud.ServiceClient, clientID string) (r TokenResult) {
+	url := selectAccountURL(c, clientID)
+	_, r.Err = c.Get(url, &r.Body, nil)
+	return
+}

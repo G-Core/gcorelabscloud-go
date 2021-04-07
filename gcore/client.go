@@ -114,6 +114,13 @@ func auth(client *gcorecloud.ProviderClient, endpoint string, options gcorecloud
 		return err
 	}
 
+	if options.ClientID != "" {
+		newToken := tokens.SelectAccount(identityClient, options.ClientID)
+		if err := client.SetTokensAndAuthResult(newToken); err != nil {
+			return err
+		}
+	}
+
 	if options.AllowReauth {
 		// here we're creating a throw-away client (tac). it's a copy of the user's provider client, but
 		// with the token and reauth func zeroed out. combined with setting `AllowReauth` to `false`,

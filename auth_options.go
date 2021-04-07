@@ -19,6 +19,7 @@ type AuthOptions struct {
 	Username    string `json:"username,omitempty"`
 	Password    string `json:"password,omitempty"`
 	AllowReauth bool   `json:"-"`
+	ClientID    string `json:"-"`
 }
 
 // ToMap implements AuthOptionsBuilder
