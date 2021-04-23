@@ -613,6 +613,10 @@ var instanceCreateCommandV2 = cli.Command{
 			Usage:    "instance security group",
 			Required: false,
 		},
+		&cli.StringFlag{
+			Name:  "server-group",
+			Usage: "instance server group",
+		},
 		&cli.StringSliceFlag{
 			Name:     "metadata",
 			Usage:    "instance metadata. Example: --metadata one=two --metadata three=four",
@@ -670,6 +674,7 @@ var instanceCreateCommandV2 = cli.Command{
 			Username:       c.String("username"),
 			UserData:       userData,
 			Metadata:       metadata,
+			ServerGroupID:  c.String("server-group"),
 		}
 
 		fmt.Printf("%#v", opts)

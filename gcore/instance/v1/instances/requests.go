@@ -129,6 +129,7 @@ type CreateOpts struct {
 	Metadata       *MetadataSetOpts    `json:"metadata,omitempty" validate:"omitempty,dive"`
 	Configuration  *MetadataSetOpts    `json:"configuration,omitempty" validate:"omitempty,dive"`
 	AllowAppPorts  bool                `json:"allow_app_ports,omitempty"`
+	ServerGroupID  string              `json:"servergroup_id,omitempty" validate:"omitempty,uuid4"`
 }
 
 // Validate

@@ -24,6 +24,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/client/reservedfixedips/v1/reservedfixedips"
 	"github.com/G-Core/gcorelabscloud-go/client/routers/v1/routers"
 	"github.com/G-Core/gcorelabscloud-go/client/securitygroups/v1/securitygroups"
+	"github.com/G-Core/gcorelabscloud-go/client/servergroups/v1/servergroups"
 	"github.com/G-Core/gcorelabscloud-go/client/snapshots/v1/snapshots"
 	"github.com/G-Core/gcorelabscloud-go/client/subnets/v1/subnets"
 	"github.com/G-Core/gcorelabscloud-go/client/tasks/v1/tasks"
@@ -60,6 +61,7 @@ var commands = []*cli.Command{
 	&l7policies.L7PolicyCommands,
 	&routers.RouterCommands,
 	&reservedfixedips.ReservedFixedIPCommands,
+	&servergroups.ServerGroupsCommands,
 }
 
 type clientCommands struct {
