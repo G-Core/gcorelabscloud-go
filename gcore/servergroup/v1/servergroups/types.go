@@ -33,7 +33,7 @@ func (s ServerGroupPolicy) IsValid() error {
 	case AffinityPolicy, AntiAffinityPolicy:
 		return nil
 	}
-	return fmt.Errorf("invalid GatewayType type: %v", s)
+	return fmt.Errorf("invalid ServerGroupPolicy type: %v", s)
 }
 
 func (s ServerGroupPolicy) ValidOrNil() (*ServerGroupPolicy, error) {

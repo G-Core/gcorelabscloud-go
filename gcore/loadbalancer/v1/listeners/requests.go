@@ -60,6 +60,7 @@ type CreateOpts struct {
 	ProtocolPort     int                `json:"protocol_port" required:"true"`
 	LoadBalancerID   string             `json:"loadbalancer_id" required:"true"`
 	InsertXForwarded bool               `json:"insert_x_forwarded"`
+	SecretID         string             `json:"secret_id,omitempty"`
 }
 
 // ToListenerCreateMap builds a request body from CreateOpts.
@@ -88,7 +89,8 @@ type UpdateOptsBuilder interface {
 
 // UpdateOpts represents options used to update a listener.
 type UpdateOpts struct {
-	Name string `json:"name" required:"true" validate:"required,name"`
+	Name     string `json:"name" required:"true" validate:"required,name"`
+	SecretID string `json:"secret_id,omitempty"`
 }
 
 // ToListenerUpdateMap builds a request body from UpdateOpts.
