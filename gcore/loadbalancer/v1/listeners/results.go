@@ -47,6 +47,7 @@ type Listener struct {
 	OperationStatus    types.OperatingStatus    `json:"operating_status"`
 	CreatorTaskID      *string                  `json:"creator_task_id"`
 	TaskID             *string                  `json:"task_id"`
+	SecretID           *string                  `json:"secret_id"`
 }
 
 func (l Listener) IsDeleted() bool {

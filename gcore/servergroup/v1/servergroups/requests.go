@@ -10,7 +10,7 @@ type CreateOptsBuilder interface {
 	ToServerGroupCreateMap() (map[string]interface{}, error)
 }
 
-// CreateOpts represents options used to create a security group.
+// CreateOpts represents options used to create a server group.
 type CreateOpts struct {
 	Name   string            `json:"name" required:"true"`
 	Policy ServerGroupPolicy `json:"policy" required:"true" validate:"enum"`
@@ -47,8 +47,8 @@ func Get(c *gcorecloud.ServiceClient, id string) (r GetResult) {
 }
 
 // Delete accepts a unique ID and deletes the server group associated with it.
-func Delete(c *gcorecloud.ServiceClient, securityGroupID string) (r DeleteResult) {
-	_, r.Err = c.Delete(deleteURL(c, securityGroupID), nil)
+func Delete(c *gcorecloud.ServiceClient, serverGroupID string) (r DeleteResult) {
+	_, r.Err = c.Delete(deleteURL(c, serverGroupID), nil)
 	return
 }
 

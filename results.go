@@ -457,6 +457,36 @@ func (jt *JSONRFC3339Z) MarshalJSON() ([]byte, error) {
 	return json.Marshal(jt.Format(RFC3339Z))
 }
 
+// RFC3339ZColon is the time format used in secrets.
+const RFC3339ZColon = "2006-01-02T15:04:05-07:00"
+
+// JSONRFC3339ZColon describes time.Time in RFC3339ZColon format.
+type JSONRFC3339ZColon struct {
+	time.Time
+}
+
+// UnmarshalJSON - implements Unmarshaler interface for JSONRFC3339ZColon
+func (jt *JSONRFC3339ZColon) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	if s == "" {
+		return nil
+	}
+	t, err := time.Parse(RFC3339ZColon, s)
+	if err != nil {
+		return err
+	}
+	jt.Time = t
+	return nil
+}
+
+// MarshalJSON - implements Marshaler interface for JSONRFC3339ZColon
+func (jt *JSONRFC3339ZColon) MarshalJSON() ([]byte, error) {
+	return json.Marshal(jt.Format(RFC3339ZColon))
+}
+
 // RFC3339ZZ describes a common time format used by some API responses.
 const RFC3339ZZ = "2006-01-02T15:04:05Z"
 

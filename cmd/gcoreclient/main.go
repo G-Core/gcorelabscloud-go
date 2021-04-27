@@ -23,6 +23,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/client/regions/v1/regions"
 	"github.com/G-Core/gcorelabscloud-go/client/reservedfixedips/v1/reservedfixedips"
 	"github.com/G-Core/gcorelabscloud-go/client/routers/v1/routers"
+	"github.com/G-Core/gcorelabscloud-go/client/secrets/v1/secrets"
 	"github.com/G-Core/gcorelabscloud-go/client/securitygroups/v1/securitygroups"
 	"github.com/G-Core/gcorelabscloud-go/client/servergroups/v1/servergroups"
 	"github.com/G-Core/gcorelabscloud-go/client/snapshots/v1/snapshots"
@@ -62,6 +63,7 @@ var commands = []*cli.Command{
 	&routers.RouterCommands,
 	&reservedfixedips.ReservedFixedIPCommands,
 	&servergroups.ServerGroupsCommands,
+	&secrets.SecretCommands,
 }
 
 type clientCommands struct {
