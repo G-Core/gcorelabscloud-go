@@ -79,6 +79,7 @@ type CreateListenerOpts struct {
 	PrivateKey       string             `json:"private_key,omitempty"`
 	Pools            []CreatePoolOpts   `json:"pools,omitempty" validate:"omitempty,dive"`
 	SecretID         string             `json:"secret_id,omitempty"`
+	SNISecretID      []string           `json:"sni_secret_id,omitempty"`
 }
 
 // CreateOpts represents options used to create a loadbalancer.
