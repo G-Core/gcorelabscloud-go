@@ -328,7 +328,7 @@ var subnetCreateCommand = cli.Command{
 	},
 }
 
-var SubnetCommands = cli.Command{
+var Commands = cli.Command{
 	Name:  "subnet",
 	Usage: "GCloud subnets API",
 	Subcommands: []*cli.Command{

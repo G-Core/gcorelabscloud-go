@@ -237,7 +237,7 @@ var regionCreateCommand = cli.Command{
 	},
 }
 
-var RegionCommands = cli.Command{
+var Commands = cli.Command{
 	Name:  "region",
 	Usage: "GCloud regions API",
 	Subcommands: []*cli.Command{

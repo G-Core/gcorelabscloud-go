@@ -31,7 +31,7 @@ var (
 	bootableIndex             = 0
 )
 
-var InstanceCommands = cli.Command{
+var Commands = cli.Command{
 	Name:  "instance",
 	Usage: "GCloud instances API",
 	Subcommands: []*cli.Command{

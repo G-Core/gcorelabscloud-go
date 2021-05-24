@@ -9,7 +9,7 @@ type GetOpts struct {
 	NeedVolumes bool `q:"need_volumes"`
 }
 
-// ListOpts represents options for List.
+// ListOpts represents options for ListAll.
 type ListOpts GetOpts
 
 // Options used for request body

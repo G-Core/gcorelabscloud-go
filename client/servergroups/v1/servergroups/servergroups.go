@@ -10,7 +10,7 @@ import (
 
 var serverGroupIDText = "servergroup_id is mandatory argument"
 
-var ServerGroupsCommands = cli.Command{
+var Commands = cli.Command{
 	Name:  "servergroup",
 	Usage: "GCloud server groups v1 API",
 	Subcommands: []*cli.Command{

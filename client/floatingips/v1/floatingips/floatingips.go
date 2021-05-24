@@ -244,7 +244,7 @@ var floatingIPUnAssignSubCommand = cli.Command{
 	},
 }
 
-var FloatingIPCommands = cli.Command{
+var Commands = cli.Command{
 	Name:  "floatingip",
 	Usage: "GCloud floating ips API",
 	Subcommands: []*cli.Command{

@@ -183,7 +183,7 @@ var snapshotCreateCommand = cli.Command{
 	},
 }
 
-var SnapshotCommands = cli.Command{
+var Commands = cli.Command{
 	Name:  "snapshot",
 	Usage: "GCloud snapshots API",
 	Subcommands: []*cli.Command{

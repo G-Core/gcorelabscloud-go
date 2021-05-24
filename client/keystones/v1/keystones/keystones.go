@@ -200,7 +200,7 @@ var keystoneCreateCommand = cli.Command{
 	},
 }
 
-var KeystoneCommands = cli.Command{
+var Commands = cli.Command{
 	Name:  "keystone",
 	Usage: "GCloud keystones API",
 	Subcommands: []*cli.Command{

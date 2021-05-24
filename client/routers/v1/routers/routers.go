@@ -16,7 +16,7 @@ import (
 
 var routerIDText = "router_id is mandatory argument"
 
-var RouterCommands = cli.Command{
+var Commands = cli.Command{
 	Name:  "router",
 	Usage: "GCloud router API",
 	Subcommands: []*cli.Command{

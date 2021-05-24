@@ -43,7 +43,7 @@ var flavorListCommand = cli.Command{
 	},
 }
 
-var FlavorCommands = cli.Command{
+var Commands = cli.Command{
 	Name:  "flavor",
 	Usage: "GCloud flavors API",
 	Subcommands: []*cli.Command{

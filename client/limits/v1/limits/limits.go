@@ -259,7 +259,7 @@ var limitUpdateCommand = cli.Command{
 	},
 }
 
-var LimitCommands = cli.Command{
+var Commands = cli.Command{
 	Name:  "limit",
 	Usage: "GCloud limits API",
 	Subcommands: []*cli.Command{

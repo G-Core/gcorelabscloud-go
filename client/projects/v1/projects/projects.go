@@ -216,7 +216,7 @@ var projectCreateCommand = cli.Command{
 	},
 }
 
-var ProjectCommands = cli.Command{
+var Commands = cli.Command{
 	Name:  "project",
 	Usage: "GCloud projects API",
 	Subcommands: []*cli.Command{

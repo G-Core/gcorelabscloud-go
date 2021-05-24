@@ -65,7 +65,7 @@ var portSecurityDisableSubCommand = cli.Command{
 	},
 }
 
-var PortCommands = cli.Command{
+var Commands = cli.Command{
 	Name:  "port",
 	Usage: "GCloud ports API",
 	Subcommands: []*cli.Command{

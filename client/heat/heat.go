@@ -6,7 +6,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var HeatsCommand = cli.Command{
+var Commands = cli.Command{
 	Name:  "heat",
 	Usage: "Gcloud Heat API",
 	Subcommands: []*cli.Command{

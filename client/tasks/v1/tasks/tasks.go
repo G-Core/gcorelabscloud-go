@@ -64,7 +64,7 @@ var taskGetCommand = cli.Command{
 	},
 }
 
-var TaskCommands = cli.Command{
+var Commands = cli.Command{
 	Name:  "task",
 	Usage: "GCloud tasks API",
 	Subcommands: []*cli.Command{

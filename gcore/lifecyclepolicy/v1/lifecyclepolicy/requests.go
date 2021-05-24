@@ -17,9 +17,9 @@ func Get(c *gcorecloud.ServiceClient, id int, opts GetOpts) (r GetResult) {
 	return
 }
 
-// List returns all lifecycle policies.
+// ListAll returns all lifecycle policies.
 // If present, opts are used to construct query parameters.
-func List(c *gcorecloud.ServiceClient, opts ListOpts) (r ListResult) {
+func ListAll(c *gcorecloud.ServiceClient, opts ListOpts) (r ListResult) {
 	url := listURL(c)
 	query, err := gcorecloud.BuildQueryString(opts)
 	if err != nil {

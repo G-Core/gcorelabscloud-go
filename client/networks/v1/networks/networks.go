@@ -211,7 +211,7 @@ var networkCreateCommand = cli.Command{
 	},
 }
 
-var NetworkCommands = cli.Command{
+var Commands = cli.Command{
 	Name:  "network",
 	Usage: "GCloud networks API",
 	Subcommands: []*cli.Command{
