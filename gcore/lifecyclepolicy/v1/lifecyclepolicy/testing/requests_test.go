@@ -102,7 +102,7 @@ func TestList(t *testing.T) {
 		}
 	})
 
-	result := lifecyclepolicy.List(client, lifecyclepolicy.ListOpts{NeedVolumes: true})
+	result := lifecyclepolicy.ListAll(client, lifecyclepolicy.ListOpts{NeedVolumes: true})
 	ct, err := result.Extract()
 	require.NoError(t, err)
 	require.Equal(t, policies, ct)

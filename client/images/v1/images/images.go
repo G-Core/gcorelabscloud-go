@@ -235,7 +235,7 @@ var imageDeleteCommand = cli.Command{
 	},
 }
 
-var ImageCommands = cli.Command{
+var Commands = cli.Command{
 	Name:  "image",
 	Usage: "GCloud images API",
 	Subcommands: []*cli.Command{

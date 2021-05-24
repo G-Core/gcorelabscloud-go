@@ -385,7 +385,7 @@ var volumeExtendCommand = cli.Command{
 	},
 }
 
-var VolumeCommands = cli.Command{
+var Commands = cli.Command{
 	Name:  "volume",
 	Usage: "GCloud volumes API",
 	Subcommands: []*cli.Command{

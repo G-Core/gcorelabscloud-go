@@ -15,7 +15,7 @@ import (
 
 var portIDText = "port_id is mandatory argument"
 
-var ReservedFixedIPCommands = cli.Command{
+var Commands = cli.Command{
 	Name:  "fixed_ip",
 	Usage: "GCloud reserved fixed ip API",
 	Subcommands: []*cli.Command{

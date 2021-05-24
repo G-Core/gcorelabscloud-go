@@ -665,7 +665,7 @@ var clusterDeleteSubCommand = cli.Command{
 	},
 }
 
-var clusterCertificateSubCommand = cli.Command{
+var clusterGetCertificateSubCommand = cli.Command{
 	Name:      "get",
 	Usage:     "K8s get cluster CA certificate",
 	ArgsUsage: "<cluster_id>",
@@ -736,7 +736,7 @@ var clusterSignCertificateSubCommand = cli.Command{
 	},
 }
 
-var ClusterCommands = cli.Command{
+var Commands = cli.Command{
 	Name:  "cluster",
 	Usage: "Gcloud k8s cluster commands",
 	Subcommands: []*cli.Command{
@@ -754,9 +754,10 @@ var ClusterCommands = cli.Command{
 			Name:  "certificate",
 			Usage: "K8s sign  certificates",
 			Subcommands: []*cli.Command{
-				&clusterCertificateSubCommand,
+				&clusterGetCertificateSubCommand,
 				&clusterSignCertificateSubCommand,
 			},
 		},
+		&poolCommands,
 	},
 }

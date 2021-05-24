@@ -186,7 +186,7 @@ var quotaCreateCommand = cli.Command{
 	},
 }
 
-var QuotaCommands = cli.Command{
+var Commands = cli.Command{
 	Name:  "quota",
 	Usage: "GCloud quotas API",
 	Subcommands: []*cli.Command{

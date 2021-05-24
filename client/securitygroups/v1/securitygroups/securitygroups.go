@@ -357,7 +357,7 @@ var securityGroupUpdateSubCommand = cli.Command{
 	},
 }
 
-var SecurityGroupCommands = cli.Command{
+var Commands = cli.Command{
 	Name:  "securitygroup",
 	Usage: "GCloud security groups API",
 	Subcommands: []*cli.Command{

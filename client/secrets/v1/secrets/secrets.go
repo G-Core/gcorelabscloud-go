@@ -15,7 +15,7 @@ import (
 
 var secretsIDText = "secrets_id is mandatory argument"
 
-var SecretCommands = cli.Command{
+var Commands = cli.Command{
 	Name:  "secrets",
 	Usage: "GCloud secrets v1 API",
 	Subcommands: []*cli.Command{

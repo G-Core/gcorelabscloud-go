@@ -14,7 +14,7 @@ type GetResult struct {
 	commonResult
 }
 
-// ListResult represents the result of a List operation.
+// ListResult represents the result of a ListAll operation.
 // Call its Extract method to interpret it as a list of LifecyclePolicy.
 type ListResult struct {
 	commonResult

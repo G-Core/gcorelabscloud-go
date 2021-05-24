@@ -15,7 +15,7 @@ import (
 
 var policyIDText = "policy_id is mandatory argument"
 
-var L7PolicyCommands = cli.Command{
+var Commands = cli.Command{
 	Name:  "l7policy",
 	Usage: "GCloud l7policy API",
 	Subcommands: []*cli.Command{

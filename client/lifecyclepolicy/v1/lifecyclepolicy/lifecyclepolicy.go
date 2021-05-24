@@ -108,7 +108,7 @@ var listSubCommand = cli.Command{
 		opts := lifecyclepolicy.ListOpts{
 			NeedVolumes: c.Bool("volumes"),
 		}
-		result, err := lifecyclepolicy.List(client, opts).Extract()
+		result, err := lifecyclepolicy.ListAll(client, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
