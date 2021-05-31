@@ -262,11 +262,10 @@ func TestResize(t *testing.T) {
 	options := clusters.ResizeOpts{
 		NodeCount:     2,
 		NodesToRemove: nil,
-		Pool:          pool,
 	}
 
 	client := fake.ServiceTokenClient("k8s", "v1")
-	tasks, err := clusters.Resize(client, Cluster1.UUID, options).Extract()
+	tasks, err := clusters.Resize(client, Cluster1.UUID, pool, options).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 

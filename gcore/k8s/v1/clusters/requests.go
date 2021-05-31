@@ -136,7 +136,6 @@ type ResizeOptsBuilder interface {
 type ResizeOpts struct {
 	NodeCount     int      `json:"node_count" required:"true" validate:"required,gt=0"`
 	NodesToRemove []string `json:"nodes_to_remove,omitempty" validate:"omitempty,dive,uuid4"`
-	Pool          string   `json:"pool,omitempty" validate:"required_with=NodesToRemove,omitempty,uuid4"`
 }
 
 // ToClusterResizeMap builds a request body from ResizeOpts.
@@ -148,13 +147,13 @@ func (opts ResizeOpts) ToClusterResizeMap() (map[string]interface{}, error) {
 }
 
 // Resize accepts a ResizeOpts struct and updates an existing cluster using the values provided.
-func Resize(c *gcorecloud.ServiceClient, clusterID string, opts ResizeOptsBuilder) (r tasks.Result) {
+func Resize(c *gcorecloud.ServiceClient, clusterID, poolID string, opts ResizeOptsBuilder) (r tasks.Result) {
 	b, err := opts.ToClusterResizeMap()
 	if err != nil {
 		r.Err = err
 		return
 	}
-	_, r.Err = c.Post(resizeURL(c, clusterID), b, &r.Body, &gcorecloud.RequestOpts{
+	_, r.Err = c.Post(resizeURL(c, clusterID, poolID), b, &r.Body, &gcorecloud.RequestOpts{
 		OkCodes: []int{200, 201},
 	})
 	return

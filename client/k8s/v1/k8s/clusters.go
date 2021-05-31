@@ -465,10 +465,9 @@ var clusterResizeSubCommand = cli.Command{
 		opts := clusters.ResizeOpts{
 			NodeCount:     c.Int("node-count"),
 			NodesToRemove: nodes,
-			Pool:          c.String("pool"),
 		}
 
-		results, err := clusters.Resize(client, clusterID, opts).Extract()
+		results, err := clusters.Resize(client, clusterID, c.String("pool"), opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
