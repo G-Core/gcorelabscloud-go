@@ -136,6 +136,7 @@ type ResizeOptsBuilder interface {
 type ResizeOpts struct {
 	NodeCount     int      `json:"node_count" required:"true" validate:"required,gt=0"`
 	NodesToRemove []string `json:"nodes_to_remove,omitempty" validate:"omitempty,dive,uuid4"`
+	Pool          string   `json:"pool,omitempty" validate:"required_with=NodesToRemove,omitempty,uuid4"`
 }
 
 // ToClusterResizeMap builds a request body from ResizeOpts.

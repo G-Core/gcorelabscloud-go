@@ -442,7 +442,7 @@ var clusterResizeSubCommand = cli.Command{
 			Aliases:     []string{"p"},
 			Usage:       "cluster pool",
 			DefaultText: "nil",
-			Required:    false,
+			Required:    true,
 		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
@@ -462,12 +462,15 @@ var clusterResizeSubCommand = cli.Command{
 			nodes = nil
 		}
 
+		poolID := c.String("pool")
+
 		opts := clusters.ResizeOpts{
 			NodeCount:     c.Int("node-count"),
 			NodesToRemove: nodes,
+			Pool:          poolID,
 		}
 
-		results, err := clusters.Resize(client, clusterID, c.String("pool"), opts).Extract()
+		results, err := clusters.Resize(client, clusterID, poolID, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
