@@ -174,9 +174,9 @@ var MainClientHelpText = `
 
 func AddFlags(commands []*cli.Command, flags ...cli.Flag) {
 	for _, cmd := range commands {
-		sunCommands := cmd.Subcommands
-		if len(sunCommands) != 0 {
-			AddFlags(sunCommands, flags...)
+		subCommands := cmd.Subcommands
+		if len(subCommands) != 0 {
+			AddFlags(subCommands, flags...)
 		} else {
 			cmd.Flags = append(cmd.Flags, flags...)
 		}
