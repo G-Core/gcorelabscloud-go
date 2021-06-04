@@ -317,7 +317,7 @@ var removeVolumeSubCommand = cli.Command{
 }
 
 func cronScheduleParamUsage(min, max int) string {
-	return fmt.Sprintf("For '%s' type only. Comma-separated list of integers (%v-%v).", lifecyclepolicy.PolicyTypeCron, min, max)
+	return fmt.Sprintf("For '%s' type only. Comma-separated list of integers (%v-%v).", lifecyclepolicy.ScheduleTypeCron, min, max)
 }
 
 func splitArg(s string) (int, rune, error) {
@@ -429,7 +429,7 @@ var addScheduleSubCommand = cli.Command{
 		&cli.StringFlag{
 			Name:     "interval",
 			Aliases:  []string{"i"},
-			Usage:    fmt.Sprintf("Required if type set to '%s'. Specifies, how often new snapshot should be taken. Should be in format nX, where n is a positive integer and X is one of W, D, H, M (weeks, days, hours, minutes respectively)", lifecyclepolicy.PolicyTypeInterval),
+			Usage:    fmt.Sprintf("Required if type set to '%s'. Specifies, how often new snapshot should be taken. Should be in format nX, where n is a positive integer and X is one of W, D, H, M (weeks, days, hours, minutes respectively)", lifecyclepolicy.ScheduleTypeInterval),
 			Required: false,
 		},
 		&cli.StringFlag{
@@ -470,7 +470,7 @@ var addScheduleSubCommand = cli.Command{
 		},
 		&cli.StringFlag{
 			Name:     "cron_timezone",
-			Usage:    fmt.Sprintf("For '%s' type only. A pytz timezone", lifecyclepolicy.PolicyTypeCron),
+			Usage:    fmt.Sprintf("For '%s' type only. A pytz timezone", lifecyclepolicy.ScheduleTypeCron),
 			Value:    "UTC",
 			Required: false,
 		},
@@ -498,9 +498,9 @@ var addScheduleSubCommand = cli.Command{
 		}
 		var opts lifecyclepolicy.CreateScheduleOpts
 		switch common.Type {
-		case lifecyclepolicy.PolicyTypeCron:
+		case lifecyclepolicy.ScheduleTypeCron:
 			opts, err = extractCreateCronScheduleOpts(c)
-		case lifecyclepolicy.PolicyTypeInterval:
+		case lifecyclepolicy.ScheduleTypeInterval:
 			opts, err = extractCreateIntervalScheduleOpts(c)
 		}
 		if err != nil {

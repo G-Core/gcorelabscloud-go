@@ -12,15 +12,15 @@ type (
 )
 
 const (
-	PolicyTypeCron             ScheduleType = "cron"
-	PolicyTypeInterval         ScheduleType = "interval"
+	ScheduleTypeCron           ScheduleType = "cron"
+	ScheduleTypeInterval       ScheduleType = "interval"
 	PolicyStatusActive         PolicyStatus = "active"
 	PolicyStatusPaused         PolicyStatus = "paused"
 	PolicyActionVolumeSnapshot PolicyAction = "volume_snapshot"
 )
 
 func (t ScheduleType) List() []ScheduleType {
-	return []ScheduleType{PolicyTypeInterval, PolicyTypeCron}
+	return []ScheduleType{ScheduleTypeInterval, ScheduleTypeCron}
 }
 
 func (t ScheduleType) String() string {
@@ -159,13 +159,13 @@ func (r rawSchedule) cook() (Schedule, error) {
 	switch typeStruct.ScheduleType {
 	default:
 		return nil, fmt.Errorf("unexpected schedule type %s", typeStruct.ScheduleType)
-	case PolicyTypeCron:
+	case ScheduleTypeCron:
 		var cronSchedule CronSchedule
 		if err := json.Unmarshal(r.RawMessage, &cronSchedule); err != nil {
 			return nil, err
 		}
 		return cronSchedule, nil
-	case PolicyTypeInterval:
+	case ScheduleTypeInterval:
 		var intervalSchedule IntervalSchedule
 		if err := json.Unmarshal(r.RawMessage, &intervalSchedule); err != nil {
 			return nil, err
