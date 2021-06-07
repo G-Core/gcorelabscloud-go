@@ -23,7 +23,7 @@ var (
 			Hours:   60,
 			Minutes: 80,
 			CommonSchedule: lifecyclepolicy.CommonSchedule{
-				Type:                 lifecyclepolicy.PolicyTypeInterval,
+				Type:                 lifecyclepolicy.ScheduleTypeInterval,
 				ID:                   "aa14fdc6-6589-4136-be94-275456df9d79",
 				Owner:                "lifecycle_policy",
 				OwnerID:              113,
@@ -39,7 +39,7 @@ var (
 			Hours:   0,
 			Minutes: 0,
 			CommonSchedule: lifecyclepolicy.CommonSchedule{
-				Type:                 lifecyclepolicy.PolicyTypeInterval,
+				Type:                 lifecyclepolicy.ScheduleTypeInterval,
 				ID:                   "3a03c757-1f24-43a0-a5b4-942f326f7d30",
 				Owner:                "lifecycle_policy",
 				OwnerID:              113,
@@ -58,7 +58,7 @@ var (
 			Hour:      "17,19",
 			Minute:    "13",
 			CommonSchedule: lifecyclepolicy.CommonSchedule{
-				Type:                 lifecyclepolicy.PolicyTypeCron,
+				Type:                 lifecyclepolicy.ScheduleTypeCron,
 				ID:                   "47aee364-ad88-4b66-aed2-6ed8f635ee17",
 				Owner:                "lifecycle_policy",
 				OwnerID:              113,
@@ -102,7 +102,7 @@ var (
 			Hours:   60,
 			Minutes: 80,
 			CommonCreateScheduleOpts: lifecyclepolicy.CommonCreateScheduleOpts{
-				Type:                 lifecyclepolicy.PolicyTypeInterval,
+				Type:                 lifecyclepolicy.ScheduleTypeInterval,
 				MaxQuantity:          4,
 				ResourceNameTemplate: "test template name {volume_id}",
 				RetentionTime:        &lifecyclepolicy.RetentionTimer{},
@@ -125,7 +125,7 @@ var (
 			Hour:      "17,19",
 			Minute:    "13",
 			CommonCreateScheduleOpts: lifecyclepolicy.CommonCreateScheduleOpts{
-				Type:                 lifecyclepolicy.PolicyTypeCron,
+				Type:                 lifecyclepolicy.ScheduleTypeCron,
 				MaxQuantity:          5,
 				ResourceNameTemplate: "yet another test template name",
 				RetentionTime: &lifecyclepolicy.RetentionTimer{
