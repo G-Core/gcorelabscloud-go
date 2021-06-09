@@ -75,6 +75,15 @@ var listenerCreateSubCommand = cli.Command{
 			Usage:    "loadbalancer ID",
 			Required: true,
 		},
+		&cli.StringFlag{
+			Name:    "secret-id",
+			Aliases: []string{"s"},
+			Usage:   "ID of the secret where PKCS12 file is stored for TERMINATED_HTTPS load balancer",
+		},
+		&cli.StringSliceFlag{
+			Name:  "sni-secret-id",
+			Usage: "List of secret's ID containing PKCS12 format certificate/key bundles for TERMINATED_HTTPS listeners",
+		},
 		&cli.GenericFlag{
 			Name:    "protocol-type",
 			Aliases: []string{"pt"},
@@ -102,6 +111,8 @@ var listenerCreateSubCommand = cli.Command{
 			Protocol:       pt,
 			ProtocolPort:   c.Int("port"),
 			LoadBalancerID: c.String("loadbalancer-id"),
+			SecretID:       c.String("secret-id"),
+			SNISecretID:    c.StringSlice("sni-secret-id"),
 		}
 
 		results, err := listeners.Create(client, opts).Extract()

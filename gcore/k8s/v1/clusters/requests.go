@@ -4,7 +4,6 @@ import (
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v1/pools"
-	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
@@ -94,18 +93,17 @@ type CreateOptsBuilder interface {
 
 // CreateOpts represents options used to create a cluster.
 type CreateOpts struct {
-	Name                      string                  `json:"name" required:"true"`
-	FixedNetwork              string                  `json:"fixed_network" required:"true" validate:"required,uuid4"`
-	FixedSubnet               string                  `json:"fixed_subnet" required:"true" validate:"required,uuid4"`
-	MasterCount               int                     `json:"master_count,omitempty" validate:"omitempty,gt=0"`
-	KeyPair                   string                  `json:"keypair,omitempty"`
-	PodsIPPool                *gcorecloud.CIDR        `json:"pods_ip_pool,omitempty"`
-	ServicesIPPool            *gcorecloud.CIDR        `json:"services_ip_pool,omitempty"`
-	AutoHealingEnabled        bool                    `json:"auto_healing_enabled"`
-	MasterLBFloatingIPEnabled bool                    `json:"master_lb_floating_ip_enabled,omitempty"`
-	Version                   string                  `json:"version,omitempty" validate:"omitempty,sem"`
-	IngressController         types.IngressController `json:"ingress_controller,omitempty" validate:"omitempty,enum"`
-	Pools                     []pools.CreateOpts      `json:"pools" required:"true" validate:"required,min=1,dive"`
+	Name                      string             `json:"name" required:"true"`
+	FixedNetwork              string             `json:"fixed_network" required:"true" validate:"required,uuid4"`
+	FixedSubnet               string             `json:"fixed_subnet" required:"true" validate:"required,uuid4"`
+	MasterCount               int                `json:"master_count,omitempty" validate:"omitempty,gt=0"`
+	KeyPair                   string             `json:"keypair,omitempty"`
+	PodsIPPool                *gcorecloud.CIDR   `json:"pods_ip_pool,omitempty"`
+	ServicesIPPool            *gcorecloud.CIDR   `json:"services_ip_pool,omitempty"`
+	AutoHealingEnabled        bool               `json:"auto_healing_enabled"`
+	MasterLBFloatingIPEnabled bool               `json:"master_lb_floating_ip_enabled,omitempty"`
+	Version                   string             `json:"version,omitempty" validate:"omitempty,sem"`
+	Pools                     []pools.CreateOpts `json:"pools" required:"true" validate:"required,min=1,dive"`
 }
 
 // ToClusterCreateMap builds a request body from CreateOpts.

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
@@ -22,9 +21,8 @@ import (
 )
 
 var (
-	clusterIDText              = "cluster_id is mandatory argument"
-	volumeTypeNames            = volumes.VolumeType("").StringList()
-	ingressControllerTypeNames = types.IngressController("").StringList()
+	clusterIDText   = "cluster_id is mandatory argument"
+	volumeTypeNames = volumes.VolumeType("").StringList()
 )
 
 func getPools(c *cli.Context) ([]pools.CreateOpts, error) {
@@ -341,11 +339,6 @@ var clusterCreateSubCommand = cli.Command{
 			Usage:    fmt.Sprintf("output in %s", strings.Join(volumeTypeNames, ", ")),
 			Required: false,
 		},
-		&cli.StringFlag{
-			Name:     "ingress-controller",
-			Usage:    fmt.Sprintf("output in %s", strings.Join(ingressControllerTypeNames, ", ")),
-			Required: false,
-		},
 	}, flags.WaitCommandFlags...,
 	),
 	Action: func(c *cli.Context) error {
@@ -388,7 +381,6 @@ var clusterCreateSubCommand = cli.Command{
 			AutoHealingEnabled:        c.Bool("auto-healing-enabled"),
 			MasterLBFloatingIPEnabled: masterLbFloatingIPEnabled,
 			Version:                   c.String("version"),
-			IngressController:         types.IngressController(c.String("ingress-controller")),
 			Pools:                     clusterPools,
 		}
 
