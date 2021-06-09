@@ -38,6 +38,7 @@ type ListOptsBuilder interface {
 // `asc' or `desc'. Marker and Limit are used for pagination.
 type ListOpts struct {
 	InstanceID *string `q:"instance_id"`
+	ClusterID  *string `q:"cluster_id"`
 }
 
 // CreateOpts represents options used to create a volume.

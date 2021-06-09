@@ -31,6 +31,13 @@ var volumeListCommand = cli.Command{
 			DefaultText: "nil",
 			Required:    false,
 		},
+		&cli.StringFlag{
+			Name:        "cluster-id",
+			Aliases:     []string{"c"},
+			Usage:       "Cluster ID, use to get pvc",
+			DefaultText: "nil",
+			Required:    false,
+		},
 	},
 	Action: func(c *cli.Context) error {
 		client, err := client.NewVolumeClientV1(c)
@@ -40,6 +47,7 @@ var volumeListCommand = cli.Command{
 		}
 		opts := volumes.ListOpts{
 			InstanceID: utils.StringToPointer(c.String("instance-id")),
+			ClusterID:  utils.StringToPointer(c.String("cluster-id")),
 		}
 		results, err := volumes.ListAll(client, opts)
 		if err != nil {
