@@ -246,12 +246,6 @@ var clusterCreateSubCommand = cli.Command{
 			Usage:    "cluster name",
 			Required: true,
 		},
-		&cli.IntFlag{
-			Name:     "master-node-count",
-			Usage:    "master nodes count",
-			Value:    1,
-			Required: false,
-		},
 		&cli.StringFlag{
 			Name:        "keypair",
 			Aliases:     []string{"k"},
@@ -364,17 +358,13 @@ var clusterCreateSubCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
-		masterCount := c.Int("master-node-count")
-		masterLbFloatingIPEnabled := c.Bool("master-lb-floating-ip-enabled")
-		if masterCount > 1 {
-			masterLbFloatingIPEnabled = true
-		}
+		//todo remove after cloud-api fix
+		masterLbFloatingIPEnabled := true
 
 		opts := clusters.CreateOpts{
 			Name:                      c.String("name"),
 			FixedNetwork:              c.String("fixed-network"),
 			FixedSubnet:               c.String("fixed-subnet"),
-			MasterCount:               masterCount,
 			KeyPair:                   c.String("keypair"),
 			PodsIPPool:                podsIPPool,
 			ServicesIPPool:            servicesIPPool,

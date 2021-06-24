@@ -96,7 +96,6 @@ type CreateOpts struct {
 	Name                      string             `json:"name" required:"true"`
 	FixedNetwork              string             `json:"fixed_network" required:"true" validate:"required,uuid4"`
 	FixedSubnet               string             `json:"fixed_subnet" required:"true" validate:"required,uuid4"`
-	MasterCount               int                `json:"master_count,omitempty" validate:"omitempty,gt=0"`
 	KeyPair                   string             `json:"keypair,omitempty"`
 	PodsIPPool                *gcorecloud.CIDR   `json:"pods_ip_pool,omitempty"`
 	ServicesIPPool            *gcorecloud.CIDR   `json:"services_ip_pool,omitempty"`
