@@ -70,6 +70,7 @@ type SecurityGroup struct {
 	ProjectID          int                      `json:"project_id"`
 	RegionID           int                      `json:"region_id"`
 	Region             string                   `json:"region"`
+	Tags               []string                 `json:"tags"`
 }
 
 // SecurityGroupRule represents a security group rule.

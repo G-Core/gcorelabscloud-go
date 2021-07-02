@@ -273,6 +273,12 @@ var subnetCreateCommand = cli.Command{
 			Usage:    "Subnet route next hop",
 			Required: false,
 		},
+		&cli.StringSliceFlag{
+			Name:     "gateway-ip",
+			Aliases:  []string{"gw"},
+			Usage:    "Gateway ip",
+			Required: false,
+		},
 	}, flags.WaitCommandFlags...,
 	),
 	Action: func(c *cli.Context) error {
@@ -293,6 +299,7 @@ var subnetCreateCommand = cli.Command{
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
+
 		opts := subnets.CreateOpts{
 			Name:                   c.String("name"),
 			EnableDHCP:             c.Bool("enable-dhcp"),
@@ -302,6 +309,13 @@ var subnetCreateCommand = cli.Command{
 			DNSNameservers:         dns,
 			HostRoutes:             hostRoutes,
 		}
+
+		rawGateway := c.String("gateway-ip")
+		if rawGateway != "" {
+			gatewayIP := net.ParseIP(rawGateway)
+			opts.GatewayIP = &gatewayIP
+		}
+
 		results, err := subnets.Create(client, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)

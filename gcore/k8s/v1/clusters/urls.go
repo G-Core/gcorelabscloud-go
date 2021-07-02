@@ -7,19 +7,15 @@ func versionsURL(c *gcorecloud.ServiceClient) string {
 }
 
 func resourceURL(c *gcorecloud.ServiceClient, id string) string {
-	return c.ServiceURL("clusters", id)
+	return c.ServiceURL(id)
 }
 
 func rootURL(c *gcorecloud.ServiceClient) string {
-	return c.ServiceURL("clusters")
-}
-
-func resourceActionURL(c *gcorecloud.ServiceClient, id, action string) string {
-	return c.ServiceURL("clusters", id, action)
+	return c.ServiceURL("")
 }
 
 func configURL(c *gcorecloud.ServiceClient, id string) string {
-	return c.ServiceURL("clusters", id, "config")
+	return c.ServiceURL(id, "config")
 }
 
 func resizeURL(c *gcorecloud.ServiceClient, clusterID, poolID string) string {
@@ -27,19 +23,19 @@ func resizeURL(c *gcorecloud.ServiceClient, clusterID, poolID string) string {
 }
 
 func upgradeURL(c *gcorecloud.ServiceClient, id string) string {
-	return resourceActionURL(c, id, "upgrade")
+	return c.ServiceURL(id, "upgrade")
 }
 
 func instancesURL(c *gcorecloud.ServiceClient, id string) string {
-	return resourceActionURL(c, id, "instances")
+	return c.ServiceURL(id, "instances")
 }
 
 func certificatesURL(c *gcorecloud.ServiceClient, id string) string {
-	return resourceActionURL(c, id, "certificates")
+	return c.ServiceURL(id, "certificates")
 }
 
 func volumesURL(c *gcorecloud.ServiceClient, id string) string {
-	return resourceActionURL(c, id, "volumes")
+	return c.ServiceURL(id, "volumes")
 }
 
 func getURL(c *gcorecloud.ServiceClient, id string) string {

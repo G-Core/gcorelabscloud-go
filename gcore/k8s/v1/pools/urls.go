@@ -3,15 +3,15 @@ package pools
 import gcorecloud "github.com/G-Core/gcorelabscloud-go"
 
 func resourceURL(c *gcorecloud.ServiceClient, clusterID, id string) string {
-	return c.ServiceURL("pools", clusterID, id)
+	return c.ServiceURL(clusterID, "pools", id)
 }
 
 func resourceActionURL(c *gcorecloud.ServiceClient, clusterID, id, action string) string {
-	return c.ServiceURL("pools", clusterID, id, action)
+	return c.ServiceURL(clusterID, "pools", id, action)
 }
 
 func rootURL(c *gcorecloud.ServiceClient, clusterID string) string {
-	return c.ServiceURL("pools", clusterID)
+	return c.ServiceURL(clusterID, "pools")
 }
 
 func getURL(c *gcorecloud.ServiceClient, clusterID string, id string) string {

@@ -285,8 +285,8 @@ func getBaremetalInterfaces(c *cli.Context) ([]bminstances.InterfaceOpts, error)
 func getSecurityGroups(c *cli.Context) []gcorecloud.ItemID {
 	securityGroups := c.StringSlice("security-group")
 	res := make([]gcorecloud.ItemID, len(securityGroups))
-	for _, s := range securityGroups {
-		res = append(res, gcorecloud.ItemID{ID: s})
+	for i, s := range securityGroups {
+		res[i] = gcorecloud.ItemID{ID: s}
 	}
 	return res
 }

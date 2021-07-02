@@ -8,5 +8,5 @@ import (
 )
 
 func NewK8sClientV1(c *cli.Context) (*gcorecloud.ServiceClient, error) {
-	return common.BuildClient(c, "k8s", "v1")
+	return common.BuildClient(c, "k8s/clusters", "v1")
 }

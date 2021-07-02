@@ -37,7 +37,7 @@ func (opts ListOpts) ToClusterListQuery() (string, error) {
 	return q.String(), err
 }
 
-// Versions returns a Pager which allows you to iterate over a collection of
+// List returns a Pager which allows you to iterate over a collection of
 // clusters. It accepts a ListOpts struct, which allows you to filter and sort
 // the returned collection for greater efficiency.
 func List(c *gcorecloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
@@ -202,7 +202,7 @@ func GetConfig(c *gcorecloud.ServiceClient, clusterID string) (r ConfigResult) {
 	return
 }
 
-// Versions returns all magnum clusters.
+// ListALL returns all magnum clusters.
 func ListAll(c *gcorecloud.ServiceClient, opts ListOptsBuilder) ([]ClusterListWithPool, error) {
 	page, err := List(c, opts).AllPages()
 	if err != nil {
