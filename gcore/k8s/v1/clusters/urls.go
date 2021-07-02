@@ -19,7 +19,7 @@ func configURL(c *gcorecloud.ServiceClient, id string) string {
 }
 
 func resizeURL(c *gcorecloud.ServiceClient, clusterID, poolID string) string {
-	return c.ServiceURL("pools", clusterID, poolID, "resize")
+	return c.ServiceURL(clusterID, "pools", poolID, "resize")
 }
 
 func upgradeURL(c *gcorecloud.ServiceClient, id string) string {

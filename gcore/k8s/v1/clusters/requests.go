@@ -1,11 +1,12 @@
 package clusters
 
 import (
+	"log"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v1/pools"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
-	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
@@ -67,14 +68,6 @@ func Instances(c *gcorecloud.ServiceClient, clusterID string) pagination.Pager {
 	url := instancesURL(c, clusterID)
 	return pagination.NewPager(c, url, func(r pagination.PageResult) pagination.Page {
 		return instances.InstancePage{LinkedPageBase: pagination.LinkedPageBase{PageResult: r}}
-	})
-}
-
-// Volumes returns a Pager which allows you to iterate over a collection of cluster instances.
-func Volumes(c *gcorecloud.ServiceClient, clusterID string) pagination.Pager {
-	url := volumesURL(c, clusterID)
-	return pagination.NewPager(c, url, func(r pagination.PageResult) pagination.Page {
-		return volumes.VolumePage{LinkedPageBase: pagination.LinkedPageBase{PageResult: r}}
 	})
 }
 
@@ -151,6 +144,7 @@ func Resize(c *gcorecloud.ServiceClient, clusterID, poolID string, opts ResizeOp
 		r.Err = err
 		return
 	}
+	log.Println(resizeURL(c, clusterID, poolID))
 	_, r.Err = c.Post(resizeURL(c, clusterID, poolID), b, &r.Body, &gcorecloud.RequestOpts{
 		OkCodes: []int{200, 201},
 	})
@@ -218,15 +212,6 @@ func InstancesAll(c *gcorecloud.ServiceClient, clusterID string) ([]instances.In
 		return nil, err
 	}
 	return instances.ExtractInstances(page)
-}
-
-// VolumesAll returns all cluster volumes.
-func VolumesAll(c *gcorecloud.ServiceClient, clusterID string) ([]volumes.Volume, error) {
-	page, err := Volumes(c, clusterID).AllPages()
-	if err != nil {
-		return nil, err
-	}
-	return volumes.ExtractVolumes(page)
 }
 
 // VersionsAll returns all cluster versions.

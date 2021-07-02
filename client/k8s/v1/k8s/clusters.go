@@ -584,33 +584,6 @@ var clusterInstancesSubCommand = cli.Command{
 	},
 }
 
-var clusterVolumesSubCommand = cli.Command{
-	Name:      "volumes",
-	Usage:     "K8s cluster volumes",
-	ArgsUsage: "<cluster_id>",
-	Category:  "cluster",
-	Action: func(c *cli.Context) error {
-		clusterID, err := flags.GetFirstStringArg(c, clusterIDText)
-		if err != nil {
-			_ = cli.ShowCommandHelp(c, "volumes")
-			return err
-		}
-		client, err := client.NewK8sClientV1(c)
-		if err != nil {
-			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
-		}
-
-		results, err := clusters.VolumesAll(client, clusterID)
-		if err != nil {
-			return cli.NewExitError(err, 1)
-		}
-		utils.ShowResults(results, c.String("format"))
-
-		return nil
-	},
-}
-
 var clusterDeleteSubCommand = cli.Command{
 	Name:      "delete",
 	Usage:     "K8s delete cluster",
@@ -732,7 +705,6 @@ var Commands = cli.Command{
 		&clusterDeleteSubCommand,
 		&clusterConfigSubCommand,
 		&clusterVersionsSubCommand,
-		&clusterVolumesSubCommand,
 		&clusterInstancesSubCommand,
 		{
 			Name:  "certificate",
