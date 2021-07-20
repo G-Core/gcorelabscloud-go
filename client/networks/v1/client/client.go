@@ -10,3 +10,7 @@ import (
 func NewNetworkClientV1(c *cli.Context) (*gcorecloud.ServiceClient, error) {
 	return common.BuildClient(c, "networks", "v1")
 }
+
+func NewAvailableNetworkClientV1(c *cli.Context) (*gcorecloud.ServiceClient, error) {
+	return common.BuildClient(c, "availablenetworks", "v1")
+}

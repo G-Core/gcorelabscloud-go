@@ -7,6 +7,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/client/networks/v1/client"
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
+	"github.com/G-Core/gcorelabscloud-go/gcore/network/v1/availablenetworks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/network/v1/networks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 
@@ -34,6 +35,25 @@ var networkListCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 		utils.ShowResults(results, c.String("format"))
+		return nil
+	},
+}
+
+var availableNetworkListCommand = cli.Command{
+	Name:     "list-available",
+	Usage:    "List available networks",
+	Category: "network",
+	Action: func(c *cli.Context) error {
+		client, err := client.NewAvailableNetworkClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+		result, err := availablenetworks.ListAll(client)
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		utils.ShowResults(result, c.String("format"))
 		return nil
 	},
 }
@@ -216,6 +236,7 @@ var Commands = cli.Command{
 	Usage: "GCloud networks API",
 	Subcommands: []*cli.Command{
 		&networkListCommand,
+		&availableNetworkListCommand,
 		&networkGetCommand,
 		&networkDeleteCommand,
 		&networkCreateCommand,
