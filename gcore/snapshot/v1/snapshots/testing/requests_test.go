@@ -183,6 +183,7 @@ func TestCreate(t *testing.T) {
 		VolumeID:    "67baa7d1-08ea-4fc5-bef2-6b2465b7d227",
 		Name:        Snapshot1.Name,
 		Description: "after boot",
+		Metadata:    map[string]string{"key": "value"},
 	}
 
 	client := fake.ServiceTokenClient("snapshots", "v1")

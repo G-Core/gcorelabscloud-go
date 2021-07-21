@@ -53,7 +53,10 @@ const CreateRequest = `
 {
   "volume_id": "67baa7d1-08ea-4fc5-bef2-6b2465b7d227",
   "name": "123",
-  "description": "after boot"
+  "description": "after boot",
+  "metadata": {
+    "key": "value"
+  }
 }
 `
 

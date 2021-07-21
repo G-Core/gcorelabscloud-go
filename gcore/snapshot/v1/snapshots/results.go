@@ -39,7 +39,7 @@ type Snapshot struct {
 	VolumeID      string                   `json:"volume_id"`
 	CreatedAt     gcorecloud.JSONRFC3339Z  `json:"created_at"`
 	UpdatedAt     *gcorecloud.JSONRFC3339Z `json:"updated_at"`
-	Metadata      map[string]interface{}   `json:"metadata"`
+	Metadata      map[string]string        `json:"metadata"`
 	CreatorTaskID *string                  `json:"creator_task_id"`
 	TaskID        *string                  `json:"task_id"`
 	ProjectID     int                      `json:"project_id"`

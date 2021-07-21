@@ -54,9 +54,10 @@ type CreateOptsBuilder interface {
 
 // CreateOpts represents options used to create a snapshot.
 type CreateOpts struct {
-	VolumeID    string `json:"volume_id" required:"true" validate:"required"`
-	Name        string `json:"name" required:"true" validate:"required"`
-	Description string `json:"description,omitempty"`
+	VolumeID    string            `json:"volume_id" required:"true" validate:"required"`
+	Name        string            `json:"name" required:"true" validate:"required"`
+	Description string            `json:"description,omitempty"`
+	Metadata    map[string]string `json:"metadata,omitempty"`
 }
 
 // ToSnapshotCreateMap builds a request body from CreateOpts.

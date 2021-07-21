@@ -1,6 +1,7 @@
 package snapshots
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/G-Core/gcorelabscloud-go/client/snapshots/v1/client"
@@ -144,6 +145,16 @@ var snapshotCreateCommand = cli.Command{
 			Usage:    "snapshot description",
 			Required: false,
 		},
+		&cli.StringSliceFlag{
+			Name:     "meta-key",
+			Usage:    "metadata key, use with meta-value",
+			Required: false,
+		},
+		&cli.StringSliceFlag{
+			Name:     "meta-value",
+			Usage:    "metadata key, use with meta-value",
+			Required: false,
+		},
 	}, flags.WaitCommandFlags...,
 	),
 	Action: func(c *cli.Context) error {
@@ -152,11 +163,19 @@ var snapshotCreateCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
+
+		meta, err := parseMetadata(c.StringSlice("meta-key"), c.StringSlice("meta-value"))
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+
 		opts := snapshots.CreateOpts{
 			VolumeID:    c.String("volume-id"),
 			Name:        c.String("name"),
 			Description: c.String("description"),
+			Metadata:    meta,
 		}
+
 		results, err := snapshots.Create(client, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
@@ -181,6 +200,21 @@ var snapshotCreateCommand = cli.Command{
 			return nil, nil
 		})
 	},
+}
+
+func parseMetadata(keys []string, values []string) (map[string]string, error) {
+	if len(keys) == 0 {
+		return nil, nil
+	}
+	if len(keys) != len(values) {
+		return nil, errors.New("meta-key args count should equal meta-value args count")
+	}
+
+	meta := map[string]string{}
+	for i, _ := range keys {
+		meta[keys[i]] = values[i]
+	}
+	return meta, nil
 }
 
 var Commands = cli.Command{
