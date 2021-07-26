@@ -122,7 +122,7 @@ type CreateOpts struct {
 	Volumes        []CreateVolumeOpts  `json:"volumes" required:"true" validate:"required,dive"`
 	Interfaces     []InterfaceOpts     `json:"interfaces" required:"true" validate:"required,dive"`
 	SecurityGroups []gcorecloud.ItemID `json:"security_groups" validate:"omitempty,dive,uuid4"`
-	Keypair        string              `json:"keypair_name"`
+	Keypair        string              `json:"keypair_name,omitempty"`
 	Password       string              `json:"password" validate:"omitempty,required_with=Username"`
 	Username       string              `json:"username" validate:"omitempty,required_with=Password"`
 	UserData       string              `json:"user_data" validate:"omitempty,base64"`

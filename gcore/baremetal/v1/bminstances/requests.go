@@ -63,7 +63,7 @@ type CreateOpts struct {
 	ImageID       string                 `json:"image_id,omitempty" validate:"required_without=AppTemplateID"`
 	AppTemplateID string                 `json:"apptemplate_id,omitempty" validate:"required_without=ImageID"`
 	Interfaces    []InterfaceOpts        `json:"interfaces" required:"true" validate:"required,dive"`
-	Keypair       string                 `json:"keypair_name"`
+	Keypair       string                 `json:"keypair_name,omitempty"`
 	Password      string                 `json:"password" validate:"omitempty,required_with=Username"`
 	Username      string                 `json:"username" validate:"omitempty,required_with=Password"`
 	UserData      string                 `json:"user_data,omitempty" validate:"omitempty,base64"`
