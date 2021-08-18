@@ -8,6 +8,11 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
+// MetadataActionResult represents the result of a create, delete or update operation(no content)
+type MetadataActionResult struct {
+	gcorecloud.ErrResult
+}
+
 type commonResult struct {
 	gcorecloud.Result
 }
