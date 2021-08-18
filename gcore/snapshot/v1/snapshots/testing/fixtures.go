@@ -76,6 +76,13 @@ const DeleteResponse = `
 }
 `
 
+const MetadataCreateRequest = `
+{
+"test1": "test1", 
+"test2": "test2"
+}
+`
+
 var (
 	createdTimeString    = "2019-05-29T05:32:41+0000"
 	updatedTimeString    = "2019-05-29T05:39:20+0000"
