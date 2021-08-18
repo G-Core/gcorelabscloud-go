@@ -217,6 +217,54 @@ func parseMetadata(keys []string, values []string) (map[string]string, error) {
 	return meta, nil
 }
 
+var metadataReplaceCommand = cli.Command{
+	Name:      "replace",
+	Usage:     "Replace snapshot metadata by key",
+	ArgsUsage: "<snapshot_id>",
+	Category:  "metadata",
+	Flags: []cli.Flag{
+		&cli.StringSliceFlag{
+			Name:  "meta-key",
+			Usage: "metadata key, use with meta-value",
+		},
+		&cli.StringSliceFlag{
+			Name:  "meta-value",
+			Usage: "metadata key, use with meta-value",
+		},
+	},
+	Action: func(c *cli.Context) error {
+		snapshotID, err := flags.GetFirstStringArg(c, snapshotIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "replace")
+			return err
+		}
+
+		client, err := client.NewSnapshotClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		meta, err := parseMetadata(c.StringSlice("meta-key"), c.StringSlice("meta-value"))
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+
+		metaData := make([]snapshots.MetadataOpts, 0, len(meta))
+		for k, v := range meta {
+			metaData = append(metaData, snapshots.MetadataOpts{Key: k, Value: v})
+		}
+		opts := snapshots.MetadataSetOpts{Metadata: metaData}
+
+		snapshot, err := snapshots.MetadataReplace(client, snapshotID, opts).Extract()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		utils.ShowResults(snapshot, c.String("format"))
+		return nil
+	},
+}
+
 var Commands = cli.Command{
 	Name:  "snapshot",
 	Usage: "GCloud snapshots API",
@@ -225,5 +273,12 @@ var Commands = cli.Command{
 		&snapshotGetCommand,
 		&snapshotDeleteCommand,
 		&snapshotCreateCommand,
+		{
+			Name:  "metadata",
+			Usage: "Snapshot metadata",
+			Subcommands: []*cli.Command{
+				&metadataReplaceCommand,
+			},
+		},
 	},
 }

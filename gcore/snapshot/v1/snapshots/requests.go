@@ -1,6 +1,8 @@
 package snapshots
 
 import (
+	"net/http"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
@@ -138,4 +140,55 @@ func IDFromName(client *gcorecloud.ServiceClient, name string, opts ListOptsBuil
 	default:
 		return "", gcorecloud.ErrMultipleResourcesFound{Name: name, Count: count, ResourceType: "snapshots"}
 	}
+}
+
+// MetadataOptsBuilder allows extensions to add additional parameters to the metadata Create and Update request.
+type MetadataOptsBuilder interface {
+	ToMetadataMap() (string, error)
+}
+
+// MetadataOpts. Set parameters for Create or Update operation
+type MetadataOpts struct {
+	Key   string `json:"key" validate:"required,max=255"`
+	Value string `json:"value" validate:"required,max=255"`
+}
+
+// MetadataSetOpts. Set parameters for Create or Update operation
+type MetadataSetOpts struct {
+	Metadata []MetadataOpts `json:"metadata"`
+}
+
+// Validate
+func (opts MetadataOpts) Validate() error {
+	return gcorecloud.ValidateStruct(opts)
+}
+
+// Validate
+func (opts MetadataSetOpts) Validate() error {
+	return gcorecloud.ValidateStruct(opts)
+}
+
+// ToMetadataMap builds a request body from MetadataSetOpts.
+func (opts MetadataSetOpts) ToMetadataMap() (map[string]interface{}, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, err
+	}
+	m := make(map[string]interface{})
+	for _, md := range opts.Metadata {
+		m[md.Key] = md.Value
+	}
+	return m, nil
+}
+
+// MetadataReplace replace a metadata for an snapshot.
+func MetadataReplace(client *gcorecloud.ServiceClient, id string, opts MetadataSetOpts) (r GetResult) {
+	b, err := opts.ToMetadataMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = client.Put(metadataURL(client, id), b, &r.Body, &gcorecloud.RequestOpts{ // nolint
+		OkCodes: []int{http.StatusNoContent, http.StatusOK},
+	})
+	return
 }

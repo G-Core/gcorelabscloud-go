@@ -14,6 +14,14 @@ func getURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceURL(c, id)
 }
 
+func resourceActionURL(c *gcorecloud.ServiceClient, id string, action string) string {
+	return c.ServiceURL(id, action)
+}
+
+func metadataURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "metadata")
+}
+
 func deleteURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceURL(c, id)
 }
