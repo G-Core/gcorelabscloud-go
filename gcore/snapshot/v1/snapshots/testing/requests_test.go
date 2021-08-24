@@ -252,36 +252,6 @@ func TestFindByName(t *testing.T) {
 
 }
 
-func TestMetadataUpdate(t *testing.T) {
-	th.SetupHTTP()
-	defer th.TeardownHTTP()
-
-	th.Mux.HandleFunc(prepareMetadataTestURL(Snapshot1.ID), func(w http.ResponseWriter, r *http.Request) {
-		th.TestMethod(t, r, "POST")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
-
-		th.TestHeader(t, r, "Content-Type", "application/json")
-		th.TestHeader(t, r, "Accept", "application/json")
-		th.TestJSONRequest(t, r, MetadataCreateRequest)
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNoContent)
-	})
-
-	opts := snapshots.MetadataSetOpts{
-		Metadata: []snapshots.MetadataOpts{{
-			Key:   "test1",
-			Value: "test1",
-		}, {
-			Key:   "test2",
-			Value: "test2",
-		},
-		}}
-
-	client := fake.ServiceTokenClient("snapshots", "v1")
-	err := snapshots.MetadataUpdate(client, Snapshot1.ID, opts).ExtractErr()
-	require.NoError(t, err)
-}
-
 func TestMetadataReplace(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()

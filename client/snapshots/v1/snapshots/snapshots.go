@@ -256,58 +256,11 @@ var metadataReplaceCommand = cli.Command{
 		}
 		opts := snapshots.MetadataSetOpts{Metadata: metaData}
 
-		if err := snapshots.MetadataReplace(client, snapshotID, opts).ExtractErr(); err != nil {
-			return cli.NewExitError(err, 1)
-		}
-		return nil
-	},
-}
-
-var metadataUpdateCommand = cli.Command{
-	Name:      "update",
-	Usage:     "Update snapshot metadata by key",
-	ArgsUsage: "<snapshot_id>",
-	Category:  "metadata",
-	Flags: []cli.Flag{
-		&cli.StringSliceFlag{
-			Name:     "meta-key",
-			Usage:    "metadata key, use with meta-value",
-			Required: true,
-		},
-		&cli.StringSliceFlag{
-			Name:     "meta-value",
-			Usage:    "metadata key, use with meta-value",
-			Required: true,
-		},
-	},
-	Action: func(c *cli.Context) error {
-		snapshotID, err := flags.GetFirstStringArg(c, snapshotIDText)
-		if err != nil {
-			_ = cli.ShowCommandHelp(c, "replace")
-			return err
-		}
-
-		client, err := client.NewSnapshotClientV1(c)
-		if err != nil {
-			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
-		}
-
-		meta, err := parseMetadata(c.StringSlice("meta-key"), c.StringSlice("meta-value"))
+		snapshot, err := snapshots.MetadataReplace(client, snapshotID, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
-
-		metaData := make([]snapshots.MetadataOpts, 0, len(meta))
-		for k, v := range meta {
-			metaData = append(metaData, snapshots.MetadataOpts{Key: k, Value: v})
-		}
-		opts := snapshots.MetadataSetOpts{Metadata: metaData}
-
-		if err := snapshots.MetadataUpdate(client, snapshotID, opts).ExtractErr(); err != nil {
-			return cli.NewExitError(err, 1)
-		}
-		return nil
+		utils.ShowResults(snapshot, c.String("format"))
 		return nil
 	},
 }
@@ -324,7 +277,6 @@ var Commands = cli.Command{
 			Name:  "metadata",
 			Usage: "Snapshot metadata",
 			Subcommands: []*cli.Command{
-				&metadataUpdateCommand,
 				&metadataReplaceCommand,
 			},
 		},

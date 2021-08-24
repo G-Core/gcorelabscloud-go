@@ -180,21 +180,8 @@ func (opts MetadataSetOpts) ToMetadataMap() (map[string]interface{}, error) {
 	return m, nil
 }
 
-// MetadataUpdate updates a metadata for an snapshot.
-func MetadataUpdate(client *gcorecloud.ServiceClient, id string, opts MetadataSetOpts) (r MetadataActionResult) {
-	b, err := opts.ToMetadataMap()
-	if err != nil {
-		r.Err = err
-		return
-	}
-	_, r.Err = client.Post(metadataURL(client, id), b, nil, &gcorecloud.RequestOpts{ // nolint
-		OkCodes: []int{http.StatusNoContent, http.StatusOK},
-	})
-	return
-}
-
-// MetadataReplace updates a metadata for an snapshot.
-func MetadataReplace(client *gcorecloud.ServiceClient, id string, opts MetadataSetOpts) (r MetadataActionResult) {
+// MetadataReplace replace a metadata for an snapshot.
+func MetadataReplace(client *gcorecloud.ServiceClient, id string, opts MetadataSetOpts) (r GetResult) {
 	b, err := opts.ToMetadataMap()
 	if err != nil {
 		r.Err = err
