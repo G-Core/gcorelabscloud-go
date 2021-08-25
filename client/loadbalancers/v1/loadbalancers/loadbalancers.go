@@ -9,6 +9,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/client/loadbalancers/v1/lbpools"
 	"github.com/G-Core/gcorelabscloud-go/client/loadbalancers/v1/listeners"
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
+	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/lbflavors"
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/loadbalancers"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 
@@ -48,6 +49,11 @@ var loadBalancerCreateSubCommand = cli.Command{
 			Required: true,
 		},
 		&cli.StringFlag{
+			Name:    "flavor",
+			Aliases: []string{"f"},
+			Usage:   "Loadbalancer flavor",
+		},
+		&cli.StringFlag{
 			Name:        "vip-network-id",
 			Usage:       "Loadbalancer vip network ID",
 			DefaultText: "<nil>",
@@ -74,6 +80,7 @@ var loadBalancerCreateSubCommand = cli.Command{
 
 		opts := loadbalancers.CreateOpts{
 			Name:         c.String("name"),
+			Flavor:       c.String("flavor"),
 			Listeners:    []loadbalancers.CreateListenerOpts{},
 			VipNetworkID: c.String("vip-network-id"),
 			VipSubnetID:  c.String("vip-subnet-id"),
@@ -206,6 +213,33 @@ var loadBalancerUpdateSubCommand = cli.Command{
 	},
 }
 
+var flavorListSubCommand = cli.Command{
+	Name:     "list",
+	Usage:    "List loadbalancer flavor",
+	Category: "loadbalancer flavor",
+	Action: func(c *cli.Context) error {
+		client, err := client.NewLBFlavorClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+		results, err := lbflavors.ListAll(client)
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		utils.ShowResults(results, c.String("format"))
+		return nil
+	},
+}
+
+var flavorSubCommand = cli.Command{
+	Name:  "flavor",
+	Usage: "GCloud loadbalancer flavor API",
+	Subcommands: []*cli.Command{
+		&flavorListSubCommand,
+	},
+}
+
 var Commands = cli.Command{
 	Name:  "loadbalancer",
 	Usage: "GCloud loadbalancers API",
@@ -215,6 +249,7 @@ var Commands = cli.Command{
 		&loadBalancerUpdateSubCommand,
 		&loadBalancerDeleteSubCommand,
 		&loadBalancerCreateSubCommand,
+		&flavorSubCommand,
 		&listeners.ListenerCommands,
 		&lbpools.PoolCommands,
 	},

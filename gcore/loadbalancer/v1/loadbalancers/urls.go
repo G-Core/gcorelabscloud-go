@@ -29,3 +29,7 @@ func updateURL(c *gcorecloud.ServiceClient, id string) string {
 func deleteURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceURL(c, id)
 }
+
+func listFlavorURL(c *gcorecloud.ServiceClient) string {
+	return rootURL(c)
+}
