@@ -80,11 +80,14 @@ var loadBalancerCreateSubCommand = cli.Command{
 
 		opts := loadbalancers.CreateOpts{
 			Name:         c.String("name"),
-			Flavor:       c.String("flavor"),
 			Listeners:    []loadbalancers.CreateListenerOpts{},
 			VipNetworkID: c.String("vip-network-id"),
 			VipSubnetID:  c.String("vip-subnet-id"),
 			Tags:         c.StringSlice("tags"),
+		}
+		flavor := c.String("flavor")
+		if flavor != "" {
+			opts.Flavor = &flavor
 		}
 
 		results, err := loadbalancers.Create(client, opts).Extract()

@@ -88,7 +88,7 @@ type CreateOpts struct {
 	Listeners    []CreateListenerOpts `json:"listeners" required:"true" validate:"required,dive"`
 	VipNetworkID string               `json:"vip_network_id,omitempty"`
 	VipSubnetID  string               `json:"vip_subnet_id,omitempty"`
-	Flavor       string               `json:"flavor,omitempty"`
+	Flavor       *string              `json:"flavor,omitempty"`
 	Tags         []string             `json:"tag,omitempty"`
 }
 
