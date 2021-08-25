@@ -5,6 +5,7 @@ import (
 	"net"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/lbflavors"
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
@@ -54,6 +55,7 @@ type LoadBalancer struct {
 	RegionID           int                      `json:"region_id"`
 	Region             string                   `json:"region"`
 	Tags               []string                 `json:"tags"`
+	Flavor             lbflavors.Flavor         `json:"flavor"`
 }
 
 func (lb LoadBalancer) IsDeleted() bool {
