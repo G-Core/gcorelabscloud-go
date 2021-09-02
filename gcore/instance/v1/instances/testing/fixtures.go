@@ -9,6 +9,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
+	"github.com/shopspring/decimal"
 )
 
 const ListResponse = `
@@ -369,6 +370,72 @@ const MetadataCreateRequest = `
 }
 `
 
+const InstanceConsoleResponse = `
+{
+    "remote_console": 
+
+    {
+        "url": "https://92.38.157.200:6082/spice_auto.html?token=369b3c64-541b-4cd7-bc47-a82cdb98228f",
+        "type": "spice-html5",
+        "protocol": "spice"
+    }
+}
+`
+
+const ListInstanceMetricsRequest = `
+{
+    "time_interval": 4,
+    "time_unit": "day"
+}
+`
+
+const ListInstanceMetricsResponse = `
+{
+  "count": 1,
+  "results": [
+    {
+      "cpu_util": 8,
+      "disks": [
+        {
+          "disk_Bps_read": 16384,
+          "disk_Bps_write": 86016,
+          "disk_iops_read": 3,
+          "disk_iops_write": 12,
+          "disk_name": "sda"
+        }
+      ],
+      "memory_util": 33.28411162695459,
+      "network_Bps_egress": 102,
+      "network_Bps_ingress": 102,
+      "network_pps_egress": 0.7,
+      "network_pps_ingress": 0.7,
+      "time": "2020-07-07T12:57:00Z"
+    }
+  ]
+}
+`
+
+const ListAvailableFlavorsResponse = `
+{
+  "count": 1,
+  "results": [
+    {
+      "currency_code": "USD",
+      "flavor_id": "g1-gpu-1-2-1",
+      "flavor_name": "g1-gpu-1-2-1",
+      "hardware_description": {
+        "gpu": "1x NVIDIA 11GB"
+      },
+      "price_per_hour": 1,
+      "price_per_month": 720,
+      "price_status": "show",
+      "ram": 2048,
+      "vcpus": 1
+    }
+  ]
+}
+`
+
 var (
 	ip1                 = net.ParseIP("10.0.0.17")
 	ip2                 = net.ParseIP("92.38.157.215")
@@ -443,6 +510,7 @@ var (
 	PortNetworkSubnet1UpdatedAt, _ = time.Parse(gcorecloud.RFC3339Z, "2019-07-22T10:55:45+0000")
 	PortNetworkSubnet2CreatedAt, _ = time.Parse(gcorecloud.RFC3339Z, "2019-07-22T15:15:05+0000")
 	PortNetworkSubnet2UpdatedAt, _ = time.Parse(gcorecloud.RFC3339Z, "2019-07-22T15:15:05+0000")
+	MetricsTime, _                 = time.Parse(gcorecloud.RFC3339ZZ, "2020-07-07T12:57:00Z")
 	PortNetworkSubnet1Cidr, _      = gcorecloud.ParseCIDRString("192.168.123.0/24")
 	PortNetworkSubnet2Cidr, _      = gcorecloud.ParseCIDRString("192.168.120.0/24")
 	FloatingIP1                    = net.ParseIP("5.188.135.29")
@@ -558,4 +626,41 @@ var (
 		ReadOnly: false,
 	}
 	ExpectedMetadataList = []instances.Metadata{Metadata1, Metadata2}
+	Console              = instances.RemoteConsole{
+		URL:      "https://92.38.157.200:6082/spice_auto.html?token=369b3c64-541b-4cd7-bc47-a82cdb98228f",
+		Type:     "spice-html5",
+		Protocol: "spice",
+	}
+	Metrics = instances.InstanceMetrics{
+		CPUUtil: 8,
+		Disks: []instances.DiskMetrics{
+			{
+				BpsRead:   16384,
+				BpsWrite:  86016,
+				IOPSRead:  3,
+				IOPSWrite: 12,
+				Name:      "sda",
+			},
+		},
+		MemoryUtil:        33.28411162695459,
+		NetworkBPSEgress:  102,
+		NetworkBPSIngress: 102,
+		NetworkPPSEgress:  0.7,
+		NetworkPPSIngress: 0.7,
+		Time:              gcorecloud.JSONRFC3339ZZ{Time: MetricsTime},
+	}
+	priceStatus     = "show"
+	currencyCode, _ = gcorecloud.ParseCurrency("USD")
+	pricePerHour    = decimal.NewFromInt(1)
+	pricePerMonth   = decimal.NewFromInt(720)
+	AvailableFlavor = flavors.Flavor{
+		FlavorID:      "g1-gpu-1-2-1",
+		FlavorName:    "g1-gpu-1-2-1",
+		PriceStatus:   &priceStatus,
+		CurrencyCode:  currencyCode,
+		PricePerHour:  &pricePerHour,
+		PricePerMonth: &pricePerMonth,
+		RAM:           2048,
+		VCPUS:         1,
+	}
 )

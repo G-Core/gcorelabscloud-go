@@ -3,6 +3,7 @@ package instances
 import (
 	"net/http"
 
+	"github.com/G-Core/gcorelabscloud-go/gcore/flavor/v1/flavors"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
@@ -438,6 +439,39 @@ func Resize(client *gcorecloud.ServiceClient, id string, opts ChangeFlavorOptsBu
 	return
 }
 
+// ListMetricsOptsBuilder builds parameters or change flavor request.
+type ListMetricsOptsBuilder interface {
+	ToListMetricsMap() (map[string]interface{}, error)
+}
+
+type ListMetricsOpts struct {
+	TimeUnit     types.MetricsTimeUnit `json:"time_unit" required:"true" validate:"required,enum"`
+	TimeInterval int                   `json:"time_interval" required:"true" validate:"required"`
+}
+
+func (opts ListMetricsOpts) Validate() error {
+	return gcorecloud.ValidateStruct(opts)
+}
+
+// ToListMetricsMap builds a request body from ListMetricsOpts.
+func (opts ListMetricsOpts) ToListMetricsMap() (map[string]interface{}, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, err
+	}
+	return gcorecloud.BuildRequestBody(opts, "")
+}
+
+// ListInstanceMetrics retrieves instance's metrics.
+func ListInstanceMetrics(client *gcorecloud.ServiceClient, id string, opts ListMetricsOptsBuilder) (r ListMetricsResult) {
+
+	b, err := opts.ToListMetricsMap()
+	if err != nil {
+		return
+	}
+	_, r.Err = client.Post(listInstanceMetricsURL(client, id), b, &r.Body, nil) // nolint
+	return
+}
+
 func MetadataList(client *gcorecloud.ServiceClient, id string) pagination.Pager {
 	url := metadataURL(client, id)
 	return pagination.NewPager(client, url, func(r pagination.PageResult) pagination.Page {
@@ -532,6 +566,34 @@ func MetadataDelete(client *gcorecloud.ServiceClient, id string, key string) (r 
 // MetadataGet gets defined metadata key for an instance.
 func MetadataGet(client *gcorecloud.ServiceClient, id string, key string) (r MetadataResult) {
 	url := metadataDetailsURL(client, id, key)
+	_, r.Err = client.Get(url, &r.Body, nil) // nolint
+	return
+}
+
+// ListAvailableFlavors get flavors available for the instance to resize into.
+func ListAvailableFlavors(client *gcorecloud.ServiceClient, id string, opts flavors.ListOptsBuilder) (r flavors.ListResult) {
+	url := listAvailableFlavorsURL(client, id)
+	if opts != nil {
+		query, err := opts.ToFlavorListQuery()
+		if err != nil {
+			return
+		}
+		url += query
+	}
+	_, r.Err = client.Post(url, nil, &r.Body, nil)
+	return
+}
+
+// GetSpiceConsole retrieves a specific spice console based on instance unique ID.
+func GetSpiceConsole(client *gcorecloud.ServiceClient, id string) (r RemoteConsoleResult) {
+	url := getSpiceConsoleURL(client, id)
+	_, r.Err = client.Get(url, &r.Body, nil) // nolint
+	return
+}
+
+// GetInstanceConsole retrieves a specific spice console based on instance unique ID.
+func GetInstanceConsole(client *gcorecloud.ServiceClient, id string) (r RemoteConsoleResult) {
+	url := getInstanceConsoleURL(client, id)
 	_, r.Err = client.Get(url, &r.Body, nil) // nolint
 	return
 }
