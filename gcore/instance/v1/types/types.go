@@ -9,6 +9,7 @@ type AddressType string
 type VolumeSource string
 type FloatingIPSource string
 type InterfaceType string
+type MetricsTimeUnit string
 
 const (
 	AddressTypeFixed       AddressType      = "fixed"
@@ -23,6 +24,8 @@ const (
 	AnySubnetInterfaceType InterfaceType    = "any_subnet"
 	ExternalInterfaceType  InterfaceType    = "external"
 	ReservedFixedIpType    InterfaceType    = "reserved_fixed_ip"
+	HourMetricsTimeUnit    MetricsTimeUnit  = "hour"
+	DayMetricsTimeUnit     MetricsTimeUnit  = "day"
 )
 
 func (vs VolumeSource) IsValid() error {
@@ -262,4 +265,62 @@ func (it *InterfaceType) UnmarshalJSON(data []byte) error {
 // MarshalJSON - implements Marshaler interface
 func (it *InterfaceType) MarshalJSON() ([]byte, error) {
 	return json.Marshal(it.String())
+}
+
+func (u MetricsTimeUnit) IsValid() error {
+	switch u {
+	case HourMetricsTimeUnit, DayMetricsTimeUnit:
+		return nil
+	}
+	return fmt.Errorf("invalid MetricsTypeUnit type: %v", u)
+}
+
+func (u MetricsTimeUnit) ValidOrNil() (*MetricsTimeUnit, error) {
+	if u.String() == "" {
+		return nil, nil
+	}
+	err := u.IsValid()
+	if err != nil {
+		return &u, err
+	}
+	return &u, nil
+}
+
+func (u MetricsTimeUnit) String() string {
+	return string(u)
+}
+
+func (u MetricsTimeUnit) List() []MetricsTimeUnit {
+	return []MetricsTimeUnit{
+		HourMetricsTimeUnit,
+		DayMetricsTimeUnit,
+	}
+}
+
+func (u MetricsTimeUnit) StringList() []string {
+	var s []string
+	for _, v := range u.List() {
+		s = append(s, v.String())
+	}
+	return s
+}
+
+// UnmarshalJSON - implements Unmarshaler interface
+func (u *MetricsTimeUnit) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	v := MetricsTimeUnit(s)
+	err := v.IsValid()
+	if err != nil {
+		return err
+	}
+	*u = v
+	return nil
+}
+
+// MarshalJSON - implements Marshaler interface
+func (u *MetricsTimeUnit) MarshalJSON() ([]byte, error) {
+	return json.Marshal(u.String())
 }

@@ -31,6 +31,36 @@ func (r commonResult) ExtractInto(v interface{}) error {
 	return r.Result.ExtractIntoStructPtr(v, "")
 }
 
+type ListMetricsResult struct {
+	gcorecloud.Result
+}
+
+// Extract is a function that accepts a result and extracts a instance's metrics resource.
+func (r ListMetricsResult) Extract() ([]InstanceMetrics, error) {
+	var s []InstanceMetrics
+	err := r.ExtractInto(&s)
+	return s, err
+}
+
+func (r ListMetricsResult) ExtractInto(v interface{}) error {
+	return r.Result.ExtractIntoSlicePtr(v, "results")
+}
+
+type RemoteConsoleResult struct {
+	gcorecloud.Result
+}
+
+// Extract is a function that accepts a result and extracts a remote console resource.
+func (r RemoteConsoleResult) Extract() (*RemoteConsole, error) {
+	var rc RemoteConsole
+	err := r.ExtractInto(&rc)
+	return &rc, err
+}
+
+func (r RemoteConsoleResult) ExtractInto(v interface{}) error {
+	return r.Result.ExtractIntoStructPtr(v, "remote_console")
+}
+
 // CreateResult represents the result of a create operation. Call its Extract
 // method to interpret it as a Instance.
 type CreateResult struct {
@@ -74,6 +104,12 @@ type InterfaceActionResult struct {
 	gcorecloud.ErrResult
 }
 
+type RemoteConsole struct {
+	URL      string `json:"url"`
+	Type     string `json:"type"`
+	Protocol string `json:"protocol"`
+}
+
 type InstanceVolume struct {
 	ID                  string `json:"id"`
 	DeleteOnTermination bool   `json:"delete_on_termination"`
@@ -84,6 +120,26 @@ type InstanceAddress struct {
 	Address    net.IP            `json:"addr"`
 	SubnetID   *string           `json:"subnet_id,omitempty"`
 	SubnetName *string           `json:"subnet_name,omitempty"`
+}
+
+// InstanceMetrics represent a instance metrics struct
+type InstanceMetrics struct {
+	CPUUtil           float64                  `json:"cpu_util"`
+	Disks             []DiskMetrics            `json:"disks"`
+	MemoryUtil        float64                  `json:"memory_util"`
+	NetworkBPSEgress  float64                  `json:"network_Bps_egress"`
+	NetworkBPSIngress float64                  `json:"network_Bps_ingress"`
+	NetworkPPSEgress  float64                  `json:"network_pps_egress"`
+	NetworkPPSIngress float64                  `json:"network_pps_ingress"`
+	Time              gcorecloud.JSONRFC3339ZZ `json:"time"`
+}
+
+type DiskMetrics struct {
+	BpsRead   float64 `json:"disk_Bps_read"`
+	BpsWrite  float64 `json:"disk_Bps_write"`
+	IOPSRead  float64 `json:"disk_iops_read"`
+	IOPSWrite float64 `json:"disk_iops_write"`
+	Name      string  `json:"disk_name"`
 }
 
 // Instance represents a instance structure.
@@ -389,4 +445,29 @@ func (r MetadataResult) Extract() (*Metadata, error) {
 	var s Metadata
 	err := r.ExtractInto(&s)
 	return &s, err
+}
+
+type InstanceLocation struct {
+	ID          string `json:"id"`
+	ProjectID   string `json:"project_id"`
+	ProjectName string `json:"project_name"`
+	Name        string `json:"name"`
+	RegionID    string `json:"region_id"`
+	RegionName  string `json:"region_name"`
+	ClientID    int    `json:"client_id"`
+}
+
+type SearchLocationResult struct {
+	gcorecloud.Result
+}
+
+// Extract is a function that accepts a result and extracts a instance's location resource.
+func (r SearchLocationResult) Extract() ([]InstanceLocation, error) {
+	var s []InstanceLocation
+	err := r.ExtractInto(&s)
+	return s, err
+}
+
+func (r SearchLocationResult) ExtractInto(v interface{}) error {
+	return r.Result.ExtractIntoSlicePtr(v, "results")
 }

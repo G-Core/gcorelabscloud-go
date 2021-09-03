@@ -104,8 +104,16 @@ const CreateResponse = `
 }
 `
 
+const RebuildRequest = `
+{
+  "image_id": "b5b4d65d-945f-4b98-ab6f-332319c724ef"
+}
+`
+
 var (
-	Tasks1 = tasks.TaskResults{
+	instanceID = "b5b4d65d-945f-4b98-ab6f-332319c724ef"
+	imageID    = "b5b4d65d-945f-4b98-ab6f-332319c724ef"
+	Tasks1     = tasks.TaskResults{
 		Tasks: []tasks.TaskID{"50f53a35-42ed-40c4-82b2-5a37fb3e00bc"},
 	}
 )

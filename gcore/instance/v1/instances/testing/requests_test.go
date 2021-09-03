@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/flavor/v1/flavors"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
@@ -30,6 +31,10 @@ func prepareGetTestURLParams(version string, projectID int, regionID int, id str
 	return fmt.Sprintf("/%s/instances/%d/%d/%s", version, projectID, regionID, id)
 }
 
+func prepareListInstanceLocationTestURL() string {
+	return "/v1/instances/search"
+}
+
 func prepareGetActionTestURLParams(version string, id string, action string) string { // nolint
 	return fmt.Sprintf("/%s/instances/%d/%d/%s/%s", version, fake.ProjectID, fake.RegionID, id, action)
 }
@@ -44,6 +49,22 @@ func prepareListTestURL() string {
 
 func prepareListInterfacesTestURL(id string) string {
 	return prepareGetActionTestURLParams("v1", id, "interfaces")
+}
+
+func prepareGetSpiceConsoleTestURL(id string) string {
+	return prepareGetActionTestURLParams("v1", id, "get_spice_console")
+}
+
+func prepareGetInstanceConsoleTestURL(id string) string {
+	return prepareGetActionTestURLParams("v1", id, "get_console")
+}
+
+func prepareListInstanceMetricsTestURL(id string) string {
+	return prepareGetActionTestURLParams("v1", id, "metrics")
+}
+
+func prepareListAvailableFlavorsTestURL(id string) string {
+	return prepareGetActionTestURLParams("v1", id, "available_flavors")
 }
 
 func prepareListSecurityGroupsTestURL(id string) string {
@@ -739,4 +760,135 @@ func TestMetadataDelete(t *testing.T) {
 	client := fake.ServiceTokenClient("instances", "v1")
 	err := instances.MetadataDelete(client, instanceID, Metadata1.Key).ExtractErr()
 	require.NoError(t, err)
+}
+
+func TestGetSpiceConsole(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareGetSpiceConsoleTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, InstanceConsoleResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("instances", "v1")
+
+	actual, err := instances.GetSpiceConsole(client, instanceID).Extract()
+	require.NoError(t, err)
+	require.Equal(t, &Console, actual)
+}
+
+func TestGetInstanceConsole(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareGetInstanceConsoleTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, InstanceConsoleResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("instances", "v1")
+
+	actual, err := instances.GetInstanceConsole(client, instanceID).Extract()
+	require.NoError(t, err)
+	require.Equal(t, &Console, actual)
+}
+
+func TestListInstanceMetrics(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareListInstanceMetricsTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestJSONRequest(t, r, ListInstanceMetricsRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, ListInstanceMetricsResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	opts := instances.ListMetricsOpts{
+		TimeUnit:     types.DayMetricsTimeUnit,
+		TimeInterval: 4,
+	}
+
+	client := fake.ServiceTokenClient("instances", "v1")
+	result, err := instances.ListInstanceMetrics(client, instanceID, opts).Extract()
+	require.NoError(t, err)
+	require.Equal(t, len(result), 1)
+	require.Equal(t, Metrics, result[0])
+}
+
+func TestListAvailableFlavors(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareListAvailableFlavorsTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		th.TestHeader(t, r, "Accept", "application/json")
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, ListAvailableFlavorsResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	includePrice := true
+	opts := flavors.ListOpts{
+		IncludePrices: &includePrice,
+	}
+	client := fake.ServiceTokenClient("instances", "v1")
+	result, err := instances.ListAvailableFlavors(client, instanceID, opts).Extract()
+	require.NoError(t, err)
+	require.Equal(t, len(result), 1)
+	require.Equal(t, AvailableFlavor, result[0])
+}
+
+func TestListInstanceLocation(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareListInstanceLocationTestURL(), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, ListInstanceLocationResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("instances", "v1")
+
+	opts := instances.ListInstanceLocationOpts{}
+	actual, err := instances.ListInstanceLocation(client, opts).Extract()
+	require.NoError(t, err)
+	ct := actual[0]
+	require.Equal(t, InstanceLocation, ct)
+	require.Equal(t, ExpectedInstancesLocationSlice, actual)
 }

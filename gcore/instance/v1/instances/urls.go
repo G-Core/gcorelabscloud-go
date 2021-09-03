@@ -90,6 +90,26 @@ func metadataDetailsURL(c *gcorecloud.ServiceClient, id string, actionID string)
 	return resourceActionDetailsURL(c, id, "metadata", actionID)
 }
 
+func listAvailableFlavorsURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "available_flavors")
+}
+
+func listInstanceMetricsURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "metrics")
+}
+
 func createURL(c *gcorecloud.ServiceClient) string {
 	return rootURL(c)
+}
+
+func getSpiceConsoleURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "get_spice_console")
+}
+
+func getInstanceConsoleURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "get_console")
+}
+
+func listInstanceLocationURL(c *gcorecloud.ServiceClient) string {
+	return c.BaseServiceURL("instances", "search")
 }

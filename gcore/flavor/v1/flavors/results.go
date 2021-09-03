@@ -27,6 +27,21 @@ func (r commonResult) ExtractInto(v interface{}) error {
 	return r.Result.ExtractIntoStructPtr(v, "")
 }
 
+type ListResult struct {
+	gcorecloud.Result
+}
+
+// Extract is a function that accepts a result and extracts a flavor resource.
+func (r ListResult) Extract() ([]Flavor, error) {
+	var s []Flavor
+	err := r.ExtractInto(&s)
+	return s, err
+}
+
+func (r ListResult) ExtractInto(v interface{}) error {
+	return r.Result.ExtractIntoSlicePtr(v, "results")
+}
+
 // GetResult represents the result of a get operation. Call its Extract
 // method to interpret it as a Flavor.
 type GetResult struct {
