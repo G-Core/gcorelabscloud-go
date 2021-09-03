@@ -31,6 +31,10 @@ func prepareGetTestURLParams(version string, projectID int, regionID int, id str
 	return fmt.Sprintf("/%s/instances/%d/%d/%s", version, projectID, regionID, id)
 }
 
+func prepareListInstanceLocationTestURL() string {
+	return "/v1/instances/search"
+}
+
 func prepareGetActionTestURLParams(version string, id string, action string) string { // nolint
 	return fmt.Sprintf("/%s/instances/%d/%d/%s/%s", version, fake.ProjectID, fake.RegionID, id, action)
 }
@@ -861,4 +865,30 @@ func TestListAvailableFlavors(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, len(result), 1)
 	require.Equal(t, AvailableFlavor, result[0])
+}
+
+func TestListInstanceLocation(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareListInstanceLocationTestURL(), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, ListInstanceLocationResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("instances", "v1")
+
+	opts := instances.ListInstanceLocationOpts{}
+	actual, err := instances.ListInstanceLocation(client, opts).Extract()
+	require.NoError(t, err)
+	ct := actual[0]
+	require.Equal(t, InstanceLocation, ct)
+	require.Equal(t, ExpectedInstancesLocationSlice, actual)
 }

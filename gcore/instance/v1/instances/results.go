@@ -446,3 +446,28 @@ func (r MetadataResult) Extract() (*Metadata, error) {
 	err := r.ExtractInto(&s)
 	return &s, err
 }
+
+type InstanceLocation struct {
+	ID          string `json:"id"`
+	ProjectID   string `json:"project_id"`
+	ProjectName string `json:"project_name"`
+	Name        string `json:"name"`
+	RegionID    string `json:"region_id"`
+	RegionName  string `json:"region_name"`
+	ClientID    int    `json:"client_id"`
+}
+
+type SearchLocationResult struct {
+	gcorecloud.Result
+}
+
+// Extract is a function that accepts a result and extracts a instance's location resource.
+func (r SearchLocationResult) Extract() ([]InstanceLocation, error) {
+	var s []InstanceLocation
+	err := r.ExtractInto(&s)
+	return s, err
+}
+
+func (r SearchLocationResult) ExtractInto(v interface{}) error {
+	return r.Result.ExtractIntoSlicePtr(v, "results")
+}

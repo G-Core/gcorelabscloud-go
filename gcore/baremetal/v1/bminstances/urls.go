@@ -13,3 +13,7 @@ func listURL(c *gcorecloud.ServiceClient) string {
 func createURL(c *gcorecloud.ServiceClient) string {
 	return rootURL(c)
 }
+
+func rebuildURL(c *gcorecloud.ServiceClient, id string) string {
+	return c.ServiceURL(id, "rebuild")
+}

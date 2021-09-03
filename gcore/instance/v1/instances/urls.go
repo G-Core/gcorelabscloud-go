@@ -109,3 +109,7 @@ func getSpiceConsoleURL(c *gcorecloud.ServiceClient, id string) string {
 func getInstanceConsoleURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceActionURL(c, id, "get_console")
 }
+
+func listInstanceLocationURL(c *gcorecloud.ServiceClient) string {
+	return c.BaseServiceURL("instances", "search")
+}

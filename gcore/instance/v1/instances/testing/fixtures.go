@@ -436,6 +436,23 @@ const ListAvailableFlavorsResponse = `
 }
 `
 
+const ListInstanceLocationResponse = `
+{
+  "count": 1,
+  "results": [
+    {
+      "project_id": "879",
+      "project_name": "default",
+      "name": "bubuntu",
+      "region_id": "1",
+      "id": "0fc2bcde-209a-44d7-9506-1e92089b1695",
+      "region_name": "ED-10",
+      "client_id": 2
+    }
+  ]
+}
+`
+
 var (
 	ip1                 = net.ParseIP("10.0.0.17")
 	ip2                 = net.ParseIP("92.38.157.215")
@@ -663,4 +680,14 @@ var (
 		RAM:           2048,
 		VCPUS:         1,
 	}
+	InstanceLocation = instances.InstanceLocation{
+		ID:          "0fc2bcde-209a-44d7-9506-1e92089b1695",
+		ProjectID:   "879",
+		ProjectName: "default",
+		Name:        "bubuntu",
+		RegionID:    "1",
+		RegionName:  "ED-10",
+		ClientID:    2,
+	}
+	ExpectedInstancesLocationSlice = []instances.InstanceLocation{InstanceLocation}
 )

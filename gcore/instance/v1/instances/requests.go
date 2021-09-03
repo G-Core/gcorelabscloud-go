@@ -570,7 +570,7 @@ func MetadataGet(client *gcorecloud.ServiceClient, id string, key string) (r Met
 	return
 }
 
-// ListAvailableFlavors get flavors available for the instance to resize into.
+// ListAvailableFlavors get available flavors for the instance to resize into.
 func ListAvailableFlavors(client *gcorecloud.ServiceClient, id string, opts flavors.ListOptsBuilder) (r flavors.ListResult) {
 	url := listAvailableFlavorsURL(client, id)
 	if opts != nil {
@@ -595,5 +595,46 @@ func GetSpiceConsole(client *gcorecloud.ServiceClient, id string) (r RemoteConso
 func GetInstanceConsole(client *gcorecloud.ServiceClient, id string) (r RemoteConsoleResult) {
 	url := getInstanceConsoleURL(client, id)
 	_, r.Err = client.Get(url, &r.Body, nil) // nolint
+	return
+}
+
+// ListInstanceLocationOptsBuilder allows extensions to add additional parameters to the ListInstanceLocation request.
+type ListInstanceLocationOptsBuilder interface {
+	ToListInstanceLocationQuery() (string, error)
+}
+
+// ListInstanceLocationOpts set parameters for search instance location operation
+type ListInstanceLocationOpts struct {
+	Name string `q:"name"`
+	ID   string `q:"id"`
+}
+
+// ToListInstanceLocationQuery formats a ListInstanceLocationOpts into a query string.
+func (opts ListInstanceLocationOpts) ToListInstanceLocationQuery() (string, error) {
+	if err := opts.Validate(); err != nil {
+		return "", err
+	}
+	q, err := gcorecloud.BuildQueryString(opts)
+	if err != nil {
+		return "", err
+	}
+	return q.String(), err
+}
+
+func (opts *ListInstanceLocationOpts) Validate() error {
+	return gcorecloud.ValidateStruct(opts)
+}
+
+// ListInstanceLocation get flavors available for the instance to resize into.
+func ListInstanceLocation(client *gcorecloud.ServiceClient, opts ListInstanceLocationOptsBuilder) (r SearchLocationResult) {
+	url := listInstanceLocationURL(client)
+	if opts != nil {
+		query, err := opts.ToListInstanceLocationQuery()
+		if err != nil {
+			return
+		}
+		url += query
+	}
+	_, r.Err = client.Get(url, &r.Body, nil)
 	return
 }

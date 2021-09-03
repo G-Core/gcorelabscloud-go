@@ -134,3 +134,30 @@ func ListAll(client *gcorecloud.ServiceClient, opts ListOptsBuilder) ([]instance
 	return all, nil
 
 }
+
+// RebuildInstanceOptsBuilder allows extensions to add additional parameters to the Rebuild request.
+type RebuildInstanceOptsBuilder interface {
+	ToRebuildInstanceCreateMap() (map[string]interface{}, error)
+}
+
+// RebuildInstanceOpts allows rebuild a baremetal instance with new image_id.
+type RebuildInstanceOpts struct {
+	ImageID string `json:"image_id" required:"true" validate:"required"`
+}
+
+// ToRebuildInstanceCreateMap formats a RebuildInstanceOpts into a query string.
+func (opts RebuildInstanceOpts) ToRebuildInstanceCreateMap() (map[string]interface{}, error) {
+	q, err := gcorecloud.BuildRequestBody(opts, "")
+	return q, err
+}
+
+// Rebuild an baremetal instance with new image_id.
+func Rebuild(client *gcorecloud.ServiceClient, instanceID string, opts RebuildInstanceOptsBuilder) (r tasks.Result) {
+	b, err := opts.ToRebuildInstanceCreateMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = client.Post(rebuildURL(client, instanceID), b, &r.Body, nil) // nolint
+	return
+}
