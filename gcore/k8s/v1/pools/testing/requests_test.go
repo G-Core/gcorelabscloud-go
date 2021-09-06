@@ -17,11 +17,11 @@ import (
 )
 
 func prepareListTestURLParams(projectID int, regionID int, clusterID string) string {
-	return fmt.Sprintf("/v1/k8s/%d/%d/pools/%s", projectID, regionID, clusterID)
+	return fmt.Sprintf("/v1/k8s/clusters/%d/%d/%s/pools", projectID, regionID, clusterID)
 }
 
 func prepareGetTestURLParams(projectID int, regionID int, clusterID, id string) string {
-	return fmt.Sprintf("/v1/k8s/%d/%d/pools/%s/%s", projectID, regionID, clusterID, id)
+	return fmt.Sprintf("/v1/k8s/clusters/%d/%d/%s/pools/%s", projectID, regionID, clusterID, id)
 }
 
 func prepareListTestURL() string {
@@ -48,7 +48,7 @@ func TestList(t *testing.T) {
 		}
 	})
 
-	client := fake.ServiceTokenClient("k8s", "v1")
+	client := fake.ServiceTokenClient("k8s/clusters", "v1")
 	count := 0
 
 	err := pools.List(client, Pool1.ClusterID, pools.ListOpts{}).EachPage(func(page pagination.Page) (bool, error) {
@@ -84,7 +84,7 @@ func TestListAll(t *testing.T) {
 		}
 	})
 
-	client := fake.ServiceTokenClient("k8s", "v1")
+	client := fake.ServiceTokenClient("k8s/clusters", "v1")
 
 	groups, err := pools.ListAll(client, Pool1.ClusterID, nil)
 	require.NoError(t, err)
@@ -113,7 +113,7 @@ func TestGet(t *testing.T) {
 		}
 	})
 
-	client := fake.ServiceTokenClient("k8s", "v1")
+	client := fake.ServiceTokenClient("k8s/clusters", "v1")
 
 	ct, err := pools.Get(client, Pool1.ClusterID, Pool1.UUID).Extract()
 
@@ -148,7 +148,7 @@ func TestCreate(t *testing.T) {
 		NodeCount:        1,
 		DockerVolumeSize: 5,
 	}
-	client := fake.ServiceTokenClient("k8s", "v1")
+	client := fake.ServiceTokenClient("k8s/clusters", "v1")
 	tasks, err := pools.Create(client, Pool1.ClusterID, options).Extract()
 
 	require.NoError(t, err)
@@ -170,7 +170,7 @@ func TestDelete(t *testing.T) {
 		}
 	})
 
-	client := fake.ServiceTokenClient("k8s", "v1")
+	client := fake.ServiceTokenClient("k8s/clusters", "v1")
 	tasks, err := pools.Delete(client, Pool1.ClusterID, Pool1.UUID).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
@@ -189,13 +189,13 @@ func TestUpdate(t *testing.T) {
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 
-		_, err := fmt.Fprint(w, UpdateResponse)
+		_, err := fmt.Fprint(w, CreateResponse)
 		if err != nil {
 			log.Error(err)
 		}
 	})
 
-	client := fake.ServiceTokenClient("k8s", "v1")
+	client := fake.ServiceTokenClient("k8s/clusters", "v1")
 
 	options := pools.UpdateOpts{
 		Name:         "",
@@ -203,10 +203,9 @@ func TestUpdate(t *testing.T) {
 		MaxNodeCount: 4,
 	}
 
-	ct, err := pools.Update(client, Pool1.ClusterID, Pool1.UUID, options).Extract()
+	tasks, err := pools.Update(client, Pool1.ClusterID, Pool1.UUID, options).Extract()
 
 	require.NoError(t, err)
-	require.Equal(t, UpdatedPool1, *ct)
-	th.CheckDeepEquals(t, &UpdatedPool1, ct)
+	require.Equal(t, Tasks1, *tasks)
 
 }

@@ -1,8 +1,6 @@
 package clusters
 
 import (
-	"log"
-
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v1/pools"
@@ -143,7 +141,6 @@ func Resize(c *gcorecloud.ServiceClient, clusterID, poolID string, opts ResizeOp
 		r.Err = err
 		return
 	}
-	log.Println(resizeURL(c, clusterID, poolID))
 	_, r.Err = c.Post(resizeURL(c, clusterID, poolID), b, &r.Body, &gcorecloud.RequestOpts{
 		OkCodes: []int{200, 201},
 	})

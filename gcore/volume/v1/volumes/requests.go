@@ -37,8 +37,12 @@ type ListOptsBuilder interface {
 // by a particular cluster templates attribute. SortDir sets the direction, and is either
 // `asc' or `desc'. Marker and Limit are used for pagination.
 type ListOpts struct {
-	InstanceID *string `q:"instance_id"`
-	ClusterID  *string `q:"cluster_id"`
+	InstanceID     *string `q:"instance_id"`
+	ClusterID      *string `q:"cluster_id"`
+	IDPart         *string `q:"id_part"`
+	NamePart       *string `q:"name_part"`
+	Bootable       *bool   `q:"bootable"`
+	HasAttachments *bool   `q:"has_attachments"`
 }
 
 // CreateOpts represents options used to create a volume.
@@ -51,6 +55,7 @@ type CreateOpts struct {
 	SnapshotID           string            `json:"snapshot_id,omitempty" validate:"rfe=Source:snapshot,allowed_without=ImageID,omitempty,uuid4"`
 	InstanceIDToAttachTo string            `json:"instance_id_to_attach_to,omitempty" validate:"omitempty,uuid4"`
 	Metadata             map[string]string `json:"metadata,omitempty"`
+	LifeCyclePolicyIDs   []int             `json:"lifecycle_policy_ids,omitempty"`
 }
 
 func (opts *CreateOpts) Validate() error {

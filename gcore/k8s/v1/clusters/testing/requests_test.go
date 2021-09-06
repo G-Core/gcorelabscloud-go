@@ -20,7 +20,7 @@ import (
 )
 
 func prepareListTestURLParams(projectID int, regionID int) string {
-	return fmt.Sprintf("/v1/k8s/%d/%d/clusters", projectID, regionID)
+	return fmt.Sprintf("/v1/k8s/clusters/%d/%d", projectID, regionID)
 }
 
 func prepareVersionURL() string {
@@ -28,15 +28,15 @@ func prepareVersionURL() string {
 }
 
 func prepareGetTestURLParams(projectID int, regionID int, id string) string {
-	return fmt.Sprintf("/v1/k8s/%d/%d/clusters/%s", projectID, regionID, id)
+	return fmt.Sprintf("/v1/k8s/clusters/%d/%d/%s", projectID, regionID, id)
 }
 
 func prepareActionTestURLParams(projectID int, regionID int, id, action string) string {
-	return fmt.Sprintf("/v1/k8s/%d/%d/clusters/%s/%s", projectID, regionID, id, action)
+	return fmt.Sprintf("/v1/k8s/clusters/%d/%d/%s/%s", projectID, regionID, id, action)
 }
 
 func prepareClusterTestURLParams(projectID int, regionID int, id, name string) string {
-	return fmt.Sprintf("/v1/k8s/%d/%d/clusters/%s/%s", projectID, regionID, id, name)
+	return fmt.Sprintf("/v1/k8s/clusters/%d/%d/%s/%s", projectID, regionID, id, name)
 }
 func prepareListTestURL() string {
 	return prepareListTestURLParams(fake.ProjectID, fake.RegionID)
@@ -50,8 +50,10 @@ func prepareGetConfigTestURL(id string) string {
 	return prepareClusterTestURLParams(fake.ProjectID, fake.RegionID, id, "config")
 }
 
-func prepareResizeTestURL(id string) string {
-	return prepareActionTestURLParams(fake.ProjectID, fake.RegionID, id, "resize")
+func prepareResizeTestURL(clusterID, poolID string) string {
+	return fmt.Sprintf(
+		"/v1/k8s/clusters/%d/%d/%s/pools/%s/resize", fake.ProjectID, fake.RegionID, clusterID, poolID,
+	)
 }
 
 func prepareUpgradeTestURL(id string) string {
@@ -78,7 +80,7 @@ func TestList(t *testing.T) {
 		}
 	})
 
-	client := fake.ServiceTokenClient("k8s", "v1")
+	client := fake.ServiceTokenClient("k8s/clusters", "v1")
 	count := 0
 
 	err := clusters.List(client, clusters.ListOpts{}).EachPage(func(page pagination.Page) (bool, error) {
@@ -114,7 +116,7 @@ func TestListAll(t *testing.T) {
 		}
 	})
 
-	client := fake.ServiceTokenClient("k8s", "v1")
+	client := fake.ServiceTokenClient("k8s/clusters", "v1")
 	actual, err := clusters.ListAll(client, clusters.ListOpts{})
 	require.NoError(t, err)
 	ct := actual[0]
@@ -139,7 +141,7 @@ func TestVersionAll(t *testing.T) {
 		}
 	})
 
-	client := fake.ServiceTokenClient("k8s", "v1")
+	client := fake.ServiceTokenClient("k8s/clusters", "v1")
 	actual, err := clusters.VersionsAll(client)
 	require.NoError(t, err)
 	require.Equal(t, []string{"1.14", "1.17"}, actual)
@@ -163,7 +165,7 @@ func TestGet(t *testing.T) {
 		}
 	})
 
-	client := fake.ServiceTokenClient("k8s", "v1")
+	client := fake.ServiceTokenClient("k8s/clusters", "v1")
 
 	ct, err := clusters.Get(client, Cluster1.UUID).Extract()
 
@@ -198,7 +200,6 @@ func TestCreate(t *testing.T) {
 		Name:                      Cluster1.Name,
 		FixedNetwork:              fixedNetwork,
 		FixedSubnet:               fixedSubnet,
-		MasterCount:               1,
 		KeyPair:                   "keypair",
 		AutoHealingEnabled:        false,
 		MasterLBFloatingIPEnabled: false,
@@ -214,7 +215,7 @@ func TestCreate(t *testing.T) {
 		}},
 	}
 
-	client := fake.ServiceTokenClient("k8s", "v1")
+	client := fake.ServiceTokenClient("k8s/clusters", "v1")
 	tasks, err := clusters.Create(client, options).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
@@ -234,7 +235,7 @@ func TestDelete(t *testing.T) {
 		}
 	})
 
-	client := fake.ServiceTokenClient("k8s", "v1")
+	client := fake.ServiceTokenClient("k8s/clusters", "v1")
 	tasks, err := clusters.Delete(client, Cluster1.UUID).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
@@ -244,7 +245,7 @@ func TestResize(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
 
-	th.Mux.HandleFunc(prepareResizeTestURL(Cluster1.UUID), func(w http.ResponseWriter, r *http.Request) {
+	th.Mux.HandleFunc(prepareResizeTestURL(Cluster1.UUID, pool), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "POST")
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 		th.TestHeader(t, r, "Content-Type", "application/json")
@@ -264,7 +265,7 @@ func TestResize(t *testing.T) {
 		NodesToRemove: nil,
 	}
 
-	client := fake.ServiceTokenClient("k8s", "v1")
+	client := fake.ServiceTokenClient("k8s/clusters", "v1")
 	tasks, err := clusters.Resize(client, Cluster1.UUID, pool, options).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
@@ -289,7 +290,7 @@ func TestGetConfig(t *testing.T) {
 		}
 	})
 
-	client := fake.ServiceTokenClient("k8s", "v1")
+	client := fake.ServiceTokenClient("k8s/clusters", "v1")
 
 	cfg, err := clusters.GetConfig(client, Cluster1.UUID).Extract()
 
@@ -322,7 +323,7 @@ func TestUpgrade(t *testing.T) {
 		Pool:    pool,
 	}
 
-	client := fake.ServiceTokenClient("k8s", "v1")
+	client := fake.ServiceTokenClient("k8s/clusters", "v1")
 	tasks, err := clusters.Upgrade(client, Cluster1.UUID, options).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
@@ -347,7 +348,7 @@ func TestGetCACertificate(t *testing.T) {
 		}
 	})
 
-	client := fake.ServiceTokenClient("k8s", "v1")
+	client := fake.ServiceTokenClient("k8s/clusters", "v1")
 
 	ct, err := clusters.Certificate(client, Cluster1.UUID).Extract()
 
@@ -376,7 +377,7 @@ func TestSignCertificate(t *testing.T) {
 		}
 	})
 
-	client := fake.ServiceTokenClient("k8s", "v1")
+	client := fake.ServiceTokenClient("k8s/clusters", "v1")
 
 	opts := clusters.ClusterSignCertificateOpts{
 		CSR: "string",

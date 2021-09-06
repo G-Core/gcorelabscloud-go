@@ -17,7 +17,6 @@ func TestResizeOpts(t *testing.T) {
 	options := clusters.ResizeOpts{
 		NodeCount:     0,
 		NodesToRemove: nil,
-		Pool:          "",
 	}
 
 	_, err := options.ToClusterResizeMap()
@@ -27,17 +26,14 @@ func TestResizeOpts(t *testing.T) {
 	options = clusters.ResizeOpts{
 		NodeCount:     1,
 		NodesToRemove: []string{"1"},
-		Pool:          "",
 	}
 
 	_, err = options.ToClusterResizeMap()
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "NodesToRemove")
-	require.Contains(t, err.Error(), "Pool")
 
 	options = clusters.ResizeOpts{
 		NodeCount: 1,
-		Pool:      "",
 	}
 
 	_, err = options.ToClusterResizeMap()
@@ -48,7 +44,6 @@ func TestResizeOpts(t *testing.T) {
 func TestCreateOptions(t *testing.T) {
 	options := clusters.CreateOpts{
 		Name:         Cluster1.Name,
-		MasterCount:  1,
 		KeyPair:      "",
 		FixedNetwork: "",
 		FixedSubnet:  "",
@@ -64,7 +59,6 @@ func TestCreateOptions(t *testing.T) {
 
 	options = clusters.CreateOpts{
 		Name:         Cluster1.Name,
-		MasterCount:  4,
 		KeyPair:      "",
 		FixedNetwork: fixedNetwork,
 		FixedSubnet:  fixedNetwork,
