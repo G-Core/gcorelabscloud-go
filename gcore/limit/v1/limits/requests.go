@@ -5,8 +5,6 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/G-Core/gcorelabscloud-go/gcore/limit/v1/types"
-
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
@@ -132,86 +130,6 @@ func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r CreateResult
 		return
 	}
 	_, r.Err = c.Post(createURL(c), b, &r.Body, nil)
-	return
-}
-
-// UpdateOptsBuilder allows extensions to add additional parameters to the Update request.
-type UpdateOptsBuilder interface {
-	ToLimitUpdateMap() (map[string]interface{}, error)
-}
-
-// UpdateOpts represents options used to update a limit request.
-type UpdateOpts struct {
-	Limit
-}
-
-func NewUpdateOpts() UpdateOpts {
-	return UpdateOpts{Limit: NewLimit()}
-}
-
-// ToLimitUpdateMap builds a request body from UpdateOpts.
-func (opts UpdateOpts) ToLimitUpdateMap() (map[string]interface{}, error) {
-	err := gcorecloud.TranslateValidationError(opts.Validate())
-	if err != nil {
-		return nil, err
-	}
-	m := opts.ToRequestMap()
-	if len(opts.ToRequestMap()) == 0 {
-		return nil, fmt.Errorf("at least one of UpdateOpts fields should be set")
-	}
-	return m, nil
-}
-
-func (opts UpdateOpts) Validate() error {
-	return gcorecloud.Validate.Struct(opts)
-}
-
-// Update accepts a UpdateOpts struct and updates an existing quota using the values provided.
-func Update(c *gcorecloud.ServiceClient, id int, opts UpdateOptsBuilder) (r UpdateResult) {
-	b, err := opts.ToLimitUpdateMap()
-	if err != nil {
-		r.Err = err
-		return
-	}
-	_, r.Err = c.Patch(updateURL(c, id), b, &r.Body, &gcorecloud.RequestOpts{
-		OkCodes: []int{200, 201},
-	})
-	return
-}
-
-// StatusOptsBuilder allows extensions to add additional parameters to the Status request.
-type StatusOptsBuilder interface {
-	ToLimitStatusMap() (map[string]interface{}, error)
-}
-
-// StatusOpts represents options used to status a limit request.
-type StatusOpts struct {
-	Status types.LimitRequestStatus `json:"status" required:"true" validate:"required,enum"`
-}
-
-// ToLimitStatusMap builds a request body from StatusOpts.
-func (opts StatusOpts) ToLimitStatusMap() (map[string]interface{}, error) {
-	err := gcorecloud.TranslateValidationError(opts.Validate())
-	if err != nil {
-		return nil, err
-	}
-	return gcorecloud.BuildRequestBody(opts, "")
-}
-
-func (opts StatusOpts) Validate() error {
-	return gcorecloud.Validate.Struct(opts)
-}
-
-// Status accepts a StatusOpts struct and statuss an existing quota using the values provided.
-func Status(c *gcorecloud.ServiceClient, id int, opts StatusOptsBuilder) (r UpdateResult) {
-	b, err := opts.ToLimitStatusMap()
-	if err != nil {
-		r.Err = err
-		return
-	}
-	_, r.Err = c.Put(statusURL(c, id), b, &r.Body, &gcorecloud.RequestOpts{
-		OkCodes: []int{200, 201},
-	})
 	return
 }
 

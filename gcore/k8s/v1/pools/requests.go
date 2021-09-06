@@ -104,8 +104,7 @@ func (opts CreateOpts) Validate() error {
 	return gcorecloud.TranslateValidationError(gcorecloud.Validate.Struct(opts))
 }
 
-// Create accepts a CreateOpts struct and creates a new cluster Pool using the values
-// provided. This operation does not actually require a request body, i.e. the CreateOpts struct argument can be empty.
+// Create accepts a CreateOpts struct and creates a new cluster Pool using the values provided
 func Create(c *gcorecloud.ServiceClient, clusterID string, opts CreateOptsBuilder) (r tasks.Result) {
 	b, err := opts.ToClusterPoolCreateMap()
 	if err != nil {
@@ -142,7 +141,7 @@ func (opts UpdateOpts) ToClusterPoolUpdateMap() (map[string]interface{}, error) 
 }
 
 // Update accepts a UpdateOpts struct and updates an existing Pool using the values provided.
-func Update(c *gcorecloud.ServiceClient, clusterID, poolID string, opts UpdateOptsBuilder) (r UpdateResult) {
+func Update(c *gcorecloud.ServiceClient, clusterID, poolID string, opts UpdateOptsBuilder) (r tasks.Result) {
 	b, err := opts.ToClusterPoolUpdateMap()
 	if err != nil {
 		r.Err = err

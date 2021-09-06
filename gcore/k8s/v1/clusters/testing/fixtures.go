@@ -177,7 +177,6 @@ var CreateRequest = fmt.Sprintf(`
   "fixed_network": "%s",
   "fixed_subnet": "%s",
   "keypair": "keypair",
-  "master_count": 1,
   "name": "%s",
   "pools": [
 	{
@@ -194,12 +193,11 @@ var CreateRequest = fmt.Sprintf(`
 }
 `, fixedNetwork, fixedSubnet, Cluster1.Name, version)
 
-var ResizeRequest = fmt.Sprintf(`
+var ResizeRequest = `
 {
-    "node_count": 2,
-    "pool": "%s"
+    "node_count": 2
 }
-`, pool)
+`
 
 var UpgradeRequest = fmt.Sprintf(`
 {

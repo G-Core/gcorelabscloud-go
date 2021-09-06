@@ -38,6 +38,28 @@ var volumeListCommand = cli.Command{
 			DefaultText: "nil",
 			Required:    false,
 		},
+		&cli.StringFlag{
+			Name:        "id-part",
+			Usage:       "Filter the volume list result by the ID part of the volume",
+			DefaultText: "nil",
+			Required:    false,
+		},
+		&cli.StringFlag{
+			Name:        "name-part",
+			Usage:       "Filter out volumes by name_part inclusion in volume name",
+			DefaultText: "nil",
+			Required:    false,
+		},
+		&cli.BoolFlag{
+			Name:     "bootable",
+			Usage:    "Filter by a bootable field",
+			Required: false,
+		},
+		&cli.BoolFlag{
+			Name:     "has-attachments",
+			Usage:    "Filter by the presence of attachments",
+			Required: false,
+		},
 	},
 	Action: func(c *cli.Context) error {
 		client, err := client.NewVolumeClientV1(c)
@@ -46,8 +68,12 @@ var volumeListCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 		opts := volumes.ListOpts{
-			InstanceID: utils.StringToPointer(c.String("instance-id")),
-			ClusterID:  utils.StringToPointer(c.String("cluster-id")),
+			InstanceID:     utils.StringToPointer(c.String("instance-id")),
+			ClusterID:      utils.StringToPointer(c.String("cluster-id")),
+			IDPart:         utils.StringToPointer(c.String("id-part")),
+			NamePart:       utils.StringToPointer(c.String("name-part")),
+			Bootable:       utils.BoolToPointer(c.Bool("bootable")),
+			HasAttachments: utils.BoolToPointer(c.Bool("has-attachments")),
 		}
 		results, err := volumes.ListAll(client, opts)
 		if err != nil {
@@ -191,6 +217,11 @@ var volumeCreateCommand = cli.Command{
 			DefaultText: "nil",
 			Required:    false,
 		},
+		&cli.IntSliceFlag{
+			Name:     "lifecycle-policy-ids",
+			Usage:    "Lifecycle policy ids list",
+			Required: false,
+		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
 		client, err := client.NewVolumeClientV1(c)
@@ -206,6 +237,10 @@ var volumeCreateCommand = cli.Command{
 			ImageID:              c.String("image-id"),
 			SnapshotID:           c.String("snapshot-id"),
 			InstanceIDToAttachTo: c.String("instance-id"),
+		}
+		lfPid := c.IntSlice("lifecycle-policy-ids")
+		if len(lfPid) != 0 {
+			opts.LifeCyclePolicyIDs = lfPid
 		}
 
 		results, err := volumes.Create(client, opts).Extract()

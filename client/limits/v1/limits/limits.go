@@ -180,85 +180,6 @@ var limitCreateCommand = cli.Command{
 	},
 }
 
-var limitStatusCommand = cli.Command{
-	Name:      "status",
-	Usage:     "Change limit request status",
-	Category:  "limit",
-	ArgsUsage: "<limit_id>",
-	Flags: []cli.Flag{
-		&cli.GenericFlag{
-			Name:    "status",
-			Aliases: []string{"s"},
-			Value: &utils.EnumValue{
-				Enum: limitRequestStatusesList,
-			},
-			Usage:    fmt.Sprintf("output in %s", strings.Join(limitRequestStatusesList, ", ")),
-			Required: true,
-		},
-	},
-	Action: func(c *cli.Context) error {
-		limitID, err := flags.GetFirstIntArg(c, limitIDText)
-		if err != nil {
-			_ = cli.ShowCommandHelp(c, "status")
-			return err
-		}
-
-		opts := limits.StatusOpts{
-			Status: types.LimitRequestStatus(c.String("status")),
-		}
-
-		client, err := client.NewLimitClientV1(c)
-		if err != nil {
-			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
-		}
-
-		result, err := limits.Status(client, limitID, opts).Extract()
-		if err != nil {
-			return cli.NewExitError(err, 1)
-		}
-		utils.ShowResults(result, c.String("format"))
-		return nil
-	},
-}
-
-var limitUpdateCommand = cli.Command{
-	Name:      "update",
-	Usage:     "Update limit partially",
-	Category:  "limit",
-	ArgsUsage: "<limit_id>",
-	Flags:     commandFlags(false, limits.Sentinel),
-	Action: func(c *cli.Context) error {
-		limitID, err := flags.GetFirstIntArg(c, limitIDText)
-		if err != nil {
-			_ = cli.ShowCommandHelp(c, "update")
-			return err
-		}
-
-		limit, err := buildLimitFromFlags(c)
-
-		if err != nil {
-			_ = cli.ShowCommandHelp(c, "update")
-			return cli.NewExitError(err, 1)
-		}
-
-		opts := limits.UpdateOpts{Limit: limit}
-
-		client, err := client.NewLimitClientV1(c)
-		if err != nil {
-			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
-		}
-
-		result, err := limits.Update(client, limitID, opts).Extract()
-		if err != nil {
-			return cli.NewExitError(err, 1)
-		}
-		utils.ShowResults(result, c.String("format"))
-		return nil
-	},
-}
-
 var Commands = cli.Command{
 	Name:  "limit",
 	Usage: "GCloud limits API",
@@ -266,8 +187,6 @@ var Commands = cli.Command{
 		&limitListCommand,
 		&limitGetCommand,
 		&limitCreateCommand,
-		&limitUpdateCommand,
 		&limitDeleteCommand,
-		&limitStatusCommand,
 	},
 }
