@@ -117,6 +117,13 @@ func ListAll(client *gcorecloud.ServiceClient) ([]Network, error) {
 
 }
 
+// ListAllInstancePort retrieves a specific list of instance ports by network_id.
+func ListAllInstancePort(c *gcorecloud.ServiceClient, networkID string) (r GetInstancePortResult) {
+	url := listInstancePortsURL(c, networkID)
+	_, r.Err = c.Get(url, &r.Body, nil)
+	return
+}
+
 // IDFromName is a convenience function that returns a network ID, given its name.
 func IDFromName(client *gcorecloud.ServiceClient, name string) (string, error) {
 	count := 0

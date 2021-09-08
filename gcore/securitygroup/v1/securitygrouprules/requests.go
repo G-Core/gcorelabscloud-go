@@ -7,7 +7,7 @@ import (
 
 // Replace accepts a CreateOpts struct and creates a new security group rule using the values provided.
 func Replace(c *gcorecloud.ServiceClient, ruleID string, opts securitygroups.CreateRuleOptsBuilder) (r securitygroups.CreateRuleResult) {
-	b, err := opts.ToFloatingIPCreateMap()
+	b, err := opts.ToRuleCreateMap()
 	if err != nil {
 		r.Err = err
 		return

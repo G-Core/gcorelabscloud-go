@@ -2,6 +2,7 @@ package lbpools
 
 import (
 	"net"
+	"net/http"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 
@@ -70,6 +71,11 @@ type CreateSessionPersistenceOpts struct {
 	CookieName             string                `json:"cookie_name,omitempty"`
 }
 
+// CreateHealthMonitorOptsBuilder allows extensions to add parameters to the CreateHealthMonitor request.
+type CreateHealthMonitorOptsBuilder interface {
+	ToHealthMonitorCreateMap() (map[string]interface{}, error)
+}
+
 // CreateHealthMonitorOpts represents options used to create a lbpool health monitor.
 type CreateHealthMonitorOpts struct {
 	ID             string                  `json:"id,omitempty"`
@@ -113,8 +119,19 @@ func (opts CreateOpts) ToLBPoolCreateMap() (map[string]interface{}, error) {
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
+// ToHealthMonitorCreateMap builds a request body from CreateHealthMonitorOpts.
+func (opts CreateHealthMonitorOpts) ToHealthMonitorCreateMap() (map[string]interface{}, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return nil, err
+	}
+	return gcorecloud.BuildRequestBody(opts, "")
+}
+
 // ToLBPoolMemberCreateMap builds a request body from CreatePoolMemberOpts.
 func (opts CreatePoolMemberOpts) ToLBPoolMemberCreateMap() (map[string]interface{}, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return nil, err
+	}
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
@@ -194,5 +211,22 @@ func CreateMember(c *gcorecloud.ServiceClient, lbpoolID string, opts CreateMembe
 // DeleteMember accepts a unique pool and member ID and deletes pool member.
 func DeleteMember(c *gcorecloud.ServiceClient, lbpoolID string, memberID string) (r tasks.Result) {
 	_, r.Err = c.DeleteWithResponse(deleteMemberURL(c, lbpoolID, memberID), &r.Body, nil)
+	return
+}
+
+// DeleteHealthMonitor accepts a unique ID and deletes the lbpool's healthmonitor associated with it.
+func DeleteHealthMonitor(c *gcorecloud.ServiceClient, lbpoolID string) (r DeleteHealthMonitorResult) {
+	_, r.Err = c.Delete(healthMonitorURL(c, lbpoolID), &gcorecloud.RequestOpts{OkCodes: []int{http.StatusNoContent}})
+	return
+}
+
+// CreateHealthMonitor creates LB pool healthmonitor
+func CreateHealthMonitor(c *gcorecloud.ServiceClient, lbpoolID string, opts CreateHealthMonitorOptsBuilder) (r tasks.Result) {
+	b, err := opts.ToHealthMonitorCreateMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = c.Post(healthMonitorURL(c, lbpoolID), b, &r.Body, nil)
 	return
 }

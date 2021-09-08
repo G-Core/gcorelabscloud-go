@@ -34,6 +34,19 @@ const ListResponse = `
 }
 `
 
+const ListInstancePortResponse = `
+{
+  "count": 1,
+  "results": [
+    {
+      "id": "8e009163-d526-4351-9266-93d9fd8fa8ef",
+      "instance_id": "bfc7824b-31b6-4a28-a0c4-7df137139215",
+      "instance_name": "instance_1"
+    }
+  ]
+}
+`
+
 const GetResponse = `
 {
   "creator_task_id": null,
@@ -113,4 +126,11 @@ var (
 	}
 
 	ExpectedNetworkSlice = []networks.Network{Network1}
+
+	InstancePort1 = networks.InstancePort{
+		ID:           "8e009163-d526-4351-9266-93d9fd8fa8ef",
+		InstanceID:   "bfc7824b-31b6-4a28-a0c4-7df137139215",
+		InstanceName: "instance_1",
+	}
+	ExpectedInstancePortSlice = []networks.InstancePort{InstancePort1}
 )

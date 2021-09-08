@@ -2,6 +2,7 @@ package loadbalancers
 
 import (
 	"net"
+	"net/http"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 
@@ -138,7 +139,7 @@ func Update(c *gcorecloud.ServiceClient, loadbalancerID string, opts UpdateOptsB
 		return
 	}
 	_, r.Err = c.Patch(updateURL(c, loadbalancerID), b, &r.Body, &gcorecloud.RequestOpts{
-		OkCodes: []int{200, 201},
+		OkCodes: []int{http.StatusOK, http.StatusCreated},
 	})
 	return
 }
@@ -156,4 +157,18 @@ func ListAll(c *gcorecloud.ServiceClient) ([]LoadBalancer, error) {
 		return nil, err
 	}
 	return ExtractLoadBalancers(page)
+}
+
+// CreateCustomSecurityGroup accepts a unique ID and create a custom security group for the load balancer's ingress port.
+func CreateCustomSecurityGroup(c *gcorecloud.ServiceClient, loadbalancerID string) (r CustomSecurityGroupCreateResult) {
+	_, r.Err = c.Post(createCustomSecurityGroupURL(c, loadbalancerID), nil, nil, &gcorecloud.RequestOpts{
+		OkCodes: []int{http.StatusNoContent},
+	})
+	return
+}
+
+// ListCustomSecurityGroup accepts a unique ID and returns a custom security group for the load balancer's ingress port.
+func ListCustomSecurityGroup(c *gcorecloud.ServiceClient, loadbalancerID string) (r CustomSecurityGroupGetResult) {
+	_, r.Err = c.Get(createCustomSecurityGroupURL(c, loadbalancerID), &r.Body, nil)
+	return
 }

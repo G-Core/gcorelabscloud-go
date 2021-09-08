@@ -13,3 +13,7 @@ func enablePortSecurityURL(c *gcorecloud.ServiceClient, id string) string {
 func disablePortSecurityURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceActionURL(c, id, "disable_port_security")
 }
+
+func assignAllowedAddressPairsURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "allow_address_pairs")
+}

@@ -827,6 +827,133 @@ var lbpoolUpdateSubCommand = cli.Command{
 	},
 }
 
+var lbpoolCreateHealthMonitorSubCommand = cli.Command{
+	Name:      "create",
+	Usage:     "create pool's health monitor",
+	ArgsUsage: "<pool_id>",
+	Category:  "healthmonitor",
+	Flags: append([]cli.Flag{
+		&cli.GenericFlag{
+			Name:    "healthmonitor-type",
+			Aliases: []string{"hmt"},
+			Value: &utils.EnumValue{
+				Enum: healthMonitorTypes,
+			},
+			Usage:    fmt.Sprintf("output in %s", strings.Join(healthMonitorTypes, ", ")),
+			Required: false,
+		},
+		&cli.IntFlag{
+			Name:     "healthmonitor-delay",
+			Aliases:  []string{"hmd"},
+			Usage:    "health monitor checking delay",
+			Required: false,
+		},
+		&cli.IntFlag{
+			Name:     "healthmonitor-max-retries",
+			Aliases:  []string{"hmr"},
+			Usage:    "health monitor checking max retries",
+			Required: false,
+		},
+		&cli.IntFlag{
+			Name:     "healthmonitor-timeout",
+			Aliases:  []string{"hmto"},
+			Usage:    "health monitor checking timeout",
+			Required: false,
+		},
+		&cli.IntFlag{
+			Name:     "healthmonitor-max-retries-down",
+			Aliases:  []string{"hmrd"},
+			Usage:    "health monitor checking max retries down",
+			Required: false,
+		},
+		&cli.GenericFlag{
+			Name:    "healthmonitor-http-method",
+			Aliases: []string{"hmhm"},
+			Value: &utils.EnumValue{
+				Enum:    httpMethods,
+				Default: types.HTTPMethodGET.String(),
+			},
+			Usage:    fmt.Sprintf("output in %s", strings.Join(httpMethods, ", ")),
+			Required: false,
+		},
+		&cli.StringFlag{
+			Name:     "healthmonitor-expected-codes",
+			Aliases:  []string{"hmec"},
+			Usage:    "health monitor checking expected codes",
+			Required: false,
+		},
+		&cli.StringFlag{
+			Name:     "healthmonitor-url-path",
+			Aliases:  []string{"hmup"},
+			Usage:    "health monitor checking url path",
+			Required: false,
+		},
+	}, flags.WaitCommandFlags...),
+	Action: func(c *cli.Context) error {
+		lbPoolID, err := flags.GetFirstStringArg(c, lbpoolIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "create")
+			return err
+		}
+		client, err := client.NewLBPoolClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		hm, err := getHealthMonitor(c)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "create")
+			return cli.NewExitError(err, 1)
+		}
+
+		results, err := lbpools.CreateHealthMonitor(client, lbPoolID, hm).Extract()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		if results == nil {
+			return cli.NewExitError(err, 1)
+		}
+		return utils.WaitTaskAndShowResult(c, client, results, true, func(task tasks.TaskID) (interface{}, error) {
+			_, err := tasks.Get(client, string(task)).Extract()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
+			}
+			lbpool, err := lbpools.Get(client, lbPoolID).Extract()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get lbpool with ID: %s. Error: %w", lbPoolID, err)
+			}
+			utils.ShowResults(lbpool, c.String("format"))
+			return nil, nil
+		})
+	},
+}
+
+var lbpoolDeleteHealthMonitorSubCommand = cli.Command{
+	Name:      "delete",
+	Usage:     "delete loadbalancer pool's health monitor",
+	ArgsUsage: "<pool_id>",
+	Category:  "pool",
+	Flags:     flags.WaitCommandFlags,
+	Action: func(c *cli.Context) error {
+		lbpoolID, err := flags.GetFirstStringArg(c, lbpoolIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "delete")
+			return err
+		}
+		client, err := client.NewLBPoolClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		if err = lbpools.DeleteHealthMonitor(client, lbpoolID).ExtractErr(); err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		return nil
+	},
+}
+
 var PoolCommands = cli.Command{
 	Name:  "pool",
 	Usage: "GCloud loadbalancer pools API",
@@ -842,6 +969,14 @@ var PoolCommands = cli.Command{
 			Subcommands: []*cli.Command{
 				&lbpoolCreateMemberSubCommand,
 				&lbpoolDeleteMemberSubCommand,
+			},
+		},
+		{
+			Name:  "healthmonitor",
+			Usage: "GCloud pool's health monitor API",
+			Subcommands: []*cli.Command{
+				&lbpoolCreateHealthMonitorSubCommand,
+				&lbpoolDeleteHealthMonitorSubCommand,
 			},
 		},
 	},

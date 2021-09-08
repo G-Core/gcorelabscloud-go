@@ -231,6 +231,31 @@ var networkCreateCommand = cli.Command{
 	},
 }
 
+var networkInstancePortCommand = cli.Command{
+	Name:      "instance_port",
+	Usage:     "List of instance ports by ID",
+	ArgsUsage: "<network_id>",
+	Category:  "network",
+	Action: func(c *cli.Context) error {
+		networkID, err := flags.GetFirstStringArg(c, networkIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "instance_port")
+			return err
+		}
+		client, err := client.NewNetworkClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+		results, err := networks.ListAllInstancePort(client, networkID).Extract()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		utils.ShowResults(results, c.String("format"))
+		return nil
+	},
+}
+
 var Commands = cli.Command{
 	Name:  "network",
 	Usage: "GCloud networks API",
@@ -242,5 +267,6 @@ var Commands = cli.Command{
 		&networkCreateCommand,
 		&networkUpdateCommand,
 		&extensionCommands,
+		&networkInstancePortCommand,
 	},
 }

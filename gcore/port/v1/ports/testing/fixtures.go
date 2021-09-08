@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
+	"github.com/G-Core/gcorelabscloud-go/gcore/port/v1/ports"
+	"github.com/G-Core/gcorelabscloud-go/gcore/reservedfixedip/v1/reservedfixedips"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 )
@@ -181,6 +183,31 @@ const DisableResponse = `
 }
 `
 
+const allowedAddressPairsRequest = `
+{
+  "allowed_address_pairs": [
+    {
+      "ip_address": "192.168.123.20",
+      "mac_address": "00:16:3e:f2:87:16"
+    }
+  ]
+}
+`
+
+const allowedAddressPairsResponse = `
+	{
+  "port_id": "1f0ca628-a73b-42c0-bdac-7b10d023e097",
+  "instance_id": "bc688791-f1b0-44eb-97d4-07697294b1e1",
+  "network_id": "351b0dd7-ca09-431c-be53-935db3785067",
+  "allowed_address_pairs": [
+    {
+      "ip_address": "192.168.123.20",
+      "mac_address": "00:16:3e:f2:87:16"
+    }
+  ]
+}
+`
+
 var (
 	PortID                         = "1f0ca628-a73b-42c0-bdac-7b10d023e097"
 	PortMac, _                     = gcorecloud.ParseMacString("00:16:3e:f2:87:16")
@@ -288,5 +315,16 @@ var (
 			RegionID:          1,
 			Region:            "ED-8",
 		}},
+	}
+	addrPairs1 = ports.InstancePort{
+		NetworkID: "351b0dd7-ca09-431c-be53-935db3785067",
+		AllowedAddressPairs: []reservedfixedips.AllowedAddressPairs{
+			{
+				IPAddress:  PortIP1,
+				MacAddress: "00:16:3e:f2:87:16",
+			},
+		},
+		InstanceID: "bc688791-f1b0-44eb-97d4-07697294b1e1",
+		PortID:     "1f0ca628-a73b-42c0-bdac-7b10d023e097",
 	}
 )

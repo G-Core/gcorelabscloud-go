@@ -111,6 +111,19 @@ const CreateRequest = `
 }
 `
 
+const CreateHealthMonitorRequest = `
+{
+  "max_retries": 1,
+  "url_path": "/",
+  "type": "HTTP",
+  "delay": 5,
+  "timeout": 30,
+  "expected_codes": "200,301,302",
+  "max_retries_down": 3,
+  "http_method": "GET"
+}
+`
+
 const CreatePoolMemberRequest = `
 {
   "address": "192.168.13.9",

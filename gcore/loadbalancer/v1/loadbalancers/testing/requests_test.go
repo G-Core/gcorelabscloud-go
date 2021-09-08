@@ -26,6 +26,10 @@ func prepareGetTestURLParams(projectID int, regionID int, id string) string {
 	return fmt.Sprintf("/v1/loadbalancers/%d/%d/%s", projectID, regionID, id)
 }
 
+func prepareCustomSecurityGroupTestURL(id string) string {
+	return fmt.Sprintf("/v1/loadbalancers/%d/%d/%s/securitygroup", fake.ProjectID, fake.RegionID, id)
+}
+
 func prepareListTestURL() string {
 	return prepareListTestURLParams(fake.ProjectID, fake.RegionID)
 }
@@ -258,4 +262,47 @@ func TestUpdate(t *testing.T) {
 	require.Equal(t, createdTime, ct.CreatedAt)
 	require.Equal(t, updatedTime, *ct.UpdatedAt)
 
+}
+
+func TestGetCustomSecurityGroup(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareCustomSecurityGroupTestURL(LoadBalancer1.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, ListCustomSecurityGroupResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("loadbalancers", "v1")
+
+	lbSg, err := loadbalancers.ListCustomSecurityGroup(client, LoadBalancer1.ID).Extract()
+	require.NoError(t, err)
+	lb := lbSg[0]
+	require.Equal(t, LbSecurityGroup1, lb)
+	require.Equal(t, ExpectedLbSecurityGroupSlice, lbSg)
+}
+
+func TestCreateCustomSecurityGroup(t *testing.T) {
+
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareCustomSecurityGroupTestURL(LoadBalancer1.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Accept", "application/json")
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	client := fake.ServiceTokenClient("loadbalancers", "v1")
+
+	err := loadbalancers.CreateCustomSecurityGroup(client, LoadBalancer1.ID).ExtractErr()
+	require.NoError(t, err)
 }

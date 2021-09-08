@@ -41,3 +41,7 @@ func addRulesURL(c *gcorecloud.ServiceClient, id string) string {
 func listInstancesURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceActionURL(c, id, "instances")
 }
+
+func deepCopyURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "copy")
+}

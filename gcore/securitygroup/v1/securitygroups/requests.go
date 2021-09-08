@@ -23,12 +23,12 @@ func Get(c *gcorecloud.ServiceClient, id string) (r GetResult) {
 
 // CreateOptsBuilder allows extensions to add additional parameters to the request.
 type CreateOptsBuilder interface {
-	ToFloatingIPCreateMap() (map[string]interface{}, error)
+	ToSecurityGroupCreateMap() (map[string]interface{}, error)
 }
 
 // CreateRuleOptsBuilder allows extensions to add additional parameters to the request.
 type CreateRuleOptsBuilder interface {
-	ToFloatingIPCreateMap() (map[string]interface{}, error)
+	ToRuleCreateMap() (map[string]interface{}, error)
 }
 
 // CreateSecurityGroupRuleOpts represents options used to create a security group rule.
@@ -44,8 +44,8 @@ type CreateSecurityGroupRuleOpts struct {
 	RemoteIPPrefix  *string             `json:"remote_ip_prefix,omitempty"`
 }
 
-// ToFloatingIPCreateMap builds a request body from CreateSecurityGroupRuleOpts.
-func (opts CreateSecurityGroupRuleOpts) ToFloatingIPCreateMap() (map[string]interface{}, error) {
+// ToRuleCreateMap builds a request body from CreateSecurityGroupRuleOpts.
+func (opts CreateSecurityGroupRuleOpts) ToRuleCreateMap() (map[string]interface{}, error) {
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
@@ -62,14 +62,17 @@ type CreateOpts struct {
 	Instances     []string                `json:"instances,omitempty"`
 }
 
-// ToFloatingIPCreateMap builds a request body from CreateOpts.
-func (opts CreateOpts) ToFloatingIPCreateMap() (map[string]interface{}, error) {
+// ToSecurityGroupCreateMap builds a request body from CreateOpts.
+func (opts CreateOpts) ToSecurityGroupCreateMap() (map[string]interface{}, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return nil, err
+	}
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
 // Create accepts a CreateOpts struct and creates a new security group using the values provided.
 func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r CreateResult) {
-	b, err := opts.ToFloatingIPCreateMap()
+	b, err := opts.ToSecurityGroupCreateMap()
 	if err != nil {
 		r.Err = err
 		return
@@ -80,7 +83,7 @@ func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r CreateResult
 
 // UpdateOptsBuilder allows extensions to add additional parameters to the Update request.
 type UpdateOptsBuilder interface {
-	ToFloatingIPUpdateMap() (map[string]interface{}, error)
+	ToSecurityGroupUpdateMap() (map[string]interface{}, error)
 }
 
 // UpdateOpts represents options used to update a security group.
@@ -88,15 +91,18 @@ type UpdateOpts struct {
 	Name string `json:"name" required:"true"`
 }
 
-// ToFloatingIPUpdateMap builds a request body from UpdateOpts.
-func (opts UpdateOpts) ToFloatingIPUpdateMap() (map[string]interface{}, error) {
+// ToSecurityGroupUpdateMap builds a request body from UpdateOpts.
+func (opts UpdateOpts) ToSecurityGroupUpdateMap() (map[string]interface{}, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return nil, err
+	}
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
 // Update accepts a UpdateOpts struct and updates an existing security group using the
 // values provided. For more information, see the Create function.
 func Update(c *gcorecloud.ServiceClient, securityGroupID string, opts UpdateOptsBuilder) (r UpdateResult) {
-	b, err := opts.ToFloatingIPUpdateMap()
+	b, err := opts.ToSecurityGroupUpdateMap()
 	if err != nil {
 		r.Err = err
 		return
@@ -124,7 +130,7 @@ func ListAll(c *gcorecloud.ServiceClient) ([]SecurityGroup, error) {
 
 // AddRule accepts a CreateSecurityGroupRuleOpts struct and add rule to existed group.
 func AddRule(c *gcorecloud.ServiceClient, securityGroupID string, opts CreateRuleOptsBuilder) (r CreateRuleResult) {
-	b, err := opts.ToFloatingIPCreateMap()
+	b, err := opts.ToRuleCreateMap()
 	if err != nil {
 		r.Err = err
 		return
@@ -176,4 +182,33 @@ func IDFromName(client *gcorecloud.ServiceClient, name string) (string, error) {
 	default:
 		return "", gcorecloud.ErrMultipleResourcesFound{Name: name, Count: count, ResourceType: "security group"}
 	}
+}
+
+// DeepCopyOptsBuilder allows extensions to add additional parameters to the request.
+type DeepCopyOptsBuilder interface {
+	ToDeepCopyMap() (map[string]interface{}, error)
+}
+
+// DeepCopyOpts represents options used to deep copy a security group.
+type DeepCopyOpts struct {
+	Name string `json:"name" required:"true"`
+}
+
+// ToDeepCopyMap builds a request body from DeepCopyOpts.
+func (opts DeepCopyOpts) ToDeepCopyMap() (map[string]interface{}, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return nil, err
+	}
+	return gcorecloud.BuildRequestBody(opts, "")
+}
+
+// DeepCopy accepts a DeepCopyOpts struct and create a deep copy of security group.
+func DeepCopy(c *gcorecloud.ServiceClient, securityGroupID string, opts DeepCopyOptsBuilder) (r DeepCopyResult) {
+	b, err := opts.ToDeepCopyMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = c.Post(deepCopyURL(c, securityGroupID), b, nil, nil)
+	return
 }

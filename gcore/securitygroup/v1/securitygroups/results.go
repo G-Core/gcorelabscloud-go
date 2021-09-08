@@ -58,6 +58,11 @@ type DeleteResult struct {
 	gcorecloud.ErrResult
 }
 
+// DeepCopyResult represents the result of a deep copy operation
+type DeepCopyResult struct {
+	gcorecloud.ErrResult
+}
+
 // SecurityGroup represents a security group.
 type SecurityGroup struct {
 	Name               string                   `json:"name"`

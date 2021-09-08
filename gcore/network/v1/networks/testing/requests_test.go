@@ -24,12 +24,20 @@ func prepareGetTestURLParams(projectID int, regionID int, id string) string {
 	return fmt.Sprintf("/v1/networks/%d/%d/%s", projectID, regionID, id)
 }
 
+func prepareActionTestURLParams(projectID, regionID int, id, action string) string {
+	return fmt.Sprintf("/v1/networks/%d/%d/%s/%s", projectID, regionID, id, action)
+}
+
 func prepareListTestURL() string {
 	return prepareListTestURLParams(fake.ProjectID, fake.RegionID)
 }
 
 func prepareGetTestURL(id string) string {
 	return prepareGetTestURLParams(fake.ProjectID, fake.RegionID, id)
+}
+
+func prepareListInstancePortTestURL(id string) string {
+	return prepareActionTestURLParams(fake.ProjectID, fake.RegionID, id, "ports")
 }
 
 func TestList(t *testing.T) {
@@ -214,5 +222,31 @@ func TestUpdate(t *testing.T) {
 	require.Equal(t, Network1.Name, ct.Name)
 	require.Equal(t, createdTime, ct.CreatedAt)
 	require.Equal(t, updatedTime, *ct.UpdatedAt)
+
+}
+
+func TestListAllInstancePort(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareListInstancePortTestURL(Network1.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, ListInstancePortResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("networks", "v1")
+
+	actual, err := networks.ListAllInstancePort(client, Network1.ID).Extract()
+	require.NoError(t, err)
+	ct := actual[0]
+	require.Equal(t, InstancePort1, ct)
+	require.Equal(t, ExpectedInstancePortSlice, actual)
 
 }

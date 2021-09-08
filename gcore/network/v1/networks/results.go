@@ -23,16 +23,44 @@ func (r commonResult) ExtractInto(v interface{}) error {
 	return r.Result.ExtractIntoStructPtr(v, "")
 }
 
+type instancePortResult struct {
+	gcorecloud.Result
+}
+
+// Extract is a function that accepts a result and extracts a network resource.
+func (r instancePortResult) Extract() ([]InstancePort, error) {
+	var s []InstancePort
+	err := r.ExtractInto(&s)
+	return s, err
+}
+
+func (r instancePortResult) ExtractInto(v interface{}) error {
+	return r.Result.ExtractIntoSlicePtr(v, "results")
+}
+
 // GetResult represents the result of a get operation. Call its Extract
 // method to interpret it as a Network.
 type GetResult struct {
 	commonResult
 }
 
+// GetInstancePortResult represents the result of a get operation. Call its Extract
+// method to interpret it as an array of instance port.
+type GetInstancePortResult struct {
+	instancePortResult
+}
+
 // UpdateResult represents the result of an update operation. Call its Extract
 // method to interpret it as a Network.
 type UpdateResult struct {
 	commonResult
+}
+
+// InstancePort represents a instance port structure.
+type InstancePort struct {
+	ID           string `json:"id"`
+	InstanceID   string `json:"instance_id"`
+	InstanceName string `json:"instance_name"`
 }
 
 // Network represents a network structure.
