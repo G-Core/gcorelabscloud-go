@@ -45,3 +45,7 @@ func createMemberURL(c *gcorecloud.ServiceClient, id string) string {
 func deleteMemberURL(c *gcorecloud.ServiceClient, id string, memberID string) string {
 	return resourceActionDetailURL(c, id, "member", memberID)
 }
+
+func healthMonitorURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "healthmonitor")
+}

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/lbpools"
+	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/types"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 
 	"github.com/stretchr/testify/require"
@@ -42,6 +43,10 @@ func prepareActionDetailTestURL(projectID int, regionID int, id string, action s
 
 func prepareCreateMemberURL(id string) string {
 	return prepareActionTestURL(fake.ProjectID, fake.RegionID, id, "member")
+}
+
+func prepareHealthMonitorURL(id string) string {
+	return prepareActionTestURL(fake.ProjectID, fake.RegionID, id, "healthmonitor")
 }
 
 func prepareDeleteMemberURL(id string, memberID string) string {
@@ -303,6 +308,59 @@ func TestCreateMember(t *testing.T) {
 
 	client := fake.ServiceTokenClient("lbpools", "v1")
 	tasks, err := lbpools.CreateMember(client, LBPool1.ID, options).Extract()
+	require.NoError(t, err)
+	require.Equal(t, Tasks1, *tasks)
+}
+
+func TestDeleteHealthMonitor(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareHealthMonitorURL(LBPool1.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "DELETE")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	client := fake.ServiceTokenClient("lbpools", "v1")
+	err := lbpools.DeleteHealthMonitor(client, LBPool1.ID).ExtractErr()
+	require.NoError(t, err)
+
+}
+
+func TestCreateHealthMonitor(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareHealthMonitorURL(LBPool1.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestJSONRequest(t, r, CreateHealthMonitorRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, CreateResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	method := types.HTTPMethodGET
+	opts := lbpools.CreateHealthMonitorOpts{
+		Type:           types.HealthMonitorTypeHTTP,
+		Delay:          5,
+		MaxRetries:     1,
+		Timeout:        30,
+		MaxRetriesDown: 3,
+		HTTPMethod:     &method,
+		URLPath:        "/",
+		ExpectedCodes:  "200,301,302",
+	}
+
+	client := fake.ServiceTokenClient("lbpools", "v1")
+	tasks, err := lbpools.CreateHealthMonitor(client, LBPool1.ID, opts).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 }

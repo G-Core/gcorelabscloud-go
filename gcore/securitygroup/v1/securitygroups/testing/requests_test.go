@@ -45,6 +45,10 @@ func prepareListInstancesTestURL(id string) string {
 	return prepareActionTestURLParams(fake.ProjectID, fake.RegionID, id, "instances")
 }
 
+func prepareDeepCopyTestURL(id string) string {
+	return prepareActionTestURLParams(fake.ProjectID, fake.RegionID, id, "copy")
+}
+
 func TestList(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
@@ -281,7 +285,6 @@ func TestListAllInstances(t *testing.T) {
 	instance := results[0]
 	require.Equal(t, instancestesting.Instance1, instance)
 	require.Equal(t, instancestesting.ExpectedInstancesSlice, results)
-
 }
 
 func TestIDFromName(t *testing.T) {
@@ -306,4 +309,26 @@ func TestIDFromName(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, SecurityGroup1.ID, groupID)
 
+}
+
+func TestDeepCopy(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareDeepCopyTestURL(SecurityGroup1.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestJSONRequest(t, r, UpdateRequest)
+		w.WriteHeader(http.StatusOK)
+	})
+
+	client := fake.ServiceTokenClient("securitygroups", "v1")
+
+	opts := securitygroups.DeepCopyOpts{Name: "default"}
+	err := securitygroups.DeepCopy(client, SecurityGroup1.ID, opts).ExtractErr()
+	require.NoError(t, err)
 }

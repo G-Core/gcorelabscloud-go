@@ -235,11 +235,68 @@ var flavorListSubCommand = cli.Command{
 	},
 }
 
+var createCustomSecurityGroup = cli.Command{
+	Name:      "create",
+	Usage:     "create loadbalancer's custom security group. Group will be populated with the default load balancer rules (VRRP protocol, and TCP ports 1025-1026). Also, current listener protocol ports will be allowed",
+	ArgsUsage: "<loadbalancer_id>",
+	Category:  "securitygroup",
+	Action: func(c *cli.Context) error {
+		loadBalancerID, err := flags.GetFirstStringArg(c, loadBalancerIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "create")
+			return err
+		}
+		client, err := client.NewLoadbalancerClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+		if err := loadbalancers.CreateCustomSecurityGroup(client, loadBalancerID).ExtractErr(); err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		return nil
+	},
+}
+
+var listCustomSecurityGroup = cli.Command{
+	Name:      "list",
+	Usage:     "Get the custom security group for the load balancer's ingress port",
+	ArgsUsage: "<loadbalancer_id>",
+	Category:  "securitygroup",
+	Action: func(c *cli.Context) error {
+		loadBalancerID, err := flags.GetFirstStringArg(c, loadBalancerIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "list")
+			return err
+		}
+		client, err := client.NewLoadbalancerClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+		result, err := loadbalancers.ListCustomSecurityGroup(client, loadBalancerID).Extract()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		utils.ShowResults(result, c.String("format"))
+		return nil
+	},
+}
+
 var flavorSubCommand = cli.Command{
 	Name:  "flavor",
 	Usage: "GCloud loadbalancer flavor API",
 	Subcommands: []*cli.Command{
 		&flavorListSubCommand,
+	},
+}
+
+var securityGroupSubCommand = cli.Command{
+	Name:  "securitygroup",
+	Usage: "Loadbalancer custom security group",
+	Subcommands: []*cli.Command{
+		&createCustomSecurityGroup,
+		&listCustomSecurityGroup,
 	},
 }
 
@@ -255,5 +312,6 @@ var Commands = cli.Command{
 		&flavorSubCommand,
 		&listeners.ListenerCommands,
 		&lbpools.PoolCommands,
+		&securityGroupSubCommand,
 	},
 }

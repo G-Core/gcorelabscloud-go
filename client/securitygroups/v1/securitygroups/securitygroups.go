@@ -357,6 +357,40 @@ var securityGroupUpdateSubCommand = cli.Command{
 	},
 }
 
+var securityGroupDeepCopySubCommand = cli.Command{
+	Name:      "copy",
+	Usage:     "Create a deep copy of security group",
+	ArgsUsage: "<securitygroup_id>",
+	Category:  "securitygroup",
+	Flags: []cli.Flag{
+		&cli.StringFlag{
+			Name:     "name",
+			Aliases:  []string{"n"},
+			Usage:    "New security group name",
+			Required: true,
+		},
+	},
+	Action: func(c *cli.Context) error {
+		securityGroupID, err := flags.GetFirstStringArg(c, securityGroupIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "update")
+			return err
+		}
+		client, err := client.NewSecurityGroupClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		opts := securitygroups.DeepCopyOpts{Name: c.String("name")}
+
+		if err := securitygroups.DeepCopy(client, securityGroupID, opts).ExtractErr(); err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		return nil
+	},
+}
+
 var Commands = cli.Command{
 	Name:  "securitygroup",
 	Usage: "GCloud security groups API",
@@ -366,6 +400,7 @@ var Commands = cli.Command{
 		&securityGroupUpdateSubCommand,
 		&securityGroupDeleteSubCommand,
 		&securityGroupCreateSubCommand,
+		&securityGroupDeepCopySubCommand,
 		{
 			Name:  "instance",
 			Usage: "Security group instances",

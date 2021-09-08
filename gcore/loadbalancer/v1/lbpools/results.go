@@ -14,6 +14,10 @@ type commonResult struct {
 	gcorecloud.Result
 }
 
+type DeleteHealthMonitorResult struct {
+	gcorecloud.ErrResult
+}
+
 // Extract is a function that accepts a result and extracts a pool resource.
 func (r commonResult) Extract() (*Pool, error) {
 	var s Pool
@@ -146,6 +150,10 @@ type PoolTaskResult struct {
 	Pools []string `json:"pools"`
 }
 
+type HealthMonitorTaskResult struct {
+	HealthMonitors []string `json:"healthmonitors"`
+}
+
 type PoolMemberTaskResult struct {
 	Members []string `json:"members"`
 }
@@ -160,6 +168,18 @@ func ExtractPoolIDFromTask(task *tasks.Task) (string, error) {
 		return "", fmt.Errorf("cannot decode pool information in task structure: %w", err)
 	}
 	return result.Pools[0], nil
+}
+
+func ExtractHealthMonitorIDFromTask(task *tasks.Task) (string, error) {
+	var result HealthMonitorTaskResult
+	err := gcorecloud.NativeMapToStruct(task.CreatedResources, &result)
+	if err != nil {
+		return "", fmt.Errorf("cannot decode healthmonitor information in task structure: %w", err)
+	}
+	if len(result.HealthMonitors) == 0 {
+		return "", fmt.Errorf("cannot decode healthmonitor information in task structure: %w", err)
+	}
+	return result.HealthMonitors[0], nil
 }
 
 func ExtractPoolMemberIDFromTask(task *tasks.Task) (string, error) {
