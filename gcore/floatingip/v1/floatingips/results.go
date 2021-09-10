@@ -14,7 +14,7 @@ type commonResult struct {
 	gcorecloud.Result
 }
 
-// Extract is a function that accepts a result and extracts a security group resource.
+// Extract is a function that accepts a result and extracts a floating ip resource.
 func (r commonResult) Extract() (*instances.FloatingIP, error) {
 	var s instances.FloatingIP
 	err := r.ExtractInto(&s)
@@ -55,7 +55,7 @@ type FloatingIPPage struct {
 	pagination.LinkedPageBase
 }
 
-// NextPageURL is invoked when a paginated collection of security groups has reached
+// NextPageURL is invoked when a paginated collection of floatin ips has reached
 // the end of a page and the pager seeks to traverse over a new one. In order
 // to do this, it needs to construct the next page's URL.
 func (r FloatingIPPage) NextPageURL() (string, error) {

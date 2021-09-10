@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/G-Core/gcorelabscloud-go/client/apptemplates/v1/apptemplates"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/client/flavors/v1/flavors"
 	"github.com/G-Core/gcorelabscloud-go/client/floatingips/v1/floatingips"
@@ -22,8 +23,10 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/client/projects/v1/projects"
 	"github.com/G-Core/gcorelabscloud-go/client/quotas/v2/quotas"
 	"github.com/G-Core/gcorelabscloud-go/client/regions/v1/regions"
+	"github.com/G-Core/gcorelabscloud-go/client/regionsaccess/v1/regionsaccess"
 	"github.com/G-Core/gcorelabscloud-go/client/reservedfixedips/v1/reservedfixedips"
 	"github.com/G-Core/gcorelabscloud-go/client/routers/v1/routers"
+	"github.com/G-Core/gcorelabscloud-go/client/schedules/v1/schedules"
 	"github.com/G-Core/gcorelabscloud-go/client/secrets/v1/secrets"
 	"github.com/G-Core/gcorelabscloud-go/client/securitygroups/v1/securitygroups"
 	"github.com/G-Core/gcorelabscloud-go/client/servergroups/v1/servergroups"
@@ -50,6 +53,7 @@ var commands = []*cli.Command{
 	&heat.Commands,
 	&securitygroups.Commands,
 	&floatingips.Commands,
+	&schedules.Commands,
 	&ports.Commands,
 	&snapshots.Commands,
 	&images.Commands,
@@ -65,6 +69,8 @@ var commands = []*cli.Command{
 	&servergroups.Commands,
 	&secrets.Commands,
 	&lifecyclepolicy.Commands,
+	&regionsaccess.Commands,
+	&apptemplates.Commands,
 }
 
 type clientCommands struct {

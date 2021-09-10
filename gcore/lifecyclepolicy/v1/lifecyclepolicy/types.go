@@ -100,10 +100,10 @@ type Schedule interface {
 }
 
 type RetentionTimer struct {
-	Weeks   int `json:"weeks"`
-	Days    int `json:"days"`
-	Hours   int `json:"hours"`
-	Minutes int `json:"minutes"`
+	Weeks   int `json:"weeks,omitempty"`
+	Days    int `json:"days,omitempty"`
+	Hours   int `json:"hours,omitempty"`
+	Minutes int `json:"minutes,omitempty"`
 }
 
 type CommonSchedule struct {
@@ -143,13 +143,13 @@ func (s IntervalSchedule) GetCommonSchedule() CommonSchedule {
 	return s.CommonSchedule
 }
 
-// rawSchedule is internal struct for unmarshalling into Schedule.
-type rawSchedule struct {
+// RawSchedule is internal struct for unmarshalling into Schedule.
+type RawSchedule struct {
 	json.RawMessage
 }
 
-// cook is internal method for unmarshalling rawSchedule into Schedule
-func (r rawSchedule) cook() (Schedule, error) {
+// Cook is method for unmarshalling RawSchedule into Schedule
+func (r RawSchedule) Cook() (Schedule, error) {
 	var typeStruct struct {
 		ScheduleType `json:"type"`
 	}
@@ -203,14 +203,14 @@ type rawLifecyclePolicy struct {
 	UserID    int           `json:"user_id"`
 	RegionID  int           `json:"region_id"`
 	Volumes   []Volume      `json:"volumes"`
-	Schedules []rawSchedule `json:"schedules"`
+	Schedules []RawSchedule `json:"schedules"`
 }
 
 // cook is internal method for unmarshalling rawLifecyclePolicy into LifecyclePolicy
 func (rawPolicy rawLifecyclePolicy) cook() (*LifecyclePolicy, error) {
 	schedules := make([]Schedule, len(rawPolicy.Schedules))
 	for i, b := range rawPolicy.Schedules {
-		s, err := b.cook()
+		s, err := b.Cook()
 		if err != nil {
 			return nil, err
 		}
