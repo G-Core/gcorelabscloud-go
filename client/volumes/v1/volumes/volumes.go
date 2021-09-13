@@ -428,6 +428,41 @@ var volumeExtendCommand = cli.Command{
 	},
 }
 
+var volumeRevertCommand = cli.Command{
+	Name:      "revert",
+	Usage:     "Revert volume to it's last snapshot",
+	ArgsUsage: "<volume_id>",
+	Category:  "volume",
+	Flags:     flags.WaitCommandFlags,
+	Action: func(c *cli.Context) error {
+		volumeID, err := flags.GetFirstStringArg(c, volumeIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "revert")
+			return err
+		}
+		client, err := client.NewVolumeClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+		results, err := volumes.Revert(client, volumeID).Extract()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		if results == nil {
+			return cli.NewExitError(err, 1)
+		}
+		return utils.WaitTaskAndShowResult(c, client, results, true, func(task tasks.TaskID) (interface{}, error) {
+			volume, err := volumes.Get(client, volumeID).Extract()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get volume with ID: %s. Error: %w", volumeID, err)
+			}
+			utils.ShowResults(volume, c.String("format"))
+			return nil, nil
+		})
+	},
+}
+
 var Commands = cli.Command{
 	Name:  "volume",
 	Usage: "GCloud volumes API",
@@ -440,5 +475,6 @@ var Commands = cli.Command{
 		&volumeDetachCommand,
 		&volumeRetypeCommand,
 		&volumeExtendCommand,
+		&volumeRevertCommand,
 	},
 }

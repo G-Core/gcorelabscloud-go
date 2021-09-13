@@ -34,6 +34,10 @@ func extendURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceActionURL(c, id, "extend")
 }
 
+func revertURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "revert")
+}
+
 func listURL(c *gcorecloud.ServiceClient) string {
 	return rootURL(c)
 }
