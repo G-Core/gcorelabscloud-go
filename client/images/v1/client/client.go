@@ -11,6 +11,10 @@ func NewImageClientV1(c *cli.Context) (*gcorecloud.ServiceClient, error) {
 	return common.BuildClient(c, "images", "v1")
 }
 
+func NewBmImageClientV1(c *cli.Context) (*gcorecloud.ServiceClient, error) {
+	return common.BuildClient(c, "bmimages", "v1")
+}
+
 func NewDownloadImageClientV1(c *cli.Context) (*gcorecloud.ServiceClient, error) {
 	return common.BuildClient(c, "downloadimage", "v1")
 }

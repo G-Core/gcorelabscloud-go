@@ -22,7 +22,12 @@ var (
 )
 
 func listImages(c *cli.Context) error {
-	client, err := client.NewImageClientV1(c)
+	var err error
+	var cl *gcorecloud.ServiceClient
+	cl, err = client.NewImageClientV1(c)
+	if c.Bool("baremetal") {
+		cl, err = client.NewBmImageClientV1(c)
+	}
 	if err != nil {
 		_ = cli.ShowAppHelp(c)
 		return cli.NewExitError(err, 1)
@@ -33,7 +38,7 @@ func listImages(c *cli.Context) error {
 		Visibility: types.Visibility(c.String("visibility")),
 	}
 
-	results, err := images.ListAll(client, opts)
+	results, err := images.ListAll(cl, opts)
 	if err != nil {
 		return cli.NewExitError(err, 1)
 	}
@@ -70,6 +75,12 @@ var imageListCommand = cli.Command{
 			Name:     "owner",
 			Aliases:  []string{"o"},
 			Usage:    "only current project images",
+			Required: false,
+		},
+		&cli.BoolFlag{
+			Name:     "baremetal",
+			Aliases:  []string{"b"},
+			Usage:    "only baremetal images",
 			Required: false,
 		},
 		&cli.GenericFlag{

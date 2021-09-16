@@ -36,7 +36,7 @@ func getPools(c *cli.Context) ([]pools.CreateOpts, error) {
 	poolDockerVolumeTypes := utils.GetEnumStringSliceValue(c, "docker-volume-type")
 
 	if err := utils.ValidateEqualSlicesLength(poolNames, poolFlavors, poolNodesCount, poolMinNodesCount, poolMaxNodesCount); err != nil {
-		return nil, fmt.Errorf("parameters number should be same for pool names, flavors, node-count, min-node-count and max_node_count: %w", err)
+		return nil, fmt.Errorf("parameters number should be same for pool names, flavors, node-count, min-node-count and max-node-count: %w", err)
 	}
 
 	var result []pools.CreateOpts
