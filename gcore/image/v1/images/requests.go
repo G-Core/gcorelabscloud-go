@@ -34,12 +34,16 @@ type CreateOptsBuilder interface {
 	ToImageCreateMap() (map[string]interface{}, error)
 }
 
-// CreateOpts represents options used to create a image.
+// CreateOpts represents options used to create an image.
 type CreateOpts struct {
-	URL        string             `json:"url" required:"true" validate:"required,url"`
-	Name       string             `json:"name" required:"true" validate:"required"`
-	CowFormat  bool               `json:"cow_format,omitempty"`
-	Properties *map[string]string `json:"properties,omitempty"`
+	Name           string                `json:"name" required:"true" validate:"required"`
+	HwMachineType  types.HwMachineType   `json:"hw_machine_type" validate:"required,enum"`
+	SshKey         types.SshKeyType      `json:"ssh_key" validate:"required,enum"`
+	OSType         types.OSType          `json:"os_type" validate:"required,enum"`
+	IsBaremetal    *bool                 `json:"is_baremetal,omitempty"`
+	HwFirmwareType types.HwFirmwareType  `json:"hw_firmware_type" validate:"required,enum"`
+	Source         types.ImageSourceType `json:"source" validate:"required,enum"`
+	VolumeID       string                `json:"volume_id" required:"true" validate:"required"`
 }
 
 // Validate
@@ -49,6 +53,60 @@ func (opts CreateOpts) Validate() error {
 
 // ToImageCreateMap builds a request body from CreateOpts.
 func (opts CreateOpts) ToImageCreateMap() (map[string]interface{}, error) {
+	return gcorecloud.BuildRequestBody(opts, "")
+}
+
+// UpdateOptsBuilder allows extensions to add additional parameters to the Update request.
+type UpdateOptsBuilder interface {
+	ToImageUpdateMap() (map[string]interface{}, error)
+}
+
+// UpdateOpts represents options used to create an image.
+type UpdateOpts struct {
+	HwMachineType  types.HwMachineType  `json:"hw_machine_type" validate:"required,enum"`
+	SshKey         types.SshKeyType     `json:"ssh_key" validate:"required,enum"`
+	Name           string               `json:"name" required:"true"`
+	OSType         types.OSType         `json:"os_type" validate:"required,enum"`
+	IsBaremetal    *bool                `json:"is_baremetal,omitempty"`
+	HwFirmwareType types.HwFirmwareType `json:"hw_firmware_type" validate:"required,enum"`
+}
+
+// Validate
+func (opts UpdateOpts) Validate() error {
+	return gcorecloud.Validate.Struct(opts)
+}
+
+// ToImageUpdateMap builds a request body from UpdateOpts.
+func (opts UpdateOpts) ToImageUpdateMap() (map[string]interface{}, error) {
+	return gcorecloud.BuildRequestBody(opts, "")
+}
+
+// UploadOptsBuilder allows extensions to add additional parameters to the Upload request.
+type UploadOptsBuilder interface {
+	ToImageUploadMap() (map[string]interface{}, error)
+}
+
+// UploadOpts represents options used to upload an image.
+type UploadOpts struct {
+	OsVersion      string               `json:"os_version,omitempty"`
+	HwMachineType  types.HwMachineType  `json:"hw_machine_type" validate:"required,enum"`
+	SshKey         types.SshKeyType     `json:"ssh_key" validate:"required,enum"`
+	Name           string               `json:"name" required:"true" validate:"required"`
+	OsDistro       string               `json:"os_distro,omitempty"`
+	OSType         types.OSType         `json:"os_type" validate:"required,enum"`
+	URL            string               `json:"url" required:"true" validate:"required,url"`
+	IsBaremetal    *bool                `json:"is_baremetal,omitempty"`
+	HwFirmwareType types.HwFirmwareType `json:"hw_firmware_type" validate:"required,enum"`
+	CowFormat      bool                 `json:"cow_format"`
+}
+
+// Validate
+func (opts UploadOpts) Validate() error {
+	return gcorecloud.Validate.Struct(opts)
+}
+
+// ToImageUploadMap builds a request body from UploadOpts.
+func (opts UploadOpts) ToImageUploadMap() (map[string]interface{}, error) {
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
@@ -103,5 +161,30 @@ func Create(client *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r tasks.R
 func Delete(client *gcorecloud.ServiceClient, imageID string) (r tasks.Result) {
 	url := deleteURL(client, imageID)
 	_, r.Err = client.DeleteWithResponse(url, &r.Body, nil) // nolint
+	return
+}
+
+// Update accepts a UpdateOpts struct and updates an existing image using the
+// values provided.
+func Update(client *gcorecloud.ServiceClient, id string, opts UpdateOptsBuilder) (r UpdateResult) {
+	url := updateURL(client, id)
+	b, err := opts.ToImageUpdateMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = client.Patch(url, b, &r.Body, nil) // nolint
+	return
+}
+
+// Upload accepts a UploadOpts struct and upload an image using the
+// values provided.
+func Upload(client *gcorecloud.ServiceClient, opts UploadOptsBuilder) (r tasks.Result) {
+	b, err := opts.ToImageUploadMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = client.Post(uploadURL(client), b, &r.Body, nil) // nolint
 	return
 }

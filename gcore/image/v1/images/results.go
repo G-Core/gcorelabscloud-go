@@ -30,6 +30,12 @@ type GetResult struct {
 	commonResult
 }
 
+// UpdatyResult represents the result of a update operation. Call its Extract
+// method to interpret it as a Image.
+type UpdateResult struct {
+	commonResult
+}
+
 type Image struct {
 	ID            string                   `json:"id"`
 	Name          string                   `json:"name"`

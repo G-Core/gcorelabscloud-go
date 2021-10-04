@@ -59,8 +59,38 @@ const GetResponse = `
 
 const CreateRequest = `
 {
-  "url": "http://mirror.noris.net/cirros/0.4.0/cirros-0.4.0-x86_64-disk.img",
-  "name": "image_name"
+  "hw_firmware_type": "bios",
+  "hw_machine_type": "q35",
+  "is_baremetal": false,
+  "name": "test_image",
+  "os_type": "linux",
+  "source": "volume",
+  "ssh_key": "allow",
+  "volume_id": "d478ae29-dedc-4869-82f0-96104425f565"
+}
+`
+
+const UploadRequest = `
+{
+  "cow_format": false,
+  "hw_firmware_type": "bios",
+  "hw_machine_type": "q35",
+  "is_baremetal": false,
+  "name": "image_name",
+  "os_type": "linux",
+  "ssh_key": "allow",
+  "url": "http://mirror.noris.net/cirros/0.4.0/cirros-0.4.0-x86_64-disk.img"
+}
+`
+
+const UpdateRequest = `
+{
+  "hw_machine_type": "i440",
+  "ssh_key": "allow",
+  "name": "string",
+  "os_type": "linux",
+  "is_baremetal": true,
+  "hw_firmware_type": "bios"
 }
 `
 

@@ -2,6 +2,7 @@ package testing
 
 import (
 	"fmt"
+	"github.com/G-Core/gcorelabscloud-go/gcore/image/v1/images/types"
 	"net/http"
 	"testing"
 
@@ -26,6 +27,10 @@ func prepareGetTestURLParams(version string, projectID int, regionID int, id str
 }
 
 func prepareCreateTestURLParams(version string, projectID int, regionID int) string {
+	return fmt.Sprintf("/%s/images/%d/%d", version, projectID, regionID)
+}
+
+func prepareUploadTestURLParams(version string, projectID int, regionID int) string {
 	return fmt.Sprintf("/%s/downloadimage/%d/%d", version, projectID, regionID)
 }
 
@@ -37,12 +42,20 @@ func prepareGetTestURL(id string) string {
 	return prepareGetTestURLParams("v1", fake.ProjectID, fake.RegionID, id)
 }
 
+func prepareUpdateTestURL(id string) string {
+	return prepareGetTestURLParams("v1", fake.ProjectID, fake.RegionID, id)
+}
+
 func prepareDeleteTestURL(id string) string {
 	return prepareGetTestURLParams("v1", fake.ProjectID, fake.RegionID, id)
 }
 
 func prepareCreateTestURL() string {
 	return prepareCreateTestURLParams("v1", fake.ProjectID, fake.RegionID)
+}
+
+func prepareUploadTestURL() string {
+	return prepareUploadTestURLParams("v1", fake.ProjectID, fake.RegionID)
 }
 
 func TestList(t *testing.T) {
@@ -157,16 +170,22 @@ func TestCreate(t *testing.T) {
 		}
 	})
 
+	isBm := false
 	options := images.CreateOpts{
-		URL:       "http://mirror.noris.net/cirros/0.4.0/cirros-0.4.0-x86_64-disk.img",
-		Name:      "image_name",
-		CowFormat: false,
+		Name:           "test_image",
+		HwMachineType:  types.HwMachineQ35,
+		SshKey:         types.SshKeyAllow,
+		OSType:         types.OsLinux,
+		IsBaremetal:    &isBm,
+		HwFirmwareType: types.HwFirmwareBIOS,
+		Source:         types.ImageSourceVolume,
+		VolumeID:       "d478ae29-dedc-4869-82f0-96104425f565",
 	}
 
 	err := options.Validate()
 	require.NoError(t, err)
 
-	client := fake.ServiceTokenClient("downloadimage", "v1")
+	client := fake.ServiceTokenClient("images", "v1")
 	tasks, err := images.Create(client, options).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
@@ -194,4 +213,82 @@ func TestDelete(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 
+}
+
+func TestUpload(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareUploadTestURL(), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestJSONRequest(t, r, UploadRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, CreateResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	isBm := false
+	options := images.UploadOpts{
+		Name:           "image_name",
+		HwMachineType:  types.HwMachineQ35,
+		SshKey:         types.SshKeyAllow,
+		OSType:         types.OsLinux,
+		IsBaremetal:    &isBm,
+		HwFirmwareType: types.HwFirmwareBIOS,
+		CowFormat:      false,
+		URL:            "http://mirror.noris.net/cirros/0.4.0/cirros-0.4.0-x86_64-disk.img",
+	}
+
+	err := options.Validate()
+	require.NoError(t, err)
+
+	client := fake.ServiceTokenClient("downloadimage", "v1")
+	tasks, err := images.Upload(client, options).Extract()
+	require.NoError(t, err)
+	require.Equal(t, Tasks1, *tasks)
+}
+
+func TestUpdate(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareUpdateTestURL(Image1.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "PATCH")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestJSONRequest(t, r, UpdateRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, GetResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	isBm := true
+	options := images.UpdateOpts{
+		Name:           "string",
+		HwMachineType:  types.HwMachineI440,
+		SshKey:         types.SshKeyAllow,
+		OSType:         types.OsLinux,
+		IsBaremetal:    &isBm,
+		HwFirmwareType: types.HwFirmwareBIOS,
+	}
+
+	err := options.Validate()
+	require.NoError(t, err)
+
+	client := fake.ServiceTokenClient("images", "v1")
+	ct, err := images.Update(client, Image1.ID, options).Extract()
+	require.NoError(t, err)
+	require.Equal(t, Image1, *ct)
 }

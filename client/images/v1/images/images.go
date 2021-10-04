@@ -114,28 +114,40 @@ var imageCreateCommand = cli.Command{
 	Category: "image",
 	Flags: append([]cli.Flag{
 		&cli.StringFlag{
-			Name:     "url",
-			Aliases:  []string{"u"},
-			Usage:    "image url",
-			Required: true,
-		},
-		&cli.StringFlag{
 			Name:     "name",
 			Aliases:  []string{"n"},
 			Usage:    "image name",
 			Required: true,
 		},
-		&cli.BoolFlag{
-			Name:     "cow-format",
-			Aliases:  []string{"c"},
-			Usage:    "image with cow format",
-			Required: false,
+		&cli.StringFlag{
+			Name:     "volume-id",
+			Aliases:  []string{"v"},
+			Usage:    "Required if source is volume",
+			Required: true,
 		},
-		&cli.StringSliceFlag{
-			Name:        "property",
-			Usage:       "Image properties. Example: --property os_distro=coreos",
-			DefaultText: "nil",
-			Required:    false,
+		&cli.StringFlag{
+			Name:     "hw-firmware-type",
+			Usage:    "Specifies the type of firmware with which to boot the guest. Available value is 'bios', 'uefi'",
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:     "hw-machine-type",
+			Usage:    "A virtual chipset type. Available value is 'i440', 'q35'",
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:     "ssh-key",
+			Usage:    "Permission to use a ssh key in instances. Available value is 'allow', 'deny', 'required'",
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:     "os-type",
+			Usage:    "The operating system installed on the image. Available value is 'windows', 'linux'",
+			Required: true,
+		},
+		&cli.BoolFlag{
+			Name:  "is-baremetal",
+			Usage: "Set to true if the image will be used by baremetal instances. Defaults to false.",
 		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
@@ -144,17 +156,16 @@ var imageCreateCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		properties, err := utils.StringSliceToMapNil(c.StringSlice("property"))
-		if err != nil {
-			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
-		}
 
 		opts := images.CreateOpts{
-			URL:        c.String("url"),
-			Name:       c.String("name"),
-			CowFormat:  c.Bool("cow-format"),
-			Properties: properties,
+			Name:           c.String("name"),
+			HwMachineType:  types.HwMachineType(c.String("hw-machine-type")),
+			SshKey:         types.SshKeyType(c.String("ssh-key")),
+			OSType:         types.OSType(c.String("os-type")),
+			IsBaremetal:    utils.BoolToPointer(c.Bool("is-baremetal")),
+			HwFirmwareType: types.HwFirmwareType(c.String("hw-firmware-type")),
+			Source:         types.ImageSourceVolume,
+			VolumeID:       c.String("volume-id"),
 		}
 
 		results, err := images.Create(downloadClient, opts).Extract()
@@ -209,6 +220,171 @@ var imageShowCommand = cli.Command{
 	},
 }
 
+var imageUpdateCommand = cli.Command{
+	Name:      "update",
+	Usage:     "Update image fields",
+	Category:  "image",
+	ArgsUsage: "<image_id>",
+	Flags: []cli.Flag{
+		&cli.StringFlag{
+			Name:     "name",
+			Aliases:  []string{"n"},
+			Usage:    "image name",
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:     "hw-firmware-type",
+			Usage:    "Specifies the type of firmware with which to boot the guest. Available value is 'bios', 'uefi'",
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:     "hw-machine-type",
+			Usage:    "A virtual chipset type. Available value is 'i440', 'q35'",
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:     "ssh-key",
+			Usage:    "Permission to use a ssh key in instances. Available value is 'allow', 'deny', 'required'",
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:     "os-type",
+			Usage:    "The operating system installed on the image. Available value is 'windows', 'linux'",
+			Required: true,
+		},
+		&cli.BoolFlag{
+			Name:  "is-baremetal",
+			Usage: "Set to true if the image will be used by baremetal instances. Defaults to false.",
+		},
+	},
+	Action: func(c *cli.Context) error {
+		imageID, err := flags.GetFirstStringArg(c, imageIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "show")
+			return err
+		}
+		client, err := client.NewImageClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		opts := images.UpdateOpts{
+			Name:           c.String("name"),
+			HwMachineType:  types.HwMachineType(c.String("hw-machine-type")),
+			SshKey:         types.SshKeyType(c.String("ssh-key")),
+			OSType:         types.OSType(c.String("os-type")),
+			IsBaremetal:    utils.BoolToPointer(c.Bool("is-baremetal")),
+			HwFirmwareType: types.HwFirmwareType(c.String("hw-firmware-type")),
+		}
+
+		image, err := images.Update(client, imageID, opts).Extract()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		utils.ShowResults(image, c.String("format"))
+		return nil
+	},
+}
+
+var imageUploadCommand = cli.Command{
+	Name:     "upload",
+	Usage:    "Upload image",
+	Category: "image",
+	Flags: append([]cli.Flag{
+		&cli.StringFlag{
+			Name:  "os-version",
+			Usage: "OS version, i.e. 19.04 (for Ubuntu) or 9.4 for Debian.",
+		},
+		&cli.StringFlag{
+			Name:  "os-distro",
+			Usage: "OS Distribution, i.e. Debian, CentOS, Ubuntu, CoreOS etc.",
+		},
+		&cli.StringFlag{
+			Name:     "url",
+			Required: true,
+		},
+		&cli.BoolFlag{
+			Name:  "cow-format",
+			Usage: "When True, image cannot be deleted unless all volumes, created from it, are deleted. Defaults to False",
+		},
+		&cli.StringFlag{
+			Name:     "name",
+			Aliases:  []string{"n"},
+			Usage:    "image name",
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:     "hw-firmware-type",
+			Usage:    "Specifies the type of firmware with which to boot the guest. Available value is 'bios', 'uefi'",
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:     "hw-machine-type",
+			Usage:    "A virtual chipset type. Available value is 'i440', 'q35'",
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:     "ssh-key",
+			Usage:    "Permission to use a ssh key in instances. Available value is 'allow', 'deny', 'required'",
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:     "os-type",
+			Usage:    "The operating system installed on the image. Available value is 'windows', 'linux'",
+			Required: true,
+		},
+		&cli.BoolFlag{
+			Name:  "is-baremetal",
+			Usage: "Set to true if the image will be used by baremetal instances. Defaults to false.",
+		},
+	}, flags.WaitCommandFlags...),
+	Action: func(c *cli.Context) error {
+		downloadClient, err := client.NewDownloadImageClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		opts := images.UploadOpts{
+			OsVersion:      c.String("os-version"),
+			HwMachineType:  types.HwMachineType(c.String("hw-machine-type")),
+			SshKey:         types.SshKeyType(c.String("ssh-key")),
+			Name:           c.String("name"),
+			OsDistro:       c.String("os-distro"),
+			OSType:         types.OSType(c.String("os-type")),
+			URL:            c.String("url"),
+			IsBaremetal:    utils.BoolToPointer(c.Bool("is-baremetal")),
+			HwFirmwareType: types.HwFirmwareType(c.String("hw-firmware-type")),
+			CowFormat:      c.Bool("cow-format"),
+		}
+
+		results, err := images.Upload(downloadClient, opts).Extract()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		return utils.WaitTaskAndShowResult(c, downloadClient, results, true, func(task tasks.TaskID) (interface{}, error) {
+			taskInfo, err := tasks.Get(downloadClient, string(task)).Extract()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
+			}
+			instanceID, err := images.ExtractImageIDFromTask(taskInfo)
+			if err != nil {
+				return nil, fmt.Errorf("cannot retrieve image ID from task info: %w", err)
+			}
+			getClient, err := client.NewImageClientV1(c)
+			if err != nil {
+				return nil, err
+			}
+			instance, err := images.Get(getClient, instanceID).Extract()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get image with ID: %s. Error: %w", instanceID, err)
+			}
+			return instance, nil
+		})
+	},
+}
+
 var imageDeleteCommand = cli.Command{
 	Name:      "delete",
 	Usage:     "Delete image",
@@ -254,6 +430,8 @@ var Commands = cli.Command{
 		&imageShowCommand,
 		&imageDeleteCommand,
 		&imageCreateCommand,
+		&imageUpdateCommand,
+		&imageUploadCommand,
 		{
 			Name:  "project",
 			Usage: "GCloud project images API",
