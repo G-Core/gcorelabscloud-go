@@ -8,6 +8,10 @@ type commonResult struct {
 	gcorecloud.Result
 }
 
+type estimateResult struct {
+	gcorecloud.Result
+}
+
 // GetResult represents the result of a Get operation.
 // Call its Extract method to interpret it as a LifecyclePolicy.
 type GetResult struct {
@@ -24,6 +28,12 @@ type ListResult struct {
 // Call its Extract method to interpret it as a LifecyclePolicy.
 type CreateResult struct {
 	commonResult
+}
+
+// EstimateResult represents the result of a estimate operation.
+// Call its Extract method to interpret it as a EstimateMaxPolicyUsage.
+type EstimateResult struct {
+	estimateResult
 }
 
 // UpdateResult represents the result of a Update operation.
@@ -63,6 +73,13 @@ func (r commonResult) Extract() (*LifecyclePolicy, error) {
 		return nil, err
 	}
 	return rawPolicy.cook()
+}
+
+// Extract is a function that accepts a result and extracts an estimation of max lifecycle policy resources usage.
+func (r estimateResult) Extract() (*MaxPolicyUsage, error) {
+	var mpu MaxPolicyUsage
+	err := r.Result.ExtractIntoStructPtr(&mpu, "")
+	return &mpu, err
 }
 
 // Extract is a function that accepts a result and extracts a slice of lifecycle policy resources.

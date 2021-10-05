@@ -41,6 +41,6 @@ func removeSchedulesURL(c *gcorecloud.ServiceClient, id int) string {
 	return c.ServiceURL(strconv.Itoa(id), "remove_schedules")
 }
 
-//func getQuotaURL(c *gcorecloud.ServiceClient) string {
-//	return c.ServiceURL("estimate_max_policy_usage")
-//}
+func estimateURL(c *gcorecloud.ServiceClient) string {
+	return c.ServiceURL("estimate_max_policy_usage")
+}

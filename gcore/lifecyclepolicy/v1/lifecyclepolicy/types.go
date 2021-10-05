@@ -3,6 +3,8 @@ package lifecyclepolicy
 import (
 	"encoding/json"
 	"fmt"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	"github.com/shopspring/decimal"
 )
 
 type (
@@ -227,4 +229,18 @@ func (rawPolicy rawLifecyclePolicy) cook() (*LifecyclePolicy, error) {
 	}
 	policy.Schedules = schedules
 	return &policy, nil
+}
+
+type MaxPolicyUsage struct {
+	CountUsage     int             `json:"max_volume_snapshot_count_usage"`
+	SizeUsage      int             `json:"max_volume_snapshot_size_usage"`
+	SequenceLength int             `json:"max_volume_snapshot_sequence_length"`
+	MaxCost        PolicyUsageCost `json:"max_cost"`
+}
+
+type PolicyUsageCost struct {
+	CurrencyCode  gcorecloud.Currency `json:"currency_code"`
+	PricePerHour  decimal.Decimal     `json:"price_per_hour"`
+	PricePerMonth decimal.Decimal     `json:"price_per_month"`
+	PriceStatus   string              `json:"price_status"`
 }

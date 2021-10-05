@@ -42,6 +42,25 @@ type AddVolumesOpts struct {
 	VolumeIds []string `json:"volume_ids" validate:"required"`
 }
 
+type EstimateOpts struct {
+	Name      string       `json:"name" required:"true" validate:"required"`
+	VolumeIds []string     `json:"volume_ids"`
+	Status    PolicyStatus `json:"status,omitempty" validate:"omitempty,enum"`
+	Action    PolicyAction `json:"action" validate:"required,enum"`
+}
+
+// EstimateCronOpts represent options for EstimateCronMaxPolicyUsage
+type EstimateCronOpts struct {
+	EstimateOpts
+	Schedules []CreateCronScheduleOpts `json:"schedules"`
+}
+
+// EstimateIntervalOpts represent options for EstimateIntervalMaxPolicyUsage
+type EstimateIntervalOpts struct {
+	EstimateOpts
+	Schedules []CreateIntervalScheduleOpts `json:"schedules"`
+}
+
 // RemoveVolumesOpts represents options for RemoveVolumes.
 type RemoveVolumesOpts struct {
 	VolumeIds []string `json:"volume_ids" validate:"required"`

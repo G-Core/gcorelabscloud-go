@@ -114,3 +114,27 @@ func RemoveSchedules(c *gcorecloud.ServiceClient, id int, opts RemoveSchedulesOp
 	_, r.Err = c.Post(url, b, &r.Body, nil)
 	return
 }
+
+// EstimateCronMaxPolicyUsage Get maximum usage quota of resources if all snapshots create by the cron policy.
+func EstimateCronMaxPolicyUsage(c *gcorecloud.ServiceClient, opts EstimateCronOpts) (r EstimateResult) {
+	url := estimateURL(c)
+	b, err := ValidateAndBuildRequestBody(opts)
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = c.Post(url, b, &r.Body, nil)
+	return
+}
+
+// EstimateIntervalMaxPolicyUsage Get maximum usage quota of resources if all snapshots create by the interval policy.
+func EstimateIntervalMaxPolicyUsage(c *gcorecloud.ServiceClient, opts EstimateIntervalOpts) (r EstimateResult) {
+	url := estimateURL(c)
+	b, err := ValidateAndBuildRequestBody(opts)
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = c.Post(url, b, &r.Body, nil)
+	return
+}
