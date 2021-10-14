@@ -231,8 +231,8 @@ func TestValidateCreateInstanceBlankSnapshotIDOpts(t *testing.T) {
 			NetworkID: "28bfe198-a003-4283-8dca-ab5da4a71b62",
 			SubnetID:  "28bfe198-a003-4283-8dca-ab5da4a71b62",
 			FloatingIP: &instances.CreateNewInterfaceFloatingIPOpts{
-				Source:             types.NewFloatingIP,
-				ExistingFloatingID: "",
+				Source:             types.ExistingFloatingIP,
+				ExistingFloatingID: "28bfe198-a003-4283-8dca-ab5da4a71b62",
 			},
 		}},
 		Keypair:  "",
@@ -414,4 +414,16 @@ func TestInterfaceOpts(t *testing.T) {
 	err = opts.Validate()
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "Type NetworkID SubnetID FloatingIP")
+
+	opts = instances.InterfaceOpts{
+		Type:      types.SubnetInterfaceType,
+		SubnetID:  "9bc36cf6-407c-4a74-bc83-ce3aa3854c3d",
+		NetworkID: "9bc36cf6-407c-4a74-bc83-ce3aa3854c3d",
+		FloatingIP: &instances.CreateNewInterfaceFloatingIPOpts{
+			Source:             types.ExistingFloatingIP,
+			ExistingFloatingID: "28bfe198-a003-4283-8dca-ab5da4a71b62",
+		},
+	}
+	err = opts.Validate()
+	require.NoError(t, err)
 }
