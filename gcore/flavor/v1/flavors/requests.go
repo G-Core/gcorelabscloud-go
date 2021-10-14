@@ -43,6 +43,15 @@ func List(c *gcorecloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
 	})
 }
 
+// ListAll retrieves list of flavors
+func ListAll(c *gcorecloud.ServiceClient, opts ListOptsBuilder) ([]Flavor, error) {
+	results, err := List(c, opts).AllPages()
+	if err != nil {
+		return nil, err
+	}
+	return ExtractFlavors(results)
+}
+
 // IDFromName is a convenience function that returns a flavor ID, given its name.
 func IDFromName(client *gcorecloud.ServiceClient, name string) (string, error) {
 	count := 0

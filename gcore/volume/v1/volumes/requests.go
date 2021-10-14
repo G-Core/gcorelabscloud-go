@@ -223,6 +223,12 @@ func Extend(c *gcorecloud.ServiceClient, volumeID string, opts PropertiesOperati
 	return
 }
 
+// Revert volume to it's last snapshot.
+func Revert(c *gcorecloud.ServiceClient, volumeID string) (r tasks.Result) {
+	_, r.Err = c.Post(revertURL(c, volumeID), nil, &r.Body, nil)
+	return
+}
+
 // ListAll is a convenience function that returns all volumes.
 func ListAll(client *gcorecloud.ServiceClient, opts ListOptsBuilder) ([]Volume, error) {
 	pages, err := List(client, opts).AllPages()

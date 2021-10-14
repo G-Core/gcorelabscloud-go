@@ -52,6 +52,10 @@ func prepareExtendTestURL(id string) string {
 	return prepareActionTestURLParams(fake.ProjectID, fake.RegionID, id, "extend")
 }
 
+func prepareRevertTestURL(id string) string {
+	return prepareActionTestURLParams(fake.ProjectID, fake.RegionID, id, "revert")
+}
+
 func TestList(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
@@ -319,6 +323,27 @@ func TestExtend(t *testing.T) {
 	opts := volumes.SizePropertyOperationOpts{Size: 16}
 
 	tasks, err := volumes.Extend(client, Volume1.ID, opts).Extract()
+	require.NoError(t, err)
+	require.Equal(t, Tasks1, *tasks)
+}
+
+func TestRevert(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareRevertTestURL(Volume1.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Accept", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, ExtendResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("volumes", "v1")
+	tasks, err := volumes.Revert(client, Volume1.ID).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 }

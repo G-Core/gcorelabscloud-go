@@ -1,6 +1,7 @@
 package flavors
 
 import (
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/client/flavors/v1/client"
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
 	"github.com/G-Core/gcorelabscloud-go/gcore/flavor/v1/flavors"
@@ -14,14 +15,24 @@ var flavorListCommand = cli.Command{
 	Category: "flavor",
 	Flags: []cli.Flag{
 		&cli.BoolFlag{
-			Name:     "include_prices",
-			Aliases:  []string{"p"},
-			Usage:    "Include prices",
-			Required: false,
+			Name:    "include_prices",
+			Aliases: []string{"p"},
+			Usage:   "Include prices",
+		},
+		&cli.BoolFlag{
+			Name:    "baremetal",
+			Aliases: []string{"bm"},
+			Usage:   "show only baremetal flavors",
 		},
 	},
 	Action: func(c *cli.Context) error {
-		client, err := client.NewFlavorClientV1(c)
+		var err error
+		var cl *gcorecloud.ServiceClient
+		cl, err = client.NewFlavorClientV1(c)
+
+		if c.Bool("baremetal") {
+			cl, err = client.NewBmFlavorClientV1(c)
+		}
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -30,11 +41,7 @@ var flavorListCommand = cli.Command{
 		opts := flavors.ListOpts{
 			IncludePrices: &prices,
 		}
-		pages, err := flavors.List(client, opts).AllPages()
-		if err != nil {
-			return cli.NewExitError(err, 1)
-		}
-		results, err := flavors.ExtractFlavors(pages)
+		results, err := flavors.ListAll(cl, opts)
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}

@@ -10,3 +10,7 @@ import (
 func NewFlavorClientV1(c *cli.Context) (*gcorecloud.ServiceClient, error) {
 	return common.BuildClient(c, "flavors", "v1")
 }
+
+func NewBmFlavorClientV1(c *cli.Context) (*gcorecloud.ServiceClient, error) {
+	return common.BuildClient(c, "bmflavors", "v1")
+}
