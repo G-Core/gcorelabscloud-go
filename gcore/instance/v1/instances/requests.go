@@ -105,7 +105,7 @@ type InterfaceOpts struct {
 	Type       types.InterfaceType               `json:"type,omitempty" validate:"omitempty,enum"`
 	NetworkID  string                            `json:"network_id,omitempty" validate:"rfe=Type:any_subnet,omitempty,uuid4"`
 	SubnetID   string                            `json:"subnet_id,omitempty" validate:"rfe=Type:subnet,omitempty,uuid4"`
-	PortID     string                            `json:"port_id,omitempty" validate:"rfe=Type:reserved_fixed_ip,allowed_without_all=NetworkID SubnetID FloatingIP,omitempty,uuid4"`
+	PortID     string                            `json:"port_id,omitempty" validate:"rfe=Type:reserved_fixed_ip,allowed_without_all=NetworkID SubnetID,omitempty,uuid4"`
 	IpAddress  string                            `json:"ip_address,omitempty" validate:"allowed_without_all=Type NetworkID SubnetID FloatingIP,omitempty"`
 	FloatingIP *CreateNewInterfaceFloatingIPOpts `json:"floating_ip,omitempty" validate:"omitempty,dive"`
 }
