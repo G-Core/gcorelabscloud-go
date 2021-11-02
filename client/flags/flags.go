@@ -12,6 +12,7 @@ import (
 const (
 	ClientTypeToken    = "token"
 	ClientTypePlatform = "platform"
+	ClientTypeAPIToken = "api-token"
 )
 
 var (
@@ -52,7 +53,7 @@ var commonFlags = []cli.Flag{
 			Destination: &ClientType,
 		},
 		Hidden: true,
-		Usage:  "client type. Either use prepared token for gcloud API access or get an access token via gcloud platform",
+		Usage:  "client type. Either use prepared token for gcloud API access, get an access token via gcloud platform or use an api token",
 	},
 }
 
@@ -71,6 +72,14 @@ var OutputFlags = []cli.Flag{
 			Default: "json",
 		},
 		Usage: "output in json, table or yaml",
+	},
+}
+
+var apiTokenFlag = []cli.Flag{
+	&cli.StringFlag{
+		Name:     "api-token",
+		Usage:    "api token",
+		Required: false,
 	},
 }
 
@@ -140,8 +149,16 @@ func buildPlatformClientFlags() []cli.Flag {
 	return flags
 }
 
+func buildAPITokenClientFlags() []cli.Flag {
+	var flags []cli.Flag
+	flags = append(flags, commonFlags...)
+	flags = append(flags, apiTokenFlag...)
+	return flags
+}
+
 var TokenClientFlags = buildTokenClientFlags()
 var PlatformClientFlags = buildPlatformClientFlags()
+var APITokenClientFlags = buildAPITokenClientFlags()
 
 var TokenClientHelpText = `
    Environment variables example:
@@ -166,10 +183,20 @@ var PlatformClientHelpText = `
    GCLOUD_PROJECT=
 `
 
+var APITokenClientHelpText = `
+   Environment variables example:
+
+   GCLOUD_API_URL=
+   GCLOUD_API_VERSION=v1
+   GCLOUD_API_TOKEN=
+   GCLOUD_REGION=
+   GCLOUD_PROJECT=
+`
+
 var MainClientHelpText = `
    Environment variables example:
 	
-   GCLOUD_CLIENT_TYPE=[platform,token]
+   GCLOUD_CLIENT_TYPE=[platform,token,api-token]
 `
 
 func AddFlags(commands []*cli.Command, flags ...cli.Flag) {

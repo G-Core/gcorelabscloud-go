@@ -193,3 +193,51 @@ func NewGCloudTokenAPISettingsFromEnv() (*gcorecloud.TokenAPISettings, error) {
 		Debug:        debug,
 	}, nil
 }
+
+func NewGCloudAPITokenAPISettingsFromEnv() (*gcorecloud.APITokenAPISettings, error) {
+	apiURL := os.Getenv("GCLOUD_API_URL")
+	apiVersion := os.Getenv("GCLOUD_API_VERSION")
+	region := os.Getenv("GCLOUD_REGION")
+	project := os.Getenv("GCLOUD_PROJECT")
+	debugEnv := os.Getenv("GCLOUD_DEBUG")
+	apiToken := os.Getenv("GCLOUD_API_TOKEN")
+
+	var (
+		projectInt, regionInt int
+		err                   error
+		version               = "v1"
+		debug                 bool
+	)
+
+	if project != "" {
+		projectInt, err = strconv.Atoi(project)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if region != "" {
+		regionInt, err = strconv.Atoi(region)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if apiVersion != "" {
+		version = apiVersion
+	}
+
+	debug, err = strconv.ParseBool(debugEnv)
+	if err != nil {
+		debug = false
+	}
+
+	return &gcorecloud.APITokenAPISettings{
+		Version:  version,
+		APIURL:   apiURL,
+		Region:   regionInt,
+		Project:  projectInt,
+		APIToken: apiToken,
+		Debug:    debug,
+	}, nil
+}

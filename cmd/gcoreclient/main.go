@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/G-Core/gcorelabscloud-go/client/apitokens/v1/apitokens"
 	"os"
 
 	"github.com/G-Core/gcorelabscloud-go/client/apptemplates/v1/apptemplates"
@@ -71,6 +72,7 @@ var commands = []*cli.Command{
 	&lifecyclepolicy.Commands,
 	&regionsaccess.Commands,
 	&apptemplates.Commands,
+	&apitokens.Commands,
 }
 
 type clientCommands struct {
@@ -83,6 +85,7 @@ func buildClientCommands(commands []*cli.Command) clientCommands {
 	clientType := os.Getenv("GCLOUD_CLIENT_TYPE")
 	tokenClientUsage := fmt.Sprintf("GCloud API client\n%s", flags.TokenClientHelpText)
 	platformClientUsage := fmt.Sprintf("GCloud API client\n%s", flags.PlatformClientHelpText)
+	apiTokenClientUsage := fmt.Sprintf("GCloud API client\n%s", flags.APITokenClientHelpText)
 	switch clientType {
 	case flags.ClientTypeToken:
 		flags.ClientType = clientType
@@ -97,6 +100,13 @@ func buildClientCommands(commands []*cli.Command) clientCommands {
 			commands: commands,
 			flags:    flags.PlatformClientFlags,
 			usage:    platformClientUsage,
+		}
+	case flags.ClientTypeAPIToken:
+		flags.ClientType = clientType
+		return clientCommands{
+			commands: commands,
+			flags:    flags.APITokenClientFlags,
+			usage:    apiTokenClientUsage,
 		}
 	}
 	mainClientUsage := fmt.Sprintf("GCloud API client\n%s", flags.MainClientHelpText)
@@ -118,6 +128,15 @@ func buildClientCommands(commands []*cli.Command) clientCommands {
 				Subcommands: commands,
 				Before: func(c *cli.Context) error {
 					return c.Set("client-type", "platform")
+				},
+			},
+			{
+				Name:        "api-token",
+				Usage:       apiTokenClientUsage,
+				Flags:       flags.APITokenClientFlags,
+				Subcommands: commands,
+				Before: func(c *cli.Context) error {
+					return c.Set("client-type", "api-token")
 				},
 			},
 		},

@@ -60,9 +60,22 @@ func (to TokenOptions) ToMap() map[string]interface{} {
 	}
 }
 
+// APITokenOptions gcore API
+type APITokenOptions struct {
+	APIURL   string `json:"-"`
+	APIToken string `json:"-"`
+}
+
 // TokenClientSettings interface
 type TokenClientSettings interface {
 	ToTokenOptions() TokenOptions
+	ToEndpointOptions() EndpointOpts
+	Validate() error
+}
+
+// APITokenClientSettings interface
+type APITokenClientSettings interface {
+	ToAPITokenOptions() APITokenOptions
 	ToEndpointOptions() EndpointOpts
 	Validate() error
 }
@@ -123,8 +136,47 @@ func (gs TokenAPISettings) Validate() error {
 	if gs.APIURL == "" {
 		return fmt.Errorf("api url required. APIURL")
 	}
-	if gs.Name == "" {
-		return fmt.Errorf("name required")
+	return nil
+}
+
+// APITokenAPISettings - settings for api token client building
+type APITokenAPISettings struct {
+	APIURL   string `json:"url,omitempty"`
+	APIToken string `json:"-"`
+	Type     string `json:"type,omitempty"`
+	Name     string `json:"name,omitempty"`
+	Region   int    `json:"region,omitempty"`
+	Project  int    `json:"project,omitempty"`
+	Version  string `json:"version,omitempty"`
+	Debug    bool   `json:"debug,omitempty"`
+}
+
+// ToEndpointOptions implements APITokenClientSettings interface
+func (gs APITokenAPISettings) ToEndpointOptions() EndpointOpts {
+	return EndpointOpts{
+		Region:  gs.Region,
+		Project: gs.Project,
+		Version: gs.Version,
+		Name:    gs.Name,
+		Type:    gs.Type,
+	}
+}
+
+// ToAPITokenOptions implements APITokenClientSettings interface
+func (gs APITokenAPISettings) ToAPITokenOptions() APITokenOptions {
+	return APITokenOptions{
+		APIURL:   gs.APIURL,
+		APIToken: gs.APIToken,
+	}
+}
+
+// Validate implements TokenClientSettings interface
+func (gs APITokenAPISettings) Validate() error {
+	if gs.APIURL == "" {
+		return fmt.Errorf("api-url endpoint required")
+	}
+	if gs.APIToken == "" {
+		return fmt.Errorf("api token required")
 	}
 	return nil
 }
@@ -179,12 +231,6 @@ func (gs PasswordAPISettings) Validate() error {
 	}
 	if gs.Password == "" {
 		return fmt.Errorf("password required")
-	}
-	if gs.APIURL == "" {
-		return fmt.Errorf("api url required. APIURL")
-	}
-	if gs.Name == "" {
-		return fmt.Errorf("name required")
 	}
 	return nil
 }

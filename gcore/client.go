@@ -65,6 +65,27 @@ func AuthenticatedClientWithDebug(options gcorecloud.AuthOptions, debug bool) (*
 	return client, err
 }
 
+func APITokenClient(options gcorecloud.APITokenOptions) (*gcorecloud.ProviderClient, error) {
+	client, err := NewGCoreClient(options.APIURL)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := client.SetAPIToken(options); err != nil {
+		return nil, err
+	}
+	return client, nil
+}
+
+func APITokenClientWithDebug(options gcorecloud.APITokenOptions, debug bool) (*gcorecloud.ProviderClient, error) {
+	client, err := APITokenClient(options)
+	if err != nil {
+		return nil, err
+	}
+	client.SetDebug(debug)
+	return client, err
+}
+
 func TokenClient(options gcorecloud.TokenOptions) (*gcorecloud.ProviderClient, error) {
 	client, err := NewGCoreClient(options.APIURL)
 	if err != nil {
@@ -309,6 +330,14 @@ func initClientOpts(client *gcorecloud.ProviderClient, eo gcorecloud.EndpointOpt
 	sc.ResourceBase = url
 	sc.Type = clientType
 	return sc, nil
+}
+
+func APITokenClientServiceWithDebug(options gcorecloud.APITokenOptions, eo gcorecloud.EndpointOpts, debug bool) (*gcorecloud.ServiceClient, error) {
+	provider, err := APITokenClientWithDebug(options, debug)
+	if err != nil {
+		return nil, err
+	}
+	return ClientServiceFromProvider(provider, eo)
 }
 
 func TokenClientService(options gcorecloud.TokenOptions, eo gcorecloud.EndpointOpts) (*gcorecloud.ServiceClient, error) {
