@@ -33,6 +33,21 @@ const ListResponse = `
           "revision_number": 0,
           "created_at": "2019-07-26T13:25:03+0000",
           "ethertype": "IPv4"
+        },
+        {
+          "description": null,
+          "direction": "egress",
+          "port_range_max": null,
+          "updated_at": "2019-07-26T13:25:03+0000",
+          "remote_group_id": null,
+          "id": "253c1ad7-8061-44b9-9f33-5616ad8ba5b6",
+          "protocol": "50",
+          "security_group_id": "3addc7a1-e926-46da-b5a2-eb4b2f935230",
+          "remote_ip_prefix": null,
+          "port_range_min": null,
+          "revision_number": 0,
+          "created_at": "2019-07-26T13:25:03+0000",
+          "ethertype": "IPv4"
         }
       ],
       "id": "3addc7a1-e926-46da-b5a2-eb4b2f935230",
@@ -52,21 +67,36 @@ const GetResponse = `
   "updated_at": "2019-07-26T13:25:03+0000",
   "name": "default",
   "security_group_rules": [
-    {
-      "description": null,
-      "direction": "egress",
-      "port_range_max": null,
-      "updated_at": "2019-07-26T13:25:03+0000",
-      "remote_group_id": null,
-      "id": "253c1ad7-8061-44b9-9f33-5616ad8ba5b6",
-      "protocol": "51",
-      "security_group_id": "3addc7a1-e926-46da-b5a2-eb4b2f935230",
-      "remote_ip_prefix": null,
-      "port_range_min": null,
-      "revision_number": 0,
-      "created_at": "2019-07-26T13:25:03+0000",
-      "ethertype": "IPv4"
-    }
+	{
+	  "description": null,
+	  "direction": "egress",
+	  "port_range_max": null,
+	  "updated_at": "2019-07-26T13:25:03+0000",
+	  "remote_group_id": null,
+	  "id": "253c1ad7-8061-44b9-9f33-5616ad8ba5b6",
+	  "protocol": "51",
+	  "security_group_id": "3addc7a1-e926-46da-b5a2-eb4b2f935230",
+	  "remote_ip_prefix": null,
+	  "port_range_min": null,
+	  "revision_number": 0,
+	  "created_at": "2019-07-26T13:25:03+0000",
+	  "ethertype": "IPv4"
+	},
+	{
+	  "description": null,
+	  "direction": "egress",
+	  "port_range_max": null,
+	  "updated_at": "2019-07-26T13:25:03+0000",
+	  "remote_group_id": null,
+	  "id": "253c1ad7-8061-44b9-9f33-5616ad8ba5b6",
+	  "protocol": "50",
+	  "security_group_id": "3addc7a1-e926-46da-b5a2-eb4b2f935230",
+	  "remote_ip_prefix": null,
+	  "port_range_min": null,
+	  "revision_number": 0,
+	  "created_at": "2019-07-26T13:25:03+0000",
+	  "ethertype": "IPv4"
+	}
   ],
   "id": "3addc7a1-e926-46da-b5a2-eb4b2f935230",
   "revision_number": 4,
@@ -112,21 +142,36 @@ const CreateResponse = `
   "updated_at": "2019-07-26T13:25:03+0000",
   "name": "default",
   "security_group_rules": [
-    {
-      "description": null,
-      "direction": "egress",
-      "port_range_max": null,
-      "updated_at": "2019-07-26T13:25:03+0000",
-      "remote_group_id": null,
-      "id": "253c1ad7-8061-44b9-9f33-5616ad8ba5b6",
-      "protocol": "51",
-      "security_group_id": "3addc7a1-e926-46da-b5a2-eb4b2f935230",
-      "remote_ip_prefix": null,
-      "port_range_min": null,
-      "revision_number": 0,
-      "created_at": "2019-07-26T13:25:03+0000",
-      "ethertype": "IPv4"
-    }
+	{
+	  "description": null,
+	  "direction": "egress",
+	  "port_range_max": null,
+	  "updated_at": "2019-07-26T13:25:03+0000",
+	  "remote_group_id": null,
+	  "id": "253c1ad7-8061-44b9-9f33-5616ad8ba5b6",
+	  "protocol": "51",
+	  "security_group_id": "3addc7a1-e926-46da-b5a2-eb4b2f935230",
+	  "remote_ip_prefix": null,
+	  "port_range_min": null,
+	  "revision_number": 0,
+	  "created_at": "2019-07-26T13:25:03+0000",
+	  "ethertype": "IPv4"
+	},
+	{
+	  "description": null,
+	  "direction": "egress",
+	  "port_range_max": null,
+	  "updated_at": "2019-07-26T13:25:03+0000",
+	  "remote_group_id": null,
+	  "id": "253c1ad7-8061-44b9-9f33-5616ad8ba5b6",
+	  "protocol": "50",
+	  "security_group_id": "3addc7a1-e926-46da-b5a2-eb4b2f935230",
+	  "remote_ip_prefix": null,
+	  "port_range_min": null,
+	  "revision_number": 0,
+	  "created_at": "2019-07-26T13:25:03+0000",
+	  "ethertype": "IPv4"
+	}
   ],
   "id": "3addc7a1-e926-46da-b5a2-eb4b2f935230",
   "revision_number": 4,
@@ -170,6 +215,7 @@ var (
 	direction                 = types.RuleDirectionEgress
 	protocol                  = types.ProtocolTCP
 	sgProto                   = types.Protocol51
+	sgProto2                  = types.Protocol50
 
 	securityGroupRule1 = securitygroups.SecurityGroupRule{
 		ID:              groupRuleID,
@@ -194,21 +240,38 @@ var (
 		CreatedAt:      groupCreatedTime,
 		UpdatedAt:      &groupUpdatedTime,
 		RevisionNumber: 4,
-		SecurityGroupRules: []securitygroups.SecurityGroupRule{{
-			ID:              groupRuleID,
-			SecurityGroupID: groupID,
-			Direction:       direction,
-			RemoteGroupID:   nil,
-			EtherType:       &eitherType,
-			Protocol:        &sgProto,
-			PortRangeMax:    nil,
-			PortRangeMin:    nil,
-			Description:     nil,
-			RemoteIPPrefix:  nil,
-			CreatedAt:       groupCreatedTime,
-			UpdatedAt:       &groupUpdatedTime,
-			RevisionNumber:  0,
-		}},
+		SecurityGroupRules: []securitygroups.SecurityGroupRule{
+			{
+				ID:              groupRuleID,
+				SecurityGroupID: groupID,
+				Direction:       direction,
+				RemoteGroupID:   nil,
+				EtherType:       &eitherType,
+				Protocol:        &sgProto,
+				PortRangeMax:    nil,
+				PortRangeMin:    nil,
+				Description:     nil,
+				RemoteIPPrefix:  nil,
+				CreatedAt:       groupCreatedTime,
+				UpdatedAt:       &groupUpdatedTime,
+				RevisionNumber:  0,
+			},
+			{
+				ID:              groupRuleID,
+				SecurityGroupID: groupID,
+				Direction:       direction,
+				RemoteGroupID:   nil,
+				EtherType:       &eitherType,
+				Protocol:        &sgProto2,
+				PortRangeMax:    nil,
+				PortRangeMin:    nil,
+				Description:     nil,
+				RemoteIPPrefix:  nil,
+				CreatedAt:       groupCreatedTime,
+				UpdatedAt:       &groupUpdatedTime,
+				RevisionNumber:  0,
+			},
+		},
 		ProjectID: fake.ProjectID,
 		RegionID:  fake.RegionID,
 		Region:    "Luxembourg 1",

@@ -31,6 +31,7 @@ const (
 	ProtocolUDPLITE      Protocol      = "udplite"
 	ProtocolVRRP         Protocol      = "vrrp"
 	Protocol51           Protocol      = "51"
+	Protocol50           Protocol      = "50"
 	Protocol112          Protocol      = "112"
 )
 
@@ -171,6 +172,7 @@ func (p Protocol) IsValid() error {
 		ProtocolUDPLITE,
 		ProtocolVRRP,
 		Protocol51,
+		Protocol50,
 		Protocol112:
 		return nil
 	}
@@ -211,6 +213,7 @@ func (p Protocol) List() []Protocol {
 		ProtocolUDPLITE,
 		ProtocolVRRP,
 		Protocol51,
+		Protocol50,
 		Protocol112,
 	}
 }
