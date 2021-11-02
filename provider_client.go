@@ -98,7 +98,8 @@ type ProviderClient struct {
 
 	authResult AuthResult
 
-	debug bool
+	debug    bool
+	APIToken string
 }
 
 // reauthlock represents a set of attributes used to help in the reauthentication process.
@@ -113,6 +114,9 @@ type reauthlock struct {
 // AuthenticatedHeaders returns a map of HTTP headers that are common for all
 // authenticated service requests. Blocks if Reauthenticate is in progress.
 func (client *ProviderClient) AuthenticatedHeaders() (m map[string]string) {
+	if client.APIToken != "" {
+		return map[string]string{"Authorization": fmt.Sprintf("APIKey %s", client.APIToken)}
+	}
 	if client.IsThrowaway() {
 		return
 	}
@@ -173,6 +177,12 @@ func (client *ProviderClient) RefreshToken() string {
 		defer client.mut.RUnlock()
 	}
 	return client.RefreshTokenID
+}
+
+// SetAPIToken safely sets the value of the api token in the ProviderClient
+func (client *ProviderClient) SetAPIToken(opt APITokenOptions) error {
+	client.APIToken = opt.APIToken
+	return nil
 }
 
 // SetTokensAndAuthResult safely sets the value of the auth token in the

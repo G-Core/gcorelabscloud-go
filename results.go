@@ -563,6 +563,36 @@ func (jt *JSONRFC3339ZNoTNoZ) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// RFC3339Date describes a common time format used by some API responses.
+const RFC3339Date = "2006-01-02"
+
+// JSONRFC3339Date describes time.Time in RFC3339Date format
+type JSONRFC3339Date struct {
+	time.Time
+}
+
+// UnmarshalJSON - implements Unmarshaler interface for JSONRFC3339Date
+func (jt *JSONRFC3339Date) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	if s == "" {
+		return nil
+	}
+	t, err := time.Parse(RFC3339Date, s)
+	if err != nil {
+		return err
+	}
+	jt.Time = t
+	return nil
+}
+
+// MarshalJSON - implements Marshaler interface for JSONRFC3339Date
+func (jt *JSONRFC3339Date) MarshalJSON() ([]byte, error) {
+	return json.Marshal(jt.Format(RFC3339Date))
+}
+
 /*
 Link is an internal type to be used in packages of collection resources that are
 paginated in a certain way.
