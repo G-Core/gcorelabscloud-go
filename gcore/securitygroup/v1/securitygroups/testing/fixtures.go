@@ -26,7 +26,7 @@ const ListResponse = `
           "updated_at": "2019-07-26T13:25:03+0000",
           "remote_group_id": null,
           "id": "253c1ad7-8061-44b9-9f33-5616ad8ba5b6",
-          "protocol": "51",
+          "protocol": "0",
           "security_group_id": "3addc7a1-e926-46da-b5a2-eb4b2f935230",
           "remote_ip_prefix": null,
           "port_range_min": null,
@@ -74,7 +74,7 @@ const GetResponse = `
 	  "updated_at": "2019-07-26T13:25:03+0000",
 	  "remote_group_id": null,
 	  "id": "253c1ad7-8061-44b9-9f33-5616ad8ba5b6",
-	  "protocol": "51",
+	  "protocol": "0",
 	  "security_group_id": "3addc7a1-e926-46da-b5a2-eb4b2f935230",
 	  "remote_ip_prefix": null,
 	  "port_range_min": null,
@@ -149,7 +149,7 @@ const CreateResponse = `
 	  "updated_at": "2019-07-26T13:25:03+0000",
 	  "remote_group_id": null,
 	  "id": "253c1ad7-8061-44b9-9f33-5616ad8ba5b6",
-	  "protocol": "51",
+	  "protocol": "0",
 	  "security_group_id": "3addc7a1-e926-46da-b5a2-eb4b2f935230",
 	  "remote_ip_prefix": null,
 	  "port_range_min": null,
@@ -214,7 +214,7 @@ var (
 	eitherType                = types.EtherTypeIPv4
 	direction                 = types.RuleDirectionEgress
 	protocol                  = types.ProtocolTCP
-	sgProto                   = types.Protocol51
+	sgProto                   = types.Protocol0
 	sgProto2                  = types.Protocol50
 
 	securityGroupRule1 = securitygroups.SecurityGroupRule{
