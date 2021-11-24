@@ -2,6 +2,7 @@ package testing
 
 import (
 	"fmt"
+	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"net/http"
 	"testing"
 
@@ -62,6 +63,12 @@ func TestCreate(t *testing.T) {
 		Keypair:  "keypair",
 		Password: "password",
 		Username: "username",
+		Metadata: &instances.MetadataSetOpts{
+			Metadata: []instances.MetadataOpts{{
+				Key:   "env",
+				Value: "test",
+			}},
+		},
 	}
 
 	err := options.Validate()

@@ -57,17 +57,18 @@ type CreateOptsBuilder interface {
 
 // CreateOpts represents options used to create a instance.
 type CreateOpts struct {
-	Flavor        string                 `json:"flavor" required:"true"`
-	Names         []string               `json:"names,omitempty" validate:"required_without=NameTemplates"`
-	NameTemplates []string               `json:"name_templates,omitempty" validate:"required_without=Names"`
-	ImageID       string                 `json:"image_id,omitempty" validate:"required_without=AppTemplateID"`
-	AppTemplateID string                 `json:"apptemplate_id,omitempty" validate:"required_without=ImageID"`
-	Interfaces    []InterfaceOpts        `json:"interfaces" required:"true" validate:"required,dive"`
-	Keypair       string                 `json:"keypair_name,omitempty"`
-	Password      string                 `json:"password" validate:"omitempty,required_with=Username"`
-	Username      string                 `json:"username" validate:"omitempty,required_with=Password"`
-	UserData      string                 `json:"user_data,omitempty" validate:"omitempty,base64"`
-	AppConfig     map[string]interface{} `json:"app_config,omitempty" validate:"omitempty"`
+	Flavor        string                     `json:"flavor" required:"true"`
+	Names         []string                   `json:"names,omitempty" validate:"required_without=NameTemplates"`
+	NameTemplates []string                   `json:"name_templates,omitempty" validate:"required_without=Names"`
+	ImageID       string                     `json:"image_id,omitempty" validate:"required_without=AppTemplateID"`
+	AppTemplateID string                     `json:"apptemplate_id,omitempty" validate:"required_without=ImageID"`
+	Interfaces    []InterfaceOpts            `json:"interfaces" required:"true" validate:"required,dive"`
+	Keypair       string                     `json:"keypair_name,omitempty"`
+	Password      string                     `json:"password" validate:"omitempty,required_with=Username"`
+	Username      string                     `json:"username" validate:"omitempty,required_with=Password"`
+	UserData      string                     `json:"user_data,omitempty" validate:"omitempty,base64"`
+	AppConfig     map[string]interface{}     `json:"app_config,omitempty" validate:"omitempty"`
+	Metadata      *instances.MetadataSetOpts `json:"metadata,omitempty" validate:"omitempty,dive"`
 }
 
 // Validate
@@ -90,6 +91,18 @@ func (opts CreateOpts) ToInstanceCreateMap() (map[string]interface{}, error) {
 		mp["app_config"] = opts.AppConfig
 	} else {
 		delete(mp, "app_config")
+	}
+	var metadata map[string]interface{}
+	if opts.Metadata != nil {
+		metadata, err = opts.Metadata.ToMetadataMap()
+		if err != nil {
+			return nil, err
+		}
+	}
+	if len(metadata) > 0 {
+		mp["metadata"] = metadata
+	} else {
+		delete(mp, "metadata")
 	}
 	return mp, nil
 }
