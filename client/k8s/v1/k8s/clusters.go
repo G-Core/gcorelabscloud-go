@@ -251,7 +251,7 @@ var clusterCreateSubCommand = cli.Command{
 			Aliases:     []string{"k"},
 			Usage:       "The name of the SSH keypair",
 			DefaultText: "nil",
-			Required:    false,
+			Required:    true,
 		},
 		&cli.StringFlag{
 			Name:     "fixed-subnet",
@@ -264,32 +264,27 @@ var clusterCreateSubCommand = cli.Command{
 			Required: true,
 		},
 		&cli.StringFlag{
-			Name:     "version",
-			Value:    "",
-			Usage:    "K8s cluster version",
-			Required: false,
+			Name:  "version",
+			Value: "",
+			Usage: "K8s cluster version",
 		},
 		&cli.BoolFlag{
-			Name:     "auto-healing-enabled",
-			Usage:    "cluster auto healing",
-			Required: false,
+			Name:  "auto-healing-enabled",
+			Usage: "cluster auto healing",
 		},
 		&cli.BoolFlag{
-			Name:     "master-lb-floating-ip-enabled",
-			Usage:    "use load balancer for K8s API",
-			Required: false,
+			Name:  "external-dns-enabled",
+			Usage: "cluster external dns",
 		},
 		&cli.StringFlag{
 			Name:        "pods-ip-pool",
 			Usage:       "cluster pods ip pool in CIDR notation",
 			DefaultText: "nil",
-			Required:    false,
 		},
 		&cli.StringFlag{
 			Name:        "services-ip-pool",
 			Usage:       "cluster services ip pool in CIDR notation",
 			DefaultText: "nil",
-			Required:    false,
 		},
 
 		// pools parameters
@@ -305,9 +300,8 @@ var clusterCreateSubCommand = cli.Command{
 			Required: true,
 		},
 		&cli.IntSliceFlag{
-			Name:     "docker-volume-size",
-			Usage:    "docker volume size for pool nodes",
-			Required: false,
+			Name:  "docker-volume-size",
+			Usage: "docker volume size for pool nodes",
 		},
 		&cli.StringSliceFlag{
 			Name:     "flavor-id",
@@ -330,8 +324,7 @@ var clusterCreateSubCommand = cli.Command{
 				Enum:    volumeTypeNames,
 				Default: volumeTypeNames[0],
 			},
-			Usage:    fmt.Sprintf("output in %s", strings.Join(volumeTypeNames, ", ")),
-			Required: false,
+			Usage: fmt.Sprintf("output in %s", strings.Join(volumeTypeNames, ", ")),
 		},
 	}, flags.WaitCommandFlags...,
 	),
@@ -369,6 +362,7 @@ var clusterCreateSubCommand = cli.Command{
 			PodsIPPool:                podsIPPool,
 			ServicesIPPool:            servicesIPPool,
 			AutoHealingEnabled:        c.Bool("auto-healing-enabled"),
+			ExternalDNSEnabled:        c.Bool("external-dns-enabled"),
 			MasterLBFloatingIPEnabled: masterLbFloatingIPEnabled,
 			Version:                   c.String("version"),
 			Pools:                     clusterPools,
