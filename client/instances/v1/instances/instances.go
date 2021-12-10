@@ -38,6 +38,7 @@ var Commands = cli.Command{
 		&instanceGetCommand,
 		&instanceListCommand,
 		&instanceCreateCommandV2,
+		&instanceRenameCommand,
 		&instanceDeleteCommand,
 		&instanceStartCommand,
 		&instanceStopCommand,
@@ -402,6 +403,42 @@ var instanceListSecurityGroupsCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 		utils.ShowResults(results, c.String("format"))
+		return nil
+	},
+}
+
+var instanceRenameCommand = cli.Command{
+	Name:      "rename",
+	Usage:     "Rename instance",
+	ArgsUsage: "<instance_id>",
+	Category:  "instance",
+	Flags: []cli.Flag{
+		&cli.StringFlag{
+			Name:     "name",
+			Aliases:  []string{"n"},
+			Usage:    "security group name",
+			Required: true,
+		},
+	},
+	Action: func(c *cli.Context) error {
+		instanceID, err := flags.GetFirstStringArg(c, instanceIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "rename")
+			return err
+		}
+		client, err := client.NewInstanceClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		opts := instances.RenameInstanceOpts{Name: c.String("name")}
+
+		instance, err := instances.RenameInstance(client, instanceID, opts).Extract()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		utils.ShowResults(instance, c.String("format"))
 		return nil
 	},
 }

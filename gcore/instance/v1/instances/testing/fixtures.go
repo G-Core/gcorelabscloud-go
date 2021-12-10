@@ -237,13 +237,19 @@ const InterfacesResponse = `
 }
 `
 
+const RenameInstanceRequest = `
+{
+	"name": "new-name"
+}
+`
+
 const CreateRequest = `
 {
   "flavor": "g1-standard-1-2",
   "interfaces": [
 	{
 	  "floating_ip": {
-		"existing_floating_id": "127.0.0.1",
+		"existing_floating_id": "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c",
 		"source": "existing"
 	  },
 	  "network_id": "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c",

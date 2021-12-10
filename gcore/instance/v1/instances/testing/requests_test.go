@@ -123,6 +123,10 @@ func prepareMetadataDetailsTestURL(id, key string) string {
 	return prepareGetActionDetailsTestURLParams("v1", id, "metadata", key)
 }
 
+func prepareRenameInstanceTestURL(id string) string {
+	return prepareGetTestURLParams("v1", fake.ProjectID, fake.RegionID, id)
+}
+
 func prepareGetTestURL(id string) string {
 	return prepareGetTestURLParams("v1", fake.ProjectID, fake.RegionID, id)
 }
@@ -222,6 +226,37 @@ func TestGet(t *testing.T) {
 	client := fake.ServiceTokenClient("instances", "v1")
 
 	ct, err := instances.Get(client, Instance1.ID).Extract()
+
+	require.NoError(t, err)
+	require.Equal(t, Instance1, *ct)
+
+}
+
+func TestRenameInstance(t *testing.T) {
+
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	testURL := prepareRenameInstanceTestURL(Instance1.ID)
+
+	th.Mux.HandleFunc(testURL, func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "PATCH")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		th.TestJSONRequest(t, r, RenameInstanceRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, GetResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("instances", "v1")
+
+	opts := instances.RenameInstanceOpts{Name: "new-name"}
+	ct, err := instances.RenameInstance(client, Instance1.ID, opts).Extract()
 
 	require.NoError(t, err)
 	require.Equal(t, Instance1, *ct)
@@ -424,7 +459,7 @@ func TestCreate(t *testing.T) {
 			SubnetID:  "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c",
 			FloatingIP: &instances.CreateNewInterfaceFloatingIPOpts{
 				Source:             types.ExistingFloatingIP,
-				ExistingFloatingID: "127.0.0.1",
+				ExistingFloatingID: "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c",
 			},
 		}},
 		Keypair:  "keypair",

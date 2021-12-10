@@ -14,6 +14,10 @@ func getURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceURL(c, id)
 }
 
+func renameInstanceURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceURL(c, id)
+}
+
 func deleteURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceURL(c, id)
 }

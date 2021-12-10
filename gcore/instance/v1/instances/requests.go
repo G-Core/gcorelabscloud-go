@@ -175,6 +175,28 @@ func (opts CreateOpts) ToInstanceCreateMap() (map[string]interface{}, error) {
 	return mp, nil
 }
 
+// RenameInstanceOptsBuilder allows extensions to add parameters to rename instance request.
+type RenameInstanceOptsBuilder interface {
+	ToRenameInstanceActionMap() (map[string]interface{}, error)
+}
+
+type RenameInstanceOpts struct {
+	Name string `json:"name" required:"true" validate:"required"`
+}
+
+// Validate.
+func (opts RenameInstanceOpts) Validate() error {
+	return gcorecloud.ValidateStruct(opts)
+}
+
+// ToRenameInstanceActionMap builds a request body from RenameInstanceOpts.
+func (opts RenameInstanceOpts) ToRenameInstanceActionMap() (map[string]interface{}, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, err
+	}
+	return gcorecloud.BuildRequestBody(opts, "")
+}
+
 // SecurityGroupOptsBuilder allows extensions to add parameters to the security groups request.
 type SecurityGroupOptsBuilder interface {
 	ToSecurityGroupActionMap() (map[string]interface{}, error)
@@ -313,6 +335,19 @@ func ListSecurityGroupsAll(client *gcorecloud.ServiceClient, id string) ([]gcore
 	}
 
 	return all, nil
+}
+
+// RenameInstance rename instance.
+func RenameInstance(client *gcorecloud.ServiceClient, id string, opts RenameInstanceOptsBuilder) (r GetResult) {
+	b, err := opts.ToRenameInstanceActionMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = client.Patch(renameInstanceURL(client, id), b, &r.Body, &gcorecloud.RequestOpts{ // nolint
+		OkCodes: []int{http.StatusOK},
+	})
+	return
 }
 
 // AssignSecurityGroup adds a security groups to the instance.
