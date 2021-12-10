@@ -37,7 +37,7 @@ const ListResponse = `
       "project_id": 1,
       "allowed_address_pairs": [
         {
-          "ip_address": "192.168.123.20",
+          "ip_address": "192.168.123.0/24",
           "mac_address": "00:16:3e:f2:87:16"
         }
       ],
@@ -85,7 +85,7 @@ const GetResponse = `
   "project_id": 1,
   "allowed_address_pairs": [
 	{
-	  "ip_address": "192.168.123.20",
+	  "ip_address": "192.168.123.0/24",
 	  "mac_address": "00:16:3e:f2:87:16"
 	}
   ],
@@ -233,7 +233,7 @@ var (
 		ProjectID: 1,
 		AllowedAddressPairs: []reservedfixedips.AllowedAddressPairs{
 			{
-				IPAddress:  net.ParseIP("192.168.123.20"),
+				IPAddress:  "192.168.123.0/24",
 				MacAddress: "00:16:3e:f2:87:16",
 			},
 		},

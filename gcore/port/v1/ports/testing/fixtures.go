@@ -212,6 +212,7 @@ var (
 	PortID                         = "1f0ca628-a73b-42c0-bdac-7b10d023e097"
 	PortMac, _                     = gcorecloud.ParseMacString("00:16:3e:f2:87:16")
 	PortIP1                        = net.ParseIP("192.168.123.20")
+	PortIPRaw1                     = "192.168.123.20"
 	PortIP2                        = net.ParseIP("192.168.120.16")
 	PortNetworkUpdatedAt, _        = time.Parse(gcorecloud.RFC3339Z, "2020-02-26T08:44:44+0000")
 	PortNetworkCreatedAt, _        = time.Parse(gcorecloud.RFC3339Z, "2020-02-26T08:44:08+0000")
@@ -320,7 +321,7 @@ var (
 		NetworkID: "351b0dd7-ca09-431c-be53-935db3785067",
 		AllowedAddressPairs: []reservedfixedips.AllowedAddressPairs{
 			{
-				IPAddress:  PortIP1,
+				IPAddress:  PortIPRaw1,
 				MacAddress: "00:16:3e:f2:87:16",
 			},
 		},

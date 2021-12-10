@@ -108,7 +108,7 @@ func TestAllowAddressPairs(t *testing.T) {
 
 	opts := ports.AllowAddressPairsOpts{
 		AllowedAddressPairs: []reservedfixedips.AllowedAddressPairs{{
-			IPAddress:  PortIP1,
+			IPAddress:  PortIPRaw1,
 			MacAddress: "00:16:3e:f2:87:16",
 		}},
 	}

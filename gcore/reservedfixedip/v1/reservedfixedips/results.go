@@ -57,7 +57,7 @@ type IPReservation struct {
 //AllowedAddressPairs represents the information of an allowed address pairs
 // for any particular ReservedFixedIP
 type AllowedAddressPairs struct {
-	IPAddress  net.IP `json:"ip_address"`
+	IPAddress  string `json:"ip_address"`
 	MacAddress string `json:"mac_address"`
 }
 

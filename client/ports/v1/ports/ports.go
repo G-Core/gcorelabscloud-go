@@ -2,8 +2,6 @@ package ports
 
 import (
 	"errors"
-	"net"
-
 	"github.com/G-Core/gcorelabscloud-go/client/ports/v1/client"
 	"github.com/G-Core/gcorelabscloud-go/gcore/port/v1/ports"
 	"github.com/G-Core/gcorelabscloud-go/gcore/reservedfixedip/v1/reservedfixedips"
@@ -123,7 +121,7 @@ func getAddressPairs(ips, macs []string) ([]reservedfixedips.AllowedAddressPairs
 	result := make([]reservedfixedips.AllowedAddressPairs, len(ips))
 	for i, ipRaw := range ips {
 		result[i] = reservedfixedips.AllowedAddressPairs{
-			IPAddress:  net.ParseIP(ipRaw),
+			IPAddress:  ipRaw,
 			MacAddress: macs[i],
 		}
 	}
