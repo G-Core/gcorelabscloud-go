@@ -50,7 +50,7 @@ var loadBalancerCreateSubCommand = cli.Command{
 		},
 		&cli.StringFlag{
 			Name:    "flavor",
-			Aliases: []string{"f"},
+			Aliases: []string{"fl"},
 			Usage:   "Loadbalancer flavor",
 		},
 		&cli.StringFlag{
