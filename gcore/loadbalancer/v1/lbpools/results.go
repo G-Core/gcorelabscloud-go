@@ -80,6 +80,9 @@ type Pool struct {
 	OperatingStatus       types.OperatingStatus       `json:"operating_status"`
 	CreatorTaskID         string                      `json:"creator_task_id"`
 	TaskID                string                      `json:"task_id"`
+	TimeoutClientData     int                         `json:"timeout_client_data"`
+	TimeoutMemberData     int                         `json:"timeout_member_data"`
+	TimeoutMemberConnect  int                         `json:"timeout_member_connect"`
 }
 
 // IsDeleted LB pool state.
