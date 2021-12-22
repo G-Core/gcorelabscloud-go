@@ -419,6 +419,24 @@ var lbpoolCreateSubCommand = cli.Command{
 			Usage:    "pool instance ID",
 			Required: false,
 		},
+		&cli.IntFlag{
+			Name:     "timeout-client-data",
+			Aliases:  []string{"tcd"},
+			Usage:    "frontend client inactivity timeout in milliseconds",
+			Required: false,
+		},
+		&cli.IntFlag{
+			Name:     "timeout-member-connect",
+			Aliases:  []string{"tmc"},
+			Usage:    "backend member connection timeout in milliseconds",
+			Required: false,
+		},
+		&cli.IntFlag{
+			Name:     "timeout-member-data",
+			Aliases:  []string{"tmd"},
+			Usage:    "backend member inactivity timeout in milliseconds",
+			Required: false,
+		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
 		client, err := client.NewLBPoolClientV1(c)
@@ -469,15 +487,22 @@ var lbpoolCreateSubCommand = cli.Command{
 			return cli.NewExitError(fmt.Errorf("either --loadbalancer or --listener should be set"), 1)
 		}
 
+		timeoutClientData := c.Int("timeout-client-data")
+		timeoutMemberConnect := c.Int("timeout-member-connect")
+		timeoutMemberData := c.Int("timeout-member-data")
+
 		opts := lbpools.CreateOpts{
-			Name:               c.String("name"),
-			Protocol:           pt,
-			LBPoolAlgorithm:    lba,
-			Members:            members,
-			LoadBalancerID:     c.String("loadbalancer"),
-			ListenerID:         c.String("listener"),
-			HealthMonitor:      hm,
-			SessionPersistence: sp,
+			Name:                 c.String("name"),
+			Protocol:             pt,
+			LBPoolAlgorithm:      lba,
+			Members:              members,
+			LoadBalancerID:       c.String("loadbalancer"),
+			ListenerID:           c.String("listener"),
+			HealthMonitor:        hm,
+			SessionPersistence:   sp,
+			TimeoutClientData:    timeoutClientData,
+			TimeoutMemberConnect: timeoutMemberConnect,
+			TimeoutMemberData:    timeoutMemberData,
 		}
 
 		results, err := lbpools.Create(client, opts).Extract()
@@ -645,6 +670,24 @@ var lbpoolUpdateSubCommand = cli.Command{
 			Usage:    "lbpool name",
 			Required: false,
 		},
+		&cli.IntFlag{
+			Name:     "timeout-client-data",
+			Aliases:  []string{"tcd"},
+			Usage:    "frontend client inactivity timeout in milliseconds",
+			Required: false,
+		},
+		&cli.IntFlag{
+			Name:     "timeout-member-connect",
+			Aliases:  []string{"tmc"},
+			Usage:    "backend member connection timeout in milliseconds",
+			Required: false,
+		},
+		&cli.IntFlag{
+			Name:     "timeout-member-data",
+			Aliases:  []string{"tmd"},
+			Usage:    "backend member inactivity timeout in milliseconds",
+			Required: false,
+		},
 		&cli.GenericFlag{
 			Name:    "algorithm",
 			Aliases: []string{"a"},
@@ -797,12 +840,22 @@ var lbpoolUpdateSubCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
+		timeoutClientData := c.Int("timeout-client-data")
+		timeoutMemberConnect := c.Int("timeout-member-connect")
+		timeoutMemberData := c.Int("timeout-member-data")
+
 		opts := lbpools.UpdateOpts{
-			Name:               c.String("name"),
-			Members:            members,
-			LBPoolAlgorithm:    *lba,
-			HealthMonitor:      hm,
-			SessionPersistence: sp,
+			Name:                 c.String("name"),
+			Members:              members,
+			HealthMonitor:        hm,
+			SessionPersistence:   sp,
+			TimeoutClientData:    timeoutClientData,
+			TimeoutMemberConnect: timeoutMemberConnect,
+			TimeoutMemberData:    timeoutMemberData,
+		}
+
+		if lba != nil {
+			opts.LBPoolAlgorithm = *lba
 		}
 
 		results, err := lbpools.Update(client, lbPoolID, opts).Extract()
