@@ -7,6 +7,6 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func NewLimitClientV1(c *cli.Context) (*gcorecloud.ServiceClient, error) {
-	return common.BuildClient(c, "limits_request", "v1")
+func NewLimitClientV2(c *cli.Context) (*gcorecloud.ServiceClient, error) {
+	return common.BuildClient(c, "limits_request", "v2")
 }

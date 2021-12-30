@@ -7,8 +7,8 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
@@ -221,29 +221,6 @@ func IntFromIndex(content []int, idx int, defaultValue int) int {
 	return defaultValue
 }
 
-func StringSliceToMap(slice []string) (map[string]string, error) {
-	m := make(map[string]string)
-	for _, s := range slice {
-		parts := strings.SplitN(s, "=", 2)
-		if len(parts) != 2 {
-			return nil, fmt.Errorf("wrong label format: %s", s)
-		}
-		m[parts[0]] = parts[1]
-	}
-	return m, nil
-}
-
-func StringSliceToMapNil(slice []string) (*map[string]string, error) {
-	if len(slice) == 0 {
-		return nil, nil
-	}
-	m, err := StringSliceToMap(slice)
-	if err != nil {
-		return nil, err
-	}
-	return &m, nil
-}
-
 func StringSliceToMapInterface(slice []string) (map[string]interface{}, error) {
 	m := make(map[string]interface{})
 	for _, s := range slice {
@@ -373,26 +350,62 @@ type Result struct {
 	Err     error
 }
 
-func GetItemsByIDs(items []string, getter func(item string) (Item, error)) chan Result {
-
-	var wg sync.WaitGroup
-	wg.Add(len(items))
-
-	ch := make(chan Result)
-
-	for _, item := range items {
-		go func(item string, wg *sync.WaitGroup) {
-			defer wg.Done()
-			res, err := getter(item)
-			ch <- Result{res, item, err}
-		}(item, &wg)
+// Find field name from struct by different key, example by `json`
+func getStructFieldName(tag, key string, s interface{}) string {
+	valueG := reflect.ValueOf(s).Elem()
+	rt := valueG.Type()
+	if rt.Kind() != reflect.Struct {
+		panic("bad type")
 	}
 
-	go func() {
-		wg.Wait()
-		defer close(ch)
-	}()
+	for i := 0; i < valueG.NumField(); i++ {
+		f := valueG.Type().Field(i) //.Name
+		v := strings.Split(f.Tag.Get(key), ",")[0]
+		if v == tag {
+			return f.Name
+		}
+	}
+	return ""
+}
 
-	return ch
+// Update struct from string by pattern key=value;
+func UpdateStructFromString(item interface{}, value string) error {
+	entries := strings.Split(value, ";")
+	r := reflect.ValueOf(item)
+	if r.Kind() == reflect.Ptr {
+		r = r.Elem()
+	}
+	for _, e := range entries {
+		parts := strings.Split(e, "=")
+		if len(parts) < 2 {
+			panic(fmt.Sprintf("Wrong some flag key and value format, should be key=value.\n %T", value))
+		}
+		jsonName := parts[0]
+		fieldName := getStructFieldName(jsonName, "json", item)
+		field := reflect.Indirect(r).FieldByName(fieldName)
+		value, err := strconv.ParseInt(parts[1], 10, 64)
+		if err != nil {
+			return err
+		}
+		field.SetInt(value)
+	}
+	return nil
+}
 
+// Make string from struct for example or documentation
+func StructToString(item interface{}) string {
+	valueG := reflect.ValueOf(item).Elem()
+	var fields []string
+	for i := 0; i < valueG.NumField(); i++ {
+		f := valueG.Type().Field(i) //.Name
+		jsonTag := f.Tag.Get("json")
+		if jsonTag == "-" || jsonTag == "" {
+			continue
+		}
+		name := strings.Split(jsonTag, ",")[0]
+		defaultName := fmt.Sprintf("%s=0", name)
+		fields = append(fields, defaultName)
+	}
+	result := strings.Join(fields, ";")
+	return result
 }
