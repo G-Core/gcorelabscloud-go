@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/G-Core/gcorelabscloud-go/gcore/limit/v1/types"
-
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/limit/v1/limits"
@@ -140,73 +138,6 @@ func TestCreate(t *testing.T) {
 	limit, err := limits.Create(client, options).Extract()
 	require.NoError(t, err)
 	require.Equal(t, LimitRequest1, *limit)
-}
-
-func TestUpdate(t *testing.T) {
-
-	th.SetupHTTP()
-	defer th.TeardownHTTP()
-
-	testURL := prepareItemTestURL()
-
-	th.Mux.HandleFunc(testURL, func(w http.ResponseWriter, r *http.Request) {
-		th.TestMethod(t, r, "PATCH")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
-		th.TestHeader(t, r, "Content-Type", "application/json")
-		th.TestHeader(t, r, "Accept", "application/json")
-		th.TestJSONRequest(t, r, UpdateRequest)
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-
-		_, err := fmt.Fprint(w, UpdateResponse)
-		if err != nil {
-			log.Error(err)
-		}
-	})
-
-	client := fake.ServiceTokenClient("limits_request", "v1")
-
-	options := limits.NewUpdateOpts()
-	options.ExternalIPCountLimit = 4
-
-	limit, err := limits.Update(client, limitRequestID, options).Extract()
-	require.NoError(t, err)
-	require.Equal(t, LimitRequest1, *limit)
-
-}
-
-func TestStatus(t *testing.T) {
-
-	th.SetupHTTP()
-	defer th.TeardownHTTP()
-
-	testURL := prepareItemTestURL()
-
-	th.Mux.HandleFunc(testURL, func(w http.ResponseWriter, r *http.Request) {
-		th.TestMethod(t, r, "PUT")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
-		th.TestHeader(t, r, "Content-Type", "application/json")
-		th.TestHeader(t, r, "Accept", "application/json")
-		th.TestJSONRequest(t, r, StatusRequest)
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-
-		_, err := fmt.Fprint(w, StatusResponse)
-		if err != nil {
-			log.Error(err)
-		}
-	})
-
-	client := fake.ServiceTokenClient("limits_request", "v1")
-
-	options := limits.StatusOpts{
-		Status: types.LimitRequestDone,
-	}
-
-	limit, err := limits.Status(client, limitRequestID, options).Extract()
-	require.NoError(t, err)
-	require.Equal(t, LimitRequest1, *limit)
-
 }
 
 func TestDelete(t *testing.T) {

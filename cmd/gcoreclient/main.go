@@ -17,7 +17,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/client/keystones/v1/keystones"
 	"github.com/G-Core/gcorelabscloud-go/client/l7policies/v1/l7policies"
 	"github.com/G-Core/gcorelabscloud-go/client/lifecyclepolicy/v1/lifecyclepolicy"
-	"github.com/G-Core/gcorelabscloud-go/client/limits/v1/limits"
+	"github.com/G-Core/gcorelabscloud-go/client/limits/v2/limits"
 	"github.com/G-Core/gcorelabscloud-go/client/loadbalancers/v1/loadbalancers"
 	"github.com/G-Core/gcorelabscloud-go/client/networks/v1/networks"
 	"github.com/G-Core/gcorelabscloud-go/client/ports/v1/ports"
