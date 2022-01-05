@@ -21,12 +21,13 @@ type ListOptsBuilder interface {
 
 // ListOpts allows the filtering and sorting of paginated collections through the API.
 type ListOpts struct {
-	ExcludeSecGroup   string `q:"exclude_secgroup"`
-	AvailableFloating bool   `q:"available_floating"`
-	Name              string `q:"name"`
-	FlavorID          string `q:"flavor_id"`
-	Limit             int    `q:"limit" validate:"omitempty,gt=0"`
-	Offset            int    `q:"offset" validate:"omitempty,gt=0"`
+	ExcludeSecGroup   string            `q:"exclude_secgroup"`
+	AvailableFloating bool              `q:"available_floating"`
+	Name              string            `q:"name"`
+	FlavorID          string            `q:"flavor_id"`
+	Limit             int               `q:"limit" validate:"omitempty,gt=0"`
+	Offset            int               `q:"offset" validate:"omitempty,gt=0"`
+	Metadata          map[string]string `q:"metadata_kv" validate:"omitempty"`
 }
 
 // ToInstanceListQuery formats a ListOpts into a query string.
