@@ -2,6 +2,7 @@ package limits
 
 import (
 	"github.com/G-Core/gcorelabscloud-go/client/limits/v2/client"
+	"github.com/G-Core/gcorelabscloud-go/client/utils"
 
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/gcore/limit/v2/limits"
@@ -11,6 +12,31 @@ import (
 var (
 	limitIDText = "limit_id is mandatory argument"
 )
+
+var limitGetCommand = cli.Command{
+	Name:      "show",
+	Usage:     "Get limit request",
+	ArgsUsage: "<limit_id>",
+	Category:  "limit",
+	Action: func(c *cli.Context) error {
+		limitID, err := flags.GetFirstIntArg(c, limitIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "show")
+			return err
+		}
+		client, err := client.NewLimitClientV2(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+		limitRequest, err := limits.Get(client, limitID).Extract()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		utils.ShowResults(limitRequest, c.String("format"))
+		return nil
+	},
+}
 
 var limitDeleteCommand = cli.Command{
 	Name:      "delete",
@@ -41,5 +67,6 @@ var Commands = cli.Command{
 	Usage: "GCloud limits API",
 	Subcommands: []*cli.Command{
 		&limitDeleteCommand,
+		&limitGetCommand,
 	},
 }
