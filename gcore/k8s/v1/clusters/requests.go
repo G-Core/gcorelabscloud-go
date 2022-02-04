@@ -91,6 +91,7 @@ type CreateOpts struct {
 	PodsIPPool                *gcorecloud.CIDR   `json:"pods_ip_pool,omitempty"`
 	ServicesIPPool            *gcorecloud.CIDR   `json:"services_ip_pool,omitempty"`
 	AutoHealingEnabled        bool               `json:"auto_healing_enabled"`
+	ExternalDNSEnabled        bool               `json:"external_dns_enabled"`
 	MasterLBFloatingIPEnabled bool               `json:"master_lb_floating_ip_enabled,omitempty"`
 	Version                   string             `json:"version,omitempty" validate:"omitempty,sem"`
 	Pools                     []pools.CreateOpts `json:"pools" required:"true" validate:"required,min=1,dive"`
