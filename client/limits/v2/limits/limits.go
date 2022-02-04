@@ -1,71 +1,43 @@
 package limits
 
 import (
-	"fmt"
+	"github.com/G-Core/gcorelabscloud-go/client/limits/v2/client"
+	"github.com/G-Core/gcorelabscloud-go/client/utils"
 	"reflect"
-	"sort"
 	"strings"
 
-	"github.com/G-Core/gcorelabscloud-go/client/limits/v1/client"
-
-	"github.com/G-Core/gcorelabscloud-go/gcore/limit/v1/types"
-
-	"github.com/iancoleman/strcase"
-
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
-	"github.com/G-Core/gcorelabscloud-go/client/utils"
-	"github.com/G-Core/gcorelabscloud-go/gcore/limit/v1/limits"
+	"github.com/G-Core/gcorelabscloud-go/gcore/limit/v2/limits"
 	"github.com/urfave/cli/v2"
 )
 
 var (
-	limitIDText              = "limit_id is mandatory argument"
-	limitRequestStatusesList = types.LimitRequestStatus("").StringList()
+	limitIDText = "limit_id is mandatory argument"
 )
 
-func commandFlags(required bool, value int) []cli.Flag {
-	limit := limits.Limit{}.ToRequestMap()
-	var res []cli.Flag
-	var fields []string
-	for f := range limit {
-		fields = append(fields, f)
-	}
-	sort.Strings(fields)
-	for _, f := range fields {
-		nameParts := strings.Split(f, "_")
-		usage := strings.Join(nameParts, " ")
-		name := strings.Join(nameParts, "-")
-		res = append(res, &cli.IntFlag{
-			Name:     name,
-			Usage:    usage,
-			Required: required,
-			Value:    value,
-		})
-	}
-	return res
-}
-
-func sanitizeFieldName(n string) string {
-	n = strings.ReplaceAll(n, "Ip", "IP")
-	n = strings.ReplaceAll(n, "Cpu", "CPU")
-	n = strings.ReplaceAll(n, "Vm", "VM")
-	n = strings.ReplaceAll(n, "Ram", "RAM")
-	return n
-}
-
 func buildLimitFromFlags(c *cli.Context) (limits.Limit, error) {
-	m := limits.Limit{}.ToRequestMap()
+	var err error
 	limit := limits.NewLimit()
-	slf := reflect.ValueOf(&limit)
-	s := slf.Elem()
-	for f := range m {
-		name := strings.ReplaceAll(f, "_", "-")
-		fieldName := sanitizeFieldName(strcase.ToCamel(name))
-		sf := s.FieldByName(fieldName)
-		if sf.IsValid() && sf.CanSet() && sf.Kind() == reflect.Int {
-			sf.SetInt(int64(c.Int(name)))
-		} else {
-			return limit, fmt.Errorf("cannot set field %s", fieldName)
+
+	if c.IsSet("global") {
+		globalFlagData := c.Generic("global")
+		err = limit.GlobalLimits.Update(globalFlagData)
+		if err != nil {
+			return limit, err
+		}
+	}
+
+	if c.IsSet("regions") {
+		regionalData := c.Generic("regions")
+		regionalEl := reflect.ValueOf(regionalData).Elem()
+		for _, key := range regionalEl.MapKeys() {
+			regionData := regionalEl.MapIndex(key).Interface()
+			newRegionalLimits := limits.RegionalLimits{}
+			err = newRegionalLimits.Update(regionData)
+			if err != nil {
+				return limit, err
+			}
+			limit.RegionalLimits = append(limit.RegionalLimits, newRegionalLimits)
 		}
 	}
 	return limit, nil
@@ -76,7 +48,7 @@ var limitListCommand = cli.Command{
 	Usage:    "List limit requests",
 	Category: "limit",
 	Action: func(c *cli.Context) error {
-		client, err := client.NewLimitClientV1(c)
+		client, err := client.NewLimitClientV2(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -101,7 +73,7 @@ var limitGetCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
 		}
-		client, err := client.NewLimitClientV1(c)
+		client, err := client.NewLimitClientV2(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -126,7 +98,7 @@ var limitDeleteCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
 		}
-		client, err := client.NewLimitClientV1(c)
+		client, err := client.NewLimitClientV2(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -139,6 +111,36 @@ var limitDeleteCommand = cli.Command{
 	},
 }
 
+type GlobalLimitsFlag limits.GlobalLimits
+
+func (g *GlobalLimitsFlag) Set(value string) error {
+	return utils.UpdateStructFromString(g, value)
+}
+
+func (g *GlobalLimitsFlag) String() string {
+	return utils.StructToString(g)
+}
+
+type RegionLimitsFlag map[int]limits.RegionalLimits
+
+func (g RegionLimitsFlag) Set(value string) error {
+	regionItems := strings.Split(value, ",")
+	for _, regionParams := range regionItems {
+		newRegion := limits.RegionalLimits{}
+		err := utils.UpdateStructFromString(&newRegion, regionParams)
+		if err != nil {
+			return err
+		}
+
+		g[newRegion.RegionID] = newRegion
+	}
+	return nil
+}
+
+func (g RegionLimitsFlag) String() string {
+	return utils.StructToString(&limits.RegionalLimits{})
+}
+
 var limitCreateCommand = cli.Command{
 	Name:     "create",
 	Usage:    "Create limit request",
@@ -149,7 +151,18 @@ var limitCreateCommand = cli.Command{
 			Usage:    "limit request description",
 			Required: true,
 		},
-	}, commandFlags(false, limits.Sentinel)...),
+		&cli.GenericFlag{
+			Name:  "global",
+			Value: &GlobalLimitsFlag{},
+			Usage: "Create global limits, example [--global=key=value;key2=value2]",
+		},
+		&cli.GenericFlag{
+			Name:  "regions",
+			Value: &RegionLimitsFlag{},
+			Usage: "Create regional limits. Use & for separate few regions with key/value content.\n" +
+				"Example [--regions=region_id=1;key=value&region_id=2;key=value]",
+		},
+	}),
 	Action: func(c *cli.Context) error {
 
 		requestedLimits, err := buildLimitFromFlags(c)
@@ -164,7 +177,7 @@ var limitCreateCommand = cli.Command{
 			RequestedQuotas: requestedLimits,
 		}
 
-		client, err := client.NewLimitClientV1(c)
+		client, err := client.NewLimitClientV2(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -185,8 +198,8 @@ var Commands = cli.Command{
 	Usage: "GCloud limits API",
 	Subcommands: []*cli.Command{
 		&limitListCommand,
-		&limitGetCommand,
-		&limitCreateCommand,
 		&limitDeleteCommand,
+		&limitCreateCommand,
+		&limitGetCommand,
 	},
 }

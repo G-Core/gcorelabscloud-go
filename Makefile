@@ -53,7 +53,7 @@ test: unit functional
 
 check: work fmt vet goimports golangci
 unit: work
-	go test -tags=unit $(TESTARGS) ./...
+	go test -count=1 -v $(TESTARGS) ./...
 
 functional:
 	@echo "$@ not yet implemented"
