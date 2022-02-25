@@ -5,16 +5,43 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
-func List(c *gcorecloud.ServiceClient) pagination.Pager {
+// ListOptsBuilder allows extensions to add additional parameters to the List request.
+type ListOptsBuilder interface {
+	ToInstanceListQuery() (string, error)
+}
+
+// ListOpts allows the filtering and sorting of paginated collections through the API.
+type ListOpts struct {
+	NetworkID   string            `q:"network_id"`
+	NetworkType string            `q:"network_type"`
+}
+
+// ToInstanceListQuery formats a ListOpts into a query string.
+func (opts ListOpts) ToInstanceListQuery() (string, error) {
+	q, err := gcorecloud.BuildQueryString(opts)
+	if err != nil {
+		return "", err
+	}
+	return q.String(), err
+}
+
+func List(c *gcorecloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
 	url := listURL(c)
+	if opts != nil {
+		query, err := opts.ToInstanceListQuery()
+		if err != nil {
+			return pagination.Pager{Err: err}
+		}
+		url += query
+	}
 	return pagination.NewPager(c, url, func(r pagination.PageResult) pagination.Page {
 		return NetworkPage{pagination.LinkedPageBase{PageResult: r}}
 	})
 }
 
 // ListAll is a convenience function that returns all networks.
-func ListAll(client *gcorecloud.ServiceClient) ([]Network, error) {
-	pages, err := List(client).AllPages()
+func ListAll(client *gcorecloud.ServiceClient, opts ListOptsBuilder) ([]Network, error) {
+	pages, err := List(client, opts).AllPages()
 	if err != nil {
 		return nil, err
 	}
@@ -25,5 +52,4 @@ func ListAll(client *gcorecloud.ServiceClient) ([]Network, error) {
 	}
 
 	return all, nil
-
 }
