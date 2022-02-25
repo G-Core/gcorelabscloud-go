@@ -509,7 +509,7 @@ func BuildQueryString(opts interface{}) (*url.URL, error) {
 							var s []string
 							for _, k := range v.MapKeys() {
 								value := v.MapIndex(k).String()
-								s = append(s, fmt.Sprintf("'%s':'%s'", k.String(), value))
+								s = append(s, fmt.Sprintf("%q:%q", k.String(), value))
 							}
 							params.Add(tags[0], fmt.Sprintf("{%s}", strings.Join(s, ", ")))
 						}
