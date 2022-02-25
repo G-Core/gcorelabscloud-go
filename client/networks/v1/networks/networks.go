@@ -43,13 +43,33 @@ var availableNetworkListCommand = cli.Command{
 	Name:     "list-available",
 	Usage:    "List available networks",
 	Category: "network",
+	Flags: []cli.Flag{
+		&cli.StringFlag{
+			Name:     "network-id",
+			Aliases:  []string{"i"},
+			Usage:    "show subnets of the specific network",
+			Required: false,
+		},
+		&cli.StringFlag{
+			Name:     "network-type",
+			Aliases:  []string{"t"},
+			Usage:    "filter network by network type (vlan or vxlan)",
+			Required: false,
+		},
+	},
 	Action: func(c *cli.Context) error {
 		client, err := client.NewAvailableNetworkClientV1(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		result, err := availablenetworks.ListAll(client)
+
+		opts := availablenetworks.ListOpts{
+			NetworkID: c.String("network-id"),
+			NetworkType: c.String("network-type"),
+		}
+
+		result, err := availablenetworks.ListAll(client, opts)
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
