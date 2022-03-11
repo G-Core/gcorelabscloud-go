@@ -54,6 +54,7 @@ type Region struct {
 	CreatedOn         gcorecloud.JSONRFC3339NoZ `json:"created_on"`
 	KeystoneID        int                       `json:"keystone_id"`
 	Keystone          keystones.Keystone        `json:"keystone"`
+	HasBaremetal      bool                      `json:"has_baremetal"`
 }
 
 // RegionPage is the page returned by a pager when traversing over a
