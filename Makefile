@@ -24,7 +24,7 @@ TEMP_DIR	:=$(shell mktemp -d)
 GOOS		?= $(shell go env GOOS)
 VERSION		?= $(shell git describe --tags 2> /dev/null || \
 			   git describe --match=$(git rev-parse --short=8 HEAD) --always --dirty --abbrev=8)
-GOARCH		:= amd64
+GOARCH		?= $(shell go env GOARCH)
 TAGS		:=
 LDFLAGS		:= "-w -s -X 'main.AppVersion=${VERSION}'"
 CMD_PACKAGE := ./cmd/gcoreclient
