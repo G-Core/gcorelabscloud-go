@@ -87,7 +87,7 @@ type CreateListenerOpts struct {
 // CreateOpts represents options used to create a loadbalancer.
 type CreateOpts struct {
 	Name         string               `json:"name" required:"true" validate:"required,name"`
-	Listeners    []CreateListenerOpts `json:"listeners" required:"true" validate:"required,dive"`
+	Listeners    []CreateListenerOpts `json:"listeners,omitempty" validate:"omitempty,dive"`
 	VipNetworkID string               `json:"vip_network_id,omitempty"`
 	VipSubnetID  string               `json:"vip_subnet_id,omitempty"`
 	Flavor       *string              `json:"flavor,omitempty"`
