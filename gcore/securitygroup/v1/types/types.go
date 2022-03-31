@@ -35,6 +35,7 @@ const (
 	Protocol112          Protocol      = "112"
 	Protocol0            Protocol      = "0"
 	ProtocolIPinIP       Protocol      = "4"
+	ProtocolIPIP         Protocol      = "ipip"
 )
 
 func (rd RuleDirection) IsValid() error {
@@ -177,7 +178,8 @@ func (p Protocol) IsValid() error {
 		Protocol50,
 		Protocol0,
 		Protocol112,
-		ProtocolIPinIP:
+		ProtocolIPinIP,
+		ProtocolIPIP:
 		return nil
 	}
 	return fmt.Errorf("invalid Protocol: %v", p)
@@ -221,6 +223,7 @@ func (p Protocol) List() []Protocol {
 		Protocol112,
 		Protocol0,
 		ProtocolIPinIP,
+		ProtocolIPIP,
 	}
 }
 
