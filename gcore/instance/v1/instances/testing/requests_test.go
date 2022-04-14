@@ -71,6 +71,10 @@ func prepareListSecurityGroupsTestURL(id string) string {
 	return prepareGetActionTestURLParams("v1", id, "securitygroups")
 }
 
+func prepareListPortsTestURL(id string) string {
+	return prepareGetActionTestURLParams("v1", id, "ports")
+}
+
 func prepareAssignSecurityGroupsTestURL(id string) string {
 	return prepareGetActionTestURLParams("v1", id, "addsecuritygroup")
 }
@@ -311,6 +315,31 @@ func TestListAllSecurityGroups(t *testing.T) {
 	require.Len(t, sgs, 1)
 	require.Equal(t, SecurityGroup1, sgs[0])
 	require.Equal(t, ExpectedSecurityGroupsSlice, sgs)
+}
+
+func TestListAllPorts(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareListPortsTestURL(Instance1.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, PortsListResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("instances", "v1")
+	ports, err := instances.ListPortsAll(client, instanceID)
+
+	require.NoError(t, err)
+	require.Len(t, ports, 1)
+	require.Equal(t, InstancePort1, ports[0])
+	require.Equal(t, ExpectedPortsSlice, ports)
 }
 
 func TestUnAssignSecurityGroups(t *testing.T) {

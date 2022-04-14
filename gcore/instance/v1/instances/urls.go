@@ -42,6 +42,10 @@ func securityGroupsListURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceActionURL(c, id, "securitygroups")
 }
 
+func portsListURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "ports")
+}
+
 func addSecurityGroupsURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceActionURL(c, id, "addsecuritygroup")
 }

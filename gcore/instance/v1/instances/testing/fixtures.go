@@ -293,6 +293,24 @@ const SecurityGroupsListResponse = `
 }
 `
 
+const PortsListResponse = `
+{
+  "count": 1,
+  "results": [
+    {
+      "id": "ae74714c-c380-48b4-87f8-758d656cdad6",
+      "name": "name",
+      "security_groups": [
+        {
+          "name": "Test",
+          "id": "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c"
+        }
+      ]
+    }
+  ]
+}
+`
+
 const AssignSecurityGroupsRequest = `
 {
   "name": "Test"
@@ -552,6 +570,11 @@ var (
 		ID:   "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c",
 		Name: "Test",
 	}
+	InstancePort1 = instances.InstancePorts{
+		ID:             "ae74714c-c380-48b4-87f8-758d656cdad6",
+		Name:           "name",
+		SecurityGroups: ExpectedSecurityGroupsSlice,
+	}
 	InstanceInterface1 = instances.Interface{
 		PortID:              PortID,
 		MacAddress:          *PortMac,
@@ -635,6 +658,7 @@ var (
 	ExpectedInstancesSlice          = []instances.Instance{Instance1}
 	ExpectedInstanceInterfacesSlice = []instances.Interface{InstanceInterface1}
 	ExpectedSecurityGroupsSlice     = []gcorecloud.ItemIDName{SecurityGroup1}
+	ExpectedPortsSlice              = []instances.InstancePorts{InstancePort1}
 	Tasks1                          = tasks.TaskResults{
 		Tasks: []tasks.TaskID{"50f53a35-42ed-40c4-82b2-5a37fb3e00bc"},
 	}

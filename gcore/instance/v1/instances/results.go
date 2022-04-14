@@ -248,6 +248,12 @@ type NetworkDetail struct {
 	CreatorTaskID *string                  `json:"creator_task_id"`
 }
 
+type InstancePorts struct {
+	ID             string                  `json:"id"`
+	Name           string                  `json:"name"`
+	SecurityGroups []gcorecloud.ItemIDName `json:"security_groups"`
+}
+
 // InstancePage is the page returned by a pager when traversing over a
 // collection of instances.
 type InstancePage struct {
@@ -269,6 +275,12 @@ type InstanceInterfacePage struct {
 // InstanceSecurityGroupPage is the page returned by a pager when traversing over a
 // collection of instance security groups.
 type InstanceSecurityGroupPage struct {
+	pagination.LinkedPageBase
+}
+
+// InstancePortsPage is the page returned by a pager when traversing over a
+// collection of instance ports.
+type InstancePortsPage struct {
 	pagination.LinkedPageBase
 }
 
@@ -314,6 +326,20 @@ func (r InstanceSecurityGroupPage) NextPageURL() (string, error) {
 	return gcorecloud.ExtractNextURL(s.Links)
 }
 
+// NextPageURL is invoked when a paginated collection of instance ports has reached
+// the end of a page and the pager seeks to traverse over a new one. In order
+// to do this, it needs to construct the next page's URL.
+func (r InstancePortsPage) NextPageURL() (string, error) {
+	var s struct {
+		Links []gcorecloud.Link `json:"links"`
+	}
+	err := r.ExtractInto(&s)
+	if err != nil {
+		return "", err
+	}
+	return gcorecloud.ExtractNextURL(s.Links)
+}
+
 // NextPageURL is invoked when a paginated collection of instance metadata objects has reached
 // the end of a page and the pager seeks to traverse over a new one. In order
 // to do this, it needs to construct the next page's URL.
@@ -343,6 +369,12 @@ func (r InstanceInterfacePage) IsEmpty() (bool, error) {
 // IsEmpty checks whether a InstanceSecurityGroupPage struct is empty.
 func (r InstanceSecurityGroupPage) IsEmpty() (bool, error) {
 	is, err := ExtractInstanceSecurityGroups(r)
+	return len(is) == 0, err
+}
+
+// IsEmpty checks whether a InstancePortsPage struct is empty.
+func (r InstancePortsPage) IsEmpty() (bool, error) {
+	is, err := ExtractInstancePorts(r)
 	return len(is) == 0, err
 }
 
@@ -379,6 +411,15 @@ func ExtractInstanceSecurityGroups(r pagination.Page) ([]gcorecloud.ItemIDName, 
 	return s, err
 }
 
+// ExtractInstancePorts accepts a Page struct, specifically a InstancePortsPage struct,
+// and extracts the elements into a slice of instance security group structs. In other words,
+// a generic collection is mapped into a relevant slice.
+func ExtractInstancePorts(r pagination.Page) ([]InstancePorts, error) {
+	var s []InstancePorts
+	err := ExtractInstancePortInto(r, &s)
+	return s, err
+}
+
 // ExtractMetadata accepts a Page struct, specifically a MetadataPage struct,
 // and extracts the elements into a slice of instance metadata structs. In other words,
 // a generic collection is mapped into a relevant slice.
@@ -398,6 +439,10 @@ func ExtractInstanceInterfacesInto(r pagination.Page, v interface{}) error {
 
 func ExtractInstanceSecurityGroupInto(r pagination.Page, v interface{}) error {
 	return r.(InstanceSecurityGroupPage).Result.ExtractIntoSlicePtr(v, "results")
+}
+
+func ExtractInstancePortInto(r pagination.Page, v interface{}) error {
+	return r.(InstancePortsPage).Result.ExtractIntoSlicePtr(v, "results")
 }
 
 func ExtractMetadataInto(r pagination.Page, v interface{}) error {

@@ -338,6 +338,29 @@ func ListSecurityGroupsAll(client *gcorecloud.ServiceClient, id string) ([]gcore
 	return all, nil
 }
 
+// ListPorts retrieves ports for instance
+func ListPorts(client *gcorecloud.ServiceClient, id string) pagination.Pager {
+	url := portsListURL(client, id)
+	return pagination.NewPager(client, url, func(r pagination.PageResult) pagination.Page {
+		return InstancePortsPage{pagination.LinkedPageBase{PageResult: r}}
+	})
+}
+
+// ListPortsAll is a convenience function that returns all instance ports.
+func ListPortsAll(client *gcorecloud.ServiceClient, id string) ([]InstancePorts, error) {
+	pages, err := ListPorts(client, id).AllPages()
+	if err != nil {
+		return nil, err
+	}
+
+	all, err := ExtractInstancePorts(pages)
+	if err != nil {
+		return nil, err
+	}
+
+	return all, nil
+}
+
 // RenameInstance rename instance.
 func RenameInstance(client *gcorecloud.ServiceClient, id string, opts RenameInstanceOptsBuilder) (r GetResult) {
 	b, err := opts.ToRenameInstanceActionMap()
