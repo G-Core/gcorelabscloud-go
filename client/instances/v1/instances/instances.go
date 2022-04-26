@@ -309,6 +309,12 @@ var instanceListCommand = cli.Command{
 			Usage:    "show only instances which are able to handle floating address",
 			Required: false,
 		},
+		&cli.BoolFlag{
+			Name:     "include-baremetal",
+			Aliases:  []string{"bm"},
+			Usage:    "include baremetal instances",
+			Required: false,
+		},
 		&cli.StringFlag{
 			Name:     "name",
 			Aliases:  []string{"n"},
@@ -343,6 +349,7 @@ var instanceListCommand = cli.Command{
 		opts := instances.ListOpts{
 			ExcludeSecGroup:   c.String("exclude-security-group"),
 			AvailableFloating: c.Bool("available-floating"),
+			IncludeBaremetal:  c.Bool("include-baremetal"),
 			Name:              c.String("name"),
 			FlavorID:          c.String("flavor_id"),
 			Limit:             c.Int("limit"),
