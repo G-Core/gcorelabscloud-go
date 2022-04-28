@@ -115,6 +115,7 @@ func deepDiffEqual(expected, actual reflect.Value, visited map[visit]bool, path 
 	switch expected.Kind() {
 	case reflect.Array:
 		for i := 0; i < expected.Len(); i++ {
+			// nolint:gocritic
 			hop := append(path, fmt.Sprintf("[%d]", i))
 			deepDiffEqual(expected.Index(i), actual.Index(i), visited, hop, logDifference)
 		}
@@ -128,7 +129,7 @@ func deepDiffEqual(expected, actual reflect.Value, visited map[visit]bool, path 
 			return
 		}
 		for i := 0; i < expected.Len(); i++ {
-			hop := append(path, fmt.Sprintf("[%d]", i))
+			hop := append(path, fmt.Sprintf("[%d]", i)) // nolint:gocritic
 			deepDiffEqual(expected.Index(i), actual.Index(i), visited, hop, logDifference)
 		}
 		return
@@ -145,7 +146,7 @@ func deepDiffEqual(expected, actual reflect.Value, visited map[visit]bool, path 
 	case reflect.Struct:
 		for i, n := 0, expected.NumField(); i < n; i++ {
 			field := expected.Type().Field(i)
-			hop := append(path, "."+field.Name)
+			hop := append(path, "."+field.Name) // nolint:gocritic
 			deepDiffEqual(expected.Field(i), actual.Field(i), visited, hop, logDifference)
 		}
 		return
@@ -178,6 +179,7 @@ func deepDiffEqual(expected, actual reflect.Value, visited map[visit]bool, path 
 				return
 			}
 
+			// nolint:gocritic
 			hop := append(path, fmt.Sprintf("[%v]", k))
 			deepDiffEqual(expectedValue, actualValue, visited, hop, logDifference)
 		}

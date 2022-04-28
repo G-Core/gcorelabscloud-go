@@ -27,7 +27,7 @@ func TestCreateOpts(t *testing.T) {
 			},
 		},
 	}
-	mp, err := options.ToRouterCreateMap()
+	_, err := options.ToRouterCreateMap()
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "NetworkID")
 
@@ -45,7 +45,7 @@ func TestCreateOpts(t *testing.T) {
 			},
 		},
 	}
-	mp, err = options.ToRouterCreateMap()
+	_, err = options.ToRouterCreateMap()
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "Type")
 
@@ -74,7 +74,7 @@ func TestCreateOpts(t *testing.T) {
 			},
 		},
 	}
-	mp, err = options.ToRouterCreateMap()
+	_, err = options.ToRouterCreateMap()
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "Type")
 	require.Contains(t, err.Error(), "SubnetID")
@@ -103,7 +103,7 @@ func TestCreateOpts(t *testing.T) {
 			},
 		},
 	}
-	mp, err = options.ToRouterCreateMap()
+	mp, err := options.ToRouterCreateMap()
 	require.NoError(t, err)
 	s, err := json.Marshal(mp)
 	require.NoError(t, err)
@@ -121,7 +121,10 @@ func TestUpdateOpts(t *testing.T) {
 		},
 	}
 
-	mp, err := opts.ToRouterUpdateMap()
+	var err error
+	var mp map[string]interface{}
+
+	_, err = opts.ToRouterUpdateMap()
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "Type")
 

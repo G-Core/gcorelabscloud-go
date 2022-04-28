@@ -62,8 +62,8 @@ type UpdateOpts struct {
 	Routes              []subnets.HostRoute `json:"routes"`
 }
 
-//todo not actual now
-// ListOpts allows the filtering and sorting List API response.
+// ListOpts todo not actual now
+// ListOpts allows the filtering and sorting List API response
 type ListOpts struct {
 	ID        string `q:"id"`
 	Name      string `q:"name"`

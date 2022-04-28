@@ -363,7 +363,7 @@ var clusterCreateSubCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
-		//todo remove after cloud-api fix
+		// todo remove after cloud-api fix
 		masterLbFloatingIPEnabled := true
 
 		opts := clusters.CreateOpts{

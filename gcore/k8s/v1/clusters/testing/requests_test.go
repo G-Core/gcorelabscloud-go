@@ -24,7 +24,7 @@ func prepareListTestURLParams(projectID int, regionID int) string {
 }
 
 func prepareVersionURL() string {
-	return fmt.Sprintf("/v1/k8s/versions")
+	return "/v1/k8s/versions"
 }
 
 func prepareGetTestURLParams(projectID int, regionID int, id string) string {

@@ -158,7 +158,7 @@ func (t *TE) fixFileRefs() {
 		return
 	}
 	for k, v := range t.fileMaps {
-		tStr = strings.Replace(tStr, k, v, -1)
+		tStr = strings.ReplaceAll(tStr, k, v)
 	}
 	t.Bin = []byte(tStr)
 }

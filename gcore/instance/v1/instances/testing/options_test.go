@@ -226,7 +226,7 @@ func TestValidateCreateInstanceBlankSnapshotIDOpts(t *testing.T) {
 		Names:         []string{"name"},
 		NameTemplates: nil,
 		Volumes:       volumeOpts,
-		Interfaces: []instances.InterfaceOpts{{
+		Interfaces: []instances.InterfaceInstanceCreateOpts{{InterfaceOpts: instances.InterfaceOpts{
 			Type:      types.SubnetInterfaceType,
 			NetworkID: "28bfe198-a003-4283-8dca-ab5da4a71b62",
 			SubnetID:  "28bfe198-a003-4283-8dca-ab5da4a71b62",
@@ -234,7 +234,7 @@ func TestValidateCreateInstanceBlankSnapshotIDOpts(t *testing.T) {
 				Source:             types.ExistingFloatingIP,
 				ExistingFloatingID: "28bfe198-a003-4283-8dca-ab5da4a71b62",
 			},
-		}},
+		}}},
 		Keypair:  "",
 		Password: "",
 		Username: "",

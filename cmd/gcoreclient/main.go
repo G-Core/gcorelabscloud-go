@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/G-Core/gcorelabscloud-go/client/apitokens/v1/apitokens"
 	"os"
+
+	"github.com/G-Core/gcorelabscloud-go/client/apitokens/v1/apitokens"
 
 	"github.com/G-Core/gcorelabscloud-go/client/apptemplates/v1/apptemplates"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"

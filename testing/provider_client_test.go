@@ -369,7 +369,7 @@ func TestRequestReauthsAtMostOnce(t *testing.T) {
 		reauthCounterMutex.Lock()
 		reauthCounter++
 		reauthCounterMutex.Unlock()
-		//The actual token value does not matter, the endpoint does not check it.
+		// The actual token value does not matter, the endpoint does not check it.
 		return nil
 	}
 
@@ -382,14 +382,14 @@ func TestRequestReauthsAtMostOnce(t *testing.T) {
 	th.Mux.HandleFunc("/route", func(w http.ResponseWriter, r *http.Request) {
 		requestCounterMutex.Lock()
 		requestCounter++
-		//avoid infinite loop
+		// avoid infinite loop
 		if requestCounter == 10 {
 			http.Error(w, "too many requests", http.StatusTooManyRequests)
 			return
 		}
 		requestCounterMutex.Unlock()
 
-		//always reply 401, even immediately after reauthenticate
+		// always reply 401, even immediately after reauthenticate
 		http.Error(w, "unauthorized", http.StatusUnauthorized)
 	})
 

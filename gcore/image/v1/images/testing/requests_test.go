@@ -2,9 +2,10 @@ package testing
 
 import (
 	"fmt"
-	"github.com/G-Core/gcorelabscloud-go/gcore/image/v1/images/types"
 	"net/http"
 	"testing"
+
+	"github.com/G-Core/gcorelabscloud-go/gcore/image/v1/images/types"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/image/v1/images"
 

@@ -174,6 +174,7 @@ const GetResponse = `
 var CreateRequest = fmt.Sprintf(`
 {
   "auto_healing_enabled": false,
+  "external_dns_enabled": false,
   "fixed_network": "%s",
   "fixed_subnet": "%s",
   "keypair": "keypair",

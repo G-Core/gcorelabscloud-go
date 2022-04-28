@@ -2,9 +2,10 @@ package testing
 
 import (
 	"fmt"
-	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"net/http"
 	"testing"
+
+	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"

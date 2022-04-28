@@ -2,12 +2,13 @@ package testing
 
 import (
 	"fmt"
-	gcorecloud "github.com/G-Core/gcorelabscloud-go"
-	"github.com/G-Core/gcorelabscloud-go/gcore/router/v1/types"
-	"github.com/G-Core/gcorelabscloud-go/gcore/subnet/v1/subnets"
 	"net"
 	"net/http"
 	"testing"
+
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/router/v1/types"
+	"github.com/G-Core/gcorelabscloud-go/gcore/subnet/v1/subnets"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/router/v1/routers"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"

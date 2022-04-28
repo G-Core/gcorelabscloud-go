@@ -265,7 +265,7 @@ func allowedWithoutAll(fl validator.FieldLevel) bool {
 	params := splitParamsRegex.FindAllString(strings.TrimSpace(fl.Param()), -1)
 
 	for _, field := range params {
-		field = strings.Replace(field, "'", "", -1)
+		field = strings.ReplaceAll(field, "'", "")
 		notSet := requireCheckFieldKind(fl, field, true)
 		if !notSet && hasValue(fl) {
 			return false

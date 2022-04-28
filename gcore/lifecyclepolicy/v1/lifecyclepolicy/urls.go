@@ -1,8 +1,9 @@
 package lifecyclepolicy
 
 import (
-	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"strconv"
+
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 )
 
 func getURL(c *gcorecloud.ServiceClient, id int) string {

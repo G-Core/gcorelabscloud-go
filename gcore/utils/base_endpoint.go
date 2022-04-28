@@ -23,6 +23,7 @@ func BaseEndpoint(endpoint string) (string, error) {
 
 	if version := versionRe.FindString(path); version != "" {
 		versionIndex := strings.Index(path, version)
+		// nolint:gocritic
 		u.Path = path[:versionIndex]
 	}
 

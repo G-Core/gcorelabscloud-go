@@ -1,12 +1,10 @@
 package testing
 
 import (
+	"testing"
+
 	"github.com/G-Core/gcorelabscloud-go/client/limits/v2/limits"
 	"github.com/stretchr/testify/require"
-	"github.com/urfave/cli/v2"
-	"io/ioutil"
-	"os"
-	"testing"
 )
 
 func TestGlobalUpdateStructFromString(t *testing.T) {
@@ -23,19 +21,4 @@ func TestRegionalUpdateStructFromString(t *testing.T) {
 	expectedFlagValue := limits.RegionLimitsFlag{1: {RegionID: 1, SecretCountLimit: 1}, 2: {RegionID: 2, CPUCountLimit: 1}}
 	require.NoError(t, err)
 	require.Equal(t, *gl, expectedFlagValue)
-}
-
-func TestGenericOpts(t *testing.T) {
-	createCommand := limits.Commands.Subcommands[2]
-	app := &cli.App{Writer: ioutil.Discard, Description: "test"}
-
-	os.Args = []string{
-		"limit", "create", "--description=desc test",
-		"--global=keypair_count_limit=1;project_count_limit=2",
-		"--regions=region_id=1;cpu_count_limit=2",
-	}
-	app.Commands = append(app.Commands, createCommand)
-
-	err := app.Run(os.Args)
-	require.NoError(t, err)
 }

@@ -359,7 +359,7 @@ func getStructFieldName(tag, key string, s interface{}) string {
 	}
 
 	for i := 0; i < valueG.NumField(); i++ {
-		f := valueG.Type().Field(i) //.Name
+		f := valueG.Type().Field(i) // .Name
 		v := strings.Split(f.Tag.Get(key), ",")[0]
 		if v == tag {
 			return f.Name
@@ -368,7 +368,7 @@ func getStructFieldName(tag, key string, s interface{}) string {
 	return ""
 }
 
-// Update struct from string by pattern key=value;
+// UpdateStructFromString Update struct from string by pattern key=value;
 func UpdateStructFromString(item interface{}, value string) error {
 	entries := strings.Split(value, ";")
 	r := reflect.ValueOf(item)
@@ -392,12 +392,12 @@ func UpdateStructFromString(item interface{}, value string) error {
 	return nil
 }
 
-// Make string from struct for example or documentation
+// StructToString Make string from struct for example or documentation
 func StructToString(item interface{}) string {
 	valueG := reflect.ValueOf(item).Elem()
 	var fields []string
 	for i := 0; i < valueG.NumField(); i++ {
-		f := valueG.Type().Field(i) //.Name
+		f := valueG.Type().Field(i) // .Name
 		jsonTag := f.Tag.Get("json")
 		if jsonTag == "-" || jsonTag == "" {
 			continue

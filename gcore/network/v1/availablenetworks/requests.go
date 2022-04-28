@@ -12,8 +12,8 @@ type ListOptsBuilder interface {
 
 // ListOpts allows the filtering and sorting of paginated collections through the API.
 type ListOpts struct {
-	NetworkID   string            `q:"network_id"`
-	NetworkType string            `q:"network_type"`
+	NetworkID   string `q:"network_id"`
+	NetworkType string `q:"network_type"`
 }
 
 // ToAvailableNetworkListQuery formats a ListOpts into a query string.

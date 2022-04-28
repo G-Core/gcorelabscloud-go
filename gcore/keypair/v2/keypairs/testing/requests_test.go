@@ -17,7 +17,7 @@ import (
 )
 
 func prepareListTestURLParams() string {
-	return fmt.Sprintf("/v2/keypairs")
+	return "/v2/keypairs"
 }
 
 func prepareGetTestURLParams(id string) string {

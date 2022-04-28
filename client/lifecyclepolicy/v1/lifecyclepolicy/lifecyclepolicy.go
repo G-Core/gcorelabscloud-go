@@ -2,14 +2,15 @@ package lifecyclepolicy
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
+	"unicode/utf8"
+
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/client/lifecyclepolicy/v1/client"
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
 	"github.com/G-Core/gcorelabscloud-go/gcore/lifecyclepolicy/v1/lifecyclepolicy"
 	"github.com/urfave/cli/v2"
-	"strconv"
-	"strings"
-	"unicode/utf8"
 )
 
 const (
@@ -379,7 +380,7 @@ func extractCreateIntervalScheduleOpts(c *cli.Context) (*lifecyclepolicy.CreateI
 	return opts, nil
 }
 
-func extractCreateCronScheduleOpts(c *cli.Context) (opts *lifecyclepolicy.CreateCronScheduleOpts, err error) {
+func extractCreateCronScheduleOpts(c *cli.Context) (opts *lifecyclepolicy.CreateCronScheduleOpts) {
 	opts = &lifecyclepolicy.CreateCronScheduleOpts{
 		Timezone:  c.String("cron_timezone"),
 		Week:      c.String("cron_week"),
@@ -499,7 +500,7 @@ var addScheduleSubCommand = cli.Command{
 		var opts lifecyclepolicy.CreateScheduleOpts
 		switch common.Type {
 		case lifecyclepolicy.ScheduleTypeCron:
-			opts, err = extractCreateCronScheduleOpts(c)
+			opts = extractCreateCronScheduleOpts(c)
 		case lifecyclepolicy.ScheduleTypeInterval:
 			opts, err = extractCreateIntervalScheduleOpts(c)
 		}

@@ -117,7 +117,6 @@ func BuildRequestBody(opts interface{}, parent string) (map[string]interface{}, 
 			f := optsType.Field(i)
 
 			if f.Name != strings.Title(f.Name) {
-				//fmt.Printf("Skipping field: %s...\n", f.Name)
 				continue
 			}
 
@@ -126,14 +125,10 @@ func BuildRequestBody(opts interface{}, parent string) (map[string]interface{}, 
 				continue
 			}
 
-			//fmt.Printf("Starting on field: %s...\n", f.Name)
-
 			zero := isZero(v)
-			//fmt.Printf("v is zero?: %v\n", zero)
 
 			// if the field has a required tag that's set to "true"
 			if requiredTag := f.Tag.Get("required"); requiredTag == trueTag {
-				//fmt.Printf("Checking required field [%s]:\n\tv: %+v\n\tisZero:%v\n", f.Name, v.Interface(), zero)
 				// if the field's value is zero, return a missing-argument error
 				if zero {
 					// if the field has a 'required' tag, it can't have a zero-value
@@ -144,7 +139,6 @@ func BuildRequestBody(opts interface{}, parent string) (map[string]interface{}, 
 			}
 
 			if xorTag := f.Tag.Get("xor"); xorTag != "" {
-				//fmt.Printf("Checking `xor` tag for field [%s] with value %+v:\n\txorTag: %s\n", f.Name, v, xorTag)
 				xorField := optsValue.FieldByName(xorTag)
 				var xorFieldIsZero bool
 				if reflect.ValueOf(xorField.Interface()) == reflect.Zero(xorField.Type()) {
@@ -164,8 +158,6 @@ func BuildRequestBody(opts interface{}, parent string) (map[string]interface{}, 
 			}
 
 			if orTag := f.Tag.Get("or"); orTag != "" {
-				//fmt.Printf("Checking `or` tag for field with:\n\tname: %+v\n\torTag:%s\n", f.Name, orTag)
-				//fmt.Printf("field is zero?: %v\n", zero)
 				if zero {
 					orField := optsValue.FieldByName(orTag)
 					var orFieldIsZero bool
@@ -209,7 +201,6 @@ func BuildRequestBody(opts interface{}, parent string) (map[string]interface{}, 
 			}
 			if v.Kind() == reflect.Struct || (v.Kind() == reflect.Ptr && v.Elem().Kind() == reflect.Struct) {
 				if zero {
-					//fmt.Printf("value before change: %+v\n", optsValue.Field(i))
 					if jsonTag != "" {
 						jsonTagPieces := strings.Split(jsonTag, ",")
 						if len(jsonTagPieces) > 1 && jsonTagPieces[1] == "omitempty" {
@@ -219,22 +210,18 @@ func BuildRequestBody(opts interface{}, parent string) (map[string]interface{}, 
 										v.Set(reflect.Zero(v.Type()))
 									}
 								}
-								//fmt.Printf("value after change: %+v\n", optsValue.Field(i))
 							}
 						}
 					}
 					continue
 				}
 
-				//fmt.Printf("Calling BuildRequestBody with:\n\tv: %+v\n\tf.Name:%s\n", v.Interface(), f.Name)
 				_, err := BuildRequestBody(v.Interface(), f.Name)
 				if err != nil {
 					return nil, err
 				}
 			}
 		}
-
-		//fmt.Printf("opts: %+v \n", opts)
 
 		b, err := json.Marshal(opts)
 		if err != nil {
@@ -246,12 +233,9 @@ func BuildRequestBody(opts interface{}, parent string) (map[string]interface{}, 
 			return nil, err
 		}
 
-		//fmt.Printf("optsMap: %+v\n", optsMap)
-
 		if parent != "" {
 			optsMap = map[string]interface{}{parent: optsMap}
 		}
-		//fmt.Printf("optsMap after parent added: %+v\n", optsMap)
 		return optsMap, nil
 	}
 	// Return an error if the underlying type of 'opts' isn't a struct.
@@ -334,7 +318,6 @@ func isUnderlyingStructZero(v reflect.Value) bool {
 var t time.Time
 
 func isZero(v reflect.Value) bool {
-	//fmt.Printf("\n\nchecking isZero for value: %+v\n", v)
 	switch v.Kind() {
 	case reflect.Ptr:
 		if v.IsNil() {
@@ -361,7 +344,6 @@ func isZero(v reflect.Value) bool {
 	}
 	// Compare other types directly:
 	z := reflect.Zero(v.Type())
-	//fmt.Printf("zero type for value: %+v\n\n\n", z)
 	return v.Interface() == z.Interface()
 }
 
