@@ -119,6 +119,12 @@ const AttachDetachRequest = `
 }	
 `
 
+const UpdateRequest = `
+{
+  "name": "updated"
+}
+`
+
 const RetypeRequest = `
 {
   "volume_type": "ssd_hiiops"

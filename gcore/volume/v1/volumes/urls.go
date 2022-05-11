@@ -14,6 +14,10 @@ func getURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceURL(c, id)
 }
 
+func updateURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceURL(c, id)
+}
+
 func resourceActionURL(c *gcorecloud.ServiceClient, id, action string) string {
 	return c.ServiceURL(id, action)
 }

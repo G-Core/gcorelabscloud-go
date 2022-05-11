@@ -11,6 +11,11 @@ type CreateOptsBuilder interface {
 	ToVolumeCreateMap() (map[string]interface{}, error)
 }
 
+// UpdateOptsBuilder allows extensions to add additional parameters to the Update request
+type UpdateOptsBuilder interface {
+	ToVolumeUpdateMap() (map[string]interface{}, error)
+}
+
 // InstanceOperationOptsBuilder prepare data to proceed with Attach and Detach requests
 type InstanceOperationOptsBuilder interface {
 	ToVolumeInstanceOperationMap() (map[string]interface{}, error)
@@ -64,6 +69,24 @@ func (opts *CreateOpts) Validate() error {
 
 // ToVolumeCreateMap builds a request body.
 func (opts CreateOpts) ToVolumeCreateMap() (map[string]interface{}, error) {
+	err := gcorecloud.TranslateValidationError(opts.Validate())
+	if err != nil {
+		return nil, err
+	}
+	return gcorecloud.BuildRequestBody(opts, "")
+}
+
+// UpdateOpts represents options used to update a volume.
+type UpdateOpts struct {
+	Name string `json:"name" required:"true" validate:"required"`
+}
+
+func (opts *UpdateOpts) Validate() error {
+	return gcorecloud.Validate.Struct(opts)
+}
+
+// ToVolumeUpdateMap builds a request body.
+func (opts UpdateOpts) ToVolumeUpdateMap() (map[string]interface{}, error) {
 	err := gcorecloud.TranslateValidationError(opts.Validate())
 	if err != nil {
 		return nil, err
@@ -176,6 +199,17 @@ func Delete(c *gcorecloud.ServiceClient, volumeID string, opts DeleteOptsBuilder
 		url += query
 	}
 	_, r.Err = c.DeleteWithResponse(url, &r.Body, nil)
+	return
+}
+
+// Update accepts a UpdateOpts struct and update volume.
+func Update(c *gcorecloud.ServiceClient, volumeID string, opts UpdateOptsBuilder) (r UpdateResult) {
+	b, err := opts.ToVolumeUpdateMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = c.Patch(updateURL(c, volumeID), b, &r.Body, nil)
 	return
 }
 

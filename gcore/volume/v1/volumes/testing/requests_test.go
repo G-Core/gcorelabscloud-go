@@ -36,6 +36,10 @@ func prepareGetTestURL(id string) string {
 	return prepareGetTestURLParams(fake.ProjectID, fake.RegionID, id)
 }
 
+func prepareUpdateTestURL(id string) string {
+	return prepareGetTestURLParams(fake.ProjectID, fake.RegionID, id)
+}
+
 func prepareAttachTestURL(id string) string {
 	return prepareActionTestURLParams(fake.ProjectID, fake.RegionID, id, "attach")
 }
@@ -213,6 +217,35 @@ func TestDelete(t *testing.T) {
 	tasks, err := volumes.Delete(client, Volume1.ID, opts).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
+}
+
+func TestUpdate(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareUpdateTestURL(Volume1.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "PATCH")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestJSONRequest(t, r, UpdateRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, GetResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	options := volumes.UpdateOpts{
+		Name: "updated",
+	}
+
+	client := fake.ServiceTokenClient("volumes", "v1")
+	volume, err := volumes.Update(client, Volume1.ID, options).Extract()
+	require.NoError(t, err)
+	require.Equal(t, Volume1, *volume)
 }
 
 func TestAttach(t *testing.T) {
