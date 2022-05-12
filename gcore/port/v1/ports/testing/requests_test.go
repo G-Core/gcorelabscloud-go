@@ -96,7 +96,7 @@ func TestAllowAddressPairs(t *testing.T) {
 		th.TestHeader(t, r, "Accept", "application/json")
 		th.TestJSONRequest(t, r, allowedAddressPairsRequest)
 		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
+		w.WriteHeader(http.StatusOK)
 
 		_, err := fmt.Fprint(w, allowedAddressPairsResponse)
 		if err != nil {

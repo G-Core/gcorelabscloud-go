@@ -1,6 +1,8 @@
 package ports
 
 import (
+	"net/http"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/reservedfixedip/v1/reservedfixedips"
 )
@@ -47,6 +49,6 @@ func AllowAddressPairs(c *gcorecloud.ServiceClient, portID string, opts AllowAdd
 		r.Err = err
 		return
 	}
-	_, r.Err = c.Put(assignAllowedAddressPairsURL(c, portID), b, &r.Body, nil)
+	_, r.Err = c.Put(assignAllowedAddressPairsURL(c, portID), b, &r.Body, &gcorecloud.RequestOpts{OkCodes: []int{http.StatusOK}})
 	return
 }
