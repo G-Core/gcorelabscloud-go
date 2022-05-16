@@ -28,7 +28,7 @@ func ServiceClient() *gcorecloud.ServiceClient {
 
 func ServiceTokenClient(name string, version string) *gcorecloud.ServiceClient {
 	options := gcorecloud.TokenOptions{
-		APIURL:       testhelper.GCloudRefreshTokenIdentifyEndpoint(),
+		APIURL:       testhelper.Endpoint(),
 		AccessToken:  AccessToken,
 		RefreshToken: RefreshToken,
 		AllowReauth:  true,
@@ -48,7 +48,7 @@ func ServiceTokenClient(name string, version string) *gcorecloud.ServiceClient {
 
 func ServiceAuthClient(name string, version string) *gcorecloud.ServiceClient {
 	options := gcorecloud.AuthOptions{
-		APIURL:      testhelper.GCoreIdentifyEndpoint(),
+		APIURL:      testhelper.Endpoint(),
 		AuthURL:     testhelper.GCoreRefreshTokenIdentifyEndpoint(),
 		Username:    Username,
 		Password:    Password,

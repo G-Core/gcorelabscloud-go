@@ -1,6 +1,7 @@
 package gcore
 
 import (
+	"fmt"
 	"reflect"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
@@ -27,6 +28,7 @@ func NewGCoreClient(endpoint string) (*gcorecloud.ProviderClient, error) {
 
 	p := gcorecloud.NewProviderClient()
 	p.IdentityBase = base
+	p.APIBase = endpoint
 	p.IdentityEndpoint = endpoint
 	p.UseTokenLock()
 
@@ -121,11 +123,7 @@ func auth(client *gcorecloud.ProviderClient, endpoint string, options gcorecloud
 	}
 
 	if endpoint != "" {
-		base, err := utils.BaseRootEndpoint(endpoint)
-		if err != nil {
-			return err
-		}
-		identityClient.Endpoint = gcorecloud.NormalizeURL(base)
+		identityClient.Endpoint = gcorecloud.NormalizeURL(endpoint)
 	}
 
 	result := tokens.Create(identityClient, options)
@@ -180,11 +178,7 @@ func refreshPlatform(client *gcorecloud.ProviderClient, endpoint string, tokenOp
 	}
 
 	if endpoint != "" {
-		base, err := utils.BaseRootEndpoint(endpoint)
-		if err != nil {
-			return err
-		}
-		identityClient.Endpoint = gcorecloud.NormalizeURL(base)
+		identityClient.Endpoint = gcorecloud.NormalizeURL(endpoint)
 	}
 
 	result := tokens.RefreshPlatform(identityClient, tokenOptions)
@@ -313,7 +307,7 @@ func NewIdentity(client *gcorecloud.ProviderClient, eo gcorecloud.EndpointOpts) 
 func initClientOpts(client *gcorecloud.ProviderClient, eo gcorecloud.EndpointOpts, clientType string) (*gcorecloud.ServiceClient, error) {
 	sc := new(gcorecloud.ServiceClient)
 	eo.ApplyDefaults(clientType)
-	url, err := gcorecloud.DefaultEndpointLocator(client.IdentityBase)(eo)
+	url, err := gcorecloud.DefaultEndpointLocator(client.APIBase)(eo)
 	if err != nil {
 		return sc, err
 	}
@@ -322,11 +316,7 @@ func initClientOpts(client *gcorecloud.ProviderClient, eo gcorecloud.EndpointOpt
 		return sc, err
 	}
 	sc.ProviderClient = client
-	endpoint, err := utils.BaseVersionEndpoint(url)
-	if err != nil {
-		return sc, err
-	}
-	sc.Endpoint = endpoint
+	sc.Endpoint = fmt.Sprintf("%s%s/", client.APIBase, eo.Version)
 	sc.ResourceBase = url
 	sc.Type = clientType
 	return sc, nil

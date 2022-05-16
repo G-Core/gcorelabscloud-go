@@ -100,6 +100,7 @@ type ProviderClient struct {
 
 	debug    bool
 	APIToken string
+	APIBase  string
 }
 
 // reauthlock represents a set of attributes used to help in the reauthentication process.
