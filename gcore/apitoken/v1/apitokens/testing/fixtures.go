@@ -1,10 +1,11 @@
 package testing
 
 import (
+	"time"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/apitoken/v1/apitokens"
 	"github.com/G-Core/gcorelabscloud-go/gcore/apitoken/v1/types"
-	"time"
 )
 
 const ListResponse = `

@@ -78,6 +78,7 @@ const CreateRequest = `
   "listeners": [
     {
       "name": "listener_name",
+      "insert_x_forwarded": false,
       "protocol": "HTTP",
       "protocol_port": 80,
       "pools": [

@@ -86,8 +86,7 @@ func (it InterfaceType) StringList() []string {
 }
 
 func (it InterfaceType) IsValid() error {
-	switch it {
-	case SubnetInterfaceType:
+	if it == SubnetInterfaceType {
 		return nil
 	}
 	return fmt.Errorf("invalid GatewayType type: %v", it)

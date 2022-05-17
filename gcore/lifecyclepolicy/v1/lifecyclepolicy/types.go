@@ -3,6 +3,7 @@ package lifecyclepolicy
 import (
 	"encoding/json"
 	"fmt"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/shopspring/decimal"
 )
@@ -155,6 +156,7 @@ func (r RawSchedule) Cook() (Schedule, error) {
 	var typeStruct struct {
 		ScheduleType `json:"type"`
 	}
+	// nolint:staticcheck
 	if err := json.Unmarshal(r.RawMessage, &typeStruct); err != nil {
 		return nil, err
 	}

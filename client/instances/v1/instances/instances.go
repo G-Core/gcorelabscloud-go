@@ -197,14 +197,14 @@ func getInstanceVolumes(c *cli.Context) ([]instances.CreateVolumeOpts, error) {
 
 }
 
-func getInterfaces(c *cli.Context) ([]instances.InterfaceOpts, error) {
+func getInterfaces(c *cli.Context) ([]instances.InterfaceInstanceCreateOpts, error) {
 	interfaceTypes := utils.GetEnumStringSliceValue(c, "interface-type")
 	interfaceNetworkIDs := c.StringSlice("interface-network-id")
 	interfaceSubnetIDs := c.StringSlice("interface-subnet-id")
 	interfaceFloatingSources := utils.GetEnumStringSliceValue(c, "interface-floating-source")
 	interfaceFloatingIPs := c.StringSlice("interface-floating-ip")
 
-	res := make([]instances.InterfaceOpts, 0, len(interfaceTypes))
+	res := make([]instances.InterfaceInstanceCreateOpts, 0, len(interfaceTypes))
 
 	for idx, t := range interfaceTypes {
 		interfaceType := types.InterfaceType(t)
@@ -232,7 +232,7 @@ func getInterfaces(c *cli.Context) ([]instances.InterfaceOpts, error) {
 			return nil, err
 		}
 
-		res = append(res, opts)
+		res = append(res, instances.InterfaceInstanceCreateOpts{InterfaceOpts: opts})
 
 	}
 
@@ -692,6 +692,7 @@ var instanceCreateCommandV2 = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
+		// todo add security group mapping
 		instanceInterfaces, err := getInterfaces(c)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "create")

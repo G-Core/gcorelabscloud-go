@@ -2,11 +2,12 @@ package limits
 
 import (
 	"fmt"
-	gcorecloud "github.com/G-Core/gcorelabscloud-go"
-	"github.com/G-Core/gcorelabscloud-go/pagination"
 	"net/http"
 	"reflect"
 	"strings"
+
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
 // Limit represents a GlobalLimits structure.

@@ -34,10 +34,6 @@ func certificatesURL(c *gcorecloud.ServiceClient, id string) string {
 	return c.ServiceURL(id, "certificates")
 }
 
-func volumesURL(c *gcorecloud.ServiceClient, id string) string {
-	return c.ServiceURL(id, "volumes")
-}
-
 func getURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceURL(c, id)
 }

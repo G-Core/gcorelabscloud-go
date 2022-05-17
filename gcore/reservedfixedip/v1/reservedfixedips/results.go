@@ -47,21 +47,21 @@ type GetResult struct {
 	commonResult
 }
 
-//IPReservation represents the information of an ip reservation
+// IPReservation represents the information of an ip reservation
 type IPReservation struct {
 	Status       string  `json:"status"`
 	ResourceType *string `json:"resource_type"`
 	ResourceID   *string `json:"resource_id"`
 }
 
-//AllowedAddressPairs represents the information of an allowed address pairs
+// AllowedAddressPairs represents the information of an allowed address pairs
 // for any particular ReservedFixedIP
 type AllowedAddressPairs struct {
 	IPAddress  string `json:"ip_address"`
 	MacAddress string `json:"mac_address"`
 }
 
-//ReservedFixedIP represents a ReservedFixedIP structure.
+// ReservedFixedIP represents a ReservedFixedIP structure.
 type ReservedFixedIP struct {
 	PortID              string                  `json:"port_id"`
 	Name                string                  `json:"name"`

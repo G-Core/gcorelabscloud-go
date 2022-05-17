@@ -479,6 +479,18 @@ func ExtractInstanceIDFromTask(task *tasks.Task) (string, error) {
 	return result.Instances[0], nil
 }
 
+func ExtractInstancePortIDFromTask(task *tasks.Task) (string, error) {
+	var result InstanceTaskResult
+	err := gcorecloud.NativeMapToStruct(task.CreatedResources, &result)
+	if err != nil {
+		return "", fmt.Errorf("cannot decode instance information in task structure: %w", err)
+	}
+	if len(result.Ports) == 0 {
+		return "", fmt.Errorf("cannot decode instance information in task structure: %w", err)
+	}
+	return result.Ports[0], nil
+}
+
 type Metadata struct {
 	Key      string `json:"key"`
 	Value    string `json:"value"`

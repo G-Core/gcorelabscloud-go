@@ -2,6 +2,9 @@ package apitokens
 
 import (
 	"fmt"
+	"strings"
+	"time"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/client/apitokens/v1/client"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
@@ -9,8 +12,6 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/apitoken/v1/apitokens"
 	"github.com/G-Core/gcorelabscloud-go/gcore/apitoken/v1/types"
 	"github.com/urfave/cli/v2"
-	"strings"
-	"time"
 )
 
 var apiTokenIDText = "apitoken_id is mandatory argument"
@@ -48,11 +49,11 @@ var apiTokenListCommand = cli.Command{
 			Name:  "not-issued-by",
 			Usage: "User's ID. Use to get API tokens issued by anyone except a particular user.",
 		},
-		//todo: figure out
-		//&cli.BoolFlag{
-		//	Name: "deleted",
-		//	Usage: "If set, in the response wil be included only deleted tokens",
-		//},
+		// todo: figure out
+		// &cli.BoolFlag{
+		// 	Name: "deleted",
+		// 	Usage: "If set, in the response wil be included only deleted tokens",
+		// },
 	},
 	Action: func(c *cli.Context) error {
 		client, err := client.NewAPITokenClient(c)

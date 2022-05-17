@@ -17,12 +17,7 @@ var (
 	{
       "type": "interval",
       "max_quantity": 4,
-      "retention_time": {
-		"minutes": 0,
-		"days": 0,
-		"hours": 0,
-		"weeks": 0
-	  },
+      "retention_time": {},
 	  "resource_name_template": "test template name {volume_id}",
 	  "hours": 60,
 	  "minutes": 80,
@@ -40,10 +35,7 @@ var (
       "max_quantity": 5,
       "resource_name_template": "yet another test template name",
       "retention_time": {
-		"minutes": 0,
-        "days": 40,
-		"hours": 0,
-		"weeks": 0
+        "days": 40
       },
       "timezone": "Europe/Kirov",
       "week": "1,3,5",
@@ -82,18 +74,13 @@ var (
 		`{"volume_ids": ["c2d7afb7-888c-4234-8da0-6c3fc9298c17"]}`,
 	}
 	removeVolumesRequests = addVolumesRequests
-	addSchedulesRequests = `
+	addSchedulesRequests  = `
 {
   "schedules": [
 	{
       "type": "interval",
       "max_quantity": 4,
-      "retention_time": {
-		"minutes": 0,
-		"days": 0,
-		"hours": 0,
-		"weeks": 0
-	  },
+      "retention_time": {},
 	  "resource_name_template": "test template name {volume_id}",
 	  "hours": 60,
 	  "minutes": 80,
@@ -111,10 +98,7 @@ var (
       "max_quantity": 5,
       "resource_name_template": "yet another test template name",
       "retention_time": {
-		"minutes": 0,
-        "days": 40,
-		"hours": 0,
-		"weeks": 0
+        "days": 40
       },
       "timezone": "Europe/Kirov",
       "week": "1,3,5",

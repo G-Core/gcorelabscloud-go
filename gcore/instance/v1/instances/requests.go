@@ -117,22 +117,32 @@ func (opts InterfaceOpts) Validate() error {
 	return gcorecloud.ValidateStruct(opts)
 }
 
+type InterfaceInstanceCreateOpts struct {
+	InterfaceOpts
+	SecurityGroups []gcorecloud.ItemID `json:"security_groups,omitempty"`
+}
+
+// Validate
+func (opts InterfaceInstanceCreateOpts) Validate() error {
+	return gcorecloud.ValidateStruct(opts)
+}
+
 // CreateOpts represents options used to create a instance.
 type CreateOpts struct {
-	Flavor         string              `json:"flavor" required:"true"`
-	Names          []string            `json:"names,omitempty" validate:"required_without=NameTemplates"`
-	NameTemplates  []string            `json:"name_templates,omitempty" validate:"required_without=Names"`
-	Volumes        []CreateVolumeOpts  `json:"volumes" required:"true" validate:"required,dive"`
-	Interfaces     []InterfaceOpts     `json:"interfaces" required:"true" validate:"required,dive"`
-	SecurityGroups []gcorecloud.ItemID `json:"security_groups" validate:"omitempty,dive,uuid4"`
-	Keypair        string              `json:"keypair_name,omitempty"`
-	Password       string              `json:"password" validate:"omitempty,required_with=Username"`
-	Username       string              `json:"username" validate:"omitempty,required_with=Password"`
-	UserData       string              `json:"user_data" validate:"omitempty,base64"`
-	Metadata       *MetadataSetOpts    `json:"metadata,omitempty" validate:"omitempty,dive"`
-	Configuration  *MetadataSetOpts    `json:"configuration,omitempty" validate:"omitempty,dive"`
-	AllowAppPorts  bool                `json:"allow_app_ports,omitempty"`
-	ServerGroupID  string              `json:"servergroup_id,omitempty" validate:"omitempty,uuid4"`
+	Flavor         string                        `json:"flavor" required:"true"`
+	Names          []string                      `json:"names,omitempty" validate:"required_without=NameTemplates"`
+	NameTemplates  []string                      `json:"name_templates,omitempty" validate:"required_without=Names"`
+	Volumes        []CreateVolumeOpts            `json:"volumes" required:"true" validate:"required,dive"`
+	Interfaces     []InterfaceInstanceCreateOpts `json:"interfaces" required:"true" validate:"required,dive"`
+	SecurityGroups []gcorecloud.ItemID           `json:"security_groups" validate:"omitempty,dive,uuid4"`
+	Keypair        string                        `json:"keypair_name,omitempty"`
+	Password       string                        `json:"password" validate:"omitempty,required_with=Username"`
+	Username       string                        `json:"username" validate:"omitempty,required_with=Password"`
+	UserData       string                        `json:"user_data" validate:"omitempty,base64"`
+	Metadata       *MetadataSetOpts              `json:"metadata,omitempty" validate:"omitempty,dive"`
+	Configuration  *MetadataSetOpts              `json:"configuration,omitempty" validate:"omitempty,dive"`
+	AllowAppPorts  bool                          `json:"allow_app_ports,omitempty"`
+	ServerGroupID  string                        `json:"servergroup_id,omitempty" validate:"omitempty,uuid4"`
 }
 
 // Validate
@@ -205,7 +215,13 @@ type SecurityGroupOptsBuilder interface {
 }
 
 type SecurityGroupOpts struct {
-	Name string `json:"name" required:"true" validate:"required"`
+	Name                    string                   `json:"name,omitempty"`
+	PortsSecurityGroupNames []PortSecurityGroupNames `json:"ports_security_group_names,omitempty"`
+}
+
+type PortSecurityGroupNames struct {
+	PortID             *string  `json:"port_id"`
+	SecurityGroupNames []string `json:"security_group_names"`
 }
 
 // Validate.
@@ -226,7 +242,7 @@ type InterfaceOptsBuilder interface {
 	ToInterfaceActionMap() (map[string]interface{}, error)
 }
 
-// ToInterfaceActionMap builds a request body from CreateInterfaceOpts.
+// ToInterfaceActionMap builds a request body from InterfaceOpts.
 func (opts InterfaceOpts) ToInterfaceActionMap() (map[string]interface{}, error) {
 	if err := opts.Validate(); err != nil {
 		return nil, err

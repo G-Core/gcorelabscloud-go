@@ -65,7 +65,7 @@ var availableNetworkListCommand = cli.Command{
 		}
 
 		opts := availablenetworks.ListOpts{
-			NetworkID: c.String("network-id"),
+			NetworkID:   c.String("network-id"),
 			NetworkType: c.String("network-type"),
 		}
 

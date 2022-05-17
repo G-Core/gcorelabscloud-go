@@ -211,6 +211,7 @@ func parseMetadata(keys []string, values []string) (map[string]string, error) {
 	}
 
 	meta := map[string]string{}
+	// nolint:gosimple
 	for i, _ := range keys {
 		meta[keys[i]] = values[i]
 	}

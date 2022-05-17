@@ -39,6 +39,8 @@ func TestGetCron(t *testing.T) {
 
 	client := fake.ServiceTokenClient("schedule", "v1")
 	ct, err := schedules.Get(client, ScheduleCron1.ID).Extract()
+	require.NoError(t, err)
+
 	sc, err := ct.Cook()
 	require.NoError(t, err)
 	cronSchedule, ok := sc.(lifecyclepolicy.CronSchedule)
@@ -70,6 +72,8 @@ func TestGetInterval(t *testing.T) {
 
 	client := fake.ServiceTokenClient("schedule", "v1")
 	ct, err := schedules.Get(client, ScheduleInterval1.ID).Extract()
+	require.NoError(t, err)
+
 	sc, err := ct.Cook()
 	require.NoError(t, err)
 	intervalSchedule, ok := sc.(lifecyclepolicy.IntervalSchedule)
@@ -117,6 +121,7 @@ func TestUpdate(t *testing.T) {
 	}
 
 	ct, err := schedules.Update(client, ScheduleCron1.ID, opts).Extract()
+	require.NoError(t, err)
 	sc, err := ct.Cook()
 	require.NoError(t, err)
 	cronSchedule, ok := sc.(lifecyclepolicy.CronSchedule)

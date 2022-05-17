@@ -2,13 +2,14 @@ package testing
 
 import (
 	"fmt"
+	"net/http"
+	"testing"
+
 	"github.com/G-Core/gcorelabscloud-go/gcore/lifecyclepolicy/v1/lifecyclepolicy"
 	th "github.com/G-Core/gcorelabscloud-go/testhelper"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
-	"net/http"
-	"testing"
 )
 
 func getURL(id int) string {

@@ -10,7 +10,3 @@ import (
 func NewLifecyclePolicyClientV1(c *cli.Context) (*gcorecloud.ServiceClient, error) {
 	return common.BuildClient(c, "lifecycle_policy", "v1")
 }
-
-//func NewScheduleClientV1(c *cli.Context) (*gcorecloud.ServiceClient, error) {
-//	return common.BuildClient(c, "schedule", "v1")
-//}

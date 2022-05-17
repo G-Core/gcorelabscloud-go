@@ -8,14 +8,13 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/http"
 	"net/http/httputil"
 	"os"
-
-	log "github.com/sirupsen/logrus"
-
-	"net/http"
 	"strings"
 	"sync"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // DefaultUserAgent is the default User-Agent string set in the request header.
@@ -37,6 +36,7 @@ func (ua *UserAgent) Prepend(s ...string) {
 // Join concatenates all the user-defined User-Agent strings with the default
 // GCore cloud User-Agent string.
 func (ua *UserAgent) Join() string {
+	// nolint:gocritic
 	uaSlice := append(ua.prepend, DefaultUserAgent)
 	return strings.Join(uaSlice, " ")
 }
@@ -100,6 +100,7 @@ type ProviderClient struct {
 
 	debug    bool
 	APIToken string
+	APIBase  string
 }
 
 // reauthlock represents a set of attributes used to help in the reauthentication process.

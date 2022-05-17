@@ -2,15 +2,10 @@ package testhelper
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
-	"reflect"
 	"testing"
-
-	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -37,32 +32,8 @@ func Endpoint() string {
 	return Server.URL + "/"
 }
 
-func GCoreIdentifyEndpoint() string {
-	return fmt.Sprintf("%sauth/jwt/login", Endpoint())
-}
-
 func GCoreRefreshTokenIdentifyEndpoint() string {
-	return fmt.Sprintf("%sauth/jwt/refresh", Endpoint())
-}
-
-func GCloudRefreshTokenIdentifyEndpoint() string {
-	return fmt.Sprintf("%sv1/token/refresh", Endpoint())
-}
-
-// TestFormValues ensures that all the URL parameters given to the http.Request are the same as values.
-func TestFormValues(t *testing.T, r *http.Request, values map[string]string) {
-	want := url.Values{}
-	for k, v := range values {
-		want.Add(k, v)
-	}
-
-	err := r.ParseForm()
-	if err != nil {
-		log.Error(err)
-	}
-	if !reflect.DeepEqual(want, r.Form) {
-		t.Errorf("Request parameters = %v, want %v", r.Form, want)
-	}
+	return Endpoint()
 }
 
 // TestMethod checks that the Request has the expected method (e.g. GET, POST).

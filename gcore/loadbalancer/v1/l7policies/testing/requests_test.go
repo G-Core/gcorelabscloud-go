@@ -14,7 +14,6 @@ import (
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 )
 
-//v1/l7policies/{project_id}/{region_id}/{l7policy_id}/rules
 func prepareListPolicyTestURLParams(projectID int, regionID int) string {
 	return fmt.Sprintf("/v1/l7policies/%d/%d", projectID, regionID)
 }

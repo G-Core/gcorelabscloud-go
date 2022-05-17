@@ -43,7 +43,7 @@ func TestList(t *testing.T) {
 	client := fake.ServiceTokenClient("availablenetworks", "v1")
 	count := 0
 
-	err := availablenetworks.List(client).EachPage(func(page pagination.Page) (bool, error) {
+	err := availablenetworks.List(client, nil).EachPage(func(page pagination.Page) (bool, error) {
 		count++
 		actual, err := availablenetworks.ExtractNetworks(page)
 		require.NoError(t, err)
@@ -78,7 +78,7 @@ func TestListAll(t *testing.T) {
 
 	client := fake.ServiceTokenClient("availablenetworks", "v1")
 
-	actual, err := availablenetworks.ListAll(client)
+	actual, err := availablenetworks.ListAll(client, nil)
 	require.NoError(t, err)
 	ct := actual[0]
 	require.Equal(t, Network1, ct)

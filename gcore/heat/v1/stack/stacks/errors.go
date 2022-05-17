@@ -12,7 +12,7 @@ type ErrInvalidEnvironment struct {
 }
 
 func (e ErrInvalidEnvironment) Error() string {
-	return fmt.Sprintf("Environment has wrong section: %s", e.Section)
+	return fmt.Sprintf("environment has wrong section: %s", e.Section)
 }
 
 type ErrInvalidDataFormat struct {
@@ -20,7 +20,7 @@ type ErrInvalidDataFormat struct {
 }
 
 func (e ErrInvalidDataFormat) Error() string {
-	return fmt.Sprintf("Data in neither json nor yaml format.")
+	return "data in neither json nor yaml format"
 }
 
 type ErrInvalidTemplateFormatVersion struct {
@@ -29,7 +29,7 @@ type ErrInvalidTemplateFormatVersion struct {
 }
 
 func (e ErrInvalidTemplateFormatVersion) Error() string {
-	return fmt.Sprintf("Template format version not found.")
+	return "template format version not found"
 }
 
 type ErrTemplateRequired struct {
@@ -37,5 +37,5 @@ type ErrTemplateRequired struct {
 }
 
 func (e ErrTemplateRequired) Error() string {
-	return fmt.Sprintf("Template required for this function.")
+	return "template required for this function"
 }

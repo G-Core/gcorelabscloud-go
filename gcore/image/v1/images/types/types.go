@@ -16,10 +16,9 @@ type SshKeyType string
 // OSType the operating system installed on the image.
 type OSType string
 
-//HwFirmwareType specifies the type of firmware with which to boot the guest.
+// HwFirmwareType specifies the type of firmware with which to boot the guest.
 type HwFirmwareType string
 
-//ImageSourceType
 type ImageSourceType string
 
 const (
@@ -319,8 +318,7 @@ func (v *HwFirmwareType) MarshalJSON() ([]byte, error) {
 }
 
 func (v ImageSourceType) IsValid() error {
-	switch v {
-	case ImageSourceVolume:
+	if v == ImageSourceVolume {
 		return nil
 	}
 	return fmt.Errorf("invalid ImageSourceType type: %v", v)

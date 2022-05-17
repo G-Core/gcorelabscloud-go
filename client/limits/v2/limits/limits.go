@@ -1,10 +1,11 @@
 package limits
 
 import (
-	"github.com/G-Core/gcorelabscloud-go/client/limits/v2/client"
-	"github.com/G-Core/gcorelabscloud-go/client/utils"
 	"reflect"
 	"strings"
+
+	"github.com/G-Core/gcorelabscloud-go/client/limits/v2/client"
+	"github.com/G-Core/gcorelabscloud-go/client/utils"
 
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/gcore/limit/v2/limits"
@@ -145,7 +146,7 @@ var limitCreateCommand = cli.Command{
 	Name:     "create",
 	Usage:    "Create limit request",
 	Category: "limit",
-	Flags: append([]cli.Flag{
+	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:     "description",
 			Usage:    "limit request description",
@@ -162,7 +163,7 @@ var limitCreateCommand = cli.Command{
 			Usage: "Create regional limits. Use & for separate few regions with key/value content.\n" +
 				"Example [--regions=region_id=1;key=value&region_id=2;key=value]",
 		},
-	}),
+	},
 	Action: func(c *cli.Context) error {
 
 		requestedLimits, err := buildLimitFromFlags(c)
