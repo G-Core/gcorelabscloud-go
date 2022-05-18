@@ -1,6 +1,7 @@
 package instances
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/flavor/v1/flavors"
@@ -119,7 +120,7 @@ func (opts InterfaceOpts) Validate() error {
 
 type InterfaceInstanceCreateOpts struct {
 	InterfaceOpts
-	SecurityGroups []gcorecloud.ItemID `json:"security_groups,omitempty"`
+	SecurityGroups []gcorecloud.ItemID `json:"security_groups"`
 }
 
 // ToInterfaceActionMap builds a request body from InterfaceOpts.
@@ -127,7 +128,9 @@ func (opts InterfaceInstanceCreateOpts) ToInterfaceActionMap() (map[string]inter
 	if err := opts.Validate(); err != nil {
 		return nil, err
 	}
-	return gcorecloud.BuildRequestBody(opts, "")
+	result, err := gcorecloud.BuildRequestBody(opts, "")
+	log.Println(result)
+	return result, err
 }
 
 // Validate
@@ -142,7 +145,7 @@ type CreateOpts struct {
 	NameTemplates  []string                      `json:"name_templates,omitempty" validate:"required_without=Names"`
 	Volumes        []CreateVolumeOpts            `json:"volumes" required:"true" validate:"required,dive"`
 	Interfaces     []InterfaceInstanceCreateOpts `json:"interfaces" required:"true" validate:"required,dive"`
-	SecurityGroups []gcorecloud.ItemID           `json:"security_groups" validate:"omitempty,dive,uuid4"`
+	SecurityGroups []gcorecloud.ItemID           `json:"security_groups,omitempty" validate:"omitempty,dive,uuid4"`
 	Keypair        string                        `json:"keypair_name,omitempty"`
 	Password       string                        `json:"password" validate:"omitempty,required_with=Username"`
 	Username       string                        `json:"username" validate:"omitempty,required_with=Password"`

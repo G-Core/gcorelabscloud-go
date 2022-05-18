@@ -254,7 +254,8 @@ const CreateRequest = `
 	  },
 	  "network_id": "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c",
 	  "subnet_id": "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c",
-	  "type": "subnet"
+	  "type": "subnet",
+      "security_groups": []
 	}
   ],
   "keypair_name": "keypair",
@@ -262,11 +263,6 @@ const CreateRequest = `
 	"name"
   ],
   "password": "password",
-  "security_groups": [
-    {
-      "id": "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c"
-    }
-  ],
   "user_data": "",
   "username": "username",
   "volumes": [

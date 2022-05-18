@@ -479,9 +479,6 @@ func TestCreate(t *testing.T) {
 			SnapshotID: "",
 			VolumeID:   "",
 		}},
-		SecurityGroups: []gcorecloud.ItemID{{
-			ID: "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c",
-		}},
 		Interfaces: []instances.InterfaceInstanceCreateOpts{{InterfaceOpts: instances.InterfaceOpts{
 			Type:      types.SubnetInterfaceType,
 			NetworkID: "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c",
@@ -490,7 +487,7 @@ func TestCreate(t *testing.T) {
 				Source:             types.ExistingFloatingIP,
 				ExistingFloatingID: "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c",
 			},
-		}}},
+		}, SecurityGroups: []gcorecloud.ItemID{}}},
 		Keypair:  "keypair",
 		Password: "password",
 		Username: "username",
