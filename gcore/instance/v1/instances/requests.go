@@ -122,6 +122,14 @@ type InterfaceInstanceCreateOpts struct {
 	SecurityGroups []gcorecloud.ItemID `json:"security_groups,omitempty"`
 }
 
+// ToInterfaceActionMap builds a request body from InterfaceOpts.
+func (opts InterfaceInstanceCreateOpts) ToInterfaceActionMap() (map[string]interface{}, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, err
+	}
+	return gcorecloud.BuildRequestBody(opts, "")
+}
+
 // Validate
 func (opts InterfaceInstanceCreateOpts) Validate() error {
 	return gcorecloud.ValidateStruct(opts)
