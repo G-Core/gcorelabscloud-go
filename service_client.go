@@ -29,6 +29,9 @@ type ServiceClient struct {
 	// MoreHeaders allows users (or GCore cloud) to set service-wide headers on requests. Put another way,
 	// values set in this field will be set on all the HTTP requests the service client sends.
 	MoreHeaders map[string]string
+
+	// RegionID is an id of chosen region
+	RegionID int
 }
 
 // ResourceBaseURL returns the base URL of any resources used by this service. It MUST end with a /.

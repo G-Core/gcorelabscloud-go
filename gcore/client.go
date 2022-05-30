@@ -301,6 +301,7 @@ func NewIdentity(client *gcorecloud.ProviderClient, eo gcorecloud.EndpointOpts) 
 		ProviderClient: client,
 		Endpoint:       endpoint,
 		Type:           clientType,
+		RegionID:       eo.Region,
 	}, nil
 }
 
@@ -319,6 +320,7 @@ func initClientOpts(client *gcorecloud.ProviderClient, eo gcorecloud.EndpointOpt
 	sc.Endpoint = fmt.Sprintf("%s%s/", client.APIBase, eo.Version)
 	sc.ResourceBase = url
 	sc.Type = clientType
+	sc.RegionID = eo.Region
 	return sc, nil
 }
 
