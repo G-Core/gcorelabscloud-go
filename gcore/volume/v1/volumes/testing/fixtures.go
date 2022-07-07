@@ -195,10 +195,10 @@ var (
 			Device:       "/dev/vda",
 		},
 		},
-		Metadata: volumes.Metadata{
-			TaskID:       "d74c2bb9-cea7-4b23-a009-2f13518ae66d",
-			AttachedMode: "rw",
-		},
+		//Metadata: volumes.Metadata{
+		//	TaskID:       "d74c2bb9-cea7-4b23-a009-2f13518ae66d",
+		//	AttachedMode: "rw",
+		//},
 		CreatorTaskID: "d74c2bb9-cea7-4b23-a009-2f13518ae66d",
 		VolumeImageMetadata: volumes.VolumeImageMetadata{
 			ContainerFormat:               "bare",
