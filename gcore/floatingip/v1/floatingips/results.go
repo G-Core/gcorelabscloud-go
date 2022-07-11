@@ -2,6 +2,7 @@ package floatingips
 
 import (
 	"fmt"
+	"net"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
@@ -45,8 +46,22 @@ type GetResult struct {
 
 // FloatingIPDetail represents a floating IP with details.
 type FloatingIPDetail struct {
-	*instances.FloatingIP
-	Instance instances.Instance `json:"instance"`
+	FloatingIPAddress net.IP                   `json:"floating_ip_address"`
+	RouterID          string                   `json:"router_id"`
+	SubnetID          string                   `json:"subnet_id"`
+	Status            string                   `json:"status"`
+	ID                string                   `json:"id"`
+	PortID            string                   `json:"port_id"`
+	DNSDomain         string                   `json:"dns_domain"`
+	DNSName           string                   `json:"dns_name"`
+	FixedIPAddress    net.IP                   `json:"fixed_ip_address"`
+	UpdatedAt         *gcorecloud.JSONRFC3339Z `json:"updated_at"`
+	CreatedAt         gcorecloud.JSONRFC3339Z  `json:"created_at"`
+	CreatorTaskID     *string                  `json:"creator_task_id"`
+	ProjectID         int                      `json:"project_id"`
+	RegionID          int                      `json:"region_id"`
+	Region            string                   `json:"region"`
+	Instance          instances.Instance       `json:"instance,omitempty"`
 }
 
 // FloatingIPPage is the page returned by a pager when traversing over a
