@@ -10,6 +10,24 @@ import (
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 )
 
+const MetadataListResponse = `
+{
+  "count": 2,
+  "results": [
+    {
+      "key": "cost-center",
+      "value": "Atlanta",
+      "read_only": false
+    },
+    {
+      "key": "data-center",
+      "value": "A",
+      "read_only": false
+    }
+  ]
+}
+`
+
 const ListResponse = `
 {
   "count": 1,
@@ -278,4 +296,31 @@ var (
 	}
 
 	ExpectedSecurityGroupSlice = []securitygroups.SecurityGroup{SecurityGroup1}
+
+	Metadata1 = securitygroups.Metadata{
+		Key:      "cost-center",
+		Value:    "Atlanta",
+		ReadOnly: false,
+	}
+	Metadata2 = securitygroups.Metadata{
+		Key:      "data-center",
+		Value:    "A",
+		ReadOnly: false,
+	}
+	ExpectedMetadataList = []securitygroups.Metadata{Metadata1, Metadata2}
 )
+
+const MetadataResponse = `
+{
+  "key": "cost-center",
+  "value": "Atlanta",
+  "read_only": false
+}
+`
+
+const MetadataCreateRequest = `
+{
+"test1": "test1", 
+"test2": "test2"
+}
+`

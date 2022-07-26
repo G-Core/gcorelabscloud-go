@@ -5,10 +5,42 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
+	"net/http"
 )
 
-func List(c *gcorecloud.ServiceClient) pagination.Pager {
+// ListOpts allows the filtering and sorting of paginated collections through the API.
+type ListOpts struct {
+	MetadataK  string            `q:"metadata_k" validate:"omitempty"`
+	MetadataKV map[string]string `q:"metadata_kv" validate:"omitempty"`
+}
+
+// ToSequirityGroupListQuery formats a ListOpts into a query string.
+func (opts ListOpts) ToSecurityGroupListQuery() (string, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return "", err
+	}
+	q, err := gcorecloud.BuildQueryString(opts)
+	if err != nil {
+		return "", err
+	}
+	return q.String(), err
+}
+
+// ListOptsBuilder allows extensions to add additional parameters to the List request.
+type ListOptsBuilder interface {
+	ToSecurityGroupListQuery() (string, error)
+}
+
+func List(c *gcorecloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
 	url := listURL(c)
+
+	if opts != nil {
+		query, err := opts.ToSecurityGroupListQuery()
+		if err != nil {
+			return pagination.Pager{Err: err}
+		}
+		url += query
+	}
 	return pagination.NewPager(c, url, func(r pagination.PageResult) pagination.Page {
 		return SecurityGroupPage{pagination.LinkedPageBase{PageResult: r}}
 	})
@@ -49,11 +81,11 @@ func (opts CreateSecurityGroupRuleOpts) ToRuleCreateMap() (map[string]interface{
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
-// CreateSecurityGroupOpts represents options used to create a security group.
 type CreateSecurityGroupOpts struct {
 	Name               string                        `json:"name" required:"true"`
 	Description        *string                       `json:"description,omitempty"`
 	SecurityGroupRules []CreateSecurityGroupRuleOpts `json:"security_group_rules"`
+	Metadata           map[string]interface{}        `json:"metadata,omitempty"`
 }
 
 // CreateOpts represents options used to create a security group.
@@ -120,8 +152,8 @@ func Delete(c *gcorecloud.ServiceClient, securityGroupID string) (r DeleteResult
 }
 
 // ListAll returns all SGs
-func ListAll(c *gcorecloud.ServiceClient) ([]SecurityGroup, error) {
-	page, err := List(c).AllPages()
+func ListAll(c *gcorecloud.ServiceClient, opts ListOptsBuilder) ([]SecurityGroup, error) {
+	page, err := List(c, opts).AllPages()
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +194,7 @@ func IDFromName(client *gcorecloud.ServiceClient, name string) (string, error) {
 	count := 0
 	id := ""
 
-	sgs, err := ListAll(client)
+	sgs, err := ListAll(client, nil)
 	if err != nil {
 		return "", err
 	}
@@ -210,5 +242,56 @@ func DeepCopy(c *gcorecloud.ServiceClient, securityGroupID string, opts DeepCopy
 		return
 	}
 	_, r.Err = c.Post(deepCopyURL(c, securityGroupID), b, nil, nil)
+	return
+}
+
+func MetadataList(client *gcorecloud.ServiceClient, id string) pagination.Pager {
+	url := metadataURL(client, id)
+	return pagination.NewPager(client, url, func(r pagination.PageResult) pagination.Page {
+		return MetadataPage{pagination.LinkedPageBase{PageResult: r}}
+	})
+}
+
+func MetadataListAll(client *gcorecloud.ServiceClient, id string) ([]Metadata, error) {
+	pages, err := MetadataList(client, id).AllPages()
+	if err != nil {
+		return nil, err
+	}
+	all, err := ExtractMetadata(pages)
+	if err != nil {
+		return nil, err
+	}
+	return all, nil
+}
+
+// MetadataCreateOrUpdate creates or update a metadata for an security group.
+func MetadataCreateOrUpdate(client *gcorecloud.ServiceClient, id string, opts map[string]interface{}) (r MetadataActionResult) {
+	_, r.Err = client.Post(metadataURL(client, id), opts, nil, &gcorecloud.RequestOpts{ // nolint
+		OkCodes: []int{http.StatusNoContent, http.StatusOK},
+	})
+	return
+}
+
+// MetadataReplace replace a metadata for an security group.
+func MetadataReplace(client *gcorecloud.ServiceClient, id string, opts map[string]interface{}) (r MetadataActionResult) {
+	_, r.Err = client.Put(metadataURL(client, id), opts, nil, &gcorecloud.RequestOpts{ // nolint
+		OkCodes: []int{http.StatusNoContent, http.StatusOK},
+	})
+	return
+}
+
+// MetadataDelete deletes defined metadata key for a security group.
+func MetadataDelete(client *gcorecloud.ServiceClient, id string, key string) (r MetadataActionResult) {
+	_, r.Err = client.Delete(metadataItemURL(client, id, key), &gcorecloud.RequestOpts{ // nolint
+		OkCodes: []int{http.StatusNoContent, http.StatusOK},
+	})
+	return
+}
+
+// MetadataGet gets defined metadata key for a security group.
+func MetadataGet(client *gcorecloud.ServiceClient, id string, key string) (r MetadataResult) {
+	url := metadataItemURL(client, id, key)
+
+	_, r.Err = client.Get(url, &r.Body, nil) // nolint
 	return
 }
