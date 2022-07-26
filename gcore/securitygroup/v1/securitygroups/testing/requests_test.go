@@ -49,6 +49,18 @@ func prepareDeepCopyTestURL(id string) string {
 	return prepareActionTestURLParams(fake.ProjectID, fake.RegionID, id, "copy")
 }
 
+func prepareGetActionTestURLParams(version string, id string, action string) string { // nolint
+	return fmt.Sprintf("/%s/securitygroups/%d/%d/%s/%s", version, fake.ProjectID, fake.RegionID, id, action)
+}
+
+func prepareMetadataTestURL(id string) string {
+	return prepareGetActionTestURLParams("v1", id, "metadata")
+}
+
+func prepareMetadataItemTestURL(id string) string {
+	return fmt.Sprintf("/%s/securitygroups/%d/%d/%s/%s", "v1", fake.ProjectID, fake.RegionID, id, "metadata_item")
+}
+
 func TestList(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
@@ -68,7 +80,7 @@ func TestList(t *testing.T) {
 	client := fake.ServiceTokenClient("securitygroups", "v1")
 	count := 0
 
-	err := securitygroups.List(client).EachPage(func(page pagination.Page) (bool, error) {
+	err := securitygroups.List(client, nil).EachPage(func(page pagination.Page) (bool, error) {
 		count++
 		actual, err := securitygroups.ExtractSecurityGroups(page)
 		require.NoError(t, err)
@@ -103,7 +115,7 @@ func TestListAll(t *testing.T) {
 
 	client := fake.ServiceTokenClient("securitygroups", "v1")
 
-	groups, err := securitygroups.ListAll(client)
+	groups, err := securitygroups.ListAll(client, nil)
 	require.NoError(t, err)
 	ct := groups[0]
 	require.Equal(t, SecurityGroup1, ct)
@@ -330,5 +342,116 @@ func TestDeepCopy(t *testing.T) {
 
 	opts := securitygroups.DeepCopyOpts{Name: "default"}
 	err := securitygroups.DeepCopy(client, SecurityGroup1.ID, opts).ExtractErr()
+	require.NoError(t, err)
+}
+
+func TestMetadataListAll(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareMetadataTestURL(groupID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, MetadataListResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("securitygroups", "v1")
+
+	actual, err := securitygroups.MetadataListAll(client, groupID)
+	require.NoError(t, err)
+	ct := actual[0]
+	require.Equal(t, Metadata1, ct)
+	require.Equal(t, ExpectedMetadataList, actual)
+}
+
+func TestMetadataGet(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareMetadataItemTestURL(groupID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, MetadataResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("securitygroups", "v1")
+
+	actual, err := securitygroups.MetadataGet(client, groupID, Metadata1.Key).Extract()
+	require.NoError(t, err)
+	require.Equal(t, &Metadata1, actual)
+}
+
+func TestMetadataCreate(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareMetadataTestURL(groupID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestJSONRequest(t, r, MetadataCreateRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	client := fake.ServiceTokenClient("securitygroups", "v1")
+	err := securitygroups.MetadataCreateOrUpdate(client, groupID, map[string]interface{}{
+		"test1": "test1",
+		"test2": "test2",
+	}).ExtractErr()
+	require.NoError(t, err)
+}
+
+func TestMetadataUpdate(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareMetadataTestURL(groupID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "PUT")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestJSONRequest(t, r, MetadataCreateRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	client := fake.ServiceTokenClient("securitygroups", "v1")
+	err := securitygroups.MetadataReplace(client, groupID, map[string]interface{}{
+		"test1": "test1",
+		"test2": "test2",
+	}).ExtractErr()
+	require.NoError(t, err)
+}
+
+func TestMetadataDelete(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareMetadataItemTestURL(groupID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "DELETE")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Accept", "application/json")
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	client := fake.ServiceTokenClient("securitygroups", "v1")
+	err := securitygroups.MetadataDelete(client, groupID, Metadata1.Key).ExtractErr()
 	require.NoError(t, err)
 }

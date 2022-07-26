@@ -1,6 +1,9 @@
 package securitygroups
 
-import gcorecloud "github.com/G-Core/gcorelabscloud-go"
+import (
+	"fmt"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+)
 
 func resourceURL(c *gcorecloud.ServiceClient, id string) string {
 	return c.ServiceURL(id)
@@ -44,4 +47,11 @@ func listInstancesURL(c *gcorecloud.ServiceClient, id string) string {
 
 func deepCopyURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceActionURL(c, id, "copy")
+}
+
+func metadataURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "metadata")
+}
+func metadataItemURL(c *gcorecloud.ServiceClient, id string, key string) string {
+	return resourceActionURL(c, id, fmt.Sprintf("metadata_item?key=%s", key))
 }
