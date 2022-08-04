@@ -5,18 +5,14 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/G-Core/gcorelabscloud-go/gcore/image/v1/images/types"
-
 	"github.com/G-Core/gcorelabscloud-go/gcore/image/v1/images"
-
-	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
-
-	"github.com/stretchr/testify/require"
-
-	log "github.com/sirupsen/logrus"
-
+	"github.com/G-Core/gcorelabscloud-go/gcore/image/v1/images/types"
+	gtesting "github.com/G-Core/gcorelabscloud-go/gcore/utils/testing"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 	th "github.com/G-Core/gcorelabscloud-go/testhelper"
+	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
+	log "github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/require"
 )
 
 func prepareListTestURLParams(version string, projectID int, regionID int) string {
@@ -292,4 +288,25 @@ func TestUpdate(t *testing.T) {
 	ct, err := images.Update(client, Image1.ID, options).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Image1, *ct)
+}
+
+func TestMetadataListAll(t *testing.T) {
+	gtesting.BuildTestMetadataListAll("images", Image1.ID)(t)
+}
+
+func TestMetadataGet(t *testing.T) {
+	gtesting.BuildTestMetadataGet("images", Image1.ID)(t)
+}
+
+func TestMetadataCreate(t *testing.T) {
+	gtesting.BuildTestMetadataCreate("images", Image1.ID)(t)
+}
+
+func TestMetadataUpdate(t *testing.T) {
+	gtesting.BuildTestMetadataUpdate("images", Image1.ID)(t)
+
+}
+
+func TestMetadataDelete(t *testing.T) {
+	gtesting.BuildTestMetadataDelete("images", Image1.ID)(t)
 }

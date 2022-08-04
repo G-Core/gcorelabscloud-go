@@ -6,6 +6,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
@@ -55,6 +56,7 @@ type Image struct {
 	TaskID        *string                  `json:"task_id"`
 	Region        string                   `json:"region"`
 	DiskFormat    string                   `json:"disk_format"`
+	Metadata      []metadata.Metadata      `json:"metadata_detailed"`
 }
 
 // ImagePage is the page returned by a pager when traversing over a

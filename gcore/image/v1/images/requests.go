@@ -16,8 +16,10 @@ type ListOptsBuilder interface {
 
 // ListOpts allows the filtering and sorting of paginated collections through the API.
 type ListOpts struct {
-	Private    bool             `q:"private"`
-	Visibility types.Visibility `q:"visibility"`
+	Private    bool              `q:"private" validate:"omitempty"`
+	Visibility types.Visibility  `q:"visibility" validate:"omitempty"`
+	MetadataK  string            `q:"metadata_k" validate:"omitempty"`
+	MetadataKV map[string]string `q:"metadata_kv" validate:"omitempty"`
 }
 
 // ToImageListQuery formats a ListOpts into a query string.
@@ -46,6 +48,18 @@ type CreateOpts struct {
 	VolumeID       string                `json:"volume_id" required:"true" validate:"required"`
 }
 
+/*
+       "cow_format": False,
+       "hw_firmware_type": "bios",
+       "hw_machine_type": "q35",
+       "is_baremetal": False,
+       "name": "image_name",
+       "os_type": "linux",
+       "ssh_key": "allow",
+       "url": "http://mirror.noris.net/cirros/0.4.0/cirros-0.4.0-x86_64-disk.img",
+       "metadata": {"key": "value"},
+   }
+*/
 // Validate
 func (opts CreateOpts) Validate() error {
 	return gcorecloud.Validate.Struct(opts)
@@ -98,6 +112,7 @@ type UploadOpts struct {
 	IsBaremetal    *bool                `json:"is_baremetal,omitempty"`
 	HwFirmwareType types.HwFirmwareType `json:"hw_firmware_type" validate:"required,enum"`
 	CowFormat      bool                 `json:"cow_format"`
+	Metadata       map[string]string    `json:"metadata,omitempty"`
 }
 
 // Validate
