@@ -2,6 +2,7 @@ package images
 
 import (
 	"fmt"
+	cmeta "github.com/G-Core/gcorelabscloud-go/client/utils/metadata"
 	"strings"
 
 	"github.com/G-Core/gcorelabscloud-go/client/images/v1/client"
@@ -437,6 +438,48 @@ var Commands = cli.Command{
 			Usage: "GCloud project images API",
 			Subcommands: []*cli.Command{
 				&imageProjectListCommand,
+			},
+		},
+		{
+			Name:  "metadata",
+			Usage: "Image metadata",
+			Subcommands: []*cli.Command{
+				cmeta.NewMetadataListCommand(
+					client.NewImageClientV1,
+					"Get image metadata",
+					"<image_id>",
+					"image_id is mandatory argument",
+				),
+				cmeta.NewMetadataGetCommand(
+					client.NewImageClientV1,
+					"Show image metadata by key",
+					"<image_id>",
+					"image_id is mandatory argument",
+				),
+				cmeta.NewMetadataDeleteCommand(
+					client.NewImageClientV1,
+					"Delete image_id metadata by key",
+					"<image_id>",
+					"image_id is mandatory argument",
+				),
+				cmeta.NewMetadataCreateCommand(
+					client.NewImageClientV1,
+					"Create instance metadata. It would update existing keys",
+					"<image_id>",
+					"image_id is mandatory argument",
+				),
+				cmeta.NewMetadataUpdateCommand(
+					client.NewImageClientV1,
+					"Update image_id metadata. It overriding existing records",
+					"<image_id>",
+					"volume_id is mandatory argument",
+				),
+				cmeta.NewMetadataReplaceCommand(
+					client.NewImageClientV1,
+					"Replace image_id metadata. It replace existing records",
+					"<image_id>",
+					"image_id is mandatory argument",
+				),
 			},
 		},
 	},

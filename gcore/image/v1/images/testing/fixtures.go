@@ -1,6 +1,8 @@
 package testing
 
 import (
+	"fmt"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"time"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/image/v1/images"
@@ -10,7 +12,7 @@ import (
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 )
 
-const ListResponse = `
+var ListResponse = fmt.Sprintf(`
 {
   "count": 1,
   "results": [
@@ -30,13 +32,28 @@ const ListResponse = `
       "disk_format": "qcow2",
       "min_disk": 0,
       "name": "fedora-coreos",
-      "status": "active"
+      "status": "active",
+      "metadata_detailed": [%s],
+  	  "metadata": %s
     }
   ]
 }
+`, MetadataResponse, MetadataResponseKV)
+
+const MetadataResponse = `
+{
+  "key": "some_key",
+  "value": "some_val",
+  "read_only": false
+}
+`
+const MetadataResponseKV = `
+{
+  "some_key": "some_val"
+}
 `
 
-const GetResponse = `
+var GetResponse = fmt.Sprintf(`
 {
   "id": "4a44e5a2-e7ba-41b8-bf78-ddfa2e22974b",
   "project_id": 1,
@@ -53,9 +70,11 @@ const GetResponse = `
   "disk_format": "qcow2",
   "min_disk": 0,
   "name": "fedora-coreos",
-  "status": "active"
+  "status": "active",
+  "metadata_detailed": [%s],
+  "metadata": %s
 }
-`
+`, MetadataResponse, MetadataResponseKV)
 
 const CreateRequest = `
 {
@@ -135,9 +154,32 @@ var (
 		TaskID:        nil,
 		DiskFormat:    "qcow2",
 		Region:        "RegionOne",
+		Metadata:      []metadata.Metadata{ResourceMetadataReadOnly},
 	}
 	ExpectedImagesSlice = []images.Image{Image1}
 	Tasks1              = tasks.TaskResults{
 		Tasks: []tasks.TaskID{"50f53a35-42ed-40c4-82b2-5a37fb3e00bc"},
 	}
+
+	ResourceMetadata = map[string]interface{}{
+		"some_key": "some_val",
+	}
+
+	ResourceMetadataReadOnly = metadata.Metadata{
+		Key:      "some_key",
+		Value:    "some_val",
+		ReadOnly: false,
+	}
+
+	Metadata1 = metadata.Metadata{
+		Key:      "cost-center",
+		Value:    "Atlanta",
+		ReadOnly: false,
+	}
+	Metadata2 = metadata.Metadata{
+		Key:      "data-center",
+		Value:    "A",
+		ReadOnly: false,
+	}
+	ExpectedMetadataList = []metadata.Metadata{Metadata1, Metadata2}
 )

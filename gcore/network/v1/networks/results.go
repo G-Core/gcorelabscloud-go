@@ -139,3 +139,38 @@ func ExtractNetworkIDFromTask(task *tasks.Task) (string, error) {
 	}
 	return result.Networks[0], nil
 }
+
+// MetadataPage is the page returned by a pager when traversing over a
+// collection of instance metadata objects.
+type MetadataPage struct {
+	pagination.LinkedPageBase
+}
+
+// MetadataResult represents the result of a get operation
+type MetadataResult struct {
+	commonResult
+}
+
+type Metadata struct {
+	Key      string `json:"key"`
+	Value    string `json:"value"`
+	ReadOnly bool   `json:"read_only"`
+}
+
+func ExtractMetadataInto(r pagination.Page, v interface{}) error {
+	return r.(MetadataPage).Result.ExtractIntoSlicePtr(v, "results")
+}
+
+// ExtractMetadata accepts a Page struct, specifically a MetadataPage struct,
+// and extracts the elements into a slice of securitygroups metadata structs. In other words,
+// a generic collection is mapped into a relevant slice.
+func ExtractMetadata(r pagination.Page) ([]Metadata, error) {
+	var s []Metadata
+	err := ExtractMetadataInto(r, &s)
+	return s, err
+}
+
+// MetadataActionResult represents the result of a create, delete or update operation(no content)
+type MetadataActionResult struct {
+	gcorecloud.ErrResult
+}
