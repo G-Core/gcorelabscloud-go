@@ -2,6 +2,7 @@ package testing
 
 import (
 	"fmt"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"net/http"
 	"testing"
 
@@ -40,6 +41,18 @@ func prepareListInstancePortTestURL(id string) string {
 	return prepareActionTestURLParams(fake.ProjectID, fake.RegionID, id, "ports")
 }
 
+func prepareGetActionTestURLParams(version string, id string, action string) string { // nolint
+	return fmt.Sprintf("/%s/networks/%d/%d/%s/%s", version, fake.ProjectID, fake.RegionID, id, action)
+}
+
+func prepareMetadataTestURL(id string) string {
+	return prepareGetActionTestURLParams("v1", id, "metadata")
+}
+
+func prepareMetadataItemTestURL(id string) string {
+	return fmt.Sprintf("/%s/networks/%d/%d/%s/%s", "v1", fake.ProjectID, fake.RegionID, id, "metadata_item")
+}
+
 func TestList(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
@@ -59,7 +72,7 @@ func TestList(t *testing.T) {
 	client := fake.ServiceTokenClient("networks", "v1")
 	count := 0
 
-	err := networks.List(client).EachPage(func(page pagination.Page) (bool, error) {
+	err := networks.List(client, nil).EachPage(func(page pagination.Page) (bool, error) {
 		count++
 		actual, err := networks.ExtractNetworks(page)
 		require.NoError(t, err)
@@ -94,7 +107,7 @@ func TestListAll(t *testing.T) {
 
 	client := fake.ServiceTokenClient("networks", "v1")
 
-	actual, err := networks.ListAll(client)
+	actual, err := networks.ListAll(client, nil)
 	require.NoError(t, err)
 	ct := actual[0]
 	require.Equal(t, Network1, ct)
@@ -103,7 +116,6 @@ func TestListAll(t *testing.T) {
 }
 
 func TestGet(t *testing.T) {
-
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
 
@@ -249,4 +261,115 @@ func TestListAllInstancePort(t *testing.T) {
 	require.Equal(t, InstancePort1, ct)
 	require.Equal(t, ExpectedInstancePortSlice, actual)
 
+}
+
+func TestMetadataListAll(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareMetadataTestURL(Network1.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, MetadataListResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("networks", "v1")
+
+	actual, err := metadata.MetadataListAll(client, Network1.ID)
+	require.NoError(t, err)
+	ct := actual[0]
+	require.Equal(t, Metadata1, ct)
+	require.Equal(t, ExpectedMetadataList, actual)
+}
+
+func TestMetadataGet(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareMetadataItemTestURL(Network1.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, MetadataResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("networks", "v1")
+
+	actual, err := metadata.MetadataGet(client, Network1.ID, ResourceMetadataReadOnly.Key).Extract()
+	require.NoError(t, err)
+	require.Equal(t, &ResourceMetadataReadOnly, actual)
+}
+
+func TestMetadataCreate(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareMetadataTestURL(Network1.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestJSONRequest(t, r, MetadataCreateRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	client := fake.ServiceTokenClient("networks", "v1")
+	err := metadata.MetadataCreateOrUpdate(client, Network1.ID, map[string]string{
+		"test1": "test1",
+		"test2": "test2",
+	}).ExtractErr()
+	require.NoError(t, err)
+}
+
+func TestMetadataUpdate(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareMetadataTestURL(Network1.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "PUT")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestJSONRequest(t, r, MetadataCreateRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	client := fake.ServiceTokenClient("networks", "v1")
+	err := metadata.MetadataReplace(client, Network1.ID, map[string]string{
+		"test1": "test1",
+		"test2": "test2",
+	}).ExtractErr()
+	require.NoError(t, err)
+}
+
+func TestMetadataDelete(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareMetadataItemTestURL(Network1.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "DELETE")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Accept", "application/json")
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	client := fake.ServiceTokenClient("networks", "v1")
+	err := metadata.MetadataDelete(client, Network1.ID, Metadata1.Key).ExtractErr()
+	require.NoError(t, err)
 }

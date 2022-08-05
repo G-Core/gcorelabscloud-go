@@ -1,6 +1,7 @@
 package testing
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/types"
@@ -10,25 +11,7 @@ import (
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 )
 
-const MetadataListResponse = `
-{
-  "count": 2,
-  "results": [
-    {
-      "key": "cost-center",
-      "value": "Atlanta",
-      "read_only": false
-    },
-    {
-      "key": "data-center",
-      "value": "A",
-      "read_only": false
-    }
-  ]
-}
-`
-
-const ListResponse = `
+var ListResponse = fmt.Sprintf(`
 {
   "count": 1,
   "results": [
@@ -73,17 +56,19 @@ const ListResponse = `
       "created_at": "2019-07-26T13:25:03+0000",
       "region": "Luxembourg 1",
       "project_id": 1,
-      "region_id": 1
+      "region_id": 1,
+	  "metadata": [%s]
     }
   ]
 }
-`
+`, MetadataResponse)
 
-const GetResponse = `
+var GetResponse = fmt.Sprintf(`
 {
   "description": "Default security group",
   "updated_at": "2019-07-26T13:25:03+0000",
   "name": "default",
+  "metadata": [%s],
   "security_group_rules": [
 	{
 	  "description": null,
@@ -123,9 +108,9 @@ const GetResponse = `
   "project_id": 1,
   "region_id": 1
 }
-`
+`, MetadataResponse)
 
-const CreateRequest = `
+var CreateRequest = fmt.Sprintf(`
 {
   "instances": [
     "8dc30d49-bb34-4920-9bbd-03a2587ec0ad",
@@ -134,10 +119,11 @@ const CreateRequest = `
   "security_group": {
     "description": "Default security group",
     "name": "default",
-    "security_group_rules": []
+    "security_group_rules": [],
+	"metadata": %s
   }
 }
-`
+`, ResourceMetadataRequest)
 
 const CreateRuleRequest = `
 {
@@ -154,11 +140,12 @@ const UpdateRequest = `
 }
 `
 
-const CreateResponse = `
+var CreateResponse = fmt.Sprintf(`
 {
   "description": "Default security group",
   "updated_at": "2019-07-26T13:25:03+0000",
   "name": "default",
+  "metadata": [%s],	
   "security_group_rules": [
 	{
 	  "description": null,
@@ -198,7 +185,7 @@ const CreateResponse = `
   "project_id": 1,
   "region_id": 1
 }
-`
+`, MetadataResponse)
 
 const CreateRuleResponse = `
 {
@@ -215,6 +202,43 @@ const CreateRuleResponse = `
 	"revision_number": 0,
 	"created_at": "2019-07-26T13:25:03+0000",
 	"ethertype": "IPv4"
+}
+`
+
+const MetadataResponse = `
+{
+  "key": "some_key",
+  "value": "some_val",
+  "read_only": false
+}
+`
+const ResourceMetadataRequest = `
+{
+"some_key": "some_val"
+}
+`
+const MetadataCreateRequest = `
+{
+"test1": "test1", 
+"test2": "test2"
+}
+`
+
+const MetadataListResponse = `
+{
+  "count": 2,
+  "results": [
+    {
+      "key": "cost-center",
+      "value": "Atlanta",
+      "read_only": false
+    },
+    {
+      "key": "data-center",
+      "value": "A",
+      "read_only": false
+    }
+  ]
 }
 `
 
@@ -293,9 +317,20 @@ var (
 		ProjectID: fake.ProjectID,
 		RegionID:  fake.RegionID,
 		Region:    "Luxembourg 1",
+		Metadata:  []securitygroups.Metadata{ResourceMetadataReadOnly},
 	}
 
 	ExpectedSecurityGroupSlice = []securitygroups.SecurityGroup{SecurityGroup1}
+
+	ResourceMetadata = map[string]interface{}{
+		"some_key": "some_val",
+	}
+
+	ResourceMetadataReadOnly = securitygroups.Metadata{
+		Key:      "some_key",
+		Value:    "some_val",
+		ReadOnly: false,
+	}
 
 	Metadata1 = securitygroups.Metadata{
 		Key:      "cost-center",
@@ -309,18 +344,3 @@ var (
 	}
 	ExpectedMetadataList = []securitygroups.Metadata{Metadata1, Metadata2}
 )
-
-const MetadataResponse = `
-{
-  "key": "cost-center",
-  "value": "Atlanta",
-  "read_only": false
-}
-`
-
-const MetadataCreateRequest = `
-{
-"test1": "test1", 
-"test2": "test2"
-}
-`

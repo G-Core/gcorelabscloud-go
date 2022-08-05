@@ -2,6 +2,7 @@ package networks
 
 import (
 	"fmt"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
@@ -79,6 +80,7 @@ type Network struct {
 	ProjectID int                      `json:"project_id"`
 	RegionID  int                      `json:"region_id"`
 	Region    string                   `json:"region"`
+	Metadata  []metadata.Metadata      `json:"metadata"`
 }
 
 // NetworkPage is the page returned by a pager when traversing over a
