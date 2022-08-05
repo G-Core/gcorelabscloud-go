@@ -1,6 +1,8 @@
 package testing
 
 import (
+	"fmt"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"time"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
@@ -9,7 +11,7 @@ import (
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 )
 
-const ListResponse = `
+var ListResponse = fmt.Sprintf(`
 {
   "count": 1,
   "results": [
@@ -28,11 +30,12 @@ const ListResponse = `
         "3730b4d3-9337-4a60-a35e-7e1620aabe6f"
       ],
       "external": false,
-      "project_id": 1
+      "project_id": 1,
+      "metadata": [%s]
 	}
   ]
 }
-`
+`, MetadataResponse)
 
 const ListInstancePortResponse = `
 {
@@ -47,7 +50,7 @@ const ListInstancePortResponse = `
 }
 `
 
-const GetResponse = `
+var GetResponse = fmt.Sprintf(`
 {
   "creator_task_id": null,
   "region": "RegionOne",
@@ -63,9 +66,10 @@ const GetResponse = `
     "3730b4d3-9337-4a60-a35e-7e1620aabe6f"
   ],
   "external": false,
-  "project_id": 1
+  "project_id": 1,
+  "metadata": [%s]
 }
-`
+`, MetadataResponse)
 
 const CreateRequest = `
 {
@@ -74,13 +78,11 @@ const CreateRequest = `
 	"create_router": true
 }	
 `
-
 const UpdateRequest = `
 {
 	"name": "private"
 }	
 `
-
 const CreateResponse = `
 {
   "tasks": [
@@ -93,6 +95,37 @@ const DeleteResponse = `
 {
   "tasks": [
     "50f53a35-42ed-40c4-82b2-5a37fb3e00bc"
+  ]
+}
+`
+
+const MetadataResponse = `
+{
+  "key": "some_key",
+  "value": "some_val",
+  "read_only": false
+}
+`
+const MetadataCreateRequest = `
+{
+"test1": "test1", 
+"test2": "test2"
+}
+`
+const MetadataListResponse = `
+{
+  "count": 2,
+  "results": [
+    {
+      "key": "cost-center",
+      "value": "Atlanta",
+      "read_only": false
+    },
+    {
+      "key": "data-center",
+      "value": "A",
+      "read_only": false
+    }
   ]
 }
 `
@@ -120,6 +153,7 @@ var (
 		ProjectID: fake.ProjectID,
 		RegionID:  fake.RegionID,
 		Region:    "RegionOne",
+		Metadata:  []metadata.Metadata{ResourceMetadataReadOnly},
 	}
 	Tasks1 = tasks.TaskResults{
 		Tasks: []tasks.TaskID{"50f53a35-42ed-40c4-82b2-5a37fb3e00bc"},
@@ -133,4 +167,26 @@ var (
 		InstanceName: "instance_1",
 	}
 	ExpectedInstancePortSlice = []networks.InstancePort{InstancePort1}
+
+	ResourceMetadata = map[string]interface{}{
+		"some_key": "some_val",
+	}
+
+	ResourceMetadataReadOnly = metadata.Metadata{
+		Key:      "some_key",
+		Value:    "some_val",
+		ReadOnly: false,
+	}
+
+	Metadata1 = metadata.Metadata{
+		Key:      "cost-center",
+		Value:    "Atlanta",
+		ReadOnly: false,
+	}
+	Metadata2 = metadata.Metadata{
+		Key:      "data-center",
+		Value:    "A",
+		ReadOnly: false,
+	}
+	ExpectedMetadataList = []metadata.Metadata{Metadata1, Metadata2}
 )

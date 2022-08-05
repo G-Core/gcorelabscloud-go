@@ -2,6 +2,7 @@ package testing
 
 import (
 	"fmt"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"net"
 	"time"
 
@@ -41,11 +42,12 @@ var ListResponse = fmt.Sprintf(`
 			  "destination": "10.0.3.0/24",
 			  "nexthop": "10.0.0.13"
 			}
-		  ]	
+		  ],
+          "metadata": [%s]
     	}
   	]
 }
-`, availableIps, totalIps)
+`, availableIps, totalIps, MetadataResponse)
 
 var GetResponse = fmt.Sprintf(`
 {
@@ -74,9 +76,10 @@ var GetResponse = fmt.Sprintf(`
       "destination": "10.0.3.0/24",
       "nexthop": "10.0.0.13"
     }
-  ]	
+  ],
+  "metadata": [%s]
 }
-`, availableIps, totalIps)
+`, availableIps, totalIps, MetadataResponse)
 
 const CreateRequestNoGW = `
 {
@@ -126,7 +129,6 @@ const UpdateRequestNoData = `
     "gateway_ip": null
 }
 `
-
 const CreateResponse = `
 {
 	"tasks": [
@@ -134,12 +136,42 @@ const CreateResponse = `
 	]
 }
 `
-
 const DeleteResponse = `
 {
 	"tasks": [
     	"50f53a35-42ed-40c4-82b2-5a37fb3e00bc"
   	]
+}
+`
+const MetadataResponse = `
+{
+  "key": "some_key",
+  "value": "some_val",
+  "read_only": false
+}
+`
+
+const MetadataCreateRequest = `
+{
+"test1": "test1", 
+"test2": "test2"
+}
+`
+const MetadataListResponse = `
+{
+  "count": 2,
+  "results": [
+    {
+      "key": "cost-center",
+      "value": "Atlanta",
+      "read_only": false
+    },
+    {
+      "key": "data-center",
+      "value": "A",
+      "read_only": false
+    }
+  ]
 }
 `
 
@@ -180,10 +212,33 @@ var (
 		HostRoutes: []subnets.HostRoute{
 			{Destination: *routeCidr, NextHop: ip},
 		},
+		Metadata: []metadata.Metadata{ResourceMetadataReadOnly},
 	}
 	Tasks1 = tasks.TaskResults{
 		Tasks: []tasks.TaskID{"50f53a35-42ed-40c4-82b2-5a37fb3e00bc"},
 	}
 
 	ExpectedSubnetSlice = []subnets.Subnet{Subnet1}
+
+	ResourceMetadata = map[string]interface{}{
+		"some_key": "some_val",
+	}
+
+	ResourceMetadataReadOnly = metadata.Metadata{
+		Key:      "some_key",
+		Value:    "some_val",
+		ReadOnly: false,
+	}
+
+	Metadata1 = metadata.Metadata{
+		Key:      "cost-center",
+		Value:    "Atlanta",
+		ReadOnly: false,
+	}
+	Metadata2 = metadata.Metadata{
+		Key:      "data-center",
+		Value:    "A",
+		ReadOnly: false,
+	}
+	ExpectedMetadataList = []metadata.Metadata{Metadata1, Metadata2}
 )

@@ -178,6 +178,7 @@ func TestCreate(t *testing.T) {
 			Name:               groupName,
 			Description:        &groupDescription,
 			SecurityGroupRules: []securitygroups.CreateSecurityGroupRuleOpts{},
+			Metadata:           ResourceMetadata,
 		},
 		Instances: []string{
 			"8dc30d49-bb34-4920-9bbd-03a2587ec0ad",
@@ -388,9 +389,9 @@ func TestMetadataGet(t *testing.T) {
 
 	client := fake.ServiceTokenClient("securitygroups", "v1")
 
-	actual, err := securitygroups.MetadataGet(client, groupID, Metadata1.Key).Extract()
+	actual, err := securitygroups.MetadataGet(client, groupID, ResourceMetadataReadOnly.Key).Extract()
 	require.NoError(t, err)
-	require.Equal(t, &Metadata1, actual)
+	require.Equal(t, &ResourceMetadataReadOnly, actual)
 }
 
 func TestMetadataCreate(t *testing.T) {

@@ -111,8 +111,7 @@ var (
 	}
 
 	floatingIPDetails = floatingips.FloatingIPDetail{
-		FloatingIP: &floatingIP,
-		Instance:   instance,
+		Instance: instance,
 	}
 
 	ExpectedFloatingIPSlice = []floatingips.FloatingIPDetail{floatingIPDetails}

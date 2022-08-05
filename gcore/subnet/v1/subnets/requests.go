@@ -51,19 +51,22 @@ type HostRoute struct {
 // CreateOpts represents options used to create a subnet.
 // GatewayIP must be null in json because an empty key creates a gateway in the neutron API.
 type CreateOpts struct {
-	Name                   string          `json:"name" required:"true"`
-	EnableDHCP             bool            `json:"enable_dhcp,omitempty"`
-	CIDR                   gcorecloud.CIDR `json:"cidr" required:"true"`
-	NetworkID              string          `json:"network_id" required:"true"`
-	ConnectToNetworkRouter bool            `json:"connect_to_network_router"`
-	DNSNameservers         []net.IP        `json:"dns_nameservers,omitempty"`
-	HostRoutes             []HostRoute     `json:"host_routes,omitempty"`
-	GatewayIP              *net.IP         `json:"gateway_ip"`
+	Name                   string            `json:"name" required:"true"`
+	EnableDHCP             bool              `json:"enable_dhcp,omitempty"`
+	CIDR                   gcorecloud.CIDR   `json:"cidr" required:"true"`
+	NetworkID              string            `json:"network_id" required:"true"`
+	ConnectToNetworkRouter bool              `json:"connect_to_network_router"`
+	DNSNameservers         []net.IP          `json:"dns_nameservers,omitempty"`
+	HostRoutes             []HostRoute       `json:"host_routes,omitempty"`
+	GatewayIP              *net.IP           `json:"gateway_ip"`
+	Metadata               map[string]string `json:"metadata,omitempty"`
 }
 
 // ListOpts allows the filtering and sorting List API response.
 type ListOpts struct {
-	NetworkID string `q:"network_id"`
+	MetadataK  string            `q:"metadata_k" validate:"omitempty"`
+	MetadataKV map[string]string `q:"metadata_kv" validate:"omitempty"`
+	NetworkID  string            `q:"network_id"`
 }
 
 // ToSubnetCreateMap builds a request body from CreateOpts.

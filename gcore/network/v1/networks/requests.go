@@ -6,8 +6,16 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
-func List(c *gcorecloud.ServiceClient) pagination.Pager {
+func List(c *gcorecloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
 	url := listURL(c)
+	if opts != nil {
+		query, err := opts.ToNetworkListQuery()
+		if err != nil {
+			return pagination.Pager{Err: err}
+		}
+		url += query
+	}
+
 	return pagination.NewPager(c, url, func(r pagination.PageResult) pagination.Page {
 		return NetworkPage{pagination.LinkedPageBase{PageResult: r}}
 	})
@@ -26,12 +34,17 @@ type CreateOptsBuilder interface {
 	ToNetworkCreateMap() (map[string]interface{}, error)
 }
 
+type ListOptsBuilder interface {
+	ToNetworkListQuery() (string, error)
+}
+
 // CreateOpts represents options used to create a network.
 type CreateOpts struct {
-	Name         string `json:"name" required:"true" validate:"required"`
-	Mtu          int    `json:"mtu,omitempty" validate:"omitempty,lte=1500"`
-	CreateRouter bool   `json:"create_router"`
-	Type         string `json:"type,omitempty" validate:"omitempty"`
+	Name         string            `json:"name" required:"true" validate:"required"`
+	Mtu          int               `json:"mtu,omitempty" validate:"omitempty,lte=1500"`
+	CreateRouter bool              `json:"create_router"`
+	Type         string            `json:"type,omitempty" validate:"omitempty"`
+	Metadata     map[string]string `json:"metadata,omitempty"`
 }
 
 // ToNetworkCreateMap builds a request body from CreateOpts.
@@ -40,6 +53,18 @@ func (opts CreateOpts) ToNetworkCreateMap() (map[string]interface{}, error) {
 		return nil, err
 	}
 	return gcorecloud.BuildRequestBody(opts, "")
+}
+
+// ToNetworkListQuery formats a ListOpts into a query string.
+func (opts ListOpts) ToNetworkListQuery() (string, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return "", err
+	}
+	q, err := gcorecloud.BuildQueryString(opts)
+	if err != nil {
+		return "", err
+	}
+	return q.String(), err
 }
 
 // Validate
@@ -66,6 +91,12 @@ type UpdateOptsBuilder interface {
 // UpdateOpts represents options used to update a network.
 type UpdateOpts struct {
 	Name string `json:"name" required:"true" validate:"required"`
+}
+
+// ListOpts allows the filtering and sorting of paginated collections through the API.
+type ListOpts struct {
+	MetadataK  string            `q:"metadata_k" validate:"omitempty"`
+	MetadataKV map[string]string `q:"metadata_kv" validate:"omitempty"`
 }
 
 // ToNetworkUpdateMap builds a request body from UpdateOpts.
@@ -102,8 +133,8 @@ func Delete(c *gcorecloud.ServiceClient, networkID string) (r tasks.Result) {
 }
 
 // ListAll is a convenience function that returns all networks.
-func ListAll(client *gcorecloud.ServiceClient) ([]Network, error) {
-	pages, err := List(client).AllPages()
+func ListAll(client *gcorecloud.ServiceClient, opts ListOptsBuilder) ([]Network, error) {
+	pages, err := List(client, opts).AllPages()
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +160,7 @@ func IDFromName(client *gcorecloud.ServiceClient, name string) (string, error) {
 	count := 0
 	id := ""
 
-	pages, err := List(client).AllPages()
+	pages, err := List(client, nil).AllPages()
 	if err != nil {
 		return "", err
 	}

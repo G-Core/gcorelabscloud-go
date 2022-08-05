@@ -2,6 +2,7 @@ package subnets
 
 import (
 	"fmt"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"net"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
@@ -57,6 +58,7 @@ type Subnet struct {
 	DNSNameservers []net.IP                `json:"dns_nameservers"`
 	HostRoutes     []HostRoute             `json:"host_routes"`
 	GatewayIP      net.IP                  `json:"gateway_ip"`
+	Metadata       []metadata.Metadata     `json:"metadata"`
 }
 
 // SubnetPage is the page returned by a pager when traversing over a

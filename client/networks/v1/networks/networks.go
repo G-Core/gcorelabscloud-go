@@ -26,7 +26,7 @@ var networkListCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		pages, err := networks.List(client).AllPages()
+		pages, err := networks.List(client, nil).AllPages()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
