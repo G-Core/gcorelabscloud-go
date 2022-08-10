@@ -1,6 +1,7 @@
 package instances
 
 import (
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"log"
 	"net/http"
 
@@ -167,10 +168,10 @@ func (opts CreateOpts) ToInstanceCreateMap() (map[string]interface{}, error) {
 		return nil, err
 	}
 	var err error
-	var metadata map[string]interface{}
+	var meta map[string]interface{}
 	var configuration map[string]interface{}
 	if opts.Metadata != nil {
-		metadata, err = opts.Metadata.ToMetadataMap()
+		meta, err = opts.Metadata.ToMetadataMap()
 		if err != nil {
 			return nil, err
 		}
@@ -185,8 +186,8 @@ func (opts CreateOpts) ToInstanceCreateMap() (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	if len(metadata) > 0 {
-		mp["metadata"] = metadata
+	if len(meta) > 0 {
+		mp["metadata"] = meta
 	} else {
 		delete(mp, "metadata")
 	}
@@ -566,7 +567,7 @@ func MetadataList(client *gcorecloud.ServiceClient, id string) pagination.Pager 
 	})
 }
 
-func MetadataListAll(client *gcorecloud.ServiceClient, id string) ([]Metadata, error) {
+func MetadataListAll(client *gcorecloud.ServiceClient, id string) ([]metadata.Metadata, error) {
 	pages, err := MetadataList(client, id).AllPages()
 	if err != nil {
 		return nil, err

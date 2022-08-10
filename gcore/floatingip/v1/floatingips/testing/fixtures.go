@@ -1,6 +1,8 @@
 package testing
 
 import (
+	"fmt"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"net"
 	"time"
 
@@ -15,7 +17,7 @@ import (
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 )
 
-const ListResponse = `
+var ListResponse = fmt.Sprintf(`
 {
   "count": 1,
   "results": [
@@ -53,12 +55,13 @@ const ListResponse = `
       "created_at": "2019-06-13T13:58:12+0000",
 	  "region": "ED-8",
       "project_id": 1,
-      "region_id": 1
+      "region_id": 1,
+      "metadata": [%s]
     }
   ]
-}`
+}`, MetadataResponse)
 
-const GetResponse = `
+var GetResponse = fmt.Sprintf(`
 {
   "floating_ip_address": "172.24.4.34",
   "router_id": "11005a33-c5ac-4c96-ab6f-8f2827cc7da6",
@@ -71,9 +74,9 @@ const GetResponse = `
   "created_at": "2019-06-13T13:58:12+0000",
   "project_id": 1,
   "region": "ED-8",
-  "region_id": 1
-}
-`
+  "region_id": 1,
+ "metadata": [%s]
+}`, MetadataResponse)
 
 const CreateRequest = `
 {
@@ -112,8 +115,39 @@ const DeleteResponse = `
 }
 `
 
-const AssignResponse = GetResponse
-const UnassignResponse = GetResponse
+const MetadataResponse = `
+{
+  "key": "some_key",
+  "value": "some_val",
+  "read_only": false
+}
+`
+const MetadataCreateRequest = `
+{
+"test1": "test1", 
+"test2": "test2"
+}
+`
+const MetadataListResponse = `
+{
+  "count": 2,
+  "results": [
+    {
+      "key": "cost-center",
+      "value": "Atlanta",
+      "read_only": false
+    },
+    {
+      "key": "data-center",
+      "value": "A",
+      "read_only": false
+    }
+  ]
+}
+`
+
+var AssignResponse = GetResponse
+var UnassignResponse = GetResponse
 
 var (
 	floatingIPUpdatedAtParsed, _ = time.Parse(gcorecloud.RFC3339Z, "2019-06-13T13:58:12+0000")
@@ -141,6 +175,7 @@ var (
 		ProjectID:         1,
 		RegionID:          1,
 		Region:            "ED-8",
+		Metadata:          []metadata.Metadata{ResourceMetadataReadOnly},
 	}
 
 	instance = instances.Instance{
@@ -170,8 +205,23 @@ var (
 	}
 
 	floatingIPDetails = floatingips.FloatingIPDetail{
-		FloatingIP: &floatingIP,
-		Instance:   instance,
+		FloatingIPAddress: floatingIPAddress,
+		RouterID:          "11005a33-c5ac-4c96-ab6f-8f2827cc7da6",
+		SubnetID:          "",
+		Status:            "ACTIVE",
+		ID:                "c64e5db1-5f1f-43ec-a8d9-5090df85b82d",
+		PortID:            "ee2402d0-f0cd-4503-9b75-69be1d11c5f1",
+		DNSDomain:         "",
+		DNSName:           "",
+		FixedIPAddress:    nil,
+		UpdatedAt:         &floatingIPUpdatedAt,
+		CreatedAt:         floatingIPCreatedAt,
+		CreatorTaskID:     nil,
+		ProjectID:         1,
+		RegionID:          1,
+		Region:            "ED-8",
+		Instance:          instance,
+		Metadata:          []metadata.Metadata{ResourceMetadataReadOnly},
 	}
 
 	Tasks1 = tasks.TaskResults{
@@ -179,4 +229,26 @@ var (
 	}
 
 	ExpectedFloatingIPSlice = []floatingips.FloatingIPDetail{floatingIPDetails}
+
+	ResourceMetadata = map[string]interface{}{
+		"some_key": "some_val",
+	}
+
+	ResourceMetadataReadOnly = metadata.Metadata{
+		Key:      "some_key",
+		Value:    "some_val",
+		ReadOnly: false,
+	}
+
+	Metadata1 = metadata.Metadata{
+		Key:      "cost-center",
+		Value:    "Atlanta",
+		ReadOnly: false,
+	}
+	Metadata2 = metadata.Metadata{
+		Key:      "data-center",
+		Value:    "A",
+		ReadOnly: false,
+	}
+	ExpectedMetadataList = []metadata.Metadata{Metadata1, Metadata2}
 )

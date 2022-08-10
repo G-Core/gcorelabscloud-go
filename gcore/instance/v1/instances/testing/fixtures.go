@@ -1,6 +1,7 @@
 package testing
 
 import (
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"net"
 	"time"
 
@@ -658,17 +659,17 @@ var (
 	Tasks1                          = tasks.TaskResults{
 		Tasks: []tasks.TaskID{"50f53a35-42ed-40c4-82b2-5a37fb3e00bc"},
 	}
-	Metadata1 = instances.Metadata{
+	Metadata1 = metadata.Metadata{
 		Key:      "cost-center",
 		Value:    "Atlanta",
 		ReadOnly: false,
 	}
-	Metadata2 = instances.Metadata{
+	Metadata2 = metadata.Metadata{
 		Key:      "data-center",
 		Value:    "A",
 		ReadOnly: false,
 	}
-	ExpectedMetadataList = []instances.Metadata{Metadata1, Metadata2}
+	ExpectedMetadataList = []metadata.Metadata{Metadata1, Metadata2}
 	Console              = instances.RemoteConsole{
 		URL:      "https://92.38.157.200:6082/spice_auto.html?token=369b3c64-541b-4cd7-bc47-a82cdb98228f",
 		Type:     "spice-html5",

@@ -3,14 +3,14 @@ package instances
 import (
 	"encoding/json"
 	"fmt"
+
 	"net"
-
-	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
-
-	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/flavor/v1/flavors"
+	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
@@ -211,6 +211,7 @@ type FloatingIP struct {
 	ProjectID         int                      `json:"project_id"`
 	RegionID          int                      `json:"region_id"`
 	Region            string                   `json:"region"`
+	Metadata          []metadata.Metadata      `json:"metadata"`
 }
 
 // Subnet port subnet
@@ -423,8 +424,8 @@ func ExtractInstancePorts(r pagination.Page) ([]InstancePorts, error) {
 // ExtractMetadata accepts a Page struct, specifically a MetadataPage struct,
 // and extracts the elements into a slice of instance metadata structs. In other words,
 // a generic collection is mapped into a relevant slice.
-func ExtractMetadata(r pagination.Page) ([]Metadata, error) {
-	var s []Metadata
+func ExtractMetadata(r pagination.Page) ([]metadata.Metadata, error) {
+	var s []metadata.Metadata
 	err := ExtractMetadataInto(r, &s)
 	return s, err
 }
@@ -491,15 +492,9 @@ func ExtractInstancePortIDFromTask(task *tasks.Task) (string, error) {
 	return result.Ports[0], nil
 }
 
-type Metadata struct {
-	Key      string `json:"key"`
-	Value    string `json:"value"`
-	ReadOnly bool   `json:"read_only"`
-}
-
 // Extract is a function that accepts a result and extracts a instance metadata resource.
-func (r MetadataResult) Extract() (*Metadata, error) {
-	var s Metadata
+func (r MetadataResult) Extract() (*metadata.Metadata, error) {
+	var s metadata.Metadata
 	err := r.ExtractInto(&s)
 	return &s, err
 }
