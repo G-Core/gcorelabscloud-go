@@ -2,6 +2,7 @@ package floatingips
 
 import (
 	"fmt"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"net"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
@@ -32,7 +33,7 @@ type CreateResult struct {
 	commonResult
 }
 
-// UpdateResult represents the result of a assign or unassign operation. Call its Extract
+// UpdateResult represents the result of an assign or unassign operation. Call its Extract
 // method to interpret it as a FloatingIP.
 type UpdateResult struct {
 	commonResult
@@ -62,6 +63,7 @@ type FloatingIPDetail struct {
 	RegionID          int                      `json:"region_id"`
 	Region            string                   `json:"region"`
 	Instance          instances.Instance       `json:"instance,omitempty"`
+	Metadata          []metadata.Metadata      `json:"metadata"`
 }
 
 // FloatingIPPage is the page returned by a pager when traversing over a
@@ -70,7 +72,7 @@ type FloatingIPPage struct {
 	pagination.LinkedPageBase
 }
 
-// NextPageURL is invoked when a paginated collection of floatin ips has reached
+// NextPageURL is invoked when a paginated collection of floating ips has reached
 // the end of a page and the pager seeks to traverse over a new one. In order
 // to do this, it needs to construct the next page's URL.
 func (r FloatingIPPage) NextPageURL() (string, error) {
@@ -90,7 +92,7 @@ func (r FloatingIPPage) IsEmpty() (bool, error) {
 	return len(is) == 0, err
 }
 
-// ExtractFloatingIP accepts a Page struct, specifically a FloatingIPPage struct,
+// ExtractFloatingIPs accepts a Page struct, specifically a FloatingIPPage struct,
 // and extracts the elements into a slice of FloatingIP structs. In other words,
 // a generic collection is mapped into a relevant slice.
 func ExtractFloatingIPs(r pagination.Page) ([]FloatingIPDetail, error) {
