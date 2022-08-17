@@ -33,7 +33,7 @@ var securityGroupListSubCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		results, err := securitygroups.ListAll(client)
+		results, err := securitygroups.ListAll(client, securitygroups.ListOpts{})
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
