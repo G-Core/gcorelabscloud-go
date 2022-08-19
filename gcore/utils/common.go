@@ -16,18 +16,7 @@ func MapInterfaceToMapString(mapInterface interface{}) (map[string]string, error
 		for key, value := range mapInterface.(map[interface{}]interface{}) {
 			mapString[fmt.Sprintf("%v", key)] = fmt.Sprintf("%v", value)
 		}
-
 	}
 
 	return mapString, nil
 }
-
-//func MapInterfaceToMapString(mapInterface map[string]interface{}) map[string]string {
-//	mapString := make(map[string]string)
-//
-//	for key, value := range mapInterface {
-//		mapString[key] = fmt.Sprintf("%v", value)
-//	}
-//
-//	return mapString
-//}
