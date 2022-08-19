@@ -1,6 +1,8 @@
 package testing
 
 import (
+	"fmt"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"time"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
@@ -8,7 +10,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
 )
 
-const ListResponse = `
+var ListResponse = fmt.Sprintf(`
 {
   "count": 1,
   "results": [
@@ -35,10 +37,8 @@ const ListResponse = `
           "device": "/dev/vda"
         }
       ],
-      "metadata": {
-        "task_id": "d74c2bb9-cea7-4b23-a009-2f13518ae66d",
-        "attached_mode": "rw"
-      },
+      "metadata_detailed": [%s],
+  	  "metadata": %s,
       "creator_task_id": "d74c2bb9-cea7-4b23-a009-2f13518ae66d",
       "volume_image_metadata": {
         "container_format": "bare",
@@ -56,9 +56,45 @@ const ListResponse = `
     }
   ]
 }
+`, MetadataResponse, MetadataResponseKV)
+
+const MetadataResponse = `
+{
+  "key": "some_key",
+  "value": "some_val",
+  "read_only": false
+}
+`
+const MetadataResponseKV = `
+{
+  "some_key": "some_val"
+}
+`
+const MetadataCreateRequest = `
+{
+"test1": "test1", 
+"test2": "test2"
+}
+`
+const MetadataListResponse = `
+{
+  "count": 2,
+  "results": [
+    {
+      "key": "cost-center",
+      "value": "Atlanta",
+      "read_only": false
+    },
+    {
+      "key": "data-center",
+      "value": "A",
+      "read_only": false
+    }
+  ]
+}
 `
 
-const GetResponse = `
+var GetResponse = fmt.Sprintf(`
 {
   "availability_zone": "nova",
   "created_at": "2019-05-29T05:32:41+0000",
@@ -82,10 +118,8 @@ const GetResponse = `
       "device": "/dev/vda"
     }
   ],
-  "metadata": {
-    "task_id": "d74c2bb9-cea7-4b23-a009-2f13518ae66d",
-    "attached_mode": "rw"
-  },
+  "metadata_detailed": [%s],
+  "metadata": %s,
   "creator_task_id": "d74c2bb9-cea7-4b23-a009-2f13518ae66d",
   "volume_image_metadata": {
     "container_format": "bare",
@@ -101,7 +135,7 @@ const GetResponse = `
     "size": "46137344"
   }
 }
-`
+`, MetadataResponse, MetadataResponseKV)
 
 const CreateRequest = `
 {
@@ -195,10 +229,7 @@ var (
 			Device:       "/dev/vda",
 		},
 		},
-		//Metadata: volumes.Metadata{
-		//	TaskID:       "d74c2bb9-cea7-4b23-a009-2f13518ae66d",
-		//	AttachedMode: "rw",
-		//},
+		Metadata:      []metadata.Metadata{ResourceMetadataReadOnly},
 		CreatorTaskID: "d74c2bb9-cea7-4b23-a009-2f13518ae66d",
 		VolumeImageMetadata: volumes.VolumeImageMetadata{
 			ContainerFormat:               "bare",
@@ -219,4 +250,26 @@ var (
 	}
 
 	ExpectedVolumeSlice = []volumes.Volume{Volume1}
+
+	ResourceMetadata = map[string]interface{}{
+		"some_key": "some_val",
+	}
+
+	ResourceMetadataReadOnly = metadata.Metadata{
+		Key:      "some_key",
+		Value:    "some_val",
+		ReadOnly: false,
+	}
+
+	Metadata1 = metadata.Metadata{
+		Key:      "cost-center",
+		Value:    "Atlanta",
+		ReadOnly: false,
+	}
+	Metadata2 = metadata.Metadata{
+		Key:      "data-center",
+		Value:    "A",
+		ReadOnly: false,
+	}
+	ExpectedMetadataList = []metadata.Metadata{Metadata1, Metadata2}
 )

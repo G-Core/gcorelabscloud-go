@@ -49,7 +49,7 @@ func MetadataDelete(client *gcorecloud.ServiceClient, id string, key string) (r 
 	return
 }
 
-// MetadataGet gets defined metadata key for a security group.
+// MetadataGet gets defined metadata key for a resource.
 func MetadataGet(client *gcorecloud.ServiceClient, id string, key string) (r MetadataResult) {
 	url := MetadataItemURL(client, id, key)
 

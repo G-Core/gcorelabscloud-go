@@ -42,12 +42,14 @@ type ListOptsBuilder interface {
 // by a particular cluster templates attribute. SortDir sets the direction, and is either
 // `asc' or `desc'. Marker and Limit are used for pagination.
 type ListOpts struct {
-	InstanceID     *string `q:"instance_id"`
-	ClusterID      *string `q:"cluster_id"`
-	IDPart         *string `q:"id_part"`
-	NamePart       *string `q:"name_part"`
-	Bootable       *bool   `q:"bootable"`
-	HasAttachments *bool   `q:"has_attachments"`
+	InstanceID     *string           `q:"instance_id"`
+	ClusterID      *string           `q:"cluster_id"`
+	IDPart         *string           `q:"id_part"`
+	NamePart       *string           `q:"name_part"`
+	Bootable       *bool             `q:"bootable"`
+	HasAttachments *bool             `q:"has_attachments"`
+	MetadataK      string            `q:"metadata_k" validate:"omitempty"`
+	MetadataKV     map[string]string `q:"metadata_kv" validate:"omitempty"`
 }
 
 // CreateOpts represents options used to create a volume.

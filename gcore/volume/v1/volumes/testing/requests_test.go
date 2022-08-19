@@ -8,9 +8,9 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 
-	"github.com/stretchr/testify/require"
-
+	gtesting "github.com/G-Core/gcorelabscloud-go/gcore/utils/testing"
 	log "github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/require"
 
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 	th "github.com/G-Core/gcorelabscloud-go/testhelper"
@@ -58,6 +58,17 @@ func prepareExtendTestURL(id string) string {
 
 func prepareRevertTestURL(id string) string {
 	return prepareActionTestURLParams(fake.ProjectID, fake.RegionID, id, "revert")
+}
+
+func prepareGetActionTestURLParams(version string, id string, action string) string { // nolint
+	return fmt.Sprintf("/%s/floatingips/%d/%d/%s/%s", version, fake.ProjectID, fake.RegionID, id, action)
+}
+func prepareMetadataTestURL(id string) string {
+	return prepareGetActionTestURLParams("v1", id, "metadata")
+}
+
+func prepareMetadataItemTestURL(id string) string {
+	return fmt.Sprintf("/%s/floatingips/%d/%d/%s/%s", "v1", fake.ProjectID, fake.RegionID, id, "metadata_item")
 }
 
 func TestList(t *testing.T) {
@@ -379,4 +390,25 @@ func TestRevert(t *testing.T) {
 	tasks, err := volumes.Revert(client, Volume1.ID).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
+}
+
+func TestMetadataListAll(t *testing.T) {
+	gtesting.BuildTestMetadataListAll("volumes", Volume1.ID)(t)
+}
+
+func TestMetadataGet(t *testing.T) {
+	gtesting.BuildTestMetadataGet("volumes", Volume1.ID)(t)
+}
+
+func TestMetadataCreate(t *testing.T) {
+	gtesting.BuildTestMetadataCreate("volumes", Volume1.ID)(t)
+}
+
+func TestMetadataUpdate(t *testing.T) {
+	gtesting.BuildTestMetadataUpdate("volumes", Volume1.ID)(t)
+
+}
+
+func TestMetadataDelete(t *testing.T) {
+	gtesting.BuildTestMetadataDelete("volumes", Volume1.ID)(t)
 }
