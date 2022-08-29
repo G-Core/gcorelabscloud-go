@@ -17,7 +17,7 @@ var availableFloatingIPListSubCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		results, err := floatingips.ListAll(client)
+		results, err := floatingips.ListAll(client, nil)
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
