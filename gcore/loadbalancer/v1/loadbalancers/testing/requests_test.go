@@ -2,15 +2,14 @@ package testing
 
 import (
 	"fmt"
+	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/loadbalancers"
+	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/types"
+	utils_testing "github.com/G-Core/gcorelabscloud-go/gcore/utils/testing"
+	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
+	"github.com/stretchr/testify/require"
 	"net"
 	"net/http"
 	"testing"
-
-	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/loadbalancers"
-	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/types"
-	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
-
-	"github.com/stretchr/testify/require"
 
 	log "github.com/sirupsen/logrus"
 
@@ -36,6 +35,16 @@ func prepareListTestURL() string {
 
 func prepareGetTestURL(id string) string {
 	return prepareGetTestURLParams(fake.ProjectID, fake.RegionID, id)
+}
+func prepareGetActionTestURLParams(version string, id string, action string) string { // nolint
+	return fmt.Sprintf("/%s/floatingips/%d/%d/%s/%s", version, fake.ProjectID, fake.RegionID, id, action)
+}
+func prepareMetadataTestURL(id string) string {
+	return prepareGetActionTestURLParams("v1", id, "metadata")
+}
+
+func prepareMetadataItemTestURL(id string) string {
+	return fmt.Sprintf("/%s/floatingips/%d/%d/%s/%s", "v1", fake.ProjectID, fake.RegionID, id, "metadata_item")
 }
 
 func TestList(t *testing.T) {
@@ -305,4 +314,25 @@ func TestCreateCustomSecurityGroup(t *testing.T) {
 
 	err := loadbalancers.CreateCustomSecurityGroup(client, LoadBalancer1.ID).ExtractErr()
 	require.NoError(t, err)
+}
+
+func TestMetadataListAll(t *testing.T) {
+	utils_testing.BuildTestMetadataListAll("loadbalancers", LoadBalancer1.ID)(t)
+}
+
+func TestMetadataGet(t *testing.T) {
+	utils_testing.BuildTestMetadataGet("loadbalancers", LoadBalancer1.ID)(t)
+}
+
+func TestMetadataCreate(t *testing.T) {
+	utils_testing.BuildTestMetadataCreate("loadbalancers", LoadBalancer1.ID)(t)
+}
+
+func TestMetadataUpdate(t *testing.T) {
+	utils_testing.BuildTestMetadataUpdate("loadbalancers", LoadBalancer1.ID)(t)
+
+}
+
+func TestMetadataDelete(t *testing.T) {
+	utils_testing.BuildTestMetadataDelete("loadbalancers", LoadBalancer1.ID)(t)
 }
