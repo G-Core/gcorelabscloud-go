@@ -2,6 +2,7 @@ package loadbalancers
 
 import (
 	"fmt"
+	cmeta "github.com/G-Core/gcorelabscloud-go/client/utils/metadata"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
@@ -313,5 +314,47 @@ var Commands = cli.Command{
 		&listeners.ListenerCommands,
 		&lbpools.PoolCommands,
 		&securityGroupSubCommand,
+		{
+			Name:  "metadata",
+			Usage: "Loadbalancer metadata",
+			Subcommands: []*cli.Command{
+				cmeta.NewMetadataListCommand(
+					client.NewLoadbalancerClientV1,
+					"Get loadbalancer metadata",
+					"<loadbalancer_id>",
+					"loadbalancer_id is mandatory argument",
+				),
+				cmeta.NewMetadataGetCommand(
+					client.NewLoadbalancerClientV1,
+					"Show loadbalancer metadata by key",
+					"<loadbalancer_id>",
+					"loadbalancer_id is mandatory argument",
+				),
+				cmeta.NewMetadataDeleteCommand(
+					client.NewLoadbalancerClientV1,
+					"Delete loadbalancer metadata by key",
+					"<loadbalancer_id>",
+					"loadbalancer_id is mandatory argument",
+				),
+				cmeta.NewMetadataCreateCommand(
+					client.NewLoadbalancerClientV1,
+					"Create loadbalancer metadata. It would update existing keys",
+					"<loadbalancer_id>",
+					"loadbalancer_id is mandatory argument",
+				),
+				cmeta.NewMetadataUpdateCommand(
+					client.NewLoadbalancerClientV1,
+					"Update loadbalancer metadata. It overriding existing records",
+					"<loadbalancer_id>",
+					"loadbalancer_id is mandatory argument",
+				),
+				cmeta.NewMetadataReplaceCommand(
+					client.NewLoadbalancerClientV1,
+					"Replace loadbalancer metadata. It replace existing records",
+					"<loadbalancer_id>",
+					"loadbalancer_id is mandatory argument",
+				),
+			},
+		},
 	},
 }

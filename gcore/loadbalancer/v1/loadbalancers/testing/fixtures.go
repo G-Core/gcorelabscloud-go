@@ -1,17 +1,19 @@
 package testing
 
 import (
-	"net"
-	"time"
-
+	"fmt"
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/loadbalancers"
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
+	utils_testing "github.com/G-Core/gcorelabscloud-go/gcore/utils/testing"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
+	"net"
+	"time"
 )
 
-const ListResponse = `
+var ListResponse = fmt.Sprintf(`
 {
   "count": 1,
   "results": [
@@ -32,11 +34,12 @@ const ListResponse = `
       "vip_address": "5.5.5.5",
       "operating_status": "ONLINE",
       "project_id": 1,
-      "region_id": 1
+      "region_id": 1,
+ 	  "metadata": [%s]
     }
   ]
 }
-`
+`, utils_testing.MetadataResponse)
 
 const ListCustomSecurityGroupResponse = `
 {
@@ -50,7 +53,7 @@ const ListCustomSecurityGroupResponse = `
 }
 `
 
-const GetResponse = `
+var GetResponse = fmt.Sprintf(`
 {
   "region": "RegionOne",
   "created_at": "2020-01-24T13:57:12+0000",
@@ -68,9 +71,10 @@ const GetResponse = `
   "vip_address": "5.5.5.5",
   "operating_status": "ONLINE",
   "project_id": 1,
-  "region_id": 1
+  "region_id": 1,
+  "metadata": [%s]
 }
-`
+`, utils_testing.MetadataResponse)
 
 const CreateRequest = `
 {
@@ -163,6 +167,7 @@ var (
 		ProjectID:     fake.ProjectID,
 		RegionID:      fake.RegionID,
 		Region:        "RegionOne",
+		Metadata:      []metadata.Metadata{utils_testing.ResourceMetadataReadOnly},
 	}
 	Tasks1 = tasks.TaskResults{
 		Tasks: []tasks.TaskID{"50f53a35-42ed-40c4-82b2-5a37fb3e00bc"},

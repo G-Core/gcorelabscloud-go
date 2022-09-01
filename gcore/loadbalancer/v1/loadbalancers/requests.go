@@ -119,13 +119,13 @@ type CreateListenerOpts struct {
 
 // CreateOpts represents options used to create a loadbalancer.
 type CreateOpts struct {
-	Name         string                 `json:"name" required:"true" validate:"required,name"`
-	Listeners    []CreateListenerOpts   `json:"listeners,omitempty" validate:"omitempty,dive"`
-	VipNetworkID string                 `json:"vip_network_id,omitempty"`
-	VipSubnetID  string                 `json:"vip_subnet_id,omitempty"`
-	Flavor       *string                `json:"flavor,omitempty"`
-	Tags         []string               `json:"tag,omitempty"`
-	Metadata     map[string]interface{} `json:"metadata,omitempty"`
+	Name         string               `json:"name" required:"true" validate:"required,name"`
+	Listeners    []CreateListenerOpts `json:"listeners,omitempty" validate:"omitempty,dive"`
+	VipNetworkID string               `json:"vip_network_id,omitempty"`
+	VipSubnetID  string               `json:"vip_subnet_id,omitempty"`
+	Flavor       *string              `json:"flavor,omitempty"`
+	Tags         []string             `json:"tag,omitempty"`
+	Metadata     map[string]string    `json:"metadata,omitempty"`
 }
 
 // ToLoadBalancerCreateMap builds a request body from CreateOpts.
@@ -183,6 +183,18 @@ func Update(c *gcorecloud.ServiceClient, loadbalancerID string, opts UpdateOptsB
 func Delete(c *gcorecloud.ServiceClient, loadbalancerID string) (r tasks.Result) {
 	_, r.Err = c.DeleteWithResponse(deleteURL(c, loadbalancerID), &r.Body, nil)
 	return
+}
+
+// ToFloatingIPListQuery formats a ListOpts into a query string.
+func (opts ListOpts) ToLoadBalancerQuery() (string, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return "", err
+	}
+	q, err := gcorecloud.BuildQueryString(opts)
+	if err != nil {
+		return "", err
+	}
+	return q.String(), err
 }
 
 // ListAll returns all LBs

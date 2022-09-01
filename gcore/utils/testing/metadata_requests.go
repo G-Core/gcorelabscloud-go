@@ -2,7 +2,6 @@ package testing
 
 import (
 	"fmt"
-
 	"net/http"
 	"net/url"
 	"testing"
@@ -16,6 +15,8 @@ import (
 )
 
 type TestFunc func(t *testing.T)
+
+type UrlFunc func(c *gcorecloud.ServiceClient, id string, args ...string)
 
 func prepareTestParams(resourceName string, urlFunc func(c *gcorecloud.ServiceClient) string, extraParams ...string) (client *gcorecloud.ServiceClient, relativeUrl string) {
 	version := "v1"
