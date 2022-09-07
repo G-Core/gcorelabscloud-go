@@ -16,6 +16,10 @@ func prepareCreateTestURLParams() string {
 	return fmt.Sprintf("/internal/users")
 }
 
+func prepareCreateApiTokenTestURLParams() string {
+	return fmt.Sprintf("/internal/permanent_api_token")
+}
+
 func TestCreateUser(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
@@ -35,13 +39,45 @@ func TestCreateUser(t *testing.T) {
 		}
 	})
 
-	opts := users.CreateOpts{
+	opts := users.CreateUserOpts{
 		Email:    "test@test.test",
 		Password: "test",
 	}
 
 	client := fake.ServiceTokenClient("", "internal")
-	user, err := users.Create(client, opts).Extract()
+	user, err := users.CreateUser(client, opts).Extract()
 	require.NoError(t, err)
 	require.Equal(t, User1, *user)
+}
+
+func TestCreateApiToken(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareCreateApiTokenTestURLParams(), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestJSONRequest(t, r, CreateApiTokenRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, CreateApiTokenResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	opts := users.CreateApiTokenOpts{
+		Email:            "test@test.test",
+		Password:         "test",
+		TokenName:        "test",
+		TokenDescription: "test description",
+	}
+
+	client := fake.ServiceTokenClient("", "internal")
+	token, err := users.CreateApiToken(client, opts).Extract()
+	require.NoError(t, err)
+	require.Equal(t, Token1, *token)
 }
