@@ -28,7 +28,7 @@ var loadBalancerListSubCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		results, err := loadbalancers.ListAll(client)
+		results, err := loadbalancers.ListAll(client, nil)
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
