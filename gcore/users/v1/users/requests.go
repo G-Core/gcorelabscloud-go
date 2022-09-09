@@ -4,6 +4,38 @@ import (
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 )
 
+// UserAssignmentOptsBuilder allows extensions to add additional parameters to the user assignment request.
+type UserAssignmentOptsBuilder interface {
+	ToUserAssignmentMap() (map[string]interface{}, error)
+}
+
+// UserAssignmentOpts represents options used to assign role to user.
+type UserAssignmentOpts struct {
+	ClientID  int    `json:"client_id" required:"true"`
+	ProjectID int    `json:"project_id" required:"true"`
+	UserID    int    `json:"user_id" required:"true"`
+	Role      string `json:"role" required:"true"`
+}
+
+// ToUserAssignmentMap builds a request body from UserAssignmentOpts.
+func (opts UserAssignmentOpts) ToUserAssignmentMap() (map[string]interface{}, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return nil, err
+	}
+	return gcorecloud.BuildRequestBody(opts, "")
+}
+
+// AssignUser accepts a UserAssignmentOpts struct and assigns role to user using the values provided.
+func AssignUser(c *gcorecloud.ServiceClient, opts UserAssignmentOptsBuilder) (r CreateUserResult) {
+	b, err := opts.ToUserAssignmentMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = c.Post(assignUserRoleURL(c), b, &r.Body, nil)
+	return
+}
+
 // CreateUserOptsBuilder allows extensions to add additional parameters to the Create request.
 type CreateUserOptsBuilder interface {
 	ToUserCreateMap() (map[string]interface{}, error)
