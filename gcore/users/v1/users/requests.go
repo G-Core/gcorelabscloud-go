@@ -11,8 +11,8 @@ type UserAssignmentOptsBuilder interface {
 
 // UserAssignmentOpts represents options used to assign role to user.
 type UserAssignmentOpts struct {
-	ClientID  int    `json:"client_id" required:"true"`
-	ProjectID int    `json:"project_id" required:"true"`
+	ClientID  *int   `json:"client_id"`
+	ProjectID *int   `json:"project_id"`
 	UserID    int    `json:"user_id" required:"true"`
 	Role      string `json:"role" required:"true"`
 }
@@ -26,7 +26,7 @@ func (opts UserAssignmentOpts) ToUserAssignmentMap() (map[string]interface{}, er
 }
 
 // AssignUser accepts a UserAssignmentOpts struct and assigns role to user using the values provided.
-func AssignUser(c *gcorecloud.ServiceClient, opts UserAssignmentOptsBuilder) (r CreateUserResult) {
+func AssignUser(c *gcorecloud.ServiceClient, opts UserAssignmentOptsBuilder) (r UserAssignmentResult) {
 	b, err := opts.ToUserAssignmentMap()
 	if err != nil {
 		r.Err = err

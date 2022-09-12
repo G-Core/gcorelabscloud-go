@@ -57,7 +57,7 @@ func TestList(t *testing.T) {
 	client := fake.ServiceTokenClient("loadbalancers", "v1")
 	count := 0
 
-	err := loadbalancers.List(client).EachPage(func(page pagination.Page) (bool, error) {
+	err := loadbalancers.List(client, nil).EachPage(func(page pagination.Page) (bool, error) {
 		count++
 		actual, err := loadbalancers.ExtractLoadBalancers(page)
 		require.NoError(t, err)
@@ -92,7 +92,7 @@ func TestListAll(t *testing.T) {
 
 	client := fake.ServiceTokenClient("loadbalancers", "v1")
 
-	lbs, err := loadbalancers.ListAll(client)
+	lbs, err := loadbalancers.ListAll(client, nil)
 	require.NoError(t, err)
 	lb := lbs[0]
 	require.Equal(t, LoadBalancer1, lb)

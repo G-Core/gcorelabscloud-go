@@ -20,6 +20,10 @@ func prepareCreateApiTokenTestURLParams() string {
 	return fmt.Sprintf("/internal/permanent_api_token")
 }
 
+func prepareUserAssignmentsTestURLParams() string {
+	return fmt.Sprintf("/v1/users/assignments")
+}
+
 func TestCreateUser(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
@@ -80,4 +84,36 @@ func TestCreateApiToken(t *testing.T) {
 	token, err := users.CreateApiToken(client, opts).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Token1, *token)
+}
+
+func TestUserAssignments(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareUserAssignmentsTestURLParams(), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestJSONRequest(t, r, UserAssignmentsRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, UserAssignmentsResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	clientID = 8
+	opts := users.UserAssignmentOpts{
+		ClientID: &clientID,
+		UserID:   777,
+		Role:     "ClientAdministrator",
+	}
+
+	client := fake.ServiceTokenClient("users", "v1")
+	ua, err := users.AssignUser(client, opts).Extract()
+	require.NoError(t, err)
+	require.Equal(t, UA1, *ua)
 }

@@ -30,5 +30,34 @@ const CreateApiTokenResponse = `
 }
 `
 
-var User1 = users.User{UserID: 1}
-var Token1 = users.ApiToken{Token: "1"}
+const UserAssignmentsRequest = `
+{
+    "client_id": 8,
+    "project_id": null,
+    "role": "ClientAdministrator",
+    "user_id": 777
+}
+`
+
+const UserAssignmentsResponse = `
+{
+    "client_id": 8,
+    "id": 12,
+    "project_id": null,
+    "role": "ClientAdministrator",
+    "user_id": 777
+}
+`
+
+var (
+	User1  = users.User{UserID: 1}
+	Token1 = users.ApiToken{Token: "1"}
+
+	clientID = 8
+	UA1      = users.UserAssignment{
+		ClientID: &clientID,
+		ID:       12,
+		Role:     "ClientAdministrator",
+		UserID:   777,
+	}
+)

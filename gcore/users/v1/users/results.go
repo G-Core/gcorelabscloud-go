@@ -57,14 +57,14 @@ type commonUserAssignmentResult struct {
 }
 
 type UserAssignment struct {
-	ClientID  int    `json:"client_id"`
+	ClientID  *int   `json:"client_id"`
 	ID        int    `json:"id"`
-	ProjectID int    `json:"project_id"`
+	ProjectID *int   `json:"project_id"`
 	UserID    int    `json:"user_id"`
 	Role      string `json:"role"`
 }
 
-// Extract is a function that accepts a result and extracts an api token resource.
+// Extract is a function that accepts a result and extracts a user assignments resource.
 func (r commonUserAssignmentResult) Extract() (*UserAssignment, error) {
 	var s UserAssignment
 	err := r.ExtractInto(&s)
@@ -76,7 +76,7 @@ func (r commonUserAssignmentResult) ExtractInto(v interface{}) error {
 }
 
 // UserAssignmentResult represents the result of a user assignment operation. Call its Extract
-// method to interpret it as an api token.
+// method to interpret it as a user assignments.
 type UserAssignmentResult struct {
 	commonUserAssignmentResult
 }
