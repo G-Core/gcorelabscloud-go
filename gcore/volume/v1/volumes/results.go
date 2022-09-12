@@ -92,6 +92,7 @@ type Volume struct {
 	Bootable         bool                    `json:"bootable"`
 	SnapshotID       string                  `json:"snapshot_id"`
 	SourceVolID      string                  `json:"source_volid"`
+	InstanceID       string                  `json:"instance_id"`
 	ProjectID        int                     `json:"project_id"`
 	RegionID         int                     `json:"region_id"`
 	Attachments      []Attachment            `json:"attachments"`

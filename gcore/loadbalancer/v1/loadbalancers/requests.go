@@ -11,11 +11,44 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
-func List(c *gcorecloud.ServiceClient) pagination.Pager {
+func List(c *gcorecloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
 	url := listURL(c)
+	if opts != nil {
+		query, err := opts.ToLoadBalancerListQuery()
+		if err != nil {
+			return pagination.Pager{Err: err}
+		}
+		url += query
+	}
 	return pagination.NewPager(c, url, func(r pagination.PageResult) pagination.Page {
 		return LoadBalancerPage{pagination.LinkedPageBase{PageResult: r}}
 	})
+}
+
+// ListOpts allows the filtering and sorting List API response.
+type ListOpts struct {
+	ShowStats        bool              `q:"show_stats" validate:"omitempty"`
+	AssignedFloating bool              `q:"assigned_floating" validate:"omitempty"`
+	MetadataK        string            `q:"metadata_k" validate:"omitempty"`
+	MetadataKV       map[string]string `q:"metadata_kv" validate:"omitempty"`
+}
+
+// ToLoadBalancerListQuery formats a ListOpts into a query string.
+func (opts ListOpts) ToLoadBalancerListQuery() (string, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return "", err
+	}
+
+	q, err := gcorecloud.BuildQueryString(opts)
+	if err != nil {
+		return "", err
+	}
+	return q.String(), err
+}
+
+// ListOptsBuilder allows extensions to add additional parameters to the List request.
+type ListOptsBuilder interface {
+	ToLoadBalancerListQuery() (string, error)
 }
 
 // Get retrieves a specific loadbalancer based on its unique ID.
@@ -86,12 +119,13 @@ type CreateListenerOpts struct {
 
 // CreateOpts represents options used to create a loadbalancer.
 type CreateOpts struct {
-	Name         string               `json:"name" required:"true" validate:"required,name"`
-	Listeners    []CreateListenerOpts `json:"listeners,omitempty" validate:"omitempty,dive"`
-	VipNetworkID string               `json:"vip_network_id,omitempty"`
-	VipSubnetID  string               `json:"vip_subnet_id,omitempty"`
-	Flavor       *string              `json:"flavor,omitempty"`
-	Tags         []string             `json:"tag,omitempty"`
+	Name         string                 `json:"name" required:"true" validate:"required,name"`
+	Listeners    []CreateListenerOpts   `json:"listeners,omitempty" validate:"omitempty,dive"`
+	VipNetworkID string                 `json:"vip_network_id,omitempty"`
+	VipSubnetID  string                 `json:"vip_subnet_id,omitempty"`
+	Flavor       *string                `json:"flavor,omitempty"`
+	Tags         []string               `json:"tag,omitempty"`
+	Metadata     map[string]interface{} `json:"metadata,omitempty"`
 }
 
 // ToLoadBalancerCreateMap builds a request body from CreateOpts.
@@ -152,8 +186,8 @@ func Delete(c *gcorecloud.ServiceClient, loadbalancerID string) (r tasks.Result)
 }
 
 // ListAll returns all LBs
-func ListAll(c *gcorecloud.ServiceClient) ([]LoadBalancer, error) {
-	page, err := List(c).AllPages()
+func ListAll(c *gcorecloud.ServiceClient, opts ListOptsBuilder) ([]LoadBalancer, error) {
+	page, err := List(c, opts).AllPages()
 	if err != nil {
 		return nil, err
 	}

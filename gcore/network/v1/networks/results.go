@@ -2,6 +2,7 @@ package networks
 
 import (
 	"fmt"
+
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"

@@ -3,6 +3,7 @@ package availablenetworks
 import (
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/subnet/v1/subnets"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
@@ -22,6 +23,7 @@ type Network struct {
 	ProjectID int                      `json:"project_id"`
 	RegionID  int                      `json:"region_id"`
 	Region    string                   `json:"region"`
+	Metadata  []metadata.Metadata      `json:"metadata"`
 }
 
 // NetworkPage is the page returned by a pager when traversing over a

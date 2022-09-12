@@ -9,3 +9,7 @@ func createUserURL(c *gcorecloud.ServiceClient) string {
 func createApiTokenURL(c *gcorecloud.ServiceClient) string {
 	return c.BaseServiceURL("permanent_api_token")
 }
+
+func assignUserRoleURL(c *gcorecloud.ServiceClient) string {
+	return c.BaseServiceURL("users", "assignments")
+}
