@@ -1,10 +1,11 @@
 package floatingips
 
 import (
+	"net"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
-	"net"
 )
 
 // ListOpts allows the filtering and sorting of paginated collections through the API.

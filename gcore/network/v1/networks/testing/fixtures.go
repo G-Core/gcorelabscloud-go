@@ -2,12 +2,12 @@ package testing
 
 import (
 	"fmt"
-	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"time"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/network/v1/networks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 )
 

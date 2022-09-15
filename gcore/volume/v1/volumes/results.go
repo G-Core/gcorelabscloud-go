@@ -2,10 +2,10 @@ package volumes
 
 import (
 	"fmt"
-	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 

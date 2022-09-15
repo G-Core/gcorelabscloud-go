@@ -3,12 +3,13 @@ package metadata
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"github.com/urfave/cli/v2"
-	"strings"
 )
 
 type ClientConstructor func(c *cli.Context) (*gcorecloud.ServiceClient, error)
@@ -18,7 +19,6 @@ func showResults(c *cli.Context, data interface{}) error {
 		err := json.NewEncoder(c.App.Writer).Encode(data)
 		if err != nil {
 			return err
-			//return cli.NewExitError(err, 1)
 		}
 	} else {
 		utils.ShowResults(data, c.String("format"))
@@ -70,7 +70,11 @@ func NewMetadataListCommand(cc ClientConstructor, usage string, argsUsage string
 				return cli.NewExitError(err, 1)
 			}
 
-			showResults(c, metadata)
+			err = showResults(c, metadata)
+			if err != nil {
+				return cli.NewExitError(err, 1)
+			}
+
 			return nil
 		},
 	}

@@ -2,6 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+
 	"github.com/G-Core/gcorelabscloud-go/client/apitokens/v1/apitokens"
 	"github.com/G-Core/gcorelabscloud-go/client/apptemplates/v1/apptemplates"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
@@ -35,8 +38,6 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/client/volumes/v1/volumes"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
-	"os"
-	"path/filepath"
 )
 
 var AppVersion = "v0.2.11"

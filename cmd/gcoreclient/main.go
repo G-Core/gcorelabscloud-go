@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/G-Core/gcorelabscloud-go/cmd"
 	"os"
+
+	"github.com/G-Core/gcorelabscloud-go/cmd"
 )
 
 func main() {

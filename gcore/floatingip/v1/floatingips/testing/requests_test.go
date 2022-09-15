@@ -2,12 +2,12 @@ package testing
 
 import (
 	"fmt"
-	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"net"
 	"net/http"
 	"testing"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/floatingip/v1/floatingips"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 
 	"github.com/stretchr/testify/require"

@@ -4,17 +4,14 @@ import (
 	"fmt"
 	"net"
 
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/client/floatingips/v1/availablefloatingips"
 	"github.com/G-Core/gcorelabscloud-go/client/floatingips/v1/client"
-
-	gcorecloud "github.com/G-Core/gcorelabscloud-go"
-	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
-
-	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
-
-	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
+	cmeta "github.com/G-Core/gcorelabscloud-go/client/utils/metadata"
 	"github.com/G-Core/gcorelabscloud-go/gcore/floatingip/v1/floatingips"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/urfave/cli/v2"
 )
 
@@ -92,11 +89,11 @@ var floatingIPCreateSubCommand = cli.Command{
 			if err != nil {
 				return nil, fmt.Errorf("cannot retrieve floating IP ID from task info: %w", err)
 			}
-			volume, err := floatingips.Get(client, floatingIPID).Extract()
+			floatingIP, err := floatingips.Get(client, floatingIPID).Extract()
 			if err != nil {
 				return nil, fmt.Errorf("cannot get floating IP ID: %s. Error: %w", floatingIPID, err)
 			}
-			utils.ShowResults(volume, c.String("format"))
+			utils.ShowResults(floatingIP, c.String("format"))
 			return nil, nil
 		})
 
@@ -151,7 +148,7 @@ var floatingIPDeleteSubCommand = cli.Command{
 		}
 
 		return utils.WaitTaskAndShowResult(c, client, results, false, func(task tasks.TaskID) (interface{}, error) {
-			_, err := volumes.Get(client, floatingIPID).Extract()
+			_, err := floatingips.Get(client, floatingIPID).Extract()
 			if err == nil {
 				return nil, fmt.Errorf("cannot delete floating IP with ID: %s", floatingIPID)
 			}
@@ -255,5 +252,47 @@ var Commands = cli.Command{
 		&floatingIPDeleteSubCommand,
 		&floatingIPCreateSubCommand,
 		&availablefloatingips.AvailableFloatingIPCommands,
+		{
+			Name:  "metadata",
+			Usage: "FloatingIP metadata",
+			Subcommands: []*cli.Command{
+				cmeta.NewMetadataListCommand(
+					client.NewFloatingIPClientV1,
+					"Get floating ip metadata",
+					"<floatingip_id>",
+					"floatingip_id is mandatory argument",
+				),
+				cmeta.NewMetadataGetCommand(
+					client.NewFloatingIPClientV1,
+					"Show floating ip metadata by key",
+					"<floatingip_id>",
+					"floatingip_id is mandatory argument",
+				),
+				cmeta.NewMetadataDeleteCommand(
+					client.NewFloatingIPClientV1,
+					"Delete floating ip metadata by key",
+					"<floatingip_id>",
+					"floatingip_id is mandatory argument",
+				),
+				cmeta.NewMetadataCreateCommand(
+					client.NewFloatingIPClientV1,
+					"Create floating ip metadata. It would update existing keys",
+					"<floatingip_id>",
+					"floatingip_id is mandatory argument",
+				),
+				cmeta.NewMetadataUpdateCommand(
+					client.NewFloatingIPClientV1,
+					"Update floating ip metadata. It overriding existing records",
+					"<floatingip_id>",
+					"floatingip_id is mandatory argument",
+				),
+				cmeta.NewMetadataReplaceCommand(
+					client.NewFloatingIPClientV1,
+					"Replace floating ip metadata. It replace existing records",
+					"<floatingip_id>",
+					"floatingip_id is mandatory argument",
+				),
+			},
+		},
 	},
 }
