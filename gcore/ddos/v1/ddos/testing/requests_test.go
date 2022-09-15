@@ -33,7 +33,7 @@ func prepareListProfileTemplatesTestURL() string {
 }
 
 func prepareAccessibilityTestURL() string {
-	return fmt.Sprintf("/v1/ddos/accessibility")
+	return "/v1/ddos/accessibility"
 }
 
 func prepareListProfilesTestURL() string {

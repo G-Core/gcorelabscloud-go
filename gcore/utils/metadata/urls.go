@@ -2,6 +2,7 @@ package metadata
 
 import (
 	"fmt"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 )
 

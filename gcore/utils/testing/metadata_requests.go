@@ -2,20 +2,20 @@ package testing
 
 import (
 	"fmt"
+
+	"net/http"
+	"net/url"
+	"testing"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	th "github.com/G-Core/gcorelabscloud-go/testhelper"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
-	"net/http"
-	"net/url"
-	"testing"
 )
 
 type TestFunc func(t *testing.T)
-
-//type UrlFunc func(c *gcorecloud.ServiceClient, id string, args ...string)
 
 func prepareTestParams(resourceName string, urlFunc func(c *gcorecloud.ServiceClient) string, extraParams ...string) (client *gcorecloud.ServiceClient, relativeUrl string) {
 	version := "v1"

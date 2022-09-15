@@ -2,17 +2,14 @@ package testing
 
 import (
 	"fmt"
-	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"net"
 	"time"
 
-	"github.com/G-Core/gcorelabscloud-go/gcore/flavor/v1/flavors"
-
-	"github.com/G-Core/gcorelabscloud-go/gcore/floatingip/v1/floatingips"
-
-	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
-
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/flavor/v1/flavors"
+	"github.com/G-Core/gcorelabscloud-go/gcore/floatingip/v1/floatingips"
+	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 )
 
 const MetadataResponse = `

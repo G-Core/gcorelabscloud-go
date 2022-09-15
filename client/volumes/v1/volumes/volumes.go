@@ -2,15 +2,17 @@ package volumes
 
 import (
 	"fmt"
+	"strings"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	cmeta "github.com/G-Core/gcorelabscloud-go/client/utils/metadata"
+
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
-	cmeta "github.com/G-Core/gcorelabscloud-go/client/utils/metadata"
 	"github.com/G-Core/gcorelabscloud-go/client/volumes/v1/client"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
 	"github.com/urfave/cli/v2"
-	"strings"
 )
 
 var (

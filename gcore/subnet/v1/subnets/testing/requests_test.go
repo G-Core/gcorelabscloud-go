@@ -2,20 +2,17 @@ package testing
 
 import (
 	"fmt"
-	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"net"
 	"net/http"
 	"testing"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/subnet/v1/subnets"
-	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
-
-	"github.com/stretchr/testify/require"
-
-	log "github.com/sirupsen/logrus"
-
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 	th "github.com/G-Core/gcorelabscloud-go/testhelper"
+	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
+	log "github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/require"
 )
 
 func prepareListTestURLParams(projectID int, regionID int) string {

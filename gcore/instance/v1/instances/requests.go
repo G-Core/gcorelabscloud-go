@@ -1,18 +1,15 @@
 package instances
 
 import (
-	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"log"
 	"net/http"
 
-	"github.com/G-Core/gcorelabscloud-go/gcore/flavor/v1/flavors"
-	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
-
-	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
-
-	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
-
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/flavor/v1/flavors"
+	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
+	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 

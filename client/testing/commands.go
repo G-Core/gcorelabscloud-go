@@ -1,14 +1,18 @@
 package testing
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
+	"io/ioutil"
+	"reflect"
+
 	"github.com/G-Core/gcorelabscloud-go/cmd"
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"github.com/urfave/cli/v2"
-	"io/ioutil"
-	"reflect"
 )
 
 func flagSet(name string, flags []cli.Flag) (*flag.FlagSet, error) {
@@ -119,4 +123,101 @@ func InitTestApp(args []string) (*cli.App, *cli.Context) {
 	set, _ := flagSet(a.Name, a.Flags)
 	ctx := cli.NewContext(a, set, &cli.Context{Context: context.Background()})
 	return a, ctx
+}
+
+type FuncGetMetadata func() ([]metadata.Metadata, error)
+
+func MetadataTest(getMetadata FuncGetMetadata, a *cli.App, resourceName string, resourceID string) error {
+	// test metadata create
+	var meta []map[string]interface{}
+	args := []string{"gcoreclient", resourceName, "metadata", "create", "-m", "key1=val1", "-m", "key2=val2", resourceID}
+	err := a.Run(args)
+	if err != nil {
+		return err
+	}
+	var typedMeta []metadata.Metadata
+
+	typedMeta, err = getMetadata()
+	if err != nil {
+		return err
+	}
+
+	metadataMap, _ := PrepareMetadata(typedMeta)
+	if !reflect.DeepEqual(metadataMap, map[string]string{"key1": "val1", "key2": "val2"}) {
+		return errors.New("meta after create is not equal")
+	}
+
+	// test metadata list
+	a.Writer = new(bytes.Buffer)
+	args = []string{"gcoreclient", resourceName, "metadata", "list", "-t", resourceID}
+	err = a.Run(args)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(a.Writer.(*bytes.Buffer).Bytes(), &meta)
+	if err != nil {
+		return err
+	}
+
+	isEqual, err := CompareMetadata(map[string]string{"key1": "val1", "key2": "val2"}, meta)
+
+	if err != nil {
+		return err
+	}
+	if !isEqual {
+		return errors.New("meta after list is not equal")
+	}
+
+	// test metadata get by key
+	var metaOne map[string]interface{}
+	a.Writer = new(bytes.Buffer)
+	args = []string{"gcoreclient", resourceName, "metadata", "show", "-t", "-m", "key1", resourceID}
+	err = a.Run(args)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(a.Writer.(*bytes.Buffer).Bytes(), &metaOne)
+	if err != nil {
+		return err
+	}
+
+	if !reflect.DeepEqual(map[string]interface{}{"key": "key1", "value": "val1", "read_only": false}, metaOne) {
+		return errors.New("meta after show is not equal")
+	}
+
+	// test metadata update
+	args = []string{"gcoreclient", resourceName, "metadata", "update", "-m", "key1=val11", "-m", "key4=val4", resourceID}
+	err = a.Run(args)
+	if err != nil {
+		return err
+	}
+
+	typedMeta, err = getMetadata()
+	if err != nil {
+		return err
+	}
+	metadataMap, _ = PrepareMetadata(typedMeta)
+	if !reflect.DeepEqual(metadataMap, map[string]string{"key1": "val11", "key2": "val2", "key4": "val4"}) {
+		return errors.New("metadata after update not equal")
+	}
+
+	// test metadata replace
+	args = []string{"gcoreclient", resourceName, "metadata", "replace", "-m", "key1=val11", "-m", "key4=val4", resourceID}
+	err = a.Run(args)
+	if err != nil {
+		return err
+	}
+
+	typedMeta, err = getMetadata()
+	if err != nil {
+		return err
+	}
+	metadataMap, _ = PrepareMetadata(typedMeta)
+	if !reflect.DeepEqual(metadataMap, map[string]string{"key1": "val11", "key4": "val4"}) {
+		return errors.New("metadata after replace not equal")
+	}
+
+	return nil
 }

@@ -1,7 +1,6 @@
 package testing
 
 import (
-	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"net"
 	"time"
 
@@ -10,6 +9,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"github.com/shopspring/decimal"
 )
 

@@ -1,11 +1,12 @@
 package securitygroups
 
 import (
+	"net/http"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
-	"net/http"
 )
 
 // ListOpts allows the filtering and sorting of paginated collections through the API.

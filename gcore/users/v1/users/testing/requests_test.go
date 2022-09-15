@@ -13,15 +13,15 @@ import (
 )
 
 func prepareCreateTestURLParams() string {
-	return fmt.Sprintf("/internal/users")
+	return "/internal/users"
 }
 
 func prepareCreateApiTokenTestURLParams() string {
-	return fmt.Sprintf("/internal/permanent_api_token")
+	return "/internal/permanent_api_token"
 }
 
 func prepareUserAssignmentsTestURLParams() string {
-	return fmt.Sprintf("/v1/users/assignments")
+	return "/v1/users/assignments"
 }
 
 func TestCreateUser(t *testing.T) {
