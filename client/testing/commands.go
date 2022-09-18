@@ -7,6 +7,9 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/network/v1/networks"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"io/ioutil"
 	"reflect"
 
@@ -220,4 +223,53 @@ func MetadataTest(getMetadata FuncGetMetadata, a *cli.App, resourceName string, 
 	}
 
 	return nil
+}
+
+const networkDeleting int = 1200
+const networkCreatingTimeout int = 1200
+
+func CreateTestNetwork(client *gcorecloud.ServiceClient, opts networks.CreateOpts) (string, error) {
+	res, err := networks.Create(client, opts).Extract()
+	if err != nil {
+		return "", err
+	}
+
+	taskID := res.Tasks[0]
+	networkID, err := tasks.WaitTaskAndReturnResult(client, taskID, true, networkCreatingTimeout, func(task tasks.TaskID) (interface{}, error) {
+		taskInfo, err := tasks.Get(client, string(task)).Extract()
+		if err != nil {
+			return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
+		}
+		networkID, err := networks.ExtractNetworkIDFromTask(taskInfo)
+		if err != nil {
+			return nil, fmt.Errorf("cannot retrieve network ID from task info: %w", err)
+		}
+		return networkID, nil
+	},
+	)
+	if err != nil {
+		return "", err
+	}
+	return networkID.(string), nil
+}
+
+func DeleteTestNetwork(client *gcorecloud.ServiceClient, networkID string) error {
+	results, err := networks.Delete(client, networkID).Extract()
+	if err != nil {
+		return err
+	}
+	taskID := results.Tasks[0]
+	_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, networkDeleting, func(task tasks.TaskID) (interface{}, error) {
+		_, err := networks.Get(client, networkID).Extract()
+		if err == nil {
+			return nil, fmt.Errorf("cannot delete network with ID: %s", networkID)
+		}
+		switch err.(type) {
+		case gcorecloud.ErrDefault404:
+			return nil, nil
+		default:
+			return nil, err
+		}
+	})
+	return err
 }

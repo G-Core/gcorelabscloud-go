@@ -2,6 +2,7 @@ package subnets
 
 import (
 	"fmt"
+	cmeta "github.com/G-Core/gcorelabscloud-go/client/utils/metadata"
 	"net"
 
 	"github.com/G-Core/gcorelabscloud-go/client/subnets/v1/client"
@@ -351,5 +352,47 @@ var Commands = cli.Command{
 		&subnetDeleteCommand,
 		&subnetCreateCommand,
 		&subnetUpdateCommand,
+		{
+			Name:  "metadata",
+			Usage: "Network metadata",
+			Subcommands: []*cli.Command{
+				cmeta.NewMetadataListCommand(
+					client.NewSubnetClientV1,
+					"Get subnet metadata",
+					"<subnet_id>",
+					"subnet_id is mandatory argument",
+				),
+				cmeta.NewMetadataGetCommand(
+					client.NewSubnetClientV1,
+					"Show subnet metadata by key",
+					"<subnet_id>",
+					"subnet_id is mandatory argument",
+				),
+				cmeta.NewMetadataDeleteCommand(
+					client.NewSubnetClientV1,
+					"Delete subnet metadata by key",
+					"<subnet_id>",
+					"subnet_id is mandatory argument",
+				),
+				cmeta.NewMetadataCreateCommand(
+					client.NewSubnetClientV1,
+					"Create subnet metadata. It would update existing keys",
+					"<subnet_id>",
+					"subnet_id is mandatory argument",
+				),
+				cmeta.NewMetadataUpdateCommand(
+					client.NewSubnetClientV1,
+					"Update subnet metadata. It overriding existing records",
+					"<subnet_id>",
+					"subnet_id is mandatory argument",
+				),
+				cmeta.NewMetadataReplaceCommand(
+					client.NewSubnetClientV1,
+					"Replace subnet metadata. It replace existing records",
+					"<subnet_id>",
+					"subnet_id is mandatory argument",
+				),
+			},
+		},
 	},
 }

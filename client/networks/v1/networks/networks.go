@@ -2,6 +2,7 @@ package networks
 
 import (
 	"fmt"
+	cmeta "github.com/G-Core/gcorelabscloud-go/client/utils/metadata"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
@@ -288,5 +289,47 @@ var Commands = cli.Command{
 		&networkUpdateCommand,
 		&extensionCommands,
 		&networkInstancePortCommand,
+		{
+			Name:  "metadata",
+			Usage: "Network metadata",
+			Subcommands: []*cli.Command{
+				cmeta.NewMetadataListCommand(
+					client.NewNetworkClientV1,
+					"Get networks metadata",
+					"<network_id>",
+					"network_id is mandatory argument",
+				),
+				cmeta.NewMetadataGetCommand(
+					client.NewNetworkClientV1,
+					"Show network metadata by key",
+					"<network_id>",
+					"network_id is mandatory argument",
+				),
+				cmeta.NewMetadataDeleteCommand(
+					client.NewNetworkClientV1,
+					"Delete network metadata by key",
+					"<network_id>",
+					"network_id is mandatory argument",
+				),
+				cmeta.NewMetadataCreateCommand(
+					client.NewNetworkClientV1,
+					"Create network metadata. It would update existing keys",
+					"<network_id>",
+					"network_id is mandatory argument",
+				),
+				cmeta.NewMetadataUpdateCommand(
+					client.NewNetworkClientV1,
+					"Update network metadata. It overriding existing records",
+					"<network_id>",
+					"network_id is mandatory argument",
+				),
+				cmeta.NewMetadataReplaceCommand(
+					client.NewNetworkClientV1,
+					"Replace network metadata. It replace existing records",
+					"<network_id>",
+					"network_id is mandatory argument",
+				),
+			},
+		},
 	},
 }
