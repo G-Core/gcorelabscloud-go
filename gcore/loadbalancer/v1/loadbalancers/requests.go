@@ -1,6 +1,7 @@
 package loadbalancers
 
 import (
+	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"net"
 	"net/http"
 
@@ -119,13 +120,14 @@ type CreateListenerOpts struct {
 
 // CreateOpts represents options used to create a loadbalancer.
 type CreateOpts struct {
-	Name         string               `json:"name" required:"true" validate:"required,name"`
-	Listeners    []CreateListenerOpts `json:"listeners,omitempty" validate:"omitempty,dive"`
-	VipNetworkID string               `json:"vip_network_id,omitempty"`
-	VipSubnetID  string               `json:"vip_subnet_id,omitempty"`
-	Flavor       *string              `json:"flavor,omitempty"`
-	Tags         []string             `json:"tag,omitempty"`
-	Metadata     map[string]string    `json:"metadata,omitempty"`
+	Name         string                                      `json:"name" required:"true" validate:"required,name"`
+	Listeners    []CreateListenerOpts                        `json:"listeners,omitempty" validate:"omitempty,dive"`
+	VipNetworkID string                                      `json:"vip_network_id,omitempty"`
+	VipSubnetID  string                                      `json:"vip_subnet_id,omitempty"`
+	Flavor       *string                                     `json:"flavor,omitempty"`
+	Tags         []string                                    `json:"tag,omitempty"`
+	Metadata     map[string]string                           `json:"metadata,omitempty"`
+	FloatingIP   *instances.CreateNewInterfaceFloatingIPOpts `json:"floating_ip"`
 }
 
 // ToLoadBalancerCreateMap builds a request body from CreateOpts.
