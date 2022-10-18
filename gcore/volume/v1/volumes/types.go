@@ -15,6 +15,7 @@ const (
 	Snapshot         VolumeSource = "snapshot"
 	Standard         VolumeType   = "standard"
 	SsdHiIops        VolumeType   = "ssd_hiiops"
+	SsdLocal         VolumeType   = "ssd_local"
 	Cold             VolumeType   = "cold"
 	Ultra            VolumeType   = "ultra"
 	Creating         VolumeStatus = "creating"
@@ -191,7 +192,7 @@ func (vt VolumeType) String() string {
 }
 
 func (vt VolumeType) List() []VolumeType {
-	return []VolumeType{Standard, SsdHiIops, Cold, Ultra}
+	return []VolumeType{Standard, SsdHiIops, SsdLocal, Cold, Ultra}
 }
 
 func (vt VolumeType) StringList() []string {
@@ -204,7 +205,7 @@ func (vt VolumeType) StringList() []string {
 
 func (vt VolumeType) IsValid() error {
 	switch vt {
-	case Standard, Cold, SsdHiIops, Ultra:
+	case Standard, Cold, SsdHiIops, Ultra, SsdLocal:
 		return nil
 	}
 	return fmt.Errorf("invalid VolumeType type: %v", vt)
