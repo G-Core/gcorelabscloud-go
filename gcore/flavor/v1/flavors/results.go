@@ -50,14 +50,22 @@ type GetResult struct {
 
 // Flavor represents a flavor structure.
 type Flavor struct {
-	FlavorID      string               `json:"flavor_id"`
-	FlavorName    string               `json:"flavor_name"`
-	PriceStatus   *string              `json:"price_status,omitempty"`
-	CurrencyCode  *gcorecloud.Currency `json:"currency_code,omitempty"`
-	PricePerHour  *decimal.Decimal     `json:"price_per_hour,omitempty"`
-	PricePerMonth *decimal.Decimal     `json:"price_per_month,omitempty"`
-	RAM           int                  `json:"ram"`
-	VCPUS         int                  `json:"vcpus"`
+	FlavorID            string               `json:"flavor_id"`
+	FlavorName          string               `json:"flavor_name"`
+	PriceStatus         *string              `json:"price_status,omitempty"`
+	CurrencyCode        *gcorecloud.Currency `json:"currency_code,omitempty"`
+	PricePerHour        *decimal.Decimal     `json:"price_per_hour,omitempty"`
+	PricePerMonth       *decimal.Decimal     `json:"price_per_month,omitempty"`
+	HardwareDescription *HardwareDescription `json:"hardware_description,omitempty"`
+	RAM                 int                  `json:"ram"`
+	VCPUS               int                  `json:"vcpus"`
+}
+
+type HardwareDescription struct {
+	CPU     string `json:"cpu,omitempty"`
+	Disk    string `json:"disk,omitempty"`
+	Network string `json:"network,omitempty"`
+	RAM     string `json:"ram,omitempty"`
 }
 
 // FlavorPage is the page returned by a pager when traversing over a
