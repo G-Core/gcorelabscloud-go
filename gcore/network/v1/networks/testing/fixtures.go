@@ -74,7 +74,6 @@ var GetResponse = fmt.Sprintf(`
 const CreateRequest = `
 {
 	"name": "private",
-	"mtu": 1450,
 	"create_router": true
 }	
 `

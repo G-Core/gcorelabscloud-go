@@ -23,8 +23,7 @@ Example to List Network
 Example to Create a Network
 
 	createOpts := networks.CreateOpts{
-		Name:  "network_1",
-		MTU:   1500,
+		Name:  "network_1"
 	}
 
 	networks, err := networks.Create(networkClient, createOpts).Extract()

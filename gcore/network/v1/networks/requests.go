@@ -1,10 +1,11 @@
 package networks
 
 import (
+	"net/http"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
-	"net/http"
 )
 
 func List(c *gcorecloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
@@ -42,7 +43,6 @@ type ListOptsBuilder interface {
 // CreateOpts represents options used to create a network.
 type CreateOpts struct {
 	Name         string            `json:"name" required:"true" validate:"required"`
-	Mtu          int               `json:"mtu,omitempty" validate:"omitempty,lte=1500"`
 	CreateRouter bool              `json:"create_router"`
 	Type         string            `json:"type,omitempty" validate:"omitempty"`
 	Metadata     map[string]string `json:"metadata,omitempty"`
