@@ -206,6 +206,13 @@ var networkCreateCommand = cli.Command{
 			Usage:    "Create network router",
 			Required: false,
 		},
+		&cli.StringFlag{
+			Name:        "type",
+			Usage:       "Network type `vlan` or `vxlan`. Default to `vxlan`.",
+			Required:    false,
+			DefaultText: "vxlan",
+			Value:       "vxlan",
+		},
 	}, flags.WaitCommandFlags...,
 	),
 	Action: func(c *cli.Context) error {
@@ -217,6 +224,7 @@ var networkCreateCommand = cli.Command{
 		opts := networks.CreateOpts{
 			Name:         c.String("name"),
 			CreateRouter: c.Bool("create-router"),
+			Type:         c.String("type"),
 		}
 		results, err := networks.Create(client, opts).Extract()
 		if err != nil {
