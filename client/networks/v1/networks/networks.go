@@ -2,12 +2,12 @@ package networks
 
 import (
 	"fmt"
-	cmeta "github.com/G-Core/gcorelabscloud-go/client/utils/metadata"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/client/networks/v1/client"
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
+	cmeta "github.com/G-Core/gcorelabscloud-go/client/utils/metadata"
 	"github.com/G-Core/gcorelabscloud-go/gcore/network/v1/availablenetworks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/network/v1/networks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
@@ -201,17 +201,17 @@ var networkCreateCommand = cli.Command{
 			Usage:    "Network name",
 			Required: true,
 		},
-		&cli.IntFlag{
-			Name:        "mtu",
-			Usage:       "Network MTU",
-			DefaultText: "1450",
-			Value:       1450,
-			Required:    false,
-		},
 		&cli.BoolFlag{
 			Name:     "create-router",
 			Usage:    "Create network router",
 			Required: false,
+		},
+		&cli.StringFlag{
+			Name:        "type",
+			Usage:       "Network type `vlan` or `vxlan`. Default to `vxlan`.",
+			Required:    false,
+			DefaultText: "vxlan",
+			Value:       "vxlan",
 		},
 	}, flags.WaitCommandFlags...,
 	),
@@ -223,8 +223,8 @@ var networkCreateCommand = cli.Command{
 		}
 		opts := networks.CreateOpts{
 			Name:         c.String("name"),
-			Mtu:          c.Int("mtu"),
 			CreateRouter: c.Bool("create-router"),
+			Type:         c.String("type"),
 		}
 		results, err := networks.Create(client, opts).Extract()
 		if err != nil {

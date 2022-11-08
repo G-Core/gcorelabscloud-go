@@ -161,11 +161,8 @@ func TestCreate(t *testing.T) {
 		}
 	})
 
-	mtu := 1450
-
 	options := networks.CreateOpts{
 		Name:         Network1.Name,
-		Mtu:          mtu,
 		CreateRouter: true,
 	}
 
