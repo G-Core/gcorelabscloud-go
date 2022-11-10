@@ -158,10 +158,17 @@ func TestDelete(t *testing.T) {
 	th.Mux.HandleFunc(prepareGetTestURL(Sg1.ServerGroupID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "DELETE")
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
-		w.WriteHeader(http.StatusNoContent)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, TaskResponse)
+		if err != nil {
+			log.Error(err)
+		}
 	})
 
 	client := fake.ServiceTokenClient("servergroups", "v1")
-	err := servergroups.Delete(client, Sg1.ServerGroupID).ExtractErr()
+	task, err := servergroups.Delete(client, Sg1.ServerGroupID).Extract()
 	require.NoError(t, err)
+	require.Equal(t, Tasks1, *task)
 }

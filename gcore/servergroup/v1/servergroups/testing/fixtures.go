@@ -1,6 +1,17 @@
 package testing
 
-import "github.com/G-Core/gcorelabscloud-go/gcore/servergroup/v1/servergroups"
+import (
+	"github.com/G-Core/gcorelabscloud-go/gcore/servergroup/v1/servergroups"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
+)
+
+const TaskResponse = `
+{
+  "tasks": [
+    "50f53a35-42ed-40c4-82b2-5a37fb3e00bc"
+  ]
+}
+`
 
 var ListResponse = `
 {
@@ -63,4 +74,7 @@ var (
 		Policy: "anti-affinity",
 	}
 	ExpectedServerGroupSlice = []servergroups.ServerGroup{Sg1}
+	Tasks1                   = tasks.TaskResults{
+		Tasks: []tasks.TaskID{"50f53a35-42ed-40c4-82b2-5a37fb3e00bc"},
+	}
 )
