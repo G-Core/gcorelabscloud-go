@@ -127,7 +127,7 @@ type CreateOpts struct {
 	Flavor       *string                                     `json:"flavor,omitempty"`
 	Tags         []string                                    `json:"tag,omitempty"`
 	Metadata     map[string]string                           `json:"metadata,omitempty"`
-	FloatingIP   *instances.CreateNewInterfaceFloatingIPOpts `json:"floating_ip"`
+	FloatingIP   *instances.CreateNewInterfaceFloatingIPOpts `json:"floating_ip,omitempty"`
 }
 
 // ToLoadBalancerCreateMap builds a request body from CreateOpts.

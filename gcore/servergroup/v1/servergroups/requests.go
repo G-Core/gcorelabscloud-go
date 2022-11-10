@@ -2,6 +2,7 @@ package servergroups
 
 import (
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
@@ -47,8 +48,8 @@ func Get(c *gcorecloud.ServiceClient, id string) (r GetResult) {
 }
 
 // Delete accepts a unique ID and deletes the server group associated with it.
-func Delete(c *gcorecloud.ServiceClient, serverGroupID string) (r DeleteResult) {
-	_, r.Err = c.Delete(deleteURL(c, serverGroupID), nil)
+func Delete(c *gcorecloud.ServiceClient, serverGroupID string) (r tasks.Result) {
+	_, r.Err = c.DeleteWithResponse(deleteURL(c, serverGroupID), &r.Body, nil)
 	return
 }
 
