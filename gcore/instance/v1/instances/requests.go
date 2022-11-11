@@ -141,7 +141,7 @@ type CreateOpts struct {
 	Flavor         string                        `json:"flavor" required:"true"`
 	Names          []string                      `json:"names,omitempty" validate:"required_without=NameTemplates"`
 	NameTemplates  []string                      `json:"name_templates,omitempty" validate:"required_without=Names"`
-	Volumes        []CreateVolumeOpts            `json:"volumes" required:"true" validate:"required,dive"`
+	Volumes        []CreateVolumeOpts            `json:"volumes" validate:"dive"`
 	Interfaces     []InterfaceInstanceCreateOpts `json:"interfaces" required:"true" validate:"required,dive"`
 	SecurityGroups []gcorecloud.ItemID           `json:"security_groups,omitempty" validate:"omitempty,dive,uuid4"`
 	Keypair        string                        `json:"keypair_name,omitempty"`

@@ -255,8 +255,7 @@ const CreateRequest = `
 	  },
 	  "network_id": "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c",
 	  "subnet_id": "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c",
-	  "type": "subnet",
-      "security_groups": []
+	  "type": "subnet"
 	}
   ],
   "keypair_name": "keypair",
@@ -444,9 +443,6 @@ const ListAvailableFlavorsResponse = `
       "currency_code": "USD",
       "flavor_id": "g1-gpu-1-2-1",
       "flavor_name": "g1-gpu-1-2-1",
-      "hardware_description": {
-        "gpu": "1x NVIDIA 11GB"
-      },
       "price_per_hour": 1,
       "price_per_month": 720,
       "price_status": "show",
