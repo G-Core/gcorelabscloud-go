@@ -78,10 +78,11 @@ var serverGroupDeleteCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		err = servergroups.Delete(client, serverGroupID).ExtractErr()
+		result, err := servergroups.Delete(client, serverGroupID).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
+		utils.ShowResults(result, c.String("format"))
 		return nil
 	},
 }
