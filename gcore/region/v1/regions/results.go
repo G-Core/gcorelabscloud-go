@@ -43,18 +43,19 @@ type UpdateResult struct {
 
 // Region represents a region structure.
 type Region struct {
-	ID                int                       `json:"id"`
-	DisplayName       string                    `json:"display_name"`
-	KeystoneName      string                    `json:"keystone_name"`
-	State             types.RegionState         `json:"state"`
-	TaskID            *string                   `json:"task_id"`
-	EndpointType      types.EndpointType        `json:"endpoint_type"`
-	ExternalNetworkID string                    `json:"external_network_id"`
-	SpiceProxyURL     gcorecloud.URL            `json:"spice_proxy_url"`
-	CreatedOn         gcorecloud.JSONRFC3339NoZ `json:"created_on"`
-	KeystoneID        int                       `json:"keystone_id"`
-	Keystone          keystones.Keystone        `json:"keystone"`
-	HasBaremetal      bool                      `json:"has_baremetal"`
+	ID                   int                       `json:"id"`
+	DisplayName          string                    `json:"display_name"`
+	KeystoneName         string                    `json:"keystone_name"`
+	State                types.RegionState         `json:"state"`
+	TaskID               *string                   `json:"task_id"`
+	EndpointType         types.EndpointType        `json:"endpoint_type"`
+	ExternalNetworkID    string                    `json:"external_network_id"`
+	SpiceProxyURL        gcorecloud.URL            `json:"spice_proxy_url"`
+	CreatedOn            gcorecloud.JSONRFC3339NoZ `json:"created_on"`
+	KeystoneID           int                       `json:"keystone_id"`
+	Keystone             keystones.Keystone        `json:"keystone"`
+	HasBaremetal         bool                      `json:"has_baremetal"`
+	AvailableVolumeTypes []string                  `json:"available_volume_types"`
 }
 
 // RegionPage is the page returned by a pager when traversing over a
