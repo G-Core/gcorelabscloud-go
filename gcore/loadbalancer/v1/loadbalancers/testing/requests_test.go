@@ -2,14 +2,16 @@ package testing
 
 import (
 	"fmt"
+	"net"
+	"net/http"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/loadbalancers"
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/types"
 	utils_testing "github.com/G-Core/gcorelabscloud-go/gcore/utils/testing"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
-	"github.com/stretchr/testify/require"
-	"net"
-	"net/http"
-	"testing"
 
 	log "github.com/sirupsen/logrus"
 

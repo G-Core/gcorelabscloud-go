@@ -3,7 +3,6 @@ package instances
 import (
 	"encoding/json"
 	"fmt"
-
 	"net"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
@@ -99,7 +98,7 @@ type SecurityGroupActionResult struct {
 	gcorecloud.ErrResult
 }
 
-//  InterfaceActionResult represents the result of a actions operation(no content)
+// InterfaceActionResult represents the result of a actions operation(no content)
 type InterfaceActionResult struct {
 	gcorecloud.ErrResult
 }

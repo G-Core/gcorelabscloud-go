@@ -7,15 +7,17 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	gcorecloud "github.com/G-Core/gcorelabscloud-go"
-	"github.com/G-Core/gcorelabscloud-go/gcore/network/v1/networks"
-	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"io/ioutil"
 	"reflect"
 
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/network/v1/networks"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
+
+	"github.com/urfave/cli/v2"
+
 	"github.com/G-Core/gcorelabscloud-go/cmd"
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
-	"github.com/urfave/cli/v2"
 )
 
 func flagSet(name string, flags []cli.Flag) (*flag.FlagSet, error) {

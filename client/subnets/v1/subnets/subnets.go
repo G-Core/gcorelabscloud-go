@@ -2,8 +2,9 @@ package subnets
 
 import (
 	"fmt"
-	cmeta "github.com/G-Core/gcorelabscloud-go/client/utils/metadata"
 	"net"
+
+	cmeta "github.com/G-Core/gcorelabscloud-go/client/utils/metadata"
 
 	"github.com/G-Core/gcorelabscloud-go/client/subnets/v1/client"
 

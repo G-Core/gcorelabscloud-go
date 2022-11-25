@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/urfave/cli/v2"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
-	"github.com/urfave/cli/v2"
 )
 
 type ClientConstructor func(c *cli.Context) (*gcorecloud.ServiceClient, error)
@@ -117,8 +118,7 @@ func NewMetadataGetCommand(cc ClientConstructor, usage string, argsUsage string,
 				return cli.NewExitError(err, 1)
 			}
 
-			showResults(c, metadata)
-			return nil
+			return showResults(c, metadata)
 		}}
 }
 

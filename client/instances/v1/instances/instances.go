@@ -3,7 +3,7 @@ package instances
 import (
 	"encoding/base64"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"sort"
 	"strings"
 
@@ -13,13 +13,14 @@ import (
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 
+	"github.com/urfave/cli/v2"
+
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
-	"github.com/urfave/cli/v2"
 )
 
 var (
@@ -114,7 +115,7 @@ func getUserData(c *cli.Context) (string, error) {
 	userDataContent := c.String("user-data")
 
 	if userDataFile != "" {
-		fileContent, err := ioutil.ReadFile(userDataFile)
+		fileContent, err := os.ReadFile(userDataFile)
 		if err != nil {
 			return "", err
 		}

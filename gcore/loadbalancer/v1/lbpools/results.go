@@ -63,6 +63,8 @@ type PoolMember struct {
 	InstanceID      string                `json:"instance_id,omitempty"`
 	ProtocolPort    int                   `json:"protocol_port,omitempty"`
 	OperatingStatus types.OperatingStatus `json:"operating_status,omitempty"`
+	MonitorAddress  net.IP                `json:"monitor_address,omitempty"`
+	MonitorPort     *int                  `json:"monitor_port,omitempty"`
 }
 
 // Pool represents a pool structure.

@@ -1,9 +1,10 @@
 package metadata
 
 import (
+	"net/http"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
-	"net/http"
 )
 
 func MetadataList(client *gcorecloud.ServiceClient, id string) pagination.Pager {

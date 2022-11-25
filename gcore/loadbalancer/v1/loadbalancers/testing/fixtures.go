@@ -2,6 +2,9 @@ package testing
 
 import (
 	"fmt"
+	"net"
+	"time"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/loadbalancers"
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/types"
@@ -9,8 +12,6 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	utils_testing "github.com/G-Core/gcorelabscloud-go/gcore/utils/testing"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
-	"net"
-	"time"
 )
 
 var ListResponse = fmt.Sprintf(`

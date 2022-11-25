@@ -1,8 +1,9 @@
 package testing
 
 import (
-	"github.com/G-Core/gcorelabscloud-go/gcore/network/v1/networks"
 	"testing"
+
+	"github.com/G-Core/gcorelabscloud-go/gcore/network/v1/networks"
 
 	"github.com/G-Core/gcorelabscloud-go/client/networks/v1/client"
 	gtest "github.com/G-Core/gcorelabscloud-go/client/testing"

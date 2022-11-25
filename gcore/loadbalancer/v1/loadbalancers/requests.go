@@ -1,9 +1,10 @@
 package loadbalancers
 
 import (
-	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"net"
 	"net/http"
+
+	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 
@@ -86,12 +87,14 @@ type CreateHealthMonitorOpts struct {
 
 // CreatePoolMemberOpts represents options used to create a loadbalancer listener pool member.
 type CreatePoolMemberOpts struct {
-	ID           string `json:"id,omitempty"`
-	Address      net.IP `json:"address" required:"true"`
-	ProtocolPort int    `json:"protocol_port" required:"true"`
-	Weight       int    `json:"weight,omitempty"`
-	SubnetID     string `json:"subnet_id,omitempty"`
-	InstanceID   string `json:"instance_id,omitempty"`
+	ID             string `json:"id,omitempty"`
+	Address        net.IP `json:"address" required:"true"`
+	ProtocolPort   int    `json:"protocol_port" required:"true"`
+	Weight         int    `json:"weight,omitempty"`
+	SubnetID       string `json:"subnet_id,omitempty"`
+	InstanceID     string `json:"instance_id,omitempty"`
+	MonitorAddress net.IP `json:"monitor_address,omitempty"`
+	MonitorPort    *int   `json:"monitor_port,omitempty"`
 }
 
 // CreatePoolOpts represents options used to create a loadbalancer listener pool.

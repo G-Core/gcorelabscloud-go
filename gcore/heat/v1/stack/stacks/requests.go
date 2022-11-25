@@ -290,7 +290,7 @@ func toStackUpdateMap(opts UpdateOpts) (map[string]interface{}, error) {
 }
 
 // Update accepts an UpdateOpts struct and updates an existing stack using the
-//  http PUT verb with the values provided. opts.TemplateOpts is required.
+// http PUT verb with the values provided. opts.TemplateOpts is required.
 func Update(c *gcorecloud.ServiceClient, stackID string, opts UpdateOptsBuilder) (r UpdateResult) {
 	b, err := opts.ToStackUpdateMap()
 	if err != nil {
@@ -302,7 +302,8 @@ func Update(c *gcorecloud.ServiceClient, stackID string, opts UpdateOptsBuilder)
 }
 
 // Update accepts an UpdateOpts struct and updates an existing stack using the
-//  http PATCH verb with the values provided. opts.TemplateOpts is not required.
+//
+//	http PATCH verb with the values provided. opts.TemplateOpts is not required.
 func UpdatePatch(c *gcorecloud.ServiceClient, stackID string, opts UpdatePatchOptsBuilder) (r UpdateResult) {
 	b, err := opts.ToStackUpdatePatchMap()
 	if err != nil {
