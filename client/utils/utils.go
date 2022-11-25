@@ -3,7 +3,6 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -11,13 +10,14 @@ import (
 	"strings"
 	"time"
 
-	gcorecloud "github.com/G-Core/gcorelabscloud-go"
-	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/fatih/structs"
 	"github.com/mitchellh/go-homedir"
 	"github.com/olekukonko/tablewriter"
 	"github.com/urfave/cli/v2"
 	"gopkg.in/yaml.v2"
+
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 )
 
 var (
@@ -69,7 +69,7 @@ func (e *EnumStringSliceValue) Set(value string) error {
 	return fmt.Errorf("allowed values are %s", strings.Join(e.Enum, ", "))
 }
 
-func (e EnumStringSliceValue) String() string {
+func (e *EnumStringSliceValue) String() string {
 	if len(e.selected) == 0 {
 		return fmt.Sprintf("%s", []string{e.Default})
 	}
@@ -286,7 +286,7 @@ func WriteToFile(filename string, content []byte) error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(path, content, 0644) // nolint
+	err = os.WriteFile(path, content, 0644) // nolint
 	return err
 }
 
@@ -295,7 +295,7 @@ func ReadFile(filename string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return ioutil.ReadFile(path)
+	return os.ReadFile(path)
 }
 
 func CheckYamlFile(filename string) (content []byte, err error) {

@@ -3,14 +3,15 @@ package stacks
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"path/filepath"
 	"reflect"
 	"strings"
 
-	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"gopkg.in/yaml.v2"
+
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 )
 
 // Client is an interface that expects a Get method similar to http.Get. This
@@ -81,7 +82,7 @@ func (t *TE) Fetch() error {
 			_ = resp.Body.Close()
 		}
 	}()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}

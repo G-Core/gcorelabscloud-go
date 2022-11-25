@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
 	"os"
@@ -472,7 +471,7 @@ func (client *ProviderClient) doRequest(method, url string, options *RequestOpts
 	}
 
 	if !ok {
-		body, _ := ioutil.ReadAll(resp.Body)
+		body, _ := io.ReadAll(resp.Body)
 		err := resp.Body.Close()
 		if err != nil {
 			log.Error(err)

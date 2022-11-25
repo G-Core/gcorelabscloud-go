@@ -2,8 +2,9 @@ package testing
 
 import (
 	"fmt"
-	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"time"
+
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/image/v1/images"
 

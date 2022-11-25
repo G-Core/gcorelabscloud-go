@@ -2,6 +2,7 @@ package loadbalancers
 
 import (
 	"fmt"
+
 	cmeta "github.com/G-Core/gcorelabscloud-go/client/utils/metadata"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
