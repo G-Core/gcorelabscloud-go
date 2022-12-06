@@ -37,7 +37,7 @@ type UpdateProfileOpts struct {
 	ProfileTemplate     int            `json:"profile_template" required:"true" validate:"required"`
 	BaremetalInstanceID string         `json:"bm_instance_id" required:"true" validate:"required"`
 	IPAddress           string         `json:"ip_address" required:"true" validate:"required,ip4_addr"`
-	Fields              []ProfileField `json:"fields"`
+	Fields              []ProfileField `json:"fields" required:"true" validate:"required"`
 }
 
 // ToProfileUpdateMap builds a request body from UpdateProfileOpts.

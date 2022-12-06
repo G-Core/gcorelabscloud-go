@@ -1,7 +1,9 @@
 package ddos
 
 import (
+	"encoding/json"
 	"fmt"
+	"strconv"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
@@ -82,12 +84,13 @@ type ProfileTemplate struct {
 
 // TemplateField represents additional fields for protection profile template
 type TemplateField struct {
-	ID          int       `json:"id"`
-	Description string    `json:"description"`
-	Name        string    `json:"name"`
-	Required    bool      `json:"required"`
-	FieldType   FieldType `json:"field_type"`
-	Default     *string   `json:"default,omitempty"`
+	ID               int             `json:"id"`
+	Name             string          `json:"name"`
+	FieldType        FieldType       `json:"field_type"`
+	Required         bool            `json:"required"`
+	Description      string          `json:"description"`
+	Default          string          `json:"default,omitempty"`
+	ValidationSchema json.RawMessage `json:"validation_schema,omitempty"`
 }
 
 // Profile represents active client DDoS protection profile
@@ -95,7 +98,9 @@ type Profile struct {
 	ID              int            `json:"id"`
 	Options         Options        `json:"options"`
 	IPAddress       string         `json:"ip_address"`
+	Site            string         `json:"site"`
 	Fields          []ProfileField `json:"fields"`
+	Protocols       []Protocol     `json:"protocols"`
 	ProfileTemplate int            `json:"profile_template"`
 }
 
@@ -106,16 +111,23 @@ type Options struct {
 	Active bool   `json:"active"`
 }
 
+type Protocol struct {
+	Port      string   `json:"port"`
+	Protocols []string `json:"protocols"`
+}
+
 // ProfileField represent fields of active client DDoS protection profile
 type ProfileField struct {
-	ID          int       `json:"id,omitempty"`
-	Value       string    `json:"value,omitempty" required:"true" validate:"required,max=500"`
-	Description string    `json:"description,omitempty"`
-	Name        string    `json:"name,omitempty"`
-	Required    bool      `json:"required,omitempty"`
-	FieldType   FieldType `json:"field_type,omitempty"`
-	Default     *string   `json:"default,omitempty"`
-	BaseField   int       `json:"base_field,omitempty" required:"true" validate:"required"`
+	ID               int             `json:"id,omitempty"`
+	Name             string          `json:"name,omitempty"`
+	FieldType        FieldType       `json:"field_type,omitempty"`
+	BaseField        int             `json:"base_field,omitempty" required:"true" validate:"required"`
+	Value            string          `json:"value,omitempty" required_without:"FieldValue" validate:"required,max=500"`
+	Description      string          `json:"description,omitempty"`
+	Default          string          `json:"default,omitempty"`
+	Required         bool            `json:"required,omitempty"`
+	FieldValue       json.RawMessage `json:"field_value,omitempty" required_without:"Value"`
+	ValidationSchema json.RawMessage `json:"validation_schema,omitempty"`
 }
 
 // ProfileTemplatesPage is the page returned by a pager when traversing over a
@@ -197,7 +209,7 @@ func ExtractProfilesInto(r pagination.Page, v interface{}) error {
 }
 
 type ProfileTaskResult struct {
-	Profiles []string `json:"ddos_profiles"`
+	Profiles []int `json:"ddos_profiles" mapstructure:"ddos_profiles"`
 }
 
 func ExtractProfileIDFromTask(task *tasks.Task) (string, error) {
@@ -211,5 +223,5 @@ func ExtractProfileIDFromTask(task *tasks.Task) (string, error) {
 		return "", fmt.Errorf("cannot decode DDoS protection profile ID in task structure: %w", err)
 	}
 
-	return result.Profiles[0], nil
+	return strconv.Itoa(result.Profiles[0]), nil
 }
