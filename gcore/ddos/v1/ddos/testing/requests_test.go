@@ -235,6 +235,7 @@ func TestUpdateProfile(t *testing.T) {
 		ProfileTemplate:     7,
 		BaremetalInstanceID: "9f310fe7-baa2-47a3-b6a6-63c5d78becc2",
 		IPAddress:           "123.123.123.1",
+		Fields:              make([]ddos.ProfileField, 0),
 	}
 
 	client := fake.ServiceTokenClient("ddos/profiles", "v1")

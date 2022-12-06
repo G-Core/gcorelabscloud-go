@@ -43,6 +43,7 @@ const (
       "id": 1,
       "profile_template": 0,
       "ip_address": "123.123.123.1",
+      "site": "example.com",
       "options": {
         "bgp": true,
         "price": "string",
@@ -58,6 +59,12 @@ const (
           "default": "string",
           "value": "string",
           "base_field": 1
+        }
+      ],
+      "protocols": [
+        {
+          "port": "12000-25000",
+          "protocols": ["UDP", "TCP"]
         }
       ]
     }
@@ -138,7 +145,7 @@ var (
 				Description: "test field",
 				FieldType:   "int",
 				Required:    true,
-				Default:     &defaultString,
+				Default:     defaultString,
 			},
 		},
 	}
@@ -152,6 +159,7 @@ var (
 			BGP:    true,
 			Price:  "string",
 		},
+		Site: "example.com",
 		Fields: []ddos.ProfileField{
 			{
 				ID:          0,
@@ -159,9 +167,15 @@ var (
 				Description: "test field",
 				FieldType:   "int",
 				Required:    true,
-				Default:     &defaultString,
+				Default:     defaultString,
 				Value:       "string",
 				BaseField:   1,
+			},
+		},
+		Protocols: []ddos.Protocol{
+			{
+				Port:      "12000-25000",
+				Protocols: []string{"UDP", "TCP"},
 			},
 		},
 	}
