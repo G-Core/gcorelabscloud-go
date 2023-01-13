@@ -26,7 +26,7 @@ VERSION		?= $(shell git describe --tags 2> /dev/null || \
 			   git describe --match=$(git rev-parse --short=8 HEAD) --always --dirty --abbrev=8)
 GOARCH		?= $(shell go env GOARCH)
 TAGS		:=
-LDFLAGS		:= "-w -s -X 'main.AppVersion=${VERSION}'"
+LDFLAGS		:= "-w -s -X 'github.com/G-Core/gcorelabscloud-go/cmd.AppVersion=${VERSION}'"
 CMD_PACKAGE := ./cmd/gcoreclient
 BINARY 		:= ./gcoreclient
 
