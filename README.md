@@ -1,7 +1,7 @@
 Gcore cloud API client
 ====================================
 
-Command line client to GCore cloud API.
+Command line client to Gcore cloud API.
 
 Installation
 ------------------------------------
@@ -19,8 +19,8 @@ export GCLOUD_USERNAME=username
 export GCLOUD_PASSWORD=secret
 export GCLOUD_PROJECT=1
 export GCLOUD_REGION=1
-export GCLOUD_AUTH_URL=https://api.gcdn.co
-export GCLOUD_API_URL=https://api.cloud.gcorelabs.com
+export GCLOUD_AUTH_URL=https://api.gcore.com/iam
+export GCLOUD_API_URL=https://api.gcore.com/cloud
 export GCLOUD_CLIENT_TYPE=platform
 ```
 
