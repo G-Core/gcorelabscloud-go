@@ -56,6 +56,7 @@ type Region struct {
 	Keystone             keystones.Keystone        `json:"keystone"`
 	HasBaremetal         bool                      `json:"has_baremetal"`
 	AvailableVolumeTypes []string                  `json:"available_volume_types"`
+	Zone                 string                    `json:"zone"`
 }
 
 // RegionPage is the page returned by a pager when traversing over a
