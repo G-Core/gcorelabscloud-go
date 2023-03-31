@@ -56,7 +56,8 @@ func (to TokenOptions) ExtractTokensPair() (string, string, error) {
 // ToMap implements TokenOptionsBuilder
 func (to TokenOptions) ToMap() map[string]interface{} {
 	return map[string]interface{}{
-		"token": to.RefreshToken,
+		"access":  to.AccessToken,
+		"refresh": to.RefreshToken,
 	}
 }
 
