@@ -525,7 +525,7 @@ var instanceCreateCommandV2 = cli.Command{
 	Name: "create",
 	Usage: `
 	Create instance. 
-	Example: gcoreclient token instance create --flavor g1-standard-1-2 --name test1 --keypair keypair --volume-source image --volume-type standard --volume-image-id --interface-type subnet --interface-network-id 95ea2073-c5eb-448a-aed5-78045f88f24a --interface-subnet-id b7fd6e0a-36a5-4f6a-9dc4-90a39eb9833f --volume-size 2 --metadata one=two -d -w`,
+	Example: gcoreclient instance create --flavor g1-standard-1-2 --name test1 --keypair keypair --volume-source image --volume-type standard --volume-image-id --interface-type subnet --interface-network-id 95ea2073-c5eb-448a-aed5-78045f88f24a --interface-subnet-id b7fd6e0a-36a5-4f6a-9dc4-90a39eb9833f --volume-size 2 --metadata one=two -d -w`,
 	Category: "instance",
 	Flags: append([]cli.Flag{
 		&cli.StringSliceFlag{
@@ -722,8 +722,6 @@ var instanceCreateCommandV2 = cli.Command{
 			Metadata:       metadata,
 			ServerGroupID:  c.String("server-group"),
 		}
-
-		fmt.Printf("%#v", opts)
 
 		err = gcorecloud.TranslateValidationError(opts.Validate())
 		if err != nil {
