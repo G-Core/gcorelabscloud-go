@@ -478,6 +478,7 @@ func TestCreate(t *testing.T) {
 			ImageID:    "",
 			SnapshotID: "",
 			VolumeID:   "",
+			Metadata:   map[string]string{"meta1": "value1"},
 		}},
 		Interfaces: []instances.InterfaceInstanceCreateOpts{{InterfaceOpts: instances.InterfaceOpts{
 			Type:      types.SubnetInterfaceType,

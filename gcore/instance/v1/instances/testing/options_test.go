@@ -135,6 +135,7 @@ func TestValidateCreateVolumeOpts(t *testing.T) {
 		SnapshotID:    "",
 		VolumeID:      "",
 		AttachmentTag: "",
+		Metadata: map[string]string{},
 	}
 
 	err := gcorecloud.TranslateValidationError(opts.Validate())
@@ -151,6 +152,7 @@ func TestValidateCreateVolumeOpts(t *testing.T) {
 		SnapshotID:    "",
 		VolumeID:      "",
 		AttachmentTag: "",
+		Metadata: map[string]string{"meta1": "value1", "meta2": "value2"},
 	}
 
 	err = gcorecloud.TranslateValidationError(opts.Validate())
