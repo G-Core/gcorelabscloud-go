@@ -86,6 +86,7 @@ type CreateVolumeOpts struct {
 	ImageID       string             `json:"image_id,omitempty" validate:"rfe=Source:image,sfe=Source:snapshot;existing-volume;new-volume,allowed_without_all=SnapshotID VolumeID,omitempty,uuid4"`
 	SnapshotID    string             `json:"snapshot_id,omitempty" validate:"rfe=Source:snapshot,sfe=Source:image;existing-volume;new-volume,allowed_without_all=ImageID VolumeID,omitempty,uuid4"`
 	VolumeID      string             `json:"volume_id,omitempty" validate:"rfe=Source:existing-volume,sfe=Source:image;shapshot;new-volume,allowed_without_all=ImageID SnapshotID,omitempty,uuid4"`
+	Metadata      map[string]string  `json:"metadata,omitempty" validate:"omitempty"`
 }
 
 func (opts *CreateVolumeOpts) Validate() error {

@@ -271,6 +271,9 @@ const CreateRequest = `
 	  "name": "name",
 	  "size": 10,
 	  "source": "new-volume",
+    "metadata": {
+      "meta1": "value1"
+    },
 	  "type_name": "standard"
 	}
   ]
