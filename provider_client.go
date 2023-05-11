@@ -495,9 +495,7 @@ func (client *ProviderClient) doRequest(method, url string, options *RequestOpts
 			if client.ReauthFunc != nil && !state.hasReauthenticated {
 				err = client.Reauthenticate(preReqToken)
 				if err != nil {
-					e := &ErrUnableToReauthenticate{BaseError: BaseError{
-						Info: fmt.Sprint("token expired, unable to reauthenticate. ", err.Error()),
-					} }
+					e := &ErrUnableToReauthenticate{}
 					e.ErrOriginal = respErr
 					return nil, e
 				}
