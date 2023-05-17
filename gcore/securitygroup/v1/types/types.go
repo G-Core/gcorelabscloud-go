@@ -17,6 +17,12 @@ const (
 	ProtocolTCP          Protocol      = "tcp"
 	ProtocolUDP          Protocol      = "udp"
 	ProtocolICMP         Protocol      = "icmp"
+	ProtocolIPv6ICMP     Protocol      = "ipv6-icmp"
+	ProtocolIPv6Route    Protocol      = "ipv6-route"
+	ProtocolIPv6Opts     Protocol      = "ipv6-opts"
+	ProtocolIPv6Nonxt    Protocol      = "ipv6-nonxt"
+	ProtocolIPv6Frag     Protocol      = "ipv6-frag"
+	ProtocolIPv6Encap    Protocol      = "ipv6-encap"
 	ProtocolAny          Protocol      = "any"
 	ProtocolAH           Protocol      = "ah"
 	ProtocolDCCP         Protocol      = "dccp"
@@ -160,6 +166,12 @@ func (et *EtherType) MarshalJSON() ([]byte, error) {
 func (p Protocol) IsValid() error {
 	switch p {
 	case ProtocolICMP,
+		ProtocolIPv6ICMP,
+		ProtocolIPv6Route,
+		ProtocolIPv6Opts,
+		ProtocolIPv6Nonxt,
+		ProtocolIPv6Frag,
+		ProtocolIPv6Encap,
 		ProtocolAny,
 		ProtocolTCP,
 		ProtocolUDP,
@@ -207,6 +219,12 @@ func (p Protocol) List() []Protocol {
 		ProtocolUDP,
 		ProtocolTCP,
 		ProtocolAny,
+		ProtocolIPv6ICMP,
+		ProtocolIPv6Route,
+		ProtocolIPv6Opts,
+		ProtocolIPv6Nonxt,
+		ProtocolIPv6Frag,
+		ProtocolIPv6Encap,
 		ProtocolICMP,
 		ProtocolAH,
 		ProtocolDCCP,
