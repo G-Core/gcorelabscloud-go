@@ -80,6 +80,7 @@ var GetResponse = fmt.Sprintf(`
 const CreateRequest = `
 {
   "name": "lbname",
+  "vip_port_id": "169942e0-9b53-42df-95ef-1a8b6525c2bd",
   "listeners": [
     {
       "name": "listener_name",

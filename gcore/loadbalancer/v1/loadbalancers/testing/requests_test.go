@@ -206,8 +206,7 @@ func TestCreate(t *testing.T) {
 				SessionPersistence:    nil,
 			}},
 		}},
-		VipNetworkID: "",
-		VipSubnetID:  "",
+		VipPortID: "169942e0-9b53-42df-95ef-1a8b6525c2bd",
 	}
 
 	client := fake.ServiceTokenClient("loadbalancers", "v1")

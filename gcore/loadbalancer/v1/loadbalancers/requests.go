@@ -125,8 +125,9 @@ type CreateListenerOpts struct {
 type CreateOpts struct {
 	Name         string                                      `json:"name" required:"true" validate:"required,name"`
 	Listeners    []CreateListenerOpts                        `json:"listeners,omitempty" validate:"omitempty,dive"`
-	VipNetworkID string                                      `json:"vip_network_id,omitempty"`
+	VipNetworkID string                                      `json:"vip_network_id,allowed_without=VipPortID,omitempty"`
 	VipSubnetID  string                                      `json:"vip_subnet_id,omitempty"`
+	VipPortID    string                                      `json:"vip_port_id,allowed_without=VipNetworkID,omitempty"`
 	Flavor       *string                                     `json:"flavor,omitempty"`
 	Tags         []string                                    `json:"tag,omitempty"`
 	Metadata     map[string]string                           `json:"metadata,omitempty"`
