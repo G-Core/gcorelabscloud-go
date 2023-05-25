@@ -77,16 +77,17 @@ type CreateOptsBuilder interface {
 
 // CreateVolumeOpts represents options used to create a volume.
 type CreateVolumeOpts struct {
-	Source        types.VolumeSource `json:"source" required:"true" validate:"required,enum"`
-	BootIndex     int                `json:"boot_index"`
-	Size          int                `json:"size,omitempty" validate:"rfe=Source:image;new-volume,sfe=Source:snapshot;existing-volume"`
-	TypeName      volumes.VolumeType `json:"type_name,omitempty" validate:"omitempty"`
-	AttachmentTag string             `json:"attachment_tag,omitempty" validate:"omitempty"`
-	Name          string             `json:"name,omitempty" validate:"omitempty"`
-	ImageID       string             `json:"image_id,omitempty" validate:"rfe=Source:image,sfe=Source:snapshot;existing-volume;new-volume,allowed_without_all=SnapshotID VolumeID,omitempty,uuid4"`
-	SnapshotID    string             `json:"snapshot_id,omitempty" validate:"rfe=Source:snapshot,sfe=Source:image;existing-volume;new-volume,allowed_without_all=ImageID VolumeID,omitempty,uuid4"`
-	VolumeID      string             `json:"volume_id,omitempty" validate:"rfe=Source:existing-volume,sfe=Source:image;shapshot;new-volume,allowed_without_all=ImageID SnapshotID,omitempty,uuid4"`
-	Metadata      map[string]string  `json:"metadata,omitempty" validate:"omitempty"`
+	Source              types.VolumeSource `json:"source" required:"true" validate:"required,enum"`
+	BootIndex           int                `json:"boot_index"`
+	Size                int                `json:"size,omitempty" validate:"rfe=Source:image;new-volume,sfe=Source:snapshot;existing-volume"`
+	TypeName            volumes.VolumeType `json:"type_name,omitempty" validate:"omitempty"`
+	AttachmentTag       string             `json:"attachment_tag,omitempty" validate:"omitempty"`
+	Name                string             `json:"name,omitempty" validate:"omitempty"`
+	ImageID             string             `json:"image_id,omitempty" validate:"rfe=Source:image,sfe=Source:snapshot;existing-volume;new-volume,allowed_without_all=SnapshotID VolumeID,omitempty,uuid4"`
+	SnapshotID          string             `json:"snapshot_id,omitempty" validate:"rfe=Source:snapshot,sfe=Source:image;existing-volume;new-volume,allowed_without_all=ImageID VolumeID,omitempty,uuid4"`
+	VolumeID            string             `json:"volume_id,omitempty" validate:"rfe=Source:existing-volume,sfe=Source:image;shapshot;new-volume,allowed_without_all=ImageID SnapshotID,omitempty,uuid4"`
+	Metadata            map[string]string  `json:"metadata,omitempty" validate:"omitempty"`
+	DeleteOnTermination bool               `json:"delete_on_termination,omitempty"`
 }
 
 func (opts *CreateVolumeOpts) Validate() error {
