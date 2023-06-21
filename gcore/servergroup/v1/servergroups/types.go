@@ -10,6 +10,7 @@ type ServerGroupPolicy string
 const (
 	AffinityPolicy     ServerGroupPolicy = "affinity"
 	AntiAffinityPolicy ServerGroupPolicy = "anti-affinity"
+	SoftAffinityPolicy ServerGroupPolicy = "soft-anti-affinity"
 )
 
 func (s ServerGroupPolicy) String() string {
@@ -17,7 +18,7 @@ func (s ServerGroupPolicy) String() string {
 }
 
 func (s ServerGroupPolicy) List() []ServerGroupPolicy {
-	return []ServerGroupPolicy{AffinityPolicy, AntiAffinityPolicy}
+	return []ServerGroupPolicy{AffinityPolicy, AntiAffinityPolicy, SoftAffinityPolicy}
 }
 
 func (s ServerGroupPolicy) StringList() []string {
@@ -30,7 +31,7 @@ func (s ServerGroupPolicy) StringList() []string {
 
 func (s ServerGroupPolicy) IsValid() error {
 	switch s {
-	case AffinityPolicy, AntiAffinityPolicy:
+	case AffinityPolicy, AntiAffinityPolicy, SoftAffinityPolicy:
 		return nil
 	}
 	return fmt.Errorf("invalid ServerGroupPolicy type: %v", s)
