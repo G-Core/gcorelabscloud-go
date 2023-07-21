@@ -111,9 +111,9 @@ type CreateOpts struct {
 	ListenerID           string                        `json:"listener_id,omitempty"`
 	HealthMonitor        *CreateHealthMonitorOpts      `json:"healthmonitor,omitempty"`
 	SessionPersistence   *CreateSessionPersistenceOpts `json:"session_persistence,omitempty"`
-	TimeoutClientData    int                           `json:"timeout_client_data,omitempty"`
-	TimeoutMemberData    int                           `json:"timeout_member_data,omitempty"`
-	TimeoutMemberConnect int                           `json:"timeout_member_connect,omitempty"`
+	TimeoutClientData    int                           `json:"timeout_client_data"`
+	TimeoutMemberData    int                           `json:"timeout_member_data"`
+	TimeoutMemberConnect int                           `json:"timeout_member_connect"`
 }
 
 // ToLBPoolCreateMap builds a request body from CreateOpts.
@@ -163,9 +163,9 @@ type UpdateOpts struct {
 	LBPoolAlgorithm      types.LoadBalancerAlgorithm   `json:"lb_algorithm,omitempty"`
 	HealthMonitor        *CreateHealthMonitorOpts      `json:"healthmonitor,omitempty"`
 	SessionPersistence   *CreateSessionPersistenceOpts `json:"session_persistence,omitempty"`
-	TimeoutClientData    int                           `json:"timeout_client_data,omitempty"`
-	TimeoutMemberData    int                           `json:"timeout_member_data,omitempty"`
-	TimeoutMemberConnect int                           `json:"timeout_member_connect,omitempty"`
+	TimeoutClientData    int                           `json:"timeout_client_data"`
+	TimeoutMemberData    int                           `json:"timeout_member_data"`
+	TimeoutMemberConnect int                           `json:"timeout_member_connect"`
 }
 
 // ToLBPoolUpdateMap builds a request body from UpdateOpts.

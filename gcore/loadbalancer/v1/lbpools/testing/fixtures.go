@@ -135,7 +135,10 @@ const CreatePoolMemberRequest = `
 
 const UpdateRequest = `
 {
-	"name": "lbaas_test_pool"
+	"name": "lbaas_test_pool",
+	"timeout_client_data": 0,
+    "timeout_member_connect": 0,
+    "timeout_member_data": 0
 }	
 `
 
