@@ -83,7 +83,7 @@ func TestList(t *testing.T) {
 	client := fake.ServiceTokenClient(fileSharePath, "v1")
 	count := 0
 
-	err := file_shares.List(client, nil).EachPage(func(page pagination.Page) (bool, error) {
+	err := file_shares.List(client).EachPage(func(page pagination.Page) (bool, error) {
 		count++
 		actual, err := file_shares.ExtractFileShares(page)
 		require.NoError(t, err)
@@ -118,7 +118,7 @@ func TestListAll(t *testing.T) {
 
 	client := fake.ServiceTokenClient(fileSharePath, "v1")
 
-	actual, err := file_shares.ListAll(client, nil)
+	actual, err := file_shares.ListAll(client)
 	require.NoError(t, err)
 	ct := actual[0]
 	require.Equal(t, ListFileShare1, ct)
@@ -301,7 +301,7 @@ func TestListAccessRule(t *testing.T) {
 	client := fake.ServiceTokenClient(fileSharePath, "v1")
 	count := 0
 
-	err := file_shares.ListAccessRules(client, FileShare1.ID, nil).EachPage(func(page pagination.Page) (bool, error) {
+	err := file_shares.ListAccessRules(client, FileShare1.ID).EachPage(func(page pagination.Page) (bool, error) {
 		count++
 		actual, err := file_shares.ExtractAccessRule(page)
 		require.NoError(t, err)

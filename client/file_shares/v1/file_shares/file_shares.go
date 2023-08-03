@@ -290,7 +290,7 @@ var fileShareListCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		pages, err := file_shares.List(client, nil).AllPages()
+		pages, err := file_shares.List(client).AllPages()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -319,7 +319,7 @@ var fileShareAccessRuleListCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		pages, err := file_shares.ListAccessRules(client, fileShareID, nil).AllPages()
+		pages, err := file_shares.ListAccessRules(client, fileShareID).AllPages()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}

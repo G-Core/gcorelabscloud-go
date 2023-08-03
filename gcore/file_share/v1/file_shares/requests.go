@@ -9,22 +9,11 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
-type ListOptsBuilder interface {
-	ToFileShareListQuery() (string, error)
-}
 
 // List returns a Pager which allows you to iterate over a collection of
-// file shares. It accepts a ListOpts struct, which allows you to filter and sort
-// the returned collection for greater efficiency.
-func List(c *gcorecloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
+// file shares. 
+func List(c *gcorecloud.ServiceClient) pagination.Pager {
 	url := listURL(c)
-	if opts != nil {
-		query, err := opts.ToFileShareListQuery()
-		if err != nil {
-			return pagination.Pager{Err: err}
-		}
-		url += query
-	}
 	return pagination.NewPager(c, url, func(r pagination.PageResult) pagination.Page {
 		return FileSharePage{pagination.LinkedPageBase{PageResult: r}}
 	})
@@ -71,17 +60,6 @@ func (opts CreateOpts) ToFileShareCreateMap() (map[string]interface{}, error) {
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
-// ToFileShareListQuery formats a ListOpts into a query string.
-func (opts ListOpts) ToFileShareListQuery() (string, error) {
-	if err := gcorecloud.ValidateStruct(opts); err != nil {
-		return "", err
-	}
-	q, err := gcorecloud.BuildQueryString(opts)
-	if err != nil {
-		return "", err
-	}
-	return q.String(), err
-}
 
 // Validate
 func (opts CreateOpts) Validate() error {
@@ -114,8 +92,6 @@ type ResizeOptsBuilder interface {
 	ToFileShareResizeMap() (map[string]interface{}, error)
 }
 
-// ListOpts allows the filtering and sorting of paginated collections through the API.
-type ListOpts struct{}
 
 // ToFileShareUpdateMap builds a request body from UpdateOpts.
 func (opts UpdateOpts) ToFileShareUpdateMap() (map[string]interface{}, error) {
@@ -181,8 +157,8 @@ func Extend(c *gcorecloud.ServiceClient, fileShareID string, opts ResizeOptsBuil
 }
 
 // ListAll is a convenience function that returns all file shares.
-func ListAll(client *gcorecloud.ServiceClient, opts ListOptsBuilder) ([]FileShare, error) {
-	pages, err := List(client, opts).AllPages()
+func ListAll(client *gcorecloud.ServiceClient) ([]FileShare, error) {
+	pages, err := List(client).AllPages()
 
 	if err != nil {
 		return nil, err
@@ -197,37 +173,11 @@ func ListAll(client *gcorecloud.ServiceClient, opts ListOptsBuilder) ([]FileShar
 
 }
 
-type AccessRuleListOptsBuilder interface {
-	ToAccessRuleListQuery() (string, error)
-}
-
-// ListOpts allows the filtering and sorting of paginated collections through the API.
-type AccessRuleListOpts struct{}
-
-// ToAccessRuleListQuery formats a ListOpts into a query string.
-func (opts AccessRuleListOpts) ToAccessRuleListQuery() (string, error) {
-	if err := gcorecloud.ValidateStruct(opts); err != nil {
-		return "", err
-	}
-	q, err := gcorecloud.BuildQueryString(opts)
-	if err != nil {
-		return "", err
-	}
-	return q.String(), err
-}
 
 // List returns a Pager which allows you to iterate over a collection of
-// file shares. It accepts a ListOpts struct, which allows you to filter and sort
-// the returned collection for greater efficiency.
-func ListAccessRules(c *gcorecloud.ServiceClient, fileShareID string, opts AccessRuleListOptsBuilder) pagination.Pager {
+// file shares. 
+func ListAccessRules(c *gcorecloud.ServiceClient, fileShareID string) pagination.Pager {
 	url := accessRuleURL(c, fileShareID)
-	if opts != nil {
-		query, err := opts.ToAccessRuleListQuery()
-		if err != nil {
-			return pagination.Pager{Err: err}
-		}
-		url += query
-	}
 	return pagination.NewPager(c, url, func(r pagination.PageResult) pagination.Page {
 		return AccessRulePage{pagination.LinkedPageBase{PageResult: r}}
 	})
