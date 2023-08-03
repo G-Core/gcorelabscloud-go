@@ -333,7 +333,9 @@ func (jt *JSONRFC3339Milli) UnmarshalJSON(data []byte) error {
 const RFC3339MilliNoZ = "2006-01-02T15:04:05.999999"
 
 // JSONRFC3339MilliNoZ describes time.Time in RFC3339MilliNoZ format.
-type JSONRFC3339MilliNoZ time.Time
+type JSONRFC3339MilliNoZ struct {
+	time.Time
+}
 
 // UnmarshalJSON - implements Unmarshaler interface for JSONRFC3339MilliNoZ
 func (jt *JSONRFC3339MilliNoZ) UnmarshalJSON(data []byte) error {
@@ -348,7 +350,7 @@ func (jt *JSONRFC3339MilliNoZ) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	*jt = JSONRFC3339MilliNoZ(t)
+	jt.Time = t
 	return nil
 }
 
