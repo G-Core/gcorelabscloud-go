@@ -7,6 +7,7 @@ import (
 
 	"github.com/G-Core/gcorelabscloud-go/client/apitokens/v1/apitokens"
 	"github.com/G-Core/gcorelabscloud-go/client/apptemplates/v1/apptemplates"
+	"github.com/G-Core/gcorelabscloud-go/client/file_shares/v1/file_shares"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/client/flavors/v1/flavors"
 	"github.com/G-Core/gcorelabscloud-go/client/floatingips/v1/floatingips"
@@ -73,6 +74,7 @@ var commands = []*cli.Command{
 	&regionsaccess.Commands,
 	&apptemplates.Commands,
 	&apitokens.Commands,
+	&file_shares.Commands,
 }
 
 type clientCommands struct {
