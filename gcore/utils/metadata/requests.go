@@ -1,6 +1,7 @@
 package metadata
 
 import (
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"net/http"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
@@ -34,10 +35,24 @@ func MetadataCreateOrUpdate(client *gcorecloud.ServiceClient, id string, opts ma
 	return
 }
 
+// MetadataCreateOrUpdateV2 creates or update a metadata for a resource.
+func MetadataCreateOrUpdateV2(client *gcorecloud.ServiceClient, id string, opts map[string]string) (r tasks.Result) {
+	_, r.Err = client.Post(MetadataURL(client, id), opts, &r.Body, nil)
+	return
+}
+
 // MetadataReplace replace a metadata for a resource.
 func MetadataReplace(client *gcorecloud.ServiceClient, id string, opts map[string]string) (r MetadataActionResult) {
 	_, r.Err = client.Put(MetadataURL(client, id), opts, nil, &gcorecloud.RequestOpts{ // nolint
 		OkCodes: []int{http.StatusNoContent, http.StatusOK},
+	})
+	return
+}
+
+// MetadataReplaceV2 replace a metadata for a resource.
+func MetadataReplaceV2(client *gcorecloud.ServiceClient, id string, opts map[string]string) (r tasks.Result) {
+	_, r.Err = client.Put(MetadataURL(client, id), opts, &r.Body, &gcorecloud.RequestOpts{ // nolint
+		OkCodes: []int{http.StatusOK},
 	})
 	return
 }
@@ -47,6 +62,12 @@ func MetadataDelete(client *gcorecloud.ServiceClient, id string, key string) (r 
 	_, r.Err = client.Delete(MetadataItemURL(client, id, key), &gcorecloud.RequestOpts{ // nolint
 		OkCodes: []int{http.StatusNoContent, http.StatusOK},
 	})
+	return
+}
+
+// MetadataDeleteV2 deletes defined metadata key for a resource.
+func MetadataDeleteV2(client *gcorecloud.ServiceClient, id string, key string) (r tasks.Result) {
+	_, r.Err = client.DeleteWithResponse(MetadataItemURL(client, id, key), &r.Body, nil)
 	return
 }
 
