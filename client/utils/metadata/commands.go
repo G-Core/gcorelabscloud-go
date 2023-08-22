@@ -3,7 +3,7 @@ package metadata
 import (
 	"encoding/json"
 	"fmt"
-	metadataV1 "github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata"
 	"strings"
 
 	"github.com/urfave/cli/v2"
@@ -66,7 +66,7 @@ func NewMetadataListCommand(cc ClientConstructor, usage string, argsUsage string
 				_ = cli.ShowAppHelp(c)
 				return cli.NewExitError(err, 1)
 			}
-			metadata, err := metadataV1.MetadataListAll(client, resourceID)
+			metadata, err := metadata.MetadataListAll(client, resourceID)
 			if err != nil {
 				return cli.NewExitError(err, 1)
 			}
@@ -113,7 +113,7 @@ func NewMetadataGetCommand(cc ClientConstructor, usage string, argsUsage string,
 				return cli.NewExitError(err, 1)
 			}
 
-			metadata, err := metadataV1.MetadataGet(client, resourceID, c.String("metadata")).Extract()
+			metadata, err := metadata.MetadataGet(client, resourceID, c.String("metadata")).Extract()
 			if err != nil {
 				return cli.NewExitError(err, 1)
 			}
@@ -147,7 +147,7 @@ func NewMetadataDeleteCommand(cc ClientConstructor, usage string, argsUsage stri
 				_ = cli.ShowAppHelp(c)
 				return cli.NewExitError(err, 1)
 			}
-			err = metadataV1.MetadataDelete(client, resourceID, c.String("metadata")).ExtractErr()
+			err = metadata.MetadataDelete(client, resourceID, c.String("metadata")).ExtractErr()
 			if err != nil {
 				return cli.NewExitError(err, 1)
 			}
@@ -186,7 +186,7 @@ func NewMetadataCreateCommand(cc ClientConstructor, usage string, argsUsage stri
 				_ = cli.ShowAppHelp(c)
 				return cli.NewExitError(err, 1)
 			}
-			err = metadataV1.MetadataCreateOrUpdate(client, resourceID, opts).ExtractErr()
+			err = metadata.MetadataCreateOrUpdate(client, resourceID, opts).ExtractErr()
 			if err != nil {
 				return cli.NewExitError(err, 1)
 			}
@@ -225,7 +225,7 @@ func NewMetadataUpdateCommand(cc ClientConstructor, usage string, argsUsage stri
 				_ = cli.ShowAppHelp(c)
 				return cli.NewExitError(err, 1)
 			}
-			err = metadataV1.MetadataCreateOrUpdate(client, resourceID, opts).ExtractErr()
+			err = metadata.MetadataCreateOrUpdate(client, resourceID, opts).ExtractErr()
 			if err != nil {
 				return cli.NewExitError(err, 1)
 			}
@@ -263,7 +263,7 @@ func NewMetadataReplaceCommand(cc ClientConstructor, usage string, argsUsage str
 				_ = cli.ShowAppHelp(c)
 				return cli.NewExitError(err, 1)
 			}
-			err = metadataV1.MetadataReplace(client, resourceID, opts).ExtractErr()
+			err = metadata.MetadataReplace(client, resourceID, opts).ExtractErr()
 			if err != nil {
 				return cli.NewExitError(err, 1)
 			}
