@@ -2,6 +2,7 @@ package testing
 
 import (
 	"fmt"
+	metadataV1Testing "github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/testing"
 	"net"
 	"net/http"
 	"testing"
@@ -10,7 +11,6 @@ import (
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/loadbalancers"
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/types"
-	utils_testing "github.com/G-Core/gcorelabscloud-go/gcore/utils/testing"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 
 	log "github.com/sirupsen/logrus"
@@ -318,22 +318,22 @@ func TestCreateCustomSecurityGroup(t *testing.T) {
 }
 
 func TestMetadataListAll(t *testing.T) {
-	utils_testing.BuildTestMetadataListAll("loadbalancers", LoadBalancer1.ID)(t)
+	metadataV1Testing.BuildTestMetadataListAll("loadbalancers", LoadBalancer1.ID)(t)
 }
 
 func TestMetadataGet(t *testing.T) {
-	utils_testing.BuildTestMetadataGet("loadbalancers", LoadBalancer1.ID)(t)
+	metadataV1Testing.BuildTestMetadataGet("loadbalancers", LoadBalancer1.ID)(t)
 }
 
 func TestMetadataCreate(t *testing.T) {
-	utils_testing.BuildTestMetadataCreate("loadbalancers", LoadBalancer1.ID)(t)
+	metadataV1Testing.BuildTestMetadataCreate("loadbalancers", LoadBalancer1.ID)(t)
 }
 
 func TestMetadataUpdate(t *testing.T) {
-	utils_testing.BuildTestMetadataUpdate("loadbalancers", LoadBalancer1.ID)(t)
+	metadataV1Testing.BuildTestMetadataUpdate("loadbalancers", LoadBalancer1.ID)(t)
 
 }
 
 func TestMetadataDelete(t *testing.T) {
-	utils_testing.BuildTestMetadataDelete("loadbalancers", LoadBalancer1.ID)(t)
+	metadataV1Testing.BuildTestMetadataDelete("loadbalancers", LoadBalancer1.ID)(t)
 }

@@ -2,6 +2,8 @@ package testing
 
 import (
 	"fmt"
+	metadataV1 "github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1"
+	metadataV2 "github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v2"
 	th "github.com/G-Core/gcorelabscloud-go/testhelper"
 	"testing"
 	"time"
@@ -49,7 +51,7 @@ func createTestLoadBalancerWithListener(client *gcorecloud.ServiceClient, opts l
 }
 
 func createMetadataV2(clientV1 *gcorecloud.ServiceClient, clientV2 *gcorecloud.ServiceClient, lbId string, opts map[string]string) (interface{}, error) {
-	res, err := metadata.MetadataCreateOrUpdateV2(clientV2, lbId, opts).Extract()
+	res, err := metadataV2.MetadataCreateOrUpdate(clientV2, lbId, opts).Extract()
 	if err != nil {
 		return "", err
 	}
@@ -73,7 +75,7 @@ func createMetadataV2(clientV1 *gcorecloud.ServiceClient, clientV2 *gcorecloud.S
 }
 
 func replaceMetadataV2(clientV1 *gcorecloud.ServiceClient, clientV2 *gcorecloud.ServiceClient, lbId string, opts map[string]string) (interface{}, error) {
-	res, err := metadata.MetadataReplaceV2(clientV2, lbId, opts).Extract()
+	res, err := metadataV2.MetadataReplace(clientV2, lbId, opts).Extract()
 	if err != nil {
 		return "", err
 	}
@@ -97,7 +99,7 @@ func replaceMetadataV2(clientV1 *gcorecloud.ServiceClient, clientV2 *gcorecloud.
 }
 
 func deleteMetadataV2(clientV1 *gcorecloud.ServiceClient, clientV2 *gcorecloud.ServiceClient, lbId string, key string) (interface{}, error) {
-	res, err := metadata.MetadataDeleteV2(clientV2, lbId, key).Extract()
+	res, err := metadataV2.MetadataDelete(clientV2, lbId, key).Extract()
 	if err != nil {
 		return "", err
 	}
@@ -160,7 +162,7 @@ func TestLBSMetadataV2(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	createMetadataListAll, err := metadata.MetadataListAll(clientV1, resourceID)
+	createMetadataListAll, err := metadataV1.MetadataListAll(clientV1, resourceID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -185,7 +187,7 @@ func TestLBSMetadataV2(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	deleteMetadataListAll, err := metadata.MetadataListAll(clientV1, resourceID)
+	deleteMetadataListAll, err := metadataV1.MetadataListAll(clientV1, resourceID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -204,7 +206,7 @@ func TestLBSMetadataV2(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	replaceMetadataListAll, err := metadata.MetadataListAll(clientV1, resourceID)
+	replaceMetadataListAll, err := metadataV1.MetadataListAll(clientV1, resourceID)
 	if err != nil {
 		t.Fatal(err)
 	}

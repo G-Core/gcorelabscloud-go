@@ -2,12 +2,14 @@ package testing
 
 import (
 	"fmt"
+	metadataV1 "github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1"
 	"net/http"
 	"net/url"
 	"testing"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
+	metadataTesting "github.com/G-Core/gcorelabscloud-go/gcore/utils/testing"
 	th "github.com/G-Core/gcorelabscloud-go/testhelper"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 	log "github.com/sirupsen/logrus"
@@ -57,17 +59,17 @@ func BuildTestMetadataListAll(resourceName string, resourceID string, extraParam
 
 			w.Header().Add("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
-			_, err := fmt.Fprint(w, MetadataListResponse)
+			_, err := fmt.Fprint(w, metadataTesting.MetadataListResponse)
 			if err != nil {
 				log.Error(err)
 			}
 		})
 
-		actual, err := metadata.MetadataListAll(client, resourceID)
+		actual, err := metadataV1.MetadataListAll(client, resourceID)
 		require.NoError(t, err)
 		ct := actual[0]
-		require.Equal(t, Metadata1, ct)
-		require.Equal(t, ExpectedMetadataList, actual)
+		require.Equal(t, metadataTesting.Metadata1, ct)
+		require.Equal(t, metadataTesting.ExpectedMetadataList, actual)
 	}
 }
 
@@ -77,7 +79,7 @@ func BuildTestMetadataGet(resourceName string, resourceID string, extraParams ..
 		defer th.TeardownHTTP()
 
 		client, relativeUrl := prepareTestParams(resourceName, func(c *gcorecloud.ServiceClient) string {
-			return metadata.MetadataItemURL(c, resourceID, ResourceMetadataReadOnly.Key)
+			return metadata.MetadataItemURL(c, resourceID, metadataTesting.ResourceMetadataReadOnly.Key)
 		}, extraParams...)
 
 		th.Mux.HandleFunc(relativeUrl, func(w http.ResponseWriter, r *http.Request) {
@@ -86,15 +88,15 @@ func BuildTestMetadataGet(resourceName string, resourceID string, extraParams ..
 
 			w.Header().Add("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
-			_, err := fmt.Fprint(w, MetadataResponse)
+			_, err := fmt.Fprint(w, metadataTesting.MetadataResponse)
 			if err != nil {
 				log.Error(err)
 			}
 		})
 
-		actual, err := metadata.MetadataGet(client, resourceID, ResourceMetadataReadOnly.Key).Extract()
+		actual, err := metadataV1.MetadataGet(client, resourceID, metadataTesting.ResourceMetadataReadOnly.Key).Extract()
 		require.NoError(t, err)
-		require.Equal(t, &ResourceMetadataReadOnly, actual)
+		require.Equal(t, &metadataTesting.ResourceMetadataReadOnly, actual)
 	}
 }
 
@@ -113,12 +115,12 @@ func BuildTestMetadataCreate(resourceName string, resourceID string, extraParams
 
 			th.TestHeader(t, r, "Content-Type", "application/json")
 			th.TestHeader(t, r, "Accept", "application/json")
-			th.TestJSONRequest(t, r, MetadataCreateRequest)
+			th.TestJSONRequest(t, r, metadataTesting.MetadataCreateRequest)
 			w.Header().Add("Content-Type", "application/json")
 			w.WriteHeader(http.StatusNoContent)
 		})
 
-		err := metadata.MetadataCreateOrUpdate(client, resourceID, map[string]string{
+		err := metadataV1.MetadataCreateOrUpdate(client, resourceID, map[string]string{
 			"test1": "test1",
 			"test2": "test2",
 		}).ExtractErr()
@@ -141,12 +143,12 @@ func BuildTestMetadataUpdate(resourceName string, resourceID string, extraParams
 
 			th.TestHeader(t, r, "Content-Type", "application/json")
 			th.TestHeader(t, r, "Accept", "application/json")
-			th.TestJSONRequest(t, r, MetadataCreateRequest)
+			th.TestJSONRequest(t, r, metadataTesting.MetadataCreateRequest)
 			w.Header().Add("Content-Type", "application/json")
 			w.WriteHeader(http.StatusNoContent)
 		})
 
-		err := metadata.MetadataReplace(client, resourceID, map[string]string{
+		err := metadataV1.MetadataReplace(client, resourceID, map[string]string{
 			"test1": "test1",
 			"test2": "test2",
 		}).ExtractErr()
@@ -160,7 +162,7 @@ func BuildTestMetadataDelete(resourceName string, resourceID string, extraParams
 		defer th.TeardownHTTP()
 
 		client, relativeUrl := prepareTestParams(resourceName, func(c *gcorecloud.ServiceClient) string {
-			return metadata.MetadataItemURL(c, resourceID, ResourceMetadataReadOnly.Key)
+			return metadata.MetadataItemURL(c, resourceID, metadataTesting.ResourceMetadataReadOnly.Key)
 		}, extraParams...)
 
 		th.Mux.HandleFunc(relativeUrl, func(w http.ResponseWriter, r *http.Request) {
@@ -171,7 +173,7 @@ func BuildTestMetadataDelete(resourceName string, resourceID string, extraParams
 			w.WriteHeader(http.StatusNoContent)
 		})
 
-		err := metadata.MetadataDelete(client, resourceID, Metadata1.Key).ExtractErr()
+		err := metadataV1.MetadataDelete(client, resourceID, metadataTesting.Metadata1.Key).ExtractErr()
 		require.NoError(t, err)
 	}
 }
