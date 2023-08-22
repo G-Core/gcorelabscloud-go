@@ -2,7 +2,7 @@ package testing
 
 import (
 	"fmt"
-	metadataV1Testing "github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/testing"
+	metadataV1Testing "github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata/testing"
 	"net"
 	"net/http"
 	"testing"

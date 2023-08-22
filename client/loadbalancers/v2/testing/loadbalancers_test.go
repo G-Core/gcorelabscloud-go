@@ -2,8 +2,8 @@ package testing
 
 import (
 	"fmt"
-	metadataV1 "github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1"
-	metadataV2 "github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v2"
+	metadataV1 "github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata"
+	metadataV2 "github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v2/metadata"
 	th "github.com/G-Core/gcorelabscloud-go/testhelper"
 	"testing"
 	"time"

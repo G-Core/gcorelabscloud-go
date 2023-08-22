@@ -1,4 +1,4 @@
-package metadataV2
+package metadata
 
 import (
 	"net/http"

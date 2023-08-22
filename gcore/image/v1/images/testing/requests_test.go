@@ -2,12 +2,12 @@ package testing
 
 import (
 	"fmt"
+	metadataV1Testing "github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata/testing"
 	"net/http"
 	"testing"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/image/v1/images"
 	"github.com/G-Core/gcorelabscloud-go/gcore/image/v1/images/types"
-	gtesting "github.com/G-Core/gcorelabscloud-go/gcore/utils/testing"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 	th "github.com/G-Core/gcorelabscloud-go/testhelper"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
@@ -291,22 +291,22 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestMetadataListAll(t *testing.T) {
-	gtesting.BuildTestMetadataListAll("images", Image1.ID)(t)
+	metadataV1Testing.BuildTestMetadataListAll("images", Image1.ID)(t)
 }
 
 func TestMetadataGet(t *testing.T) {
-	gtesting.BuildTestMetadataGet("images", Image1.ID)(t)
+	metadataV1Testing.BuildTestMetadataGet("images", Image1.ID)(t)
 }
 
 func TestMetadataCreate(t *testing.T) {
-	gtesting.BuildTestMetadataCreate("images", Image1.ID)(t)
+	metadataV1Testing.BuildTestMetadataCreate("images", Image1.ID)(t)
 }
 
 func TestMetadataUpdate(t *testing.T) {
-	gtesting.BuildTestMetadataUpdate("images", Image1.ID)(t)
+	metadataV1Testing.BuildTestMetadataUpdate("images", Image1.ID)(t)
 
 }
 
 func TestMetadataDelete(t *testing.T) {
-	gtesting.BuildTestMetadataDelete("images", Image1.ID)(t)
+	metadataV1Testing.BuildTestMetadataDelete("images", Image1.ID)(t)
 }
