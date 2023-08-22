@@ -3,13 +3,13 @@ package testing
 import (
 	"fmt"
 	metadataV1 "github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata"
+	metadataTesting "github.com/G-Core/gcorelabscloud-go/gcore/utils/testing"
 	"net/http"
 	"net/url"
 	"testing"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
-	metadataTesting "github.com/G-Core/gcorelabscloud-go/gcore/utils/testing"
 	th "github.com/G-Core/gcorelabscloud-go/testhelper"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 	log "github.com/sirupsen/logrus"
@@ -59,7 +59,7 @@ func BuildTestMetadataListAll(resourceName string, resourceID string, extraParam
 
 			w.Header().Add("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
-			_, err := fmt.Fprint(w, metadataTesting.MetadataListResponse)
+			_, err := fmt.Fprint(w, MetadataListResponse)
 			if err != nil {
 				log.Error(err)
 			}
@@ -88,7 +88,7 @@ func BuildTestMetadataGet(resourceName string, resourceID string, extraParams ..
 
 			w.Header().Add("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
-			_, err := fmt.Fprint(w, metadataTesting.MetadataResponse)
+			_, err := fmt.Fprint(w, MetadataResponse)
 			if err != nil {
 				log.Error(err)
 			}

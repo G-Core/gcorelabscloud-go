@@ -3,7 +3,6 @@ package metadata
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata"
 	"strings"
 
 	"github.com/urfave/cli/v2"
@@ -11,6 +10,7 @@ import (
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata"
 )
 
 type ClientConstructor func(c *cli.Context) (*gcorecloud.ServiceClient, error)

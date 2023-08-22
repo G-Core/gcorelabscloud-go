@@ -8,7 +8,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 
-	gtesting "github.com/G-Core/gcorelabscloud-go/gcore/utils/testing"
+	gtesting "github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata/testing"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 

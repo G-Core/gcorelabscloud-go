@@ -2,6 +2,7 @@ package testing
 
 import (
 	"fmt"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"net"
 	"time"
 
@@ -9,8 +10,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/loadbalancers"
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
-	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
-	utils_testing "github.com/G-Core/gcorelabscloud-go/gcore/utils/testing"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata/testing"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 )
 
@@ -40,7 +40,7 @@ var ListResponse = fmt.Sprintf(`
     }
   ]
 }
-`, utils_testing.MetadataResponse)
+`, testing.MetadataResponse)
 
 const ListCustomSecurityGroupResponse = `
 {
@@ -75,7 +75,7 @@ var GetResponse = fmt.Sprintf(`
   "region_id": 1,
   "metadata": [%s]
 }
-`, utils_testing.MetadataResponse)
+`, testing.MetadataResponse)
 
 const CreateRequest = `
 {
@@ -169,7 +169,7 @@ var (
 		ProjectID:     fake.ProjectID,
 		RegionID:      fake.RegionID,
 		Region:        "RegionOne",
-		Metadata:      []metadata.Metadata{utils_testing.ResourceMetadataReadOnly},
+		Metadata:      []metadata.Metadata{testing.ResourceMetadataReadOnly},
 	}
 	Tasks1 = tasks.TaskResults{
 		Tasks: []tasks.TaskID{"50f53a35-42ed-40c4-82b2-5a37fb3e00bc"},

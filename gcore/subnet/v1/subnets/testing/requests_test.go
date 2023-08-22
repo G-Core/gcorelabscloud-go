@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/subnet/v1/subnets"
-	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 	th "github.com/G-Core/gcorelabscloud-go/testhelper"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
