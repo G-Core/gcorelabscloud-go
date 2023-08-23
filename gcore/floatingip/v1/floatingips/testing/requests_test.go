@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/floatingip/v1/floatingips"
-	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 
 	"github.com/stretchr/testify/require"
