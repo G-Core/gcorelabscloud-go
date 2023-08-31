@@ -18,7 +18,7 @@ type CreateOptsBuilder interface {
 type CreateOpts struct {
 	Name               string             `json:"name" required:"true" validate:"required"`
 	FlavorID           string             `json:"flavor_id" required:"true" validate:"required"`
-	MinNodeCount       int                `json:"min_node_count,omitempty" validate:"omitempty,gt=0,ltefield=MaxNodeCount"`
+	MinNodeCount       int                `json:"min_node_count" required:"true" validate:"required,gt=0,ltefield=MaxNodeCount"`
 	MaxNodeCount       int                `json:"max_node_count,omitempty" validate:"omitempty,gt=0,gtefield=MinNodeCount"`
 	BootVolumeSize     int                `json:"boot_volume_size,omitempty" validate:"omitempty,gt=0"`
 	BootVolumeType     volumes.VolumeType `json:"boot_volume_type,omitempty" validate:"omitempty,enum"`
@@ -108,13 +108,13 @@ func ListAll(client *gcorecloud.ServiceClient, clusterName string) ([]ClusterPoo
 
 // Create accepts a CreateOpts struct and creates a new cluster pool
 // using the values provided.
-func Create(c *gcorecloud.ServiceClient, clusterID string, opts CreateOptsBuilder) (r tasks.Result) {
+func Create(c *gcorecloud.ServiceClient, clusterName string, opts CreateOptsBuilder) (r tasks.Result) {
 	b, err := opts.ToClusterPoolCreateMap()
 	if err != nil {
 		r.Err = err
 		return
 	}
-	_, r.Err = c.Post(createURL(c, clusterID), b, &r.Body, nil)
+	_, r.Err = c.Post(createURL(c, clusterName), b, &r.Body, nil)
 	return
 }
 
@@ -126,7 +126,7 @@ func Get(c *gcorecloud.ServiceClient, clusterName, poolName string) (r GetResult
 
 // Update accepts an UpdateOpts struct and updates an existing cluster pool
 // using the values provided.
-func Update(c *gcorecloud.ServiceClient, clusterName, poolName string, opts UpdateOptsBuilder) (r tasks.Result) {
+func Update(c *gcorecloud.ServiceClient, clusterName, poolName string, opts UpdateOptsBuilder) (r UpdateResult) {
 	b, err := opts.ToClusterPoolUpdateMap()
 	if err != nil {
 		r.Err = err

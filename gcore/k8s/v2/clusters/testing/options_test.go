@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
-	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v2/pools"
 
@@ -71,16 +70,4 @@ func TestUpgradeOptions(t *testing.T) {
 
 	_, err = options.ToClusterUpgradeMap()
 	require.NoError(t, err)
-}
-
-func TestDecodeClusterTask(t *testing.T) {
-	taskID := "732851e1-f792-4194-b966-4cbfa5f30093"
-	rs := map[string]interface{}{"k8s_clusters": []string{taskID}}
-	taskInfo := tasks.Task{
-		CreatedResources: &rs,
-	}
-	var result clusters.ClusterTaskResult
-	err := gcorecloud.NativeMapToStruct(taskInfo.CreatedResources, &result)
-	require.NoError(t, err)
-	require.Equal(t, taskID, result.K8sClusters[0])
 }

@@ -1,12 +1,10 @@
 package clusters
 
 import (
-	"fmt"
 	"time"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v2/pools"
-	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
@@ -169,20 +167,4 @@ func ExtractClustersInto(r pagination.Page, v interface{}) error {
 
 func ExtractVersionInto(r pagination.Page, v interface{}) error {
 	return r.(VersionPage).Result.ExtractIntoSlicePtr(v, "results")
-}
-
-type ClusterTaskResult struct {
-	K8sClusters []string `json:"k8s_clusters" mapstructure:"k8s_clusters"`
-}
-
-func ExtractClusterIDFromTask(task *tasks.Task) (string, error) {
-	var result ClusterTaskResult
-	err := gcorecloud.NativeMapToStruct(task.CreatedResources, &result)
-	if err != nil {
-		return "", fmt.Errorf("cannot decode cluster information in task structure: %w", err)
-	}
-	if len(result.K8sClusters) == 0 {
-		return "", fmt.Errorf("cannot decode cluster information in task structure: %w", err)
-	}
-	return result.K8sClusters[0], nil
 }

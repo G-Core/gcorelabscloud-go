@@ -81,15 +81,16 @@ func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r tasks.Result
 }
 
 // Get retrieves a specific cluster based on its name.
-func Get(c *gcorecloud.ServiceClient, id string) (r GetResult) {
-	url := getURL(c, id)
+func Get(c *gcorecloud.ServiceClient, clusterName string) (r GetResult) {
+	url := getURL(c, clusterName)
 	_, r.Err = c.Get(url, &r.Body, nil)
 	return
 }
 
 // Delete accepts cluster name and deletes the cluster associated with it.
 func Delete(c *gcorecloud.ServiceClient, clusterName string) (r tasks.Result) {
-	_, r.Err = c.DeleteWithResponse(deleteURL(c, clusterName), &r.Body, nil)
+	url := deleteURL(c, clusterName)
+	_, r.Err = c.DeleteWithResponse(url, &r.Body, nil)
 	return
 }
 
