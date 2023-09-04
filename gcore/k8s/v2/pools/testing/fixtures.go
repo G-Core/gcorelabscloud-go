@@ -73,7 +73,6 @@ const GetResponse = `
 
 const UpdateRequest = `
 {
-  "node_count": 2,
   "min_mode_count": 1,
   "max_mode_count": 3,
 }

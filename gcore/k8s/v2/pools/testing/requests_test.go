@@ -179,7 +179,7 @@ func TestUpdate(t *testing.T) {
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 
-		_, err := fmt.Fprint(w, CreateResponse)
+		_, err := fmt.Fprint(w, UpdateResponse)
 		if err != nil {
 			log.Error(err)
 		}
@@ -189,14 +189,14 @@ func TestUpdate(t *testing.T) {
 
 	options := pools.UpdateOpts{
 		MinNodeCount: 1,
-		NodeCount:    2,
 		MaxNodeCount: 3,
 	}
 
-	tasks, err := pools.Update(client, Cluster1Name, Pool1.Name, options).Extract()
+	ct, err := pools.Update(client, Cluster1Name, Pool1.Name, options).Extract()
 
 	require.NoError(t, err)
-	require.Equal(t, Tasks1, *tasks)
+	require.Equal(t, 1, ct.MinNodeCount)
+	require.Equal(t, 3, ct.MaxNodeCount)
 }
 
 func TestDelete(t *testing.T) {
