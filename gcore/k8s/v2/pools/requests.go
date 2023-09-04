@@ -48,9 +48,8 @@ type UpdateOptsBuilder interface {
 // UpdateOpts represents options used to update a pool.
 type UpdateOpts struct {
 	AutoHealingEnabled bool `json:"auto_healing_enabled,omitempty"`
-	NodeCount          int  `json:"node_count,omitempty" validate:"omitempty,gt=0,lte=20,gtefield=MinNodeCount,ltefield=MaxNodeCount"`
-	MinNodeCount       int  `json:"min_node_count,omitempty" validate:"omitempty,gt=0,lte=20,ltefield=NodeCount,ltefield=MaxNodeCount"`
-	MaxNodeCount       int  `json:"max_node_count,omitempty" validate:"omitempty,gt=0,lte=20,gtefield=NodeCount,gtefield=MinNodeCount"`
+	MinNodeCount       int  `json:"min_node_count,omitempty" validate:"omitempty,gt=0,lte=20,ltefield=MaxNodeCount"`
+	MaxNodeCount       int  `json:"max_node_count,omitempty" validate:"omitempty,gt=0,lte=20,gtefield=MinNodeCount"`
 }
 
 // Validate UpdateOpts

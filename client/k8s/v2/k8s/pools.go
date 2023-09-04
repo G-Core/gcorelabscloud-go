@@ -166,16 +166,11 @@ var poolCreateSubCommand = cli.Command{
 		}
 		tc := getTaskClient(c, client)
 		return utils.WaitTaskAndShowResult(c, tc, results, true, func(task tasks.TaskID) (interface{}, error) {
-			_, err := pools.Get(client, clusterName, poolName).Extract()
+			pool, err := pools.Get(client, clusterName, poolName).Extract()
 			if err != nil {
 				return nil, fmt.Errorf("cannot create pool with name: %s. Error: %w", poolName, err)
 			}
-			switch err.(type) {
-			case gcorecloud.ErrDefault404:
-				return nil, nil
-			default:
-				return nil, err
-			}
+			return pool, err
 		})
 	},
 }
@@ -191,11 +186,6 @@ var poolUpdateSubCommand = cli.Command{
 			Aliases:  []string{"c"},
 			Usage:    "Cluster name",
 			Required: true,
-		},
-		&cli.IntFlag{
-			Name:     "node-count",
-			Usage:    "Current number of pool nodes",
-			Required: false,
 		},
 		&cli.IntFlag{
 			Name:     "min-node-count",
@@ -227,7 +217,6 @@ var poolUpdateSubCommand = cli.Command{
 		}
 		opts := pools.UpdateOpts{
 			AutoHealingEnabled: c.Bool("auto-healing-enabled"),
-			NodeCount:          c.Int("node-count"),
 			MinNodeCount:       c.Int("min-node-count"),
 			MaxNodeCount:       c.Int("max-node-count"),
 		}
@@ -279,16 +268,11 @@ var poolResizeSubCommand = cli.Command{
 		}
 		tc := getTaskClient(c, client)
 		return utils.WaitTaskAndShowResult(c, tc, results, true, func(task tasks.TaskID) (interface{}, error) {
-			_, err := pools.Get(client, clusterName, poolName).Extract()
+			pool, err := pools.Get(client, clusterName, poolName).Extract()
 			if err != nil {
 				return nil, fmt.Errorf("cannot resize pool with name: %s. Error: %w", poolName, err)
 			}
-			switch err.(type) {
-			case gcorecloud.ErrDefault404:
-				return nil, nil
-			default:
-				return nil, err
-			}
+			return pool, err
 		})
 	},
 }

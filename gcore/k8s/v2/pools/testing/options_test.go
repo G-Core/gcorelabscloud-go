@@ -52,34 +52,12 @@ func TestCreateOpts(t *testing.T) {
 func TestUpdateOpts(t *testing.T) {
 	options := pools.UpdateOpts{
 		MinNodeCount: 5,
-		NodeCount:    4,
 		MaxNodeCount: 3,
 	}
 
 	_, err := options.ToClusterPoolUpdateMap()
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "NodeCount")
 	require.Contains(t, err.Error(), "MinNodeCount")
-	require.Contains(t, err.Error(), "MaxNodeCount")
-
-	options = pools.UpdateOpts{
-		MinNodeCount: 5,
-		NodeCount:    3,
-	}
-
-	_, err = options.ToClusterPoolUpdateMap()
-	require.Error(t, err)
-	require.Contains(t, err.Error(), "NodeCount")
-	require.Contains(t, err.Error(), "MinNodeCount")
-
-	options = pools.UpdateOpts{
-		NodeCount:    5,
-		MaxNodeCount: 3,
-	}
-
-	_, err = options.ToClusterPoolUpdateMap()
-	require.Error(t, err)
-	require.Contains(t, err.Error(), "NodeCount")
 	require.Contains(t, err.Error(), "MaxNodeCount")
 
 	options = pools.UpdateOpts{}
@@ -88,7 +66,6 @@ func TestUpdateOpts(t *testing.T) {
 	require.NoError(t, err)
 
 	options = pools.UpdateOpts{
-		NodeCount:    2,
 		MinNodeCount: 2,
 		MaxNodeCount: 2,
 	}
