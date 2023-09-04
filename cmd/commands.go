@@ -14,7 +14,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/client/heat"
 	"github.com/G-Core/gcorelabscloud-go/client/images/v1/images"
 	"github.com/G-Core/gcorelabscloud-go/client/instances/v1/instances"
-	"github.com/G-Core/gcorelabscloud-go/client/k8s/v1/k8s"
+	"github.com/G-Core/gcorelabscloud-go/client/k8s/v2/k8s"
 	"github.com/G-Core/gcorelabscloud-go/client/keypairs/v2/keypairs"
 	"github.com/G-Core/gcorelabscloud-go/client/keystones/v1/keystones"
 	"github.com/G-Core/gcorelabscloud-go/client/l7policies/v1/l7policies"
