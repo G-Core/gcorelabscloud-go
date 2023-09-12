@@ -107,7 +107,10 @@ const CreateRequest = `
     }
   ],
   "lb_algorithm": "ROUND_ROBIN",
-  "listener_id": "c63341da-ea44-4027-bbf6-1f1939c783da"
+  "listener_id": "c63341da-ea44-4027-bbf6-1f1939c783da",
+  "timeout_client_data": 0,
+  "timeout_member_connect": 0,
+  "timeout_member_data": 0
 }
 `
 
