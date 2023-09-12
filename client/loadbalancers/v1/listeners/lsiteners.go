@@ -93,6 +93,10 @@ var listenerCreateSubCommand = cli.Command{
 			Usage:    fmt.Sprintf("output in %s", strings.Join(protocolTypes, ", ")),
 			Required: true,
 		},
+		&cli.StringSliceFlag{
+			Name:  "allowed-cidrs",
+			Usage: "List of networks from which listener is accessible",
+		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
 		client, err := client.NewLBListenerClientV1(c)
@@ -113,7 +117,9 @@ var listenerCreateSubCommand = cli.Command{
 			LoadBalancerID: c.String("loadbalancer-id"),
 			SecretID:       c.String("secret-id"),
 			SNISecretID:    c.StringSlice("sni-secret-id"),
+			AllowedCIDRS:	c.StringSlice("allowed-cidrs") ,
 		}
+	
 
 		results, err := listeners.Create(client, opts).Extract()
 		if err != nil {
@@ -221,7 +227,7 @@ var listenerUpdateSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "update")
 			return err
 		}
-		client, err := client.NewLBListenerClientV1(c)
+		client, err := client.NewLBListenerClientV2(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)

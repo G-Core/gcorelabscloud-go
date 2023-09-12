@@ -15,6 +15,10 @@ func NewLBListenerClientV1(c *cli.Context) (*gcorecloud.ServiceClient, error) {
 	return common.BuildClient(c, "lblisteners", "v1")
 }
 
+func NewLBListenerClientV2(c *cli.Context) (*gcorecloud.ServiceClient, error) {
+	return common.BuildClient(c, "lblisteners", "v2")
+}
+
 func NewLBPoolClientV1(c *cli.Context) (*gcorecloud.ServiceClient, error) {
 	return common.BuildClient(c, "lbpools", "v1")
 }
