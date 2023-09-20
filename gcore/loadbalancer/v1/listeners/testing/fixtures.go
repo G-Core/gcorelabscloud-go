@@ -19,7 +19,8 @@ const ListResponse = `
       "protocol_port": 80,
       "id": "43658ea9-54bd-4807-90b1-925921c9a0d1",
       "protocol": "TCP",
-      "provisioning_status": "ACTIVE"
+      "provisioning_status": "ACTIVE",
+      "allowed_cidrs": ["10.10.0.0/24"]
     }
   ]
 }
@@ -35,7 +36,8 @@ const GetResponse = `
   "protocol_port": 80,
   "id": "43658ea9-54bd-4807-90b1-925921c9a0d1",
   "protocol": "TCP",
-  "provisioning_status": "ACTIVE"
+  "provisioning_status": "ACTIVE",
+  "allowed_cidrs": ["10.10.0.0/24"]
 }
 `
 
@@ -45,7 +47,8 @@ const CreateRequest = `
   "protocol_port": 80,
   "protocol": "TCP",
   "loadbalancer_id": "43658ea9-54bd-4807-90b1-925921c9a0d1",
-  "insert_x_forwarded": false
+  "insert_x_forwarded": false,
+  "allowed_cidrs": ["10.10.0.0/24"]
 }
 `
 
@@ -56,6 +59,13 @@ const UpdateRequest = `
 `
 
 const CreateResponse = `
+{
+  "tasks": [
+    "50f53a35-42ed-40c4-82b2-5a37fb3e00bc"
+  ]
+}
+`
+const UpdateResponse = `
 {
   "tasks": [
     "50f53a35-42ed-40c4-82b2-5a37fb3e00bc"
@@ -85,6 +95,7 @@ var (
 		OperationStatus:    types.OperatingStatusOnline,
 		CreatorTaskID:      &creatorTaskID,
 		TaskID:             &taskID,
+    AllowedCIDRS:       []string{"10.10.0.0/24"},
 	}
 	Tasks1 = tasks.TaskResults{
 		Tasks: []tasks.TaskID{"50f53a35-42ed-40c4-82b2-5a37fb3e00bc"},

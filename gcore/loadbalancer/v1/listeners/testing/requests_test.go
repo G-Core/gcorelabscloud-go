@@ -25,12 +25,20 @@ func prepareGetTestURLParams(projectID int, regionID int, id string) string {
 	return fmt.Sprintf("/v1/lblisteners/%d/%d/%s", projectID, regionID, id)
 }
 
+func prepareGetTestURLv2Params(projectID int, regionID int, id string) string {
+	return fmt.Sprintf("/v2/lblisteners/%d/%d/%s", projectID, regionID, id)
+}
+
 func prepareListTestURL() string {
 	return prepareListTestURLParams(fake.ProjectID, fake.RegionID)
 }
 
 func prepareGetTestURL(id string) string {
 	return prepareGetTestURLParams(fake.ProjectID, fake.RegionID, id)
+}
+
+func prepareGetTestURLv2(id string) string {
+	return prepareGetTestURLv2Params(fake.ProjectID, fake.RegionID, id)
 }
 
 func TestList(t *testing.T) {
@@ -151,6 +159,7 @@ func TestCreate(t *testing.T) {
 		Protocol:       types.ProtocolTypeTCP,
 		ProtocolPort:   80,
 		LoadBalancerID: Listener1.ID,
+		AllowedCIDRS: []string{"10.10.0.0/24"},
 	}
 
 	client := fake.ServiceTokenClient("lblisteners", "v1")
@@ -185,7 +194,7 @@ func TestUpdate(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
 
-	testURL := prepareGetTestURL(Listener1.ID)
+	testURL := prepareGetTestURLv2(Listener1.ID)
 
 	th.Mux.HandleFunc(testURL, func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "PATCH")
@@ -196,22 +205,21 @@ func TestUpdate(t *testing.T) {
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 
-		_, err := fmt.Fprint(w, GetResponse)
+		_, err := fmt.Fprint(w, UpdateResponse)
 		if err != nil {
 			log.Error(err)
 		}
 	})
 
-	client := fake.ServiceTokenClient("lblisteners", "v1")
+	client := fake.ServiceTokenClient("lblisteners", "v2")
 
 	opts := listeners.UpdateOpts{
 		Name: Listener1.Name,
 	}
 
-	ct, err := listeners.Update(client, Listener1.ID, opts).Extract()
+	task, err := listeners.Update(client, Listener1.ID, opts).Extract()
 
 	require.NoError(t, err)
-	require.Equal(t, Listener1, *ct)
-	require.Equal(t, Listener1.Name, ct.Name)
+	require.Equal(t, Tasks1, *task)
 
 }

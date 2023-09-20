@@ -62,6 +62,7 @@ type CreateOpts struct {
 	InsertXForwarded bool               `json:"insert_x_forwarded"`
 	SecretID         string             `json:"secret_id,omitempty"`
 	SNISecretID      []string           `json:"sni_secret_id,omitempty"`
+	AllowedCIDRS     []string           `json:"allowed_cidrs,omitempty" validate:"omitempty,dive,cidr"`
 }
 
 // ToListenerCreateMap builds a request body from CreateOpts.
@@ -90,9 +91,10 @@ type UpdateOptsBuilder interface {
 
 // UpdateOpts represents options used to update a listener.
 type UpdateOpts struct {
-	Name        string   `json:"name" required:"true" validate:"required,name"`
-	SecretID    string   `json:"secret_id,omitempty"`
-	SNISecretID []string `json:"sni_secret_id,omitempty"`
+	Name         string   `json:"name,omitempty"`
+	SecretID     string   `json:"secret_id,omitempty"`
+	SNISecretID  []string `json:"sni_secret_id,omitempty"`
+	AllowedCIDRS []string `json:"allowed_cidrs,omitempty" validate:"omitempty,dive,cidr"`
 }
 
 // ToListenerUpdateMap builds a request body from UpdateOpts.
@@ -105,7 +107,7 @@ func (opts UpdateOpts) ToListenerUpdateMap() (map[string]interface{}, error) {
 
 // Update accepts a UpdateOpts struct and updates an existing listener using the
 // values provided. For more information, see the Create function.
-func Update(c *gcorecloud.ServiceClient, listenerID string, opts UpdateOptsBuilder) (r UpdateResult) {
+func Update(c *gcorecloud.ServiceClient, listenerID string, opts UpdateOptsBuilder) (r tasks.Result) {
 	b, err := opts.ToListenerUpdateMap()
 	if err != nil {
 		r.Err = err

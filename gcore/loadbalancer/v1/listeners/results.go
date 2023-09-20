@@ -49,6 +49,7 @@ type Listener struct {
 	TaskID             *string                  `json:"task_id"`
 	SecretID           *string                  `json:"secret_id"`
 	SNISecretID        []string                 `json:"sni_secret_id,omitempty"`
+	AllowedCIDRS       []string                 `json:"allowed_cidrs,omitempty" validate:"omitempty,dive,cidr"`
 }
 
 func (l Listener) IsDeleted() bool {
