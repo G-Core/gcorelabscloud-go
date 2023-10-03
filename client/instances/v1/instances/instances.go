@@ -109,7 +109,7 @@ func StringSliceToAppConfigSetOpts(slice []string) (map[string]interface{}, erro
 	return m, nil
 }
 
-func getUserData(c *cli.Context) (string, error) {
+func GetUserData(c *cli.Context) (string, error) {
 	userData := ""
 	userDataFile := c.String("user-data-file")
 	userDataContent := c.String("user-data")
@@ -126,7 +126,7 @@ func getUserData(c *cli.Context) (string, error) {
 	return userData, nil
 }
 
-func getInstanceVolumes(c *cli.Context) ([]instances.CreateVolumeOpts, error) {
+func GetInstanceVolumes(c *cli.Context) ([]instances.CreateVolumeOpts, error) {
 	volumeSources := utils.GetEnumStringSliceValue(c, "volume-source")
 	volumeTypes := utils.GetEnumStringSliceValue(c, "volume-type")
 	volumeBootIndexes := c.IntSlice("volume-boot-index")
@@ -198,7 +198,7 @@ func getInstanceVolumes(c *cli.Context) ([]instances.CreateVolumeOpts, error) {
 
 }
 
-func getInterfaces(c *cli.Context) ([]instances.InterfaceInstanceCreateOpts, error) {
+func GetInterfaces(c *cli.Context) ([]instances.InterfaceInstanceCreateOpts, error) {
 	interfaceTypes := utils.GetEnumStringSliceValue(c, "interface-type")
 	interfaceNetworkIDs := c.StringSlice("interface-network-id")
 	interfaceSubnetIDs := c.StringSlice("interface-subnet-id")
@@ -284,7 +284,7 @@ func getBaremetalInterfaces(c *cli.Context) ([]bminstances.InterfaceOpts, error)
 
 }
 
-func getSecurityGroups(c *cli.Context) []gcorecloud.ItemID {
+func GetSecurityGroups(c *cli.Context) []gcorecloud.ItemID {
 	securityGroups := c.StringSlice("security-group")
 	res := make([]gcorecloud.ItemID, len(securityGroups))
 	for i, s := range securityGroups {
@@ -681,26 +681,26 @@ var instanceCreateCommandV2 = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
-		userData, err := getUserData(c)
+		userData, err := GetUserData(c)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "create")
 			return cli.NewExitError(err, 1)
 		}
 
-		instanceVolumes, err := getInstanceVolumes(c)
+		instanceVolumes, err := GetInstanceVolumes(c)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "create")
 			return cli.NewExitError(err, 1)
 		}
 
 		// todo add security group mapping
-		instanceInterfaces, err := getInterfaces(c)
+		instanceInterfaces, err := GetInterfaces(c)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "create")
 			return cli.NewExitError(err, 1)
 		}
 
-		securityGroups := getSecurityGroups(c)
+		securityGroups := GetSecurityGroups(c)
 
 		metadata, err := StringSliceToMetadataSetOpts(c.StringSlice("metadata"))
 		if err != nil {
@@ -1290,7 +1290,7 @@ var instanceCreateBaremetalCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
-		userData, err := getUserData(c)
+		userData, err := GetUserData(c)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "create_baremetal")
 			return cli.NewExitError(err, 1)

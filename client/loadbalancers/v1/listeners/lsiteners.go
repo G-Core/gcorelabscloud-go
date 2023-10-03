@@ -120,7 +120,6 @@ var listenerCreateSubCommand = cli.Command{
 			AllowedCIDRS:	c.StringSlice("allowed-cidrs") ,
 		}
 	
-
 		results, err := listeners.Create(client, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)

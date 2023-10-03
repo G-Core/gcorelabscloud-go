@@ -66,6 +66,7 @@ type HardwareDescription struct {
 	Disk    string `json:"disk,omitempty"`
 	Network string `json:"network,omitempty"`
 	RAM     string `json:"ram,omitempty"`
+	IPU		string `json:"ipu,omitempty"`
 }
 
 // FlavorPage is the page returned by a pager when traversing over a
