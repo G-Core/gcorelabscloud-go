@@ -237,3 +237,106 @@ func UpdateFunction(c *gcorecloud.ServiceClient, nsName, fName string, opts Upda
 	_, r.Err = c.Patch(url, b, &r.Body, nil)
 	return
 }
+
+// ListKeys returns a Pager which allows you to iterate over a collection of
+// keys. It accepts a ListOpts struct, which allows you to filter and sort
+// the returned collection for greater efficiency.
+func ListKeys(c *gcorecloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
+	url := keysListURL(c)
+	if opts != nil {
+		query, err := opts.ToFaaSListQuery()
+		if err != nil {
+			return pagination.Pager{Err: err}
+		}
+		url += query
+	}
+
+	return pagination.NewPager(c, url, func(r pagination.PageResult) pagination.Page {
+		return KeyPage{pagination.LinkedPageBase{PageResult: r}}
+	})
+}
+
+// ListKeysAll returns all keys.
+func ListKeysAll(c *gcorecloud.ServiceClient, opts ListOptsBuilder) ([]Key, error) {
+	page, err := ListKeys(c, opts).AllPages()
+	if err != nil {
+		return nil, err
+	}
+	return ExtractKeys(page)
+}
+
+// CreateKeyOptsBuilder allows extensions to add additional parameters to the request.
+type CreateKeyOptsBuilder interface {
+	ToKeyCreateMap() (map[string]any, error)
+}
+
+// CreateKeyOpts represents options used to create a key.
+type CreateKeyOpts struct {
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	Expire      *string        `json:"expire,omitempty"`
+	Functions   []KeysFunction `json:"functions"`
+}
+
+func (opts CreateKeyOpts) ToKeyCreateMap() (map[string]any, error) {
+	return gcorecloud.BuildRequestBody(opts, "")
+}
+
+// CreateKey create FaaS key.
+func CreateKey(c *gcorecloud.ServiceClient, opts CreateKeyOptsBuilder) (r Key, err error) {
+	url := keysCreateURL(c)
+	b, err := opts.ToKeyCreateMap()
+	if err != nil {
+		return Key{}, err
+	}
+
+	_, err = c.Post(url, b, &r, nil)
+
+	return
+}
+
+// DeleteKey delete FaaS key.
+func DeleteKey(c *gcorecloud.ServiceClient, kName string) error {
+	url := keyURL(c, kName)
+	_, err := c.Delete(url, nil)
+
+	return err
+}
+
+// GetKey get FaaS key.
+func GetKey(c *gcorecloud.ServiceClient, kName string) (r KeyResult) {
+	url := keyURL(c, kName)
+	_, r.Err = c.Get(url, &r.Body, nil)
+
+	return
+}
+
+// UpdateKeyOptsBuilder allows extensions to add additional parameters to the request.
+type UpdateKeyOptsBuilder interface {
+	ToKeyUpdateMap() (map[string]any, error)
+}
+
+// UpdateKeyOpts represents options used to Update a key.
+type UpdateKeyOpts struct {
+	Description string         `json:"description"`
+	Expire      *string        `json:"expire,omitempty"`
+	Functions   []KeysFunction `json:"functions"`
+}
+
+// ToKeyUpdateMap builds a request body from UpdateKeyOpts.
+func (opts UpdateKeyOpts) ToKeyUpdateMap() (map[string]interface{}, error) {
+	return gcorecloud.BuildRequestBody(opts, "")
+}
+
+// UpdateKey update FaaS key.
+func UpdateKey(c *gcorecloud.ServiceClient, kName string, opts UpdateKeyOptsBuilder) (k Key, err error) {
+	url := keyURL(c, kName)
+	b, err := opts.ToKeyUpdateMap()
+	if err != nil {
+		return Key{}, err
+	}
+
+	_, err = c.Patch(url, b, &k, nil)
+
+	return
+}
