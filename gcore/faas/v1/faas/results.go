@@ -83,6 +83,7 @@ type Function struct {
 	BuildStatus  string                   `json:"build_status"`
 	Status       string                   `json:"status"`
 	DeployStatus DeployStatus             `json:"deploy_status"`
+	Dependencies string                   `json:"dependencies"`
 	Envs         map[string]string        `json:"envs"`
 	Runtime      string                   `json:"runtime"`
 	Timeout      int                      `json:"timeout"`
@@ -98,8 +99,8 @@ type Function struct {
 }
 
 type FunctionAutoscaling struct {
-	MinInstances int `json:"min_instances"`
-	MaxInstances int `json:"max_instances"`
+	MinInstances *int `json:"min_instances,omitempty"`
+	MaxInstances *int `json:"max_instances,omitempty"`
 }
 
 type FunctionResult struct {
@@ -167,13 +168,13 @@ type KeysFunction struct {
 }
 
 type Key struct {
-	Name        string         `json:"name"`
-	Description string         `json:"description"`
-	Functions   []KeysFunction `json:"functions"`
-	Expire      string         `json:"expire"`
-	CreatedAt   string         `json:"created_at"`
-	Secret      string         `json:"secret,omitempty"`
-	Status      string         `json:"status"`
+	Name        string                   `json:"name"`
+	Description string                   `json:"description"`
+	Functions   []KeysFunction           `json:"functions"`
+	Expire      gcorecloud.JSONRFC3339ZZ `json:"expire"`
+	CreatedAt   gcorecloud.JSONRFC3339ZZ `json:"created_at"`
+	Secret      string                   `json:"secret,omitempty"`
+	Status      string                   `json:"status"`
 }
 
 type KeyResult struct {

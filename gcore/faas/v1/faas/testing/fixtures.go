@@ -261,6 +261,8 @@ var (
 	}
 
 	fName     = "function-name"
+	min       = 1
+	max       = 2
 	expectedF = faas.Function{
 		Name:        fName,
 		Description: "Function description",
@@ -272,8 +274,8 @@ var (
 		Timeout: 5,
 		Flavor:  "64mCPU-64MB",
 		Autoscaling: faas.FunctionAutoscaling{
-			MinInstances: 1,
-			MaxInstances: 2,
+			MinInstances: &min,
+			MaxInstances: &max,
 		},
 		CodeText:     "def main(): print('It works!')",
 		MainMethod:   "main",

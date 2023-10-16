@@ -163,15 +163,19 @@ type CreateFunctionOptsBuilder interface {
 
 // CreateFunctionOpts represents options used to create a function.
 type CreateFunctionOpts struct {
-	Name        string              `json:"name"`
-	Description string              `json:"description"`
-	Envs        map[string]string   `json:"envs"`
-	Runtime     string              `json:"runtime"`
-	Timeout     int                 `json:"timeout"`
-	Flavor      string              `json:"flavor"`
-	Autoscaling FunctionAutoscaling `json:"autoscaling"`
-	CodeText    string              `json:"code_text"`
-	MainMethod  string              `json:"main_method"`
+	Name         string              `json:"name"`
+	Description  string              `json:"description"`
+	Envs         map[string]string   `json:"envs"`
+	Runtime      string              `json:"runtime"`
+	Timeout      int                 `json:"timeout"`
+	Flavor       string              `json:"flavor"`
+	Autoscaling  FunctionAutoscaling `json:"autoscaling"`
+	CodeText     string              `json:"code_text"`
+	EnableApiKey *bool               `json:"enable_api_key,omitempty"`
+	Keys         []string            `json:"keys,omitempty"`
+	Disabled     *bool               `json:"disabled,omitempty"`
+	MainMethod   string              `json:"main_method"`
+	Dependencies string              `json:"dependencies"`
 }
 
 // ToFunctionCreateMap builds a request body from CreateFunctionOpts.
@@ -212,13 +216,17 @@ type UpdateFunctionOptsBuilder interface {
 
 // UpdateFunctionOpts represents options used to Update a function.
 type UpdateFunctionOpts struct {
-	Description string               `json:"description,omitempty"`
-	Envs        map[string]string    `json:"envs,omitempty"`
-	Timeout     int                  `json:"timeout,omitempty"`
-	Flavor      string               `json:"flavor,omitempty"`
-	Autoscaling *FunctionAutoscaling `json:"autoscaling,omitempty"`
-	CodeText    string               `json:"code_text,omitempty"`
-	MainMethod  string               `json:"main_method,omitempty"`
+	Description  string               `json:"description,omitempty"`
+	Envs         map[string]string    `json:"envs,omitempty"`
+	Timeout      int                  `json:"timeout,omitempty"`
+	Flavor       string               `json:"flavor,omitempty"`
+	Autoscaling  *FunctionAutoscaling `json:"autoscaling,omitempty"`
+	CodeText     string               `json:"code_text,omitempty"`
+	EnableApiKey *bool                `json:"enable_api_key,omitempty"`
+	Keys         *[]string            `json:"keys,omitempty"`
+	Disabled     *bool                `json:"disabled,omitempty"`
+	Dependencies string               `json:"dependencies,omitempty"`
+	MainMethod   string               `json:"main_method,omitempty"`
 }
 
 // ToFunctionUpdateMap builds a request body from UpdateFunctionOpts.
@@ -272,10 +280,10 @@ type CreateKeyOptsBuilder interface {
 
 // CreateKeyOpts represents options used to create a key.
 type CreateKeyOpts struct {
-	Name        string         `json:"name"`
-	Description string         `json:"description"`
-	Expire      *string        `json:"expire,omitempty"`
-	Functions   []KeysFunction `json:"functions"`
+	Name        string                    `json:"name"`
+	Description string                    `json:"description"`
+	Expire      *gcorecloud.JSONRFC3339ZZ `json:"expire,omitempty"`
+	Functions   []KeysFunction            `json:"functions,omitempty"`
 }
 
 func (opts CreateKeyOpts) ToKeyCreateMap() (map[string]any, error) {
@@ -318,9 +326,9 @@ type UpdateKeyOptsBuilder interface {
 
 // UpdateKeyOpts represents options used to Update a key.
 type UpdateKeyOpts struct {
-	Description string         `json:"description"`
-	Expire      *string        `json:"expire,omitempty"`
-	Functions   []KeysFunction `json:"functions"`
+	Description string                    `json:"description,omitempty"`
+	Expire      *gcorecloud.JSONRFC3339ZZ `json:"expire,omitempty"`
+	Functions   []KeysFunction            `json:"functions,omitempty"`
 }
 
 // ToKeyUpdateMap builds a request body from UpdateKeyOpts.
