@@ -175,7 +175,7 @@ type CreateFunctionOpts struct {
 	Keys         []string            `json:"keys,omitempty"`
 	Disabled     *bool               `json:"disabled,omitempty"`
 	MainMethod   string              `json:"main_method"`
-	Dependencies string              `json:"dependencies"`
+	Dependencies string              `json:"dependencies,omitempty"`
 }
 
 // ToFunctionCreateMap builds a request body from CreateFunctionOpts.

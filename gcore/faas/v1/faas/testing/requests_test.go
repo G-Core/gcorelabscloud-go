@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/AlekSi/pointer"
 	"github.com/G-Core/gcorelabscloud-go/gcore/faas/v1/faas"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
@@ -347,11 +348,13 @@ func TestCreateFunction(t *testing.T) {
 		Timeout: 5,
 		Flavor:  "64mCPU-64MB",
 		Autoscaling: faas.FunctionAutoscaling{
-			MinInstances: 1,
-			MaxInstances: 2,
+			MinInstances: pointer.To(1),
+			MaxInstances: pointer.To(2),
 		},
-		CodeText:   "def main(): print('It works!')",
-		MainMethod: "main",
+		EnableApiKey: pointer.To(true),
+		Keys:         []string{"key-one"},
+		CodeText:     "def main(): print('It works!')",
+		MainMethod:   "main",
 	}
 	task, err := faas.CreateFunction(client, nsName, opts).Extract()
 	require.NoError(t, err)
@@ -408,8 +411,8 @@ func TestUpdateFunction(t *testing.T) {
 		Timeout:     180,
 		Flavor:      "string",
 		Autoscaling: &faas.FunctionAutoscaling{
-			MinInstances: 1,
-			MaxInstances: 2,
+			MinInstances: pointer.To(1),
+			MaxInstances: pointer.To(2),
 		},
 		CodeText:   "string",
 		MainMethod: "string",
@@ -521,11 +524,9 @@ func TestCreateKeys(t *testing.T) {
 	})
 
 	client := fake.ServiceTokenClient("faas/keys", "v1")
-	expire := "2023-08-22T11:21:00Z"
 	opts := faas.CreateKeyOpts{
 		Name:        "test-key",
 		Description: "description",
-		Expire:      &expire,
 		Functions: []faas.KeysFunction{
 			{
 				Name:      "function",

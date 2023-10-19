@@ -29,6 +29,8 @@ require (
 	k8s.io/client-go v0.18.2
 )
 
+require github.com/AlekSi/pointer v1.2.0
+
 require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect

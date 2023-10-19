@@ -2,13 +2,13 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/G-Core/gcorelabscloud-go/client/faas/v1/functions"
 	"os"
 	"path/filepath"
 
 	"github.com/G-Core/gcorelabscloud-go/client/ais/v1/ais"
 	"github.com/G-Core/gcorelabscloud-go/client/apitokens/v1/apitokens"
 	"github.com/G-Core/gcorelabscloud-go/client/apptemplates/v1/apptemplates"
+	"github.com/G-Core/gcorelabscloud-go/client/faas/v1/functions"
 	"github.com/G-Core/gcorelabscloud-go/client/file_shares/v1/file_shares"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/client/flavors/v1/flavors"

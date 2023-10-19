@@ -141,8 +141,6 @@ const getKeyResponse = `
   "description": "description",
   "name": "test-key",
   "status": "active",
-  "created_at": "2023-08-22T11:21:00Z",
-  "expire":  "2023-08-22T11:21:00Z",
   "functions": [
     {
         "name": "function",
@@ -161,8 +159,7 @@ const createKeyRequest = `
         "name": "function",
         "namespace": "namespace"
     }
-  ],
-  "expire": "2023-08-22T11:21:00Z"
+  ]
 }
 `
 
@@ -171,14 +168,12 @@ const createKeyResponse = `
   "description": "description",
   "name": "test-key",
   "status": "active",
-  "created_at": "2023-08-22T11:21:00Z",
   "functions": [
     {
         "name": "function",
         "namespace": "namespace"
     }
-  ],
-  "expire": "2023-08-22T11:21:00Z"
+  ]
 }
 `
 
@@ -190,8 +185,6 @@ const listKeysResponse = `
 		  "description": "description",
 		  "name": "test-key",
 		  "status": "active",
-		  "created_at": "2023-08-22T11:21:00Z",
-          "expire": "2023-08-22T11:21:00Z",
 		  "functions": [
 			{
 				"name": "function",
@@ -224,7 +217,6 @@ const updateKeyResponse = `
 	"description":  "long string",
 	"name": "test-key",
 	"status": "active",
-	"created_at": "2023-08-22T11:21:00Z",
 	"functions": [
 		{
 			"name":      "function1",
@@ -295,9 +287,7 @@ var (
 				Namespace: "namespace",
 			},
 		},
-		CreatedAt: "2023-08-22T11:21:00Z",
-		Expire:    "2023-08-22T11:21:00Z",
-		Status:    "active",
+		Status: "active",
 	}
 	expectedKeysSlice  = []faas.Key{expectedKey}
 	expectedUpdatedKey = faas.Key{
@@ -313,7 +303,6 @@ var (
 				Namespace: "namespace1",
 			},
 		},
-		CreatedAt: "2023-08-22T11:21:00Z",
-		Status:    "active",
+		Status: "active",
 	}
 )
