@@ -355,7 +355,7 @@ func (i *AICluster) UnmarshalJSON(data []byte) error {
 }
 
 type AIClusterTaskResult struct {
-	AIClusters []string `json:"ai_clusters"`
+	AIClusters []string `mapstructure:"ai_clusters"`
 	// etc
 }
 

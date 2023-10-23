@@ -51,7 +51,7 @@ type CreateOpts struct {
 	Name           string                                  `json:"name" validate:"required,min=3,max=63"`
 	ImageID        string                                  `json:"image_id" validate:"required,uuid4"`
 	Interfaces     []instances.InterfaceInstanceCreateOpts `json:"interfaces" validate:"required,dive"`
-	Volumes        []instances.CreateVolumeOpts            `json:"volumes" validate:"required,dive"`
+	Volumes        []instances.CreateVolumeOpts            `json:"volumes,omitempty" validate:"omitempty,required,dive"`
 	SecurityGroups []gcorecloud.ItemID                     `json:"security_groups,omitempty" validate:"omitempty,dive,uuid4"`
 	Keypair        string                                  `json:"keypair_name,omitempty"`
 	Password       string                                  `json:"password" validate:"omitempty,required_with=Username"`
@@ -87,7 +87,7 @@ type ResizeAIClusterOpts struct {
 	Flavor         string                                  `json:"flavor" validate:"omitempty,min=1"`
 	ImageID        string                                  `json:"image_id" validate:"omitempty,uuid4"`
 	Interfaces     []instances.InterfaceInstanceCreateOpts `json:"interfaces" validate:"required,dive"`
-	Volumes        []instances.CreateVolumeOpts            `json:"volumes" validate:"omitempty,dive"`
+	Volumes        []instances.CreateVolumeOpts            `json:"volumes,omitempty" validate:"omitempty,dive"`
 	SecurityGroups []gcorecloud.ItemID                     `json:"security_groups,omitempty" validate:"omitempty,dive,uuid4"`
 	Keypair        string                                  `json:"keypair_name,omitempty"`
 	Password       string                                  `json:"password" validate:"omitempty,required_with=Username"`
@@ -119,12 +119,11 @@ type AttachInterfaceOptsBuilder interface {
 }
 
 type AttachInterfaceOpts struct {
-	Type       types.InterfaceType                         `json:"type,omitempty" validate:"omitempty,enum"`
-	NetworkID  string                                      `json:"network_id,omitempty" validate:"rfe=Type:any_subnet,omitempty,uuid4"`
-	SubnetID   string                                      `json:"subnet_id,omitempty" validate:"rfe=Type:subnet,omitempty,uuid4"`
-	PortID     string                                      `json:"port_id,omitempty" validate:"rfe=Type:reserved_fixed_ip,allowed_without_all=NetworkID SubnetID,omitempty,uuid4"`
-	IpAddress  string                                      `json:"ip_address,omitempty" validate:"allowed_without_all=Type NetworkID SubnetID FloatingIP,omitempty"`
-	FloatingIP *instances.CreateNewInterfaceFloatingIPOpts `json:"floating_ip,omitempty" validate:"omitempty,dive"`
+	Type      types.InterfaceType `json:"type,omitempty" validate:"omitempty,enum"`
+	NetworkID string              `json:"network_id,omitempty" validate:"rfe=Type:any_subnet,omitempty,uuid4"`
+	SubnetID  string              `json:"subnet_id,omitempty" validate:"rfe=Type:subnet,omitempty,uuid4"`
+	PortID    string              `json:"port_id,omitempty" validate:"rfe=Type:reserved_fixed_ip,allowed_without_all=NetworkID SubnetID,omitempty,uuid4"`
+	IpAddress string              `json:"ip_address,omitempty" validate:"allowed_without_all=Type NetworkID SubnetID FloatingIP,omitempty"`
 }
 
 // Validate

@@ -5,13 +5,12 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
-
 type VisibilityType string
 
 const (
 	PRIVATE VisibilityType = "private"
-    PUBLIC VisibilityType = "public"
-    SHARED VisibilityType = "shared"
+	PUBLIC  VisibilityType = "public"
+	SHARED  VisibilityType = "shared"
 )
 
 type ListOptsBuilder interface {
@@ -19,8 +18,8 @@ type ListOptsBuilder interface {
 }
 
 type AIImageListOpts struct {
-	Visibility  string `q:"visibility" validate:"omitempty,enum"`
-	Private	string `q:"private" validate:"omitempty"`
+	Visibility string            `q:"visibility" validate:"omitempty,enum"`
+	Private    string            `q:"private" validate:"omitempty"`
 	MetadataK  string            `q:"metadata_k" validate:"omitempty"`
 	MetadataKV map[string]string `q:"metadata_kv" validate:"omitempty"`
 }
@@ -33,8 +32,6 @@ func (opts AIImageListOpts) ToAIImageListQuery() (string, error) {
 	}
 	return q.String(), err
 }
-
-
 
 // List retrieves list of flavors
 func List(c *gcorecloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
