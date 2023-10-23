@@ -11,6 +11,7 @@ import (
 	client2 "github.com/G-Core/gcorelabscloud-go/client/ais/v2/client"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	instance_client "github.com/G-Core/gcorelabscloud-go/client/instances/v1/instances"
+	task_client "github.com/G-Core/gcorelabscloud-go/client/tasks/v1/client"
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
 	cmeta "github.com/G-Core/gcorelabscloud-go/client/utils/metadata"
 	"github.com/G-Core/gcorelabscloud-go/gcore/ai/v1/aiflavors"
@@ -220,23 +221,6 @@ var aiClusterAttachInterfacesCommand = cli.Command{
 			Usage:    "interface port id",
 			Required: false,
 		},
-		&cli.StringFlag{
-			Name:     "ip-address",
-			Aliases:  []string{"ip"},
-			Usage:    "interface ip address id",
-			Required: false,
-		},
-		&cli.StringFlag{
-			Name:     "floating-type",
-			Usage:    "interface ip address id",
-			Required: false,
-		},
-		&cli.StringFlag{
-			Name:     "floating-id",
-			Aliases:  []string{"fip"},
-			Usage:    "floating ip id for interface",
-			Required: false,
-		},
 	},
 	),
 	Action: func(c *cli.Context) error {
@@ -250,23 +234,12 @@ var aiClusterAttachInterfacesCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		var fipOpts *instances.CreateNewInterfaceFloatingIPOpts
-		fipSource := types.FloatingIPSource(c.String("floating-type"))
-		fipID := c.String("floating-id")
-		if fipSource != "" || fipID != "" {
-			fipOpts = &instances.CreateNewInterfaceFloatingIPOpts{
-				Source:             fipSource,
-				ExistingFloatingID: fipID,
-			}
-		}
 
 		opts := ai.AttachInterfaceOpts{
-			Type:       types.InterfaceType(c.String("type")),
-			NetworkID:  c.String("network"),
-			SubnetID:   c.String("subnet"),
-			PortID:     c.String("port"),
-			IpAddress:  c.String("ip-address"),
-			FloatingIP: fipOpts,
+			Type:      types.InterfaceType(c.String("type")),
+			NetworkID: c.String("network"),
+			SubnetID:  c.String("subnet"),
+			PortID:    c.String("port"),
 		}
 
 		results, err := ai.AttachAIInstanceInterface(client, instanceID, opts).Extract()
@@ -375,7 +348,7 @@ var aiClusterAssignSecurityGroupsCommand = cli.Command{
 
 		opts := instances.SecurityGroupOpts{Name: c.String("name")}
 
-		err = instances.AssignSecurityGroup(client, clusterID, opts).ExtractErr()
+		err = ai.AssignSecurityGroup(client, clusterID, opts).ExtractErr()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -410,7 +383,7 @@ var aiClusterUnAssignSecurityGroupsCommand = cli.Command{
 
 		opts := instances.SecurityGroupOpts{Name: c.String("name")}
 
-		err = instances.UnAssignSecurityGroup(client, instanceID, opts).ExtractErr()
+		err = ai.UnAssignSecurityGroup(client, instanceID, opts).ExtractErr()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -575,9 +548,27 @@ var aiClusterCreateCommand = cli.Command{
 			Usage:    "instance metadata. Example: --metadata one=two --metadata three=four",
 			Required: false,
 		},
+		&cli.BoolFlag{
+			Name:     "gpu",
+			Usage:    "create gpu cluster else not gpu cluster",
+			Required: false,
+		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
-		client, err := client.NewAIClusterClientV1(c)
+		clusterClient, err := client.NewAIClusterClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+		if c.Bool("gpu") {
+			clusterClient, err = client.NewAIGPUClusterClientV1(c)
+			if err != nil {
+				_ = cli.ShowAppHelp(c)
+				return cli.NewExitError(err, 1)
+			}
+		}
+
+		clusterClientV2, err := client2.NewAIClusterClientV2(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -629,13 +620,17 @@ var aiClusterCreateCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
-		results, err := ai.Create(client, opts).Extract()
+		results, err := ai.Create(clusterClient, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
-
-		return utils.WaitTaskAndShowResult(c, client, results, true, func(task tasks.TaskID) (interface{}, error) {
-			taskInfo, err := tasks.Get(client, string(task)).Extract()
+		taskClient, err := task_client.NewTaskClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+		return utils.WaitTaskAndShowResult(c, taskClient, results, true, func(task tasks.TaskID) (interface{}, error) {
+			taskInfo, err := tasks.Get(taskClient, string(task)).Extract()
 			if err != nil {
 				return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
 			}
@@ -643,7 +638,7 @@ var aiClusterCreateCommand = cli.Command{
 			if err != nil {
 				return nil, fmt.Errorf("cannot retrieve AI cluster ID from task info: %w", err)
 			}
-			cluster, err := ai.Get(client, clusterID).Extract()
+			cluster, err := ai.Get(clusterClientV2, clusterID).Extract()
 			if err != nil {
 				return nil, fmt.Errorf("cannot get AI cluster with ID: %s. Error: %w", clusterID, err)
 			}
@@ -658,7 +653,7 @@ var aiClusterResizeCommand = cli.Command{
 	Resize AI cluster
 	Example: token ai resize --flavor g2a-ai-fake-v1pod-8 --image 06e62653-1f88-4d38-9aa6-62833e812b4f --keypair sshkey --it any_subnet --interface-network-id 518ba531-496b-4676-8ea4-68e2ed3b2e4b --interface-floating-source new --volume-type standard --volume-source image  --volume-image-id 06e62653-1f88-4d38-9aa6-62833e812b4f --volume-size  20  e673bba0-fcef-44d9-904c-824546b608ec -d -w`,
 	ArgsUsage: "<cluster_id>",
-	Category: "cluster",
+	Category:  "cluster",
 	Flags: append([]cli.Flag{
 		&cli.StringFlag{
 			Name:     "flavor",
@@ -943,7 +938,13 @@ var aiClusterDeleteCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
-		return utils.WaitTaskAndShowResult(c, client, results, false, func(task tasks.TaskID) (interface{}, error) {
+		taskClient, err := task_client.NewTaskClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		return utils.WaitTaskAndShowResult(c, taskClient, results, false, func(task tasks.TaskID) (interface{}, error) {
 			_, err := ai.Get(client, clusterID).Extract()
 			if err == nil {
 				return nil, fmt.Errorf("cannot delete AI cluster with ID: %s", clusterID)
@@ -1157,18 +1158,30 @@ var aiClusterAvailableImagesCommand = cli.Command{
 			Usage:    fmt.Sprintf("image visibility type. output in %s", strings.Join(visibilityTypes, ", ")),
 			Required: false,
 		},
+		&cli.BoolFlag{
+			Name:     "gpu",
+			Usage:    "only gpu images or not gpu images",
+			Required: false,
+		},
 	},
 	Action: func(c *cli.Context) error {
-		client, err := client.NewAIImageClientV1(c)
+		imageClient, err := client.NewAIImageClientV1(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
+		}
+		if c.Bool("gpu") {
+			imageClient, err = client.NewAIGPUImageClientV1(c)
+			if err != nil {
+				_ = cli.ShowAppHelp(c)
+				return cli.NewExitError(err, 1)
+			}
 		}
 		opts := aiimages.AIImageListOpts{
 			Visibility: c.String("visibility"),
 			Private:    c.String("private"),
 		}
-		images, err := aiimages.ListAll(client, opts)
+		images, err := aiimages.ListAll(imageClient, opts)
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -1176,7 +1189,6 @@ var aiClusterAvailableImagesCommand = cli.Command{
 		return nil
 	},
 }
-
 
 var aiClusterAvailableFlavorsCommand = cli.Command{
 	Name:     "list",
@@ -1198,7 +1210,6 @@ var aiClusterAvailableFlavorsCommand = cli.Command{
 			Usage:    "show flavor price",
 			Required: false,
 		},
-		
 	},
 	Action: func(c *cli.Context) error {
 		client, err := client.NewAIFlavorClientV1(c)

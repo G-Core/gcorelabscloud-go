@@ -6,21 +6,6 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
-type commonResult struct {
-	gcorecloud.Result
-}
-
-// Extract is a function that accepts a result and extracts a instance resource.
-func (r commonResult) Extract() (*AIImage, error) {
-	var s AIImage
-	err := r.ExtractInto(&s)
-	return &s, err
-}
-
-func (r commonResult) ExtractInto(v interface{}) error {
-	return r.Result.ExtractIntoStructPtr(v, "")
-}
-
 // AIFlavorPage is the page returned by a pager when traversing over a
 // collection of instances.
 type AIImagePage struct {
