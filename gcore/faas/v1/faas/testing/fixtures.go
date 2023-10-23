@@ -60,6 +60,9 @@ const listFunctionResponse = `
         "ENV_VAR": "value 1",
         "ENVIRONMENT_VARIABLE": "value 2"
       },
+	  "enable_api_key": true,
+	  "keys"    :["key-one"],
+	  "disabled": false,
       "runtime": "python3.7.12",
       "timeout": 5,
       "flavor": "64mCPU-64MB",
@@ -82,6 +85,9 @@ const getFunctionResponse = `
 	"ENV_VAR": "value 1",
 	"ENVIRONMENT_VARIABLE": "value 2"
   },
+  "enable_api_key": true,
+  "keys"    :["key-one"],
+  "disabled": false,
   "runtime": "python3.7.12",
   "timeout": 5,
   "flavor": "64mCPU-64MB",
@@ -100,6 +106,8 @@ const createFunctionRequest = `
   "envs": {
     "ENV_VAR": "value 1"
   },
+  "enable_api_key": true,
+  "keys"   :["key-one"],
   "runtime": "python3.7.12",
   "timeout": 5,
   "flavor": "64mCPU-64MB",
@@ -128,6 +136,100 @@ const updateFunctionRequest = `
 }
 `
 
+const getKeyResponse = `
+{
+  "description": "description",
+  "name": "test-key",
+  "status": "active",
+  "functions": [
+    {
+        "name": "function",
+        "namespace": "namespace"
+    }
+  ]
+}
+`
+
+const createKeyRequest = `
+{
+  "description": "description",
+  "name": "test-key",
+  "functions": [
+    {
+        "name": "function",
+        "namespace": "namespace"
+    }
+  ]
+}
+`
+
+const createKeyResponse = `
+{
+  "description": "description",
+  "name": "test-key",
+  "status": "active",
+  "functions": [
+    {
+        "name": "function",
+        "namespace": "namespace"
+    }
+  ]
+}
+`
+
+const listKeysResponse = `
+{
+  "count": 1,
+  "results": [
+	  {
+		  "description": "description",
+		  "name": "test-key",
+		  "status": "active",
+		  "functions": [
+			{
+				"name": "function",
+				"namespace": "namespace"
+			}
+		  ]
+	  }
+  ]
+}
+`
+
+const updateKeyRequest = `
+{
+  "description": "long string",
+  "functions": [
+    {
+      "name":      "function1",
+      "namespace": "namespace1"
+    },
+    {
+      "name":      "function2",
+      "namespace": "namespace1"
+    }
+  ]
+}
+`
+
+const updateKeyResponse = `
+{
+	"description":  "long string",
+	"name": "test-key",
+	"status": "active",
+	"functions": [
+		{
+			"name":      "function1",
+			"namespace": "namespace1"
+		},
+		{
+			"name":      "function2",
+			"namespace": "namespace1"
+		}
+	]
+}
+`
+
 const taskResponse = `
 {
   "tasks": [
@@ -151,6 +253,8 @@ var (
 	}
 
 	fName     = "function-name"
+	min       = 1
+	max       = 2
 	expectedF = faas.Function{
 		Name:        fName,
 		Description: "Function description",
@@ -162,11 +266,43 @@ var (
 		Timeout: 5,
 		Flavor:  "64mCPU-64MB",
 		Autoscaling: faas.FunctionAutoscaling{
-			MinInstances: 1,
-			MaxInstances: 2,
+			MinInstances: &min,
+			MaxInstances: &max,
 		},
-		CodeText:   "def main(): print('It works!')",
-		MainMethod: "main",
+		CodeText:     "def main(): print('It works!')",
+		MainMethod:   "main",
+		EnableAPIKey: true,
+		Disabled:     false,
+		Keys:         []string{"key-one"},
 	}
 	expectedFSlice = []faas.Function{expectedF}
+
+	kName       = "test-key"
+	expectedKey = faas.Key{
+		Name:        kName,
+		Description: "description",
+		Functions: []faas.KeysFunction{
+			{
+				Name:      "function",
+				Namespace: "namespace",
+			},
+		},
+		Status: "active",
+	}
+	expectedKeysSlice  = []faas.Key{expectedKey}
+	expectedUpdatedKey = faas.Key{
+		Name:        kName,
+		Description: "long string",
+		Functions: []faas.KeysFunction{
+			{
+				Name:      "function1",
+				Namespace: "namespace1",
+			},
+			{
+				Name:      "function2",
+				Namespace: "namespace1",
+			},
+		},
+		Status: "active",
+	}
 )

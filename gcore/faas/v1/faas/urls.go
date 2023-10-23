@@ -31,3 +31,15 @@ func functionCreateURL(c *gcorecloud.ServiceClient, namespaceName string) string
 func functionURL(c *gcorecloud.ServiceClient, namespaceName, functionName string) string {
 	return c.ServiceURL(namespaceName, "functions", functionName)
 }
+
+func keysListURL(c *gcorecloud.ServiceClient) string {
+	return rootURL(c)
+}
+
+func keysCreateURL(c *gcorecloud.ServiceClient) string {
+	return rootURL(c)
+}
+
+func keyURL(c *gcorecloud.ServiceClient, keyName string) string {
+	return c.ServiceURL(keyName)
+}

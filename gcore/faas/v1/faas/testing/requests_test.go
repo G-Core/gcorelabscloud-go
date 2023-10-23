@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/AlekSi/pointer"
 	"github.com/G-Core/gcorelabscloud-go/gcore/faas/v1/faas"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
@@ -53,6 +54,22 @@ func prepareDeleteFunctionTestURL(nsName, fName string) string {
 
 func prepareUpdateFunctionTestURL(nsName, fName string) string {
 	return prepareFunctionTestURLParams(fake.ProjectID, fake.RegionID, nsName, fName)
+}
+
+func prepareKeyTestURL() string {
+	return fmt.Sprintf("/v1/faas/keys/%d/%d", fake.ProjectID, fake.RegionID)
+}
+
+func prepareGetKeyTestURL(kName string) string {
+	return fmt.Sprintf("/v1/faas/keys/%d/%d/%s", fake.ProjectID, fake.RegionID, kName)
+}
+
+func prepareDeleteKeyTestURL(kName string) string {
+	return fmt.Sprintf("/v1/faas/keys/%d/%d/%s", fake.ProjectID, fake.RegionID, kName)
+}
+
+func prepareUpdateKeyTestURL(kName string) string {
+	return fmt.Sprintf("/v1/faas/keys/%d/%d/%s", fake.ProjectID, fake.RegionID, kName)
 }
 
 func TestGetNamespace(t *testing.T) {
@@ -331,11 +348,13 @@ func TestCreateFunction(t *testing.T) {
 		Timeout: 5,
 		Flavor:  "64mCPU-64MB",
 		Autoscaling: faas.FunctionAutoscaling{
-			MinInstances: 1,
-			MaxInstances: 2,
+			MinInstances: pointer.To(1),
+			MaxInstances: pointer.To(2),
 		},
-		CodeText:   "def main(): print('It works!')",
-		MainMethod: "main",
+		EnableApiKey: pointer.To(true),
+		Keys:         []string{"key-one"},
+		CodeText:     "def main(): print('It works!')",
+		MainMethod:   "main",
 	}
 	task, err := faas.CreateFunction(client, nsName, opts).Extract()
 	require.NoError(t, err)
@@ -392,8 +411,8 @@ func TestUpdateFunction(t *testing.T) {
 		Timeout:     180,
 		Flavor:      "string",
 		Autoscaling: &faas.FunctionAutoscaling{
-			MinInstances: 1,
-			MaxInstances: 2,
+			MinInstances: pointer.To(1),
+			MaxInstances: pointer.To(2),
 		},
 		CodeText:   "string",
 		MainMethod: "string",
@@ -401,4 +420,177 @@ func TestUpdateFunction(t *testing.T) {
 	task, err := faas.UpdateFunction(client, nsName, fName, opts).Extract()
 	require.NoError(t, err)
 	require.Equal(t, tasks1, *task)
+}
+
+func TestGetKey(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareGetKeyTestURL(kName), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, getKeyResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("faas/keys", "v1")
+	key, err := faas.GetKey(client, kName).Extract()
+	require.NoError(t, err)
+	require.Equal(t, expectedKey, *key)
+}
+
+func TestListKeys(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareKeyTestURL(), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, listKeysResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	var count int
+	client := fake.ServiceTokenClient("faas/keys", "v1")
+	err := faas.ListKeys(client, nil).EachPage(func(page pagination.Page) (bool, error) {
+		count++
+		actual, err := faas.ExtractKeys(page)
+		require.NoError(t, err)
+		ct := actual[0]
+		require.Equal(t, expectedKey, ct)
+		require.Equal(t, expectedKeysSlice, actual)
+		return true, nil
+	})
+	th.AssertNoErr(t, err)
+
+	if count != 1 {
+		t.Errorf("Expected 1 page, got %d", count)
+	}
+}
+
+func TestListAllKeys(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareKeyTestURL(), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, listKeysResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("faas/keys", "v1")
+	actual, err := faas.ListKeysAll(client, nil)
+	require.NoError(t, err)
+
+	ct := actual[0]
+	require.Equal(t, expectedKey, ct)
+	require.Equal(t, expectedKeysSlice, actual)
+
+}
+
+func TestCreateKeys(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareKeyTestURL(), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestJSONRequest(t, r, createKeyRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, createKeyResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("faas/keys", "v1")
+	opts := faas.CreateKeyOpts{
+		Name:        "test-key",
+		Description: "description",
+		Functions: []faas.KeysFunction{
+			{
+				Name:      "function",
+				Namespace: "namespace",
+			},
+		},
+	}
+	key, err := faas.CreateKey(client, &opts)
+	require.NoError(t, err)
+	require.Equal(t, expectedKey, key)
+}
+
+func TestDeleteKeys(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareDeleteKeyTestURL(nsName), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "DELETE")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Accept", "application/json")
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+	})
+
+	client := fake.ServiceTokenClient("faas/keys", "v1")
+	err := faas.DeleteKey(client, nsName)
+	require.NoError(t, err)
+}
+
+func TestUpdateKeys(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareUpdateKeyTestURL(nsName), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "PATCH")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestJSONRequest(t, r, updateKeyRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, updateKeyResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("faas/keys", "v1")
+	opts := faas.UpdateKeyOpts{
+		Description: "long string",
+		Functions: []faas.KeysFunction{
+			{
+				Name:      "function1",
+				Namespace: "namespace1",
+			},
+			{
+				Name:      "function2",
+				Namespace: "namespace1",
+			},
+		},
+	}
+	key, err := faas.UpdateKey(client, nsName, opts)
+	require.NoError(t, err)
+	require.Equal(t, expectedUpdatedKey, key)
 }

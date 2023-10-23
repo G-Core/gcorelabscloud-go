@@ -83,6 +83,7 @@ type Function struct {
 	BuildStatus  string                   `json:"build_status"`
 	Status       string                   `json:"status"`
 	DeployStatus DeployStatus             `json:"deploy_status"`
+	Dependencies string                   `json:"dependencies"`
 	Envs         map[string]string        `json:"envs"`
 	Runtime      string                   `json:"runtime"`
 	Timeout      int                      `json:"timeout"`
@@ -91,12 +92,15 @@ type Function struct {
 	CodeText     string                   `json:"code_text"`
 	MainMethod   string                   `json:"main_method"`
 	Endpoint     string                   `json:"endpoint"`
+	Disabled     bool                     `json:"disabled"`
+	EnableAPIKey bool                     `json:"enable_api_key"`
+	Keys         []string                 `json:"keys"`
 	CreatedAt    gcorecloud.JSONRFC3339ZZ `json:"created_at"`
 }
 
 type FunctionAutoscaling struct {
-	MinInstances int `json:"min_instances"`
-	MaxInstances int `json:"max_instances"`
+	MinInstances *int `json:"min_instances,omitempty"`
+	MaxInstances *int `json:"max_instances,omitempty"`
 }
 
 type FunctionResult struct {
@@ -120,7 +124,7 @@ type FunctionPage struct {
 	pagination.LinkedPageBase
 }
 
-// NextPageURL is invoked when a paginated collection of namespaces has reached
+// NextPageURL is invoked when a paginated collection of functions has reached
 // the end of a page and the pager seeks to traverse over a new one. In order
 // to do this, it needs to construct the next page's URL.
 func (f FunctionPage) NextPageURL() (string, error) {
@@ -156,4 +160,74 @@ func ExtractFunctionsInto(p pagination.Page, v interface{}) error {
 // DeleteResult represents the result of a delete operation
 type DeleteResult struct {
 	gcorecloud.ErrResult
+}
+
+type KeysFunction struct {
+	Name      string `json:"name"`
+	Namespace string `json:"namespace"`
+}
+
+type Key struct {
+	Name        string                   `json:"name"`
+	Description string                   `json:"description"`
+	Functions   []KeysFunction           `json:"functions"`
+	Expire      gcorecloud.JSONRFC3339ZZ `json:"expire"`
+	CreatedAt   gcorecloud.JSONRFC3339ZZ `json:"created_at"`
+	Secret      string                   `json:"secret,omitempty"`
+	Status      string                   `json:"status"`
+}
+
+type KeyResult struct {
+	gcorecloud.Result
+}
+
+func (r KeyResult) Extract() (*Key, error) {
+	var k Key
+	err := r.ExtractInto(&k)
+
+	return &k, err
+}
+
+func (r KeyResult) ExtractInto(v interface{}) error {
+	return r.Result.ExtractIntoStructPtr(v, "")
+}
+
+// KeyPage is the page returned by a paper when traversing over a
+// collection of keys
+type KeyPage struct {
+	pagination.LinkedPageBase
+}
+
+// NextPageURL is invoked when a pagination collection of keys has reached
+// the end of a page and the pager seeks to traverse over a new one. In order
+// to do this, it needs to construct the next page's URL.
+func (k KeyPage) NextPageURL() (string, error) {
+	var s struct {
+		Links []gcorecloud.Link `json:"links"`
+	}
+	err := k.ExtractInto(&s)
+	if err != nil {
+		return "", err
+	}
+
+	return gcorecloud.ExtractNextURL(s.Links)
+}
+
+// IsEmpty checks whether a Key struct is empty.
+func (k KeyPage) IsEmpty() (bool, error) {
+	is, err := ExtractKeys(k)
+	return len(is) == 0, err
+}
+
+// ExtractKeys accepts a Page struct, specifically a KeyPage struct,
+// and extracts the elements into a slice of Key structs. In other words,
+// a generic collection is mapped into a relevant slice.
+func ExtractKeys(p pagination.Page) ([]Key, error) {
+	var f []Key
+	err := ExtractKeysInto(p, &f)
+	return f, err
+}
+
+func ExtractKeysInto(p pagination.Page, v interface{}) error {
+	return p.(KeyPage).Result.ExtractIntoSlicePtr(v, "results")
 }
