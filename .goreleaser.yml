@@ -10,7 +10,6 @@ builds:
     ldflags:
       - '-s -w -X main.AppVersion={{.Version}}'
     goos:
-      - freebsd
       - windows
       - linux
       - darwin
