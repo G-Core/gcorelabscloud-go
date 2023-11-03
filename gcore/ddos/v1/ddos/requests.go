@@ -13,6 +13,7 @@ type CreateProfileOptsBuilder interface {
 
 type CreateProfileOpts struct {
 	ProfileTemplate     int            `json:"profile_template" required:"true" validate:"required"`
+	ProfileTemplateName string         `json:"profile_template_name,omitempty" validate:"omitempty"`
 	BaremetalInstanceID string         `json:"bm_instance_id" required:"true" validate:"required"`
 	IPAddress           string         `json:"ip_address" required:"true" validate:"required,ip4_addr"`
 	Fields              []ProfileField `json:"fields"`
@@ -35,6 +36,7 @@ type UpdateProfileOptsBuilder interface {
 
 type UpdateProfileOpts struct {
 	ProfileTemplate     int            `json:"profile_template" required:"true" validate:"required"`
+	ProfileTemplateName string         `json:"profile_template_name,omitempty" validate:"omitempty"`
 	BaremetalInstanceID string         `json:"bm_instance_id" required:"true" validate:"required"`
 	IPAddress           string         `json:"ip_address" required:"true" validate:"required,ip4_addr"`
 	Fields              []ProfileField `json:"fields" required:"true" validate:"required"`

@@ -41,12 +41,25 @@ const (
   "results": [
     {
       "id": 1,
-      "profile_template": 0,
+      "profile_template": {
+        "id": 1,
+        "name": "test_client_profile_template",
+        "description": "test client profile template",
+        "fields": [
+          {
+            "id": 0,
+            "name": "test_field",
+            "description": "test field",
+            "field_type": "int",
+            "required": true,
+            "default": "string"
+          }
+        ]
+      },
       "ip_address": "123.123.123.1",
       "site": "example.com",
       "options": {
         "bgp": true,
-        "price": "string",
         "active": true
       },
       "fields": [
@@ -151,13 +164,26 @@ var (
 	}
 
 	profile = ddos.Profile{
-		ID:              1,
-		ProfileTemplate: 0,
-		IPAddress:       "123.123.123.1",
+		ID: 1,
+		ProfileTemplate: ddos.ProfileTemplate{
+			ID:          1,
+			Name:        "test_client_profile_template",
+			Description: "test client profile template",
+			Fields: []ddos.TemplateField{
+				{
+					ID:          0,
+					Name:        "test_field",
+					Description: "test field",
+					FieldType:   "int",
+					Required:    true,
+					Default:     defaultString,
+				},
+			},
+		},
+		IPAddress: "123.123.123.1",
 		Options: ddos.Options{
 			Active: true,
 			BGP:    true,
-			Price:  "string",
 		},
 		Site: "example.com",
 		Fields: []ddos.ProfileField{
