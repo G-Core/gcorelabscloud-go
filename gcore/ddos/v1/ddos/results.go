@@ -95,20 +95,21 @@ type TemplateField struct {
 
 // Profile represents active client DDoS protection profile
 type Profile struct {
-	ID              int            `json:"id"`
-	Options         Options        `json:"options"`
-	IPAddress       string         `json:"ip_address"`
-	Site            string         `json:"site"`
-	Fields          []ProfileField `json:"fields"`
-	Protocols       []Protocol     `json:"protocols"`
-	ProfileTemplate int            `json:"profile_template"`
+	ID                         int             `json:"id"`
+	Options                    Options         `json:"options"`
+	IPAddress                  string          `json:"ip_address"`
+	Site                       string          `json:"site,omitempty" validate:"omitempty,max=50"`
+	Fields                     []ProfileField  `json:"fields"`
+	Protocols                  []Protocol      `json:"protocols"`
+	ProfileTemplate            ProfileTemplate `json:"profile_template"`
+	ProfileTemplateDescription string          `json:"profile_template_description,omitempty"`
+	Status                     Status          `json:"status,omitempty"`
 }
 
 // Options represent options of active client DDoS protection profile
 type Options struct {
-	Price  string `json:"price"`
-	BGP    bool   `json:"bgp"`
-	Active bool   `json:"active"`
+	BGP    bool `json:"bgp"`
+	Active bool `json:"active"`
 }
 
 type Protocol struct {
@@ -128,6 +129,12 @@ type ProfileField struct {
 	Required         bool            `json:"required,omitempty"`
 	FieldValue       json.RawMessage `json:"field_value,omitempty" required_without:"Value"`
 	ValidationSchema json.RawMessage `json:"validation_schema,omitempty"`
+}
+
+// Status represents the status of DDoS protection profile
+type Status struct {
+	Status           string `json:"status,omitempty"`
+	ErrorDescription string `json:"error_description,omitempty"`
 }
 
 // ProfileTemplatesPage is the page returned by a pager when traversing over a
