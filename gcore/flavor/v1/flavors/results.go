@@ -59,6 +59,8 @@ type Flavor struct {
 	HardwareDescription *HardwareDescription `json:"hardware_description,omitempty"`
 	RAM                 int                  `json:"ram"`
 	VCPUS               int                  `json:"vcpus"`
+	OsType              string               `json:"os_type,omitempty"`
+	Architecture        string               `json:"architecture,omitempty"`
 }
 
 type HardwareDescription struct {
@@ -66,7 +68,7 @@ type HardwareDescription struct {
 	Disk    string `json:"disk,omitempty"`
 	Network string `json:"network,omitempty"`
 	RAM     string `json:"ram,omitempty"`
-	IPU		string `json:"ipu,omitempty"`
+	IPU     string `json:"ipu,omitempty"`
 }
 
 // FlavorPage is the page returned by a pager when traversing over a
