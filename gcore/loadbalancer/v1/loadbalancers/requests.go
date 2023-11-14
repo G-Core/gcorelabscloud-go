@@ -33,6 +33,7 @@ type ListOpts struct {
 	AssignedFloating bool              `q:"assigned_floating" validate:"omitempty"`
 	MetadataK        string            `q:"metadata_k" validate:"omitempty"`
 	MetadataKV       map[string]string `q:"metadata_kv" validate:"omitempty"`
+	WithDdos         bool              `q:"with_ddos" validate:"omitempty"`
 }
 
 // ToLoadBalancerListQuery formats a ListOpts into a query string.

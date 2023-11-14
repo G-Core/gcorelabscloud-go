@@ -6,6 +6,13 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
+type ResourceType string
+
+const (
+	ResourceTypeInstance     ResourceType = "instance"
+	ResourceTypeLoadBalancer ResourceType = "loadbalancer"
+)
+
 // CreateProfileOptsBuilder allows extensions to add additional parameters to the Create request.
 type CreateProfileOptsBuilder interface {
 	ToProfileCreateMap() (map[string]interface{}, error)
@@ -14,9 +21,11 @@ type CreateProfileOptsBuilder interface {
 type CreateProfileOpts struct {
 	ProfileTemplate     int            `json:"profile_template" required:"true" validate:"required"`
 	ProfileTemplateName string         `json:"profile_template_name,omitempty" validate:"omitempty"`
-	BaremetalInstanceID string         `json:"bm_instance_id" required:"true" validate:"required"`
+	BaremetalInstanceID string         `json:"bm_instance_id,omitempty" validate:"omitempty,required_without=ResourceID"`
+	ResourceID          string         `json:"resource_id,omitempty" validate:"omitempty,required_without=BaremetalInstanceID"`
+	ResourceType        ResourceType   `json:"resource_type,omitempty" validate:"omitempty,enum"`
 	IPAddress           string         `json:"ip_address" required:"true" validate:"required,ip4_addr"`
-	Fields              []ProfileField `json:"fields"`
+	Fields              []ProfileField `json:"fields" required:"true" validate:"required"`
 }
 
 // ToProfileCreateMap builds a request body from CreateProfileOpts.
@@ -37,7 +46,9 @@ type UpdateProfileOptsBuilder interface {
 type UpdateProfileOpts struct {
 	ProfileTemplate     int            `json:"profile_template" required:"true" validate:"required"`
 	ProfileTemplateName string         `json:"profile_template_name,omitempty" validate:"omitempty"`
-	BaremetalInstanceID string         `json:"bm_instance_id" required:"true" validate:"required"`
+	BaremetalInstanceID string         `json:"bm_instance_id,omitempty" validate:"omitempty,required_without=ResourceID"`
+	ResourceID          string         `json:"resource_id,omitempty" validate:"omitempty,required_without=BaremetalInstanceID"`
+	ResourceType        ResourceType   `json:"resource_type,omitempty" validate:"omitempty,enum"`
 	IPAddress           string         `json:"ip_address" required:"true" validate:"required,ip4_addr"`
 	Fields              []ProfileField `json:"fields" required:"true" validate:"required"`
 }
