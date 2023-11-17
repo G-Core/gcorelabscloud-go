@@ -173,9 +173,10 @@ func TestCreateProfile(t *testing.T) {
 
 	client := fake.ServiceTokenClient("ddos/profiles", "v1")
 	opts := ddos.CreateProfileOpts{
-		IPAddress:           "123.123.123.1",
-		ProfileTemplate:     1,
-		BaremetalInstanceID: "9f310fe7-baa2-47a3-b6a6-63c5d78becc2",
+		IPAddress:       "123.123.123.1",
+		ProfileTemplate: 1,
+		ResourceID:      "9f310fe7-baa2-47a3-b6a6-63c5d78becc2",
+		ResourceType:    ddos.ResourceTypeInstance,
 		Fields: []ddos.ProfileField{
 			{
 				BaseField: 1,
@@ -232,10 +233,11 @@ func TestUpdateProfile(t *testing.T) {
 	})
 
 	opts := ddos.UpdateProfileOpts{
-		ProfileTemplate:     7,
-		BaremetalInstanceID: "9f310fe7-baa2-47a3-b6a6-63c5d78becc2",
-		IPAddress:           "123.123.123.1",
-		Fields:              make([]ddos.ProfileField, 0),
+		ProfileTemplate: 7,
+		ResourceID:      "9f310fe7-baa2-47a3-b6a6-63c5d78becc2",
+		ResourceType:    ddos.ResourceTypeLoadBalancer,
+		IPAddress:       "123.123.123.1",
+		Fields:          make([]ddos.ProfileField, 0),
 	}
 
 	client := fake.ServiceTokenClient("ddos/profiles", "v1")

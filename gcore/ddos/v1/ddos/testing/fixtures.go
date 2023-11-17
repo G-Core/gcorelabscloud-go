@@ -87,7 +87,8 @@ const (
 
 	createProfileRequest = `
 {
-  "bm_instance_id": "9f310fe7-baa2-47a3-b6a6-63c5d78becc2",
+  "resource_id": "9f310fe7-baa2-47a3-b6a6-63c5d78becc2",
+  "resource_type": "instance",
   "profile_template": 1,
   "ip_address": "123.123.123.1",
   "fields": [
@@ -99,7 +100,7 @@ const (
 }
 `
 
-	updateProfileRequest = `
+	createProfileRequestLegacy = `
 {
   "bm_instance_id": "9f310fe7-baa2-47a3-b6a6-63c5d78becc2",
   "profile_template": 1,
@@ -112,7 +113,34 @@ const (
   ]
 }
 `
+	updateProfileRequest = `
+{
+  "resource_id": "9f310fe7-baa2-47a3-b6a6-63c5d78becc2",
+  "resource_type": "loadbalancer",
+  "profile_template": 1,
+  "ip_address": "123.123.123.1",
+  "fields": [
+    {
+      "value": "string",
+      "base_field": 1
+    }
+  ]
+}
+`
 
+	updateProfileRequestLegacy = `
+{
+  "bm_instance_id": "9f310fe7-baa2-47a3-b6a6-63c5d78becc2",
+  "profile_template": 1,
+  "ip_address": "123.123.123.1",
+  "fields": [
+    {
+      "value": "string",
+      "base_field": 1
+    }
+  ]
+}
+`
 	activateProfileRequest = `
 {
     "active": true,

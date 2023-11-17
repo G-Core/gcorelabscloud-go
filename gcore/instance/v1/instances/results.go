@@ -6,6 +6,7 @@ import (
 	"net"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/ddos/v1/ddos"
 	"github.com/G-Core/gcorelabscloud-go/gcore/flavor/v1/flavors"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
@@ -161,6 +162,7 @@ type Instance struct {
 	RegionID         int                          `json:"region_id"`
 	Region           string                       `json:"region"`
 	AvailabilityZone string                       `json:"availability_zone"`
+	DdosProfile      *ddos.Profile                `json:"ddos_profile"`
 }
 
 // Interface represents a instance port interface.

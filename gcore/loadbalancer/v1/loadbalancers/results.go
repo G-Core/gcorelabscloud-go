@@ -5,6 +5,7 @@ import (
 	"net"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/ddos/v1/ddos"
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/lbflavors"
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
@@ -89,6 +90,7 @@ type LoadBalancer struct {
 	Tags               []string                 `json:"tags"`
 	Flavor             lbflavors.Flavor         `json:"flavor"`
 	Metadata           []metadata.Metadata      `json:"metadata"`
+	DdosProfile        *ddos.Profile            `json:"ddos_profile"`
 }
 
 func (lb LoadBalancer) IsDeleted() bool {
