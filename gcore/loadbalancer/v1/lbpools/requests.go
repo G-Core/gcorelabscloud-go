@@ -160,6 +160,7 @@ type UpdateOptsBuilder interface {
 type UpdateOpts struct {
 	Name                 string                        `json:"name,omitempty"`
 	Members              []CreatePoolMemberOpts        `json:"members,omitempty"`
+	Protocol             types.ProtocolType            `json:"protocol,omitempty"`
 	LBPoolAlgorithm      types.LoadBalancerAlgorithm   `json:"lb_algorithm,omitempty"`
 	HealthMonitor        *CreateHealthMonitorOpts      `json:"healthmonitor,omitempty"`
 	SessionPersistence   *CreateSessionPersistenceOpts `json:"session_persistence"`
