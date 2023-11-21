@@ -46,6 +46,7 @@ const (
 	HealthMonitorTypeTCP                  HealthMonitorType     = "TCP"
 	HealthMonitorTypeTLSHello             HealthMonitorType     = "TLS-HELLO"
 	HealthMonitorTypeUDPConnect           HealthMonitorType     = "UDP-CONNECT"
+	HealthMonitorTypeK8S                  HealthMonitorType     = "K8S"
 	HTTPMethodCONNECT                     HTTPMethod            = "CONNECT"
 	HTTPMethodDELETE                      HTTPMethod            = "DELETE"
 	HTTPMethodGET                         HTTPMethod            = "GET"
@@ -381,7 +382,8 @@ func (hm HealthMonitorType) IsValid() error {
 		HealthMonitorTypeTCP,
 		HealthMonitorTypePING,
 		HealthMonitorTypeTLSHello,
-		HealthMonitorTypeUDPConnect:
+		HealthMonitorTypeUDPConnect,
+		HealthMonitorTypeK8S:
 		return nil
 	}
 	return fmt.Errorf("invalid HealthMonitorType: %v", hm)
@@ -414,6 +416,7 @@ func (hm HealthMonitorType) List() []HealthMonitorType {
 		HealthMonitorTypePING,
 		HealthMonitorTypeTLSHello,
 		HealthMonitorTypeUDPConnect,
+		HealthMonitorTypeK8S,
 	}
 }
 
