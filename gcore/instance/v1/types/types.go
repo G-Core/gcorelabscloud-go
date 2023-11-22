@@ -9,23 +9,32 @@ type AddressType string
 type VolumeSource string
 type FloatingIPSource string
 type InterfaceType string
+type IPFamilyType string
 type MetricsTimeUnit string
 
 const (
-	AddressTypeFixed       AddressType      = "fixed"
-	AddressTypeFloating    AddressType      = "floating"
-	NewVolume              VolumeSource     = "new-volume"
-	ExistingVolume         VolumeSource     = "existing-volume"
-	Image                  VolumeSource     = "image"
-	Snapshot               VolumeSource     = "snapshot"
-	NewFloatingIP          FloatingIPSource = "new"
-	ExistingFloatingIP     FloatingIPSource = "existing"
-	SubnetInterfaceType    InterfaceType    = "subnet"
-	AnySubnetInterfaceType InterfaceType    = "any_subnet"
-	ExternalInterfaceType  InterfaceType    = "external"
-	ReservedFixedIpType    InterfaceType    = "reserved_fixed_ip"
-	HourMetricsTimeUnit    MetricsTimeUnit  = "hour"
-	DayMetricsTimeUnit     MetricsTimeUnit  = "day"
+	AddressTypeFixed    AddressType = "fixed"
+	AddressTypeFloating AddressType = "floating"
+
+	NewVolume      VolumeSource = "new-volume"
+	ExistingVolume VolumeSource = "existing-volume"
+	Image          VolumeSource = "image"
+	Snapshot       VolumeSource = "snapshot"
+
+	NewFloatingIP      FloatingIPSource = "new"
+	ExistingFloatingIP FloatingIPSource = "existing"
+
+	SubnetInterfaceType    InterfaceType = "subnet"
+	AnySubnetInterfaceType InterfaceType = "any_subnet"
+	ExternalInterfaceType  InterfaceType = "external"
+	ReservedFixedIpType    InterfaceType = "reserved_fixed_ip"
+
+	IPv4IPFamilyType      IPFamilyType = "ipv4"
+	IPv6IPFamilyType      IPFamilyType = "ipv6"
+	DualStackIPFamilyType IPFamilyType = "dual"
+
+	HourMetricsTimeUnit MetricsTimeUnit = "hour"
+	DayMetricsTimeUnit  MetricsTimeUnit = "day"
 )
 
 func (vs VolumeSource) IsValid() error {

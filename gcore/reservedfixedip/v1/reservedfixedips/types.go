@@ -6,12 +6,17 @@ import (
 )
 
 type ReservedFixedIPType string
+type IPFamilyType string
 
 const (
 	External  ReservedFixedIPType = "external"
 	Subnet    ReservedFixedIPType = "subnet"
 	AnySubnet ReservedFixedIPType = "any_subnet"
 	IPAddress ReservedFixedIPType = "ip_address"
+
+	IPv4IPFamilyType      IPFamilyType = "ipv4"
+	IPv6IPFamilyType      IPFamilyType = "ipv6"
+	DualStackIPFamilyType IPFamilyType = "dual"
 )
 
 func (t ReservedFixedIPType) String() string {
