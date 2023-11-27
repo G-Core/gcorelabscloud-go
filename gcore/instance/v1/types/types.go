@@ -9,23 +9,32 @@ type AddressType string
 type VolumeSource string
 type FloatingIPSource string
 type InterfaceType string
+type IPFamilyType string
 type MetricsTimeUnit string
 
 const (
-	AddressTypeFixed       AddressType      = "fixed"
-	AddressTypeFloating    AddressType      = "floating"
-	NewVolume              VolumeSource     = "new-volume"
-	ExistingVolume         VolumeSource     = "existing-volume"
-	Image                  VolumeSource     = "image"
-	Snapshot               VolumeSource     = "snapshot"
-	NewFloatingIP          FloatingIPSource = "new"
-	ExistingFloatingIP     FloatingIPSource = "existing"
-	SubnetInterfaceType    InterfaceType    = "subnet"
-	AnySubnetInterfaceType InterfaceType    = "any_subnet"
-	ExternalInterfaceType  InterfaceType    = "external"
-	ReservedFixedIpType    InterfaceType    = "reserved_fixed_ip"
-	HourMetricsTimeUnit    MetricsTimeUnit  = "hour"
-	DayMetricsTimeUnit     MetricsTimeUnit  = "day"
+	AddressTypeFixed    AddressType = "fixed"
+	AddressTypeFloating AddressType = "floating"
+
+	NewVolume      VolumeSource = "new-volume"
+	ExistingVolume VolumeSource = "existing-volume"
+	Image          VolumeSource = "image"
+	Snapshot       VolumeSource = "snapshot"
+
+	NewFloatingIP      FloatingIPSource = "new"
+	ExistingFloatingIP FloatingIPSource = "existing"
+
+	SubnetInterfaceType    InterfaceType = "subnet"
+	AnySubnetInterfaceType InterfaceType = "any_subnet"
+	ExternalInterfaceType  InterfaceType = "external"
+	ReservedFixedIpType    InterfaceType = "reserved_fixed_ip"
+
+	IPv4IPFamilyType      IPFamilyType = "ipv4"
+	IPv6IPFamilyType      IPFamilyType = "ipv6"
+	DualStackIPFamilyType IPFamilyType = "dual"
+
+	HourMetricsTimeUnit MetricsTimeUnit = "hour"
+	DayMetricsTimeUnit  MetricsTimeUnit = "day"
 )
 
 func (vs VolumeSource) IsValid() error {
@@ -323,4 +332,63 @@ func (u *MetricsTimeUnit) UnmarshalJSON(data []byte) error {
 // MarshalJSON - implements Marshaler interface
 func (u *MetricsTimeUnit) MarshalJSON() ([]byte, error) {
 	return json.Marshal(u.String())
+}
+
+func (it IPFamilyType) IsValid() error {
+	switch it {
+	case IPv6IPFamilyType, IPv4IPFamilyType, DualStackIPFamilyType:
+		return nil
+	}
+	return fmt.Errorf("invalid IPFamilyType type: %v", it)
+}
+
+func (it IPFamilyType) ValidOrNil() (*IPFamilyType, error) {
+	if it.String() == "" {
+		return nil, nil
+	}
+	err := it.IsValid()
+	if err != nil {
+		return &it, err
+	}
+	return &it, nil
+}
+
+func (it IPFamilyType) String() string {
+	return string(it)
+}
+
+func (it IPFamilyType) List() []IPFamilyType {
+	return []IPFamilyType{
+		IPv6IPFamilyType,
+		IPv4IPFamilyType,
+		DualStackIPFamilyType,
+	}
+}
+
+func (it IPFamilyType) StringList() []string {
+	var s []string
+	for _, v := range it.List() {
+		s = append(s, v.String())
+	}
+	return s
+}
+
+// UnmarshalJSON - implements Unmarshaler interface
+func (it *IPFamilyType) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	v := IPFamilyType(s)
+	err := v.IsValid()
+	if err != nil {
+		return err
+	}
+	*it = v
+	return nil
+}
+
+// MarshalJSON - implements Marshaler interface
+func (it *IPFamilyType) MarshalJSON() ([]byte, error) {
+	return json.Marshal(it.String())
 }

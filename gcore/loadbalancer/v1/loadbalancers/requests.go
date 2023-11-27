@@ -130,6 +130,7 @@ type CreateOpts struct {
 	VipNetworkID string                                      `json:"vip_network_id,allowed_without=VipPortID,omitempty"`
 	VipSubnetID  string                                      `json:"vip_subnet_id,omitempty"`
 	VipPortID    string                                      `json:"vip_port_id,allowed_without=VipNetworkID,omitempty"`
+	VIPIPFamily  types.IPFamilyType                          `json:"vip_ip_family,omitempty" validate:"omitempty,enum"`
 	Flavor       *string                                     `json:"flavor,omitempty"`
 	Tags         []string                                    `json:"tag,omitempty"`
 	Metadata     map[string]string                           `json:"metadata,omitempty"`

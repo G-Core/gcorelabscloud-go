@@ -39,6 +39,7 @@ type CreateOptsBuilder interface {
 // CreateOpts represents options used to create a reserved fixed ip.
 type CreateOpts struct {
 	Type      ReservedFixedIPType `json:"type" required:"true" validate:"required,enum"`
+	IPFamily  IPFamilyType        `json:"ip_family,omitempty" validate:"omitempty,enum"`
 	NetworkID string              `json:"network_id,omitempty" validate:"rfe=Type:ip_address;any_subnet,omitempty,uuid4"`
 	SubnetID  string              `json:"subnet_id,omitempty" validate:"rfe=Type:subnet,omitempty,uuid4"`
 	IPAddress net.IP              `json:"ip_address,omitempty" validate:"rfe=Type:ip_address,omitempty"`
