@@ -2,6 +2,7 @@ package testing
 
 import (
 	"fmt"
+	"math/big"
 	"net"
 	"time"
 
@@ -28,8 +29,8 @@ var ListResponse = fmt.Sprintf(`
 		  "task_id": "50f53a35-42ed-40c4-82b2-5a37fb3e00bc",
 		  "creator_task_id": "50f53a35-42ed-40c4-82b2-5a37fb3e00bc",
 		  "region": "RegionOne",
-		  "available_ips": %d,
-		  "total_ips": %d,
+		  "available_ips": 18446744073709551999,
+		  "total_ips": 18446744073709552000,
 		  "project_id": 1,
 		  "region_id": 1,
 		  "dns_nameservers": [
@@ -47,7 +48,7 @@ var ListResponse = fmt.Sprintf(`
     	}
   	]
 }
-`, availableIps, totalIps, MetadataResponse)
+`, MetadataResponse)
 
 var GetResponse = fmt.Sprintf(`
 {
@@ -64,8 +65,8 @@ var GetResponse = fmt.Sprintf(`
   "region": "RegionOne",
   "project_id": 1,
   "region_id": 1,
-  "available_ips": %d,
-  "total_ips": %d,
+  "available_ips": 18446744073709551999,
+  "total_ips": 18446744073709552000,
   "dns_nameservers": [
 	"10.0.0.13"
   ],
@@ -79,7 +80,7 @@ var GetResponse = fmt.Sprintf(`
   ],
   "metadata": [%s]
 }
-`, availableIps, totalIps, MetadataResponse)
+`, MetadataResponse)
 
 const CreateRequestNoGW = `
 {
@@ -183,11 +184,15 @@ var updatedTimeParsed, _ = time.Parse(gcorecloud.RFC3339Z, updatedTimeString)
 var updatedTime = gcorecloud.JSONRFC3339Z{Time: updatedTimeParsed}
 var cidr, _ = gcorecloud.ParseCIDRString("192.168.10.0/24")
 var taskID = "50f53a35-42ed-40c4-82b2-5a37fb3e00bc"
-var availableIps = 241
-var totalIps = 243
 var ip = net.ParseIP("10.0.0.13")
 var gwip = net.ParseIP("10.0.0.1")
 var routeCidr, _ = gcorecloud.ParseCIDRString("10.0.3.0/24")
+
+func ipDual(i string) *big.Int {
+	b := big.NewInt(0)
+	b.SetString(i, 10)
+	return b
+}
 
 var (
 	Subnet1 = subnets.Subnet{
@@ -204,8 +209,8 @@ var (
 		Region:         "RegionOne",
 		ProjectID:      fake.ProjectID,
 		RegionID:       fake.RegionID,
-		AvailableIps:   availableIps,
-		TotalIps:       totalIps,
+		AvailableIps:   ipDual("18446744073709551999"),
+		TotalIps:       ipDual("18446744073709552000"),
 		HasRouter:      true,
 		DNSNameservers: []net.IP{ip},
 		GatewayIP:      gwip,

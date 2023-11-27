@@ -2,6 +2,7 @@ package subnets
 
 import (
 	"fmt"
+	"math/big"
 	"net"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
@@ -52,8 +53,8 @@ type Subnet struct {
 	Region         string                  `json:"region"`
 	ProjectID      int                     `json:"project_id"`
 	RegionID       int                     `json:"region_id"`
-	AvailableIps   int                     `json:"available_ips"`
-	TotalIps       int                     `json:"total_ips"`
+	AvailableIps   *big.Int                `json:"available_ips"`
+	TotalIps       *big.Int                `json:"total_ips"`
 	HasRouter      bool                    `json:"has_router"`
 	DNSNameservers []net.IP                `json:"dns_nameservers"`
 	HostRoutes     []HostRoute             `json:"host_routes"`
