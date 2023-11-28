@@ -11,7 +11,7 @@ func rootURL(c *gcorecloud.ServiceClient) string {
 }
 
 func getAccessStatusURL(c *gcorecloud.ServiceClient) string {
-	return c.BaseServiceURL("ddos", "accessibility")
+	return c.BaseServiceURL("ddos", "accessibility", strconv.Itoa(c.RegionID))
 }
 
 func checkRegionCoverageURL(c *gcorecloud.ServiceClient) string {
