@@ -42,13 +42,13 @@ type UpdateResult struct {
 
 // Project represents a project structure.
 type Project struct {
-	ID          int                       `json:"id"`
-	ClientID    int                       `json:"client_id"`
-	Name        string                    `json:"name"`
-	Description string                    `json:"description"`
-	State       types.ProjectState        `json:"state"`
-	TaskID      *string                   `json:"task_id"`
-	CreatedAt   gcorecloud.JSONRFC3339NoZ `json:"created_at"`
+	ID          int                      `json:"id"`
+	ClientID    int                      `json:"client_id"`
+	Name        string                   `json:"name"`
+	Description string                   `json:"description"`
+	State       types.ProjectState       `json:"state"`
+	TaskID      *string                  `json:"task_id"`
+	CreatedAt   gcorecloud.JSONRFC3339ZZ `json:"created_at"`
 }
 
 // ProjectPage is the page returned by a pager when traversing over a
