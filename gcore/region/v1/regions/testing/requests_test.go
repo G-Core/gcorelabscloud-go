@@ -47,7 +47,7 @@ func TestList(t *testing.T) {
 	client := fake.ServiceTokenClient("regions", "v1")
 	count := 0
 
-	err := regions.List(client).EachPage(func(page pagination.Page) (bool, error) {
+	err := regions.List(client, nil).EachPage(func(page pagination.Page) (bool, error) {
 		count++
 		actual, err := regions.ExtractRegions(page)
 		require.NoError(t, err)
@@ -82,7 +82,7 @@ func TestListAll(t *testing.T) {
 
 	client := fake.ServiceTokenClient("regions", "v1")
 
-	results, err := regions.ListAll(client)
+	results, err := regions.ListAll(client, nil)
 	require.NoError(t, err)
 	ct := results[0]
 	require.Equal(t, Region1, ct)
@@ -112,7 +112,7 @@ func TestGet(t *testing.T) {
 
 	client := fake.ServiceTokenClient("regions", "v1")
 
-	ct, err := regions.Get(client, Region1.ID).Extract()
+	ct, err := regions.Get(client, Region1.ID, nil).Extract()
 
 	require.NoError(t, err)
 	require.Equal(t, Region1, *ct)
