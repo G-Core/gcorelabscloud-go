@@ -30,7 +30,7 @@ var regionListCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		results, err := regions.ListAll(client)
+		results, err := regions.ListAll(client, nil)
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -55,7 +55,7 @@ var regionGetCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		task, err := regions.Get(client, regionID).Extract()
+		task, err := regions.Get(client, regionID, nil).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}

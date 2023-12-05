@@ -6,15 +6,74 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
-func List(c *gcorecloud.ServiceClient) pagination.Pager {
-	return pagination.NewPager(c, listURL(c), func(r pagination.PageResult) pagination.Page {
+// ListOptsBuilder allows extensions to add additional parameters to the List request.
+type ListOptsBuilder interface {
+	ToInstanceListQuery() (string, error)
+}
+
+type ListOpts struct {
+	ShowVolumeTypes bool `json:"show_volume_types,omitempty" validate:"omitempty"`
+}
+
+// ToInstanceListQuery formats a ListOpts into a query string.
+func (opts ListOpts) ToInstanceListQuery() (string, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return "", err
+	}
+	q, err := gcorecloud.BuildQueryString(opts)
+	if err != nil {
+		return "", err
+	}
+	return q.String(), err
+}
+
+func List(c *gcorecloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
+	url := listURL(c)
+	if opts != nil {
+		query, err := opts.ToInstanceListQuery()
+		if err != nil {
+			return pagination.Pager{Err: err}
+		}
+		url += query
+	}
+	return pagination.NewPager(c, url, func(r pagination.PageResult) pagination.Page {
 		return RegionPage{pagination.LinkedPageBase{PageResult: r}}
 	})
 }
 
+// GetOptsBuilder allows extensions to add additional parameters to the Get request.
+type GetOptsBuilder interface {
+	ToInstanceGetQuery() (string, error)
+}
+
+type GetOpts struct {
+	ShowVolumeTypes bool `json:"show_volume_types,omitempty" validate:"omitempty"`
+}
+
+// ToInstanceGetQuery formats a GetOpts into a query string.
+func (opts GetOpts) ToInstanceGetQuery() (string, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return "", err
+	}
+	q, err := gcorecloud.BuildQueryString(opts)
+	if err != nil {
+		return "", err
+	}
+	return q.String(), err
+}
+
 // Get retrieves a specific region based on its unique ID.
-func Get(c *gcorecloud.ServiceClient, id int) (r GetResult) {
-	_, r.Err = c.Get(getURL(c, id), &r.Body, nil)
+func Get(c *gcorecloud.ServiceClient, id int, opts GetOptsBuilder) (r GetResult) {
+	url := getURL(c, id)
+	if opts != nil {
+		query, err := opts.ToInstanceGetQuery()
+		if err != nil {
+			r.Err = err
+			return
+		}
+		url += query
+	}
+	_, r.Err = c.Get(url, &r.Body, nil)
 	return
 }
 
@@ -93,8 +152,8 @@ func Update(c *gcorecloud.ServiceClient, id int, opts UpdateOptsBuilder) (r Upda
 }
 
 // ListAll is a convenience function that returns all regions.
-func ListAll(client *gcorecloud.ServiceClient) ([]Region, error) {
-	pages, err := List(client).AllPages()
+func ListAll(client *gcorecloud.ServiceClient, opts ListOptsBuilder) ([]Region, error) {
+	pages, err := List(client, opts).AllPages()
 	if err != nil {
 		return nil, err
 	}
