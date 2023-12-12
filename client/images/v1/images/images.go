@@ -63,6 +63,21 @@ func listProjectImages(c *cli.Context) error {
 	return nil
 }
 
+func StringSliceToMetadata(slice []string) (map[string]string, error) {
+	if len(slice) == 0 {
+		return nil, nil
+	}
+	m := make(map[string]string, len(slice))
+	for _, s := range slice {
+		parts := strings.SplitN(s, "=", 2)
+		if len(parts) != 2 {
+			return m, fmt.Errorf("wrong label format: %s", s)
+		}
+		m[parts[0]] = parts[1]
+	}
+	return m, nil
+}
+
 var imageListCommand = cli.Command{
 	Name:     "list",
 	Usage:    "List images",
@@ -319,27 +334,37 @@ var imageUploadCommand = cli.Command{
 		},
 		&cli.StringFlag{
 			Name:     "hw-firmware-type",
-			Usage:    "Specifies the type of firmware with which to boot the guest. Available value is 'bios', 'uefi'",
+			Usage:    "Specifies the type of firmware with which to boot the guest. Available values are 'bios', 'uefi'",
 			Required: true,
 		},
 		&cli.StringFlag{
 			Name:     "hw-machine-type",
-			Usage:    "A virtual chipset type. Available value is 'i440', 'q35'",
+			Usage:    "A virtual chipset type. Available values are 'i440', 'q35'",
 			Required: true,
 		},
 		&cli.StringFlag{
 			Name:     "ssh-key",
-			Usage:    "Permission to use a ssh key in instances. Available value is 'allow', 'deny', 'required'",
+			Usage:    "Permission to use a ssh key in instances. Available values are 'allow', 'deny', 'required'",
 			Required: true,
 		},
 		&cli.StringFlag{
 			Name:     "os-type",
-			Usage:    "The operating system installed on the image. Available value is 'windows', 'linux'",
+			Usage:    "The operating system installed on the image. Available values are 'windows', 'linux'",
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:     "architecture",
+			Usage:    "The architecture of the image. Available values are 'x86_64', 'aarch64'",
 			Required: true,
 		},
 		&cli.BoolFlag{
 			Name:  "is-baremetal",
 			Usage: "Set to true if the image will be used by baremetal instances. Defaults to false.",
+		},
+		&cli.StringSliceFlag{
+			Name:     "metadata",
+			Usage:    "Image metadata. Example: --metadata one=two --metadata three=four",
+			Required: false,
 		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
@@ -349,7 +374,14 @@ var imageUploadCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
+		metadata, err := StringSliceToMetadata(c.StringSlice("metadata"))
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "upload")
+			return cli.NewExitError(err, 1)
+		}
+
 		opts := images.UploadOpts{
+			Architecture:   c.String("architecture"),
 			OsVersion:      c.String("os-version"),
 			HwMachineType:  types.HwMachineType(c.String("hw-machine-type")),
 			SshKey:         types.SshKeyType(c.String("ssh-key")),
@@ -360,6 +392,7 @@ var imageUploadCommand = cli.Command{
 			IsBaremetal:    utils.BoolToPointer(c.Bool("is-baremetal")),
 			HwFirmwareType: types.HwFirmwareType(c.String("hw-firmware-type")),
 			CowFormat:      c.Bool("cow-format"),
+			Metadata:       metadata,
 		}
 
 		results, err := images.Upload(downloadClient, opts).Extract()
