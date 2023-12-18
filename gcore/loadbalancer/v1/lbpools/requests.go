@@ -109,7 +109,7 @@ type CreateOpts struct {
 	Members              []CreatePoolMemberOpts        `json:"members,omitempty"`
 	LoadBalancerID       string                        `json:"loadbalancer_id,omitempty"`
 	ListenerID           string                        `json:"listener_id,omitempty"`
-	HealthMonitor        *CreateHealthMonitorOpts      `json:"healthmonitor"`
+	HealthMonitor        *CreateHealthMonitorOpts      `json:"healthmonitor,omitempty"`
 	SessionPersistence   *CreateSessionPersistenceOpts `json:"session_persistence,omitempty"`
 	TimeoutClientData    int                           `json:"timeout_client_data"`
 	TimeoutMemberData    int                           `json:"timeout_member_data"`
