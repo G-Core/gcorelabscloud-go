@@ -113,6 +113,7 @@ type UploadOpts struct {
 	HwFirmwareType types.HwFirmwareType `json:"hw_firmware_type" validate:"required,enum"`
 	CowFormat      bool                 `json:"cow_format"`
 	Metadata       map[string]string    `json:"metadata,omitempty"`
+	Architecture   string               `json:"architecture,omitempty"`
 }
 
 // Validate

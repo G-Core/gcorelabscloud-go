@@ -12,49 +12,61 @@ type PersistenceType string
 type ProtocolType string
 type HealthMonitorType string
 type HTTPMethod string
+type IPFamilyType string
 
 const (
-	ProvisioningStatusActive              ProvisioningStatus    = "ACTIVE"
-	ProvisioningStatusDeleted             ProvisioningStatus    = "DELETED"
-	ProvisioningStatusError               ProvisioningStatus    = "ERROR"
-	ProvisioningStatusPendingCreate       ProvisioningStatus    = "PENDING_CREATE"
-	ProvisioningStatusPendingUpdate       ProvisioningStatus    = "PENDING_UPDATE"
-	ProvisioningStatusPendingDelete       ProvisioningStatus    = "PENDING_DELETE"
-	OperatingStatusOnline                 OperatingStatus       = "ONLINE"
-	OperatingStatusDraining               OperatingStatus       = "DRAINING"
-	OperatingStatusOffline                OperatingStatus       = "OFFLINE"
-	OperatingStatusDegraded               OperatingStatus       = "DEGRADED"
-	OperatingStatusOperatingError         OperatingStatus       = "ERROR"
-	OperatingStatusNoMonitor              OperatingStatus       = "NO_MONITOR"
+	ProvisioningStatusActive        ProvisioningStatus = "ACTIVE"
+	ProvisioningStatusDeleted       ProvisioningStatus = "DELETED"
+	ProvisioningStatusError         ProvisioningStatus = "ERROR"
+	ProvisioningStatusPendingCreate ProvisioningStatus = "PENDING_CREATE"
+	ProvisioningStatusPendingUpdate ProvisioningStatus = "PENDING_UPDATE"
+	ProvisioningStatusPendingDelete ProvisioningStatus = "PENDING_DELETE"
+
+	OperatingStatusOnline         OperatingStatus = "ONLINE"
+	OperatingStatusDraining       OperatingStatus = "DRAINING"
+	OperatingStatusOffline        OperatingStatus = "OFFLINE"
+	OperatingStatusDegraded       OperatingStatus = "DEGRADED"
+	OperatingStatusOperatingError OperatingStatus = "ERROR"
+	OperatingStatusNoMonitor      OperatingStatus = "NO_MONITOR"
+
 	LoadBalancerAlgorithmRoundRobin       LoadBalancerAlgorithm = "ROUND_ROBIN"
 	LoadBalancerAlgorithmLeastConnections LoadBalancerAlgorithm = "LEAST_CONNECTIONS"
 	LoadBalancerAlgorithmSourceIP         LoadBalancerAlgorithm = "SOURCE_IP"
 	LoadBalancerAlgorithmSourceIPPort     LoadBalancerAlgorithm = "SOURCE_IP_PORT"
-	PersistenceTypeAppCookie              PersistenceType       = "APP_COOKIE"
-	PersistenceTypeHTTPCookie             PersistenceType       = "HTTP_COOKIE"
-	PersistenceTypeSourceIP               PersistenceType       = "SOURCE_IP"
-	ProtocolTypeHTTP                      ProtocolType          = "HTTP"
-	ProtocolTypeHTTPS                     ProtocolType          = "HTTPS"
-	ProtocolTypeTCP                       ProtocolType          = "TCP"
-	ProtocolTypePrometheus                ProtocolType          = "PROMETHEUS"
-	ProtocolTypeTerminatedHTTPS           ProtocolType          = "TERMINATED_HTTPS"
-	ProtocolTypeUDP                       ProtocolType          = "UDP"
-	ProtocolTypePROXY                     ProtocolType          = "PROXY"
-	HealthMonitorTypeHTTP                 HealthMonitorType     = "HTTP"
-	HealthMonitorTypeHTTPS                HealthMonitorType     = "HTTPS"
-	HealthMonitorTypePING                 HealthMonitorType     = "PING"
-	HealthMonitorTypeTCP                  HealthMonitorType     = "TCP"
-	HealthMonitorTypeTLSHello             HealthMonitorType     = "TLS-HELLO"
-	HealthMonitorTypeUDPConnect           HealthMonitorType     = "UDP-CONNECT"
-	HTTPMethodCONNECT                     HTTPMethod            = "CONNECT"
-	HTTPMethodDELETE                      HTTPMethod            = "DELETE"
-	HTTPMethodGET                         HTTPMethod            = "GET"
-	HTTPMethodHEAD                        HTTPMethod            = "HEAD"
-	HTTPMethodOPTIONS                     HTTPMethod            = "OPTIONS"
-	HTTPMethodPATCH                       HTTPMethod            = "PATCH"
-	HTTPMethodPOST                        HTTPMethod            = "POST"
-	HTTPMethodPUT                         HTTPMethod            = "PUT"
-	HTTPMethodTRACE                       HTTPMethod            = "TRACE"
+
+	PersistenceTypeAppCookie  PersistenceType = "APP_COOKIE"
+	PersistenceTypeHTTPCookie PersistenceType = "HTTP_COOKIE"
+	PersistenceTypeSourceIP   PersistenceType = "SOURCE_IP"
+
+	ProtocolTypeHTTP            ProtocolType = "HTTP"
+	ProtocolTypeHTTPS           ProtocolType = "HTTPS"
+	ProtocolTypeTCP             ProtocolType = "TCP"
+	ProtocolTypePrometheus      ProtocolType = "PROMETHEUS"
+	ProtocolTypeTerminatedHTTPS ProtocolType = "TERMINATED_HTTPS"
+	ProtocolTypeUDP             ProtocolType = "UDP"
+	ProtocolTypePROXY           ProtocolType = "PROXY"
+
+	HealthMonitorTypeHTTP       HealthMonitorType = "HTTP"
+	HealthMonitorTypeHTTPS      HealthMonitorType = "HTTPS"
+	HealthMonitorTypePING       HealthMonitorType = "PING"
+	HealthMonitorTypeTCP        HealthMonitorType = "TCP"
+	HealthMonitorTypeTLSHello   HealthMonitorType = "TLS-HELLO"
+	HealthMonitorTypeUDPConnect HealthMonitorType = "UDP-CONNECT"
+	HealthMonitorTypeK8S        HealthMonitorType = "K8S"
+
+	HTTPMethodCONNECT HTTPMethod = "CONNECT"
+	HTTPMethodDELETE  HTTPMethod = "DELETE"
+	HTTPMethodGET     HTTPMethod = "GET"
+	HTTPMethodHEAD    HTTPMethod = "HEAD"
+	HTTPMethodOPTIONS HTTPMethod = "OPTIONS"
+	HTTPMethodPATCH   HTTPMethod = "PATCH"
+	HTTPMethodPOST    HTTPMethod = "POST"
+	HTTPMethodPUT     HTTPMethod = "PUT"
+	HTTPMethodTRACE   HTTPMethod = "TRACE"
+
+	IPv4IPFamilyType      IPFamilyType = "ipv4"
+	IPv6IPFamilyType      IPFamilyType = "ipv6"
+	DualStackIPFamilyType IPFamilyType = "dual"
 )
 
 func (ps ProvisioningStatus) IsValid() error {
@@ -381,7 +393,8 @@ func (hm HealthMonitorType) IsValid() error {
 		HealthMonitorTypeTCP,
 		HealthMonitorTypePING,
 		HealthMonitorTypeTLSHello,
-		HealthMonitorTypeUDPConnect:
+		HealthMonitorTypeUDPConnect,
+		HealthMonitorTypeK8S:
 		return nil
 	}
 	return fmt.Errorf("invalid HealthMonitorType: %v", hm)
@@ -414,6 +427,7 @@ func (hm HealthMonitorType) List() []HealthMonitorType {
 		HealthMonitorTypePING,
 		HealthMonitorTypeTLSHello,
 		HealthMonitorTypeUDPConnect,
+		HealthMonitorTypeK8S,
 	}
 }
 
@@ -520,4 +534,63 @@ func (m *HTTPMethod) MarshalJSON() ([]byte, error) {
 
 func HTTPMethodPointer(m HTTPMethod) *HTTPMethod {
 	return &m
+}
+
+func (it IPFamilyType) IsValid() error {
+	switch it {
+	case IPv6IPFamilyType, IPv4IPFamilyType, DualStackIPFamilyType:
+		return nil
+	}
+	return fmt.Errorf("invalid IPFamilyType type: %v", it)
+}
+
+func (it IPFamilyType) ValidOrNil() (*IPFamilyType, error) {
+	if it.String() == "" {
+		return nil, nil
+	}
+	err := it.IsValid()
+	if err != nil {
+		return &it, err
+	}
+	return &it, nil
+}
+
+func (it IPFamilyType) String() string {
+	return string(it)
+}
+
+func (it IPFamilyType) List() []IPFamilyType {
+	return []IPFamilyType{
+		IPv6IPFamilyType,
+		IPv4IPFamilyType,
+		DualStackIPFamilyType,
+	}
+}
+
+func (it IPFamilyType) StringList() []string {
+	var s []string
+	for _, v := range it.List() {
+		s = append(s, v.String())
+	}
+	return s
+}
+
+// UnmarshalJSON - implements Unmarshaler interface
+func (it *IPFamilyType) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	v := IPFamilyType(s)
+	err := v.IsValid()
+	if err != nil {
+		return err
+	}
+	*it = v
+	return nil
+}
+
+// MarshalJSON - implements Marshaler interface
+func (it *IPFamilyType) MarshalJSON() ([]byte, error) {
+	return json.Marshal(it.String())
 }
