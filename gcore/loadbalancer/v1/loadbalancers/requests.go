@@ -103,7 +103,7 @@ type CreatePoolOpts struct {
 	Name                  string                        `json:"name" required:"true" validate:"required,name"`
 	Protocol              types.ProtocolType            `json:"protocol" required:"true"`
 	Members               []CreatePoolMemberOpts        `json:"members"`
-	HealthMonitor         *CreateHealthMonitorOpts      `json:"healthmonitor,omitempty"`
+	HealthMonitor         *CreateHealthMonitorOpts      `json:"healthmonitor"`
 	LoadBalancerAlgorithm types.LoadBalancerAlgorithm   `json:"lb_algorithm,omitempty"`
 	SessionPersistence    *CreateSessionPersistenceOpts `json:"session_persistence,omitempty"`
 }

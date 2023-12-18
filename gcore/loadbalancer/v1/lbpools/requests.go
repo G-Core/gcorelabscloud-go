@@ -109,7 +109,7 @@ type CreateOpts struct {
 	Members              []CreatePoolMemberOpts        `json:"members,omitempty"`
 	LoadBalancerID       string                        `json:"loadbalancer_id,omitempty"`
 	ListenerID           string                        `json:"listener_id,omitempty"`
-	HealthMonitor        *CreateHealthMonitorOpts      `json:"healthmonitor,omitempty"`
+	HealthMonitor        *CreateHealthMonitorOpts      `json:"healthmonitor"`
 	SessionPersistence   *CreateSessionPersistenceOpts `json:"session_persistence,omitempty"`
 	TimeoutClientData    int                           `json:"timeout_client_data"`
 	TimeoutMemberData    int                           `json:"timeout_member_data"`
@@ -162,7 +162,7 @@ type UpdateOpts struct {
 	Members              []CreatePoolMemberOpts        `json:"members,omitempty"`
 	Protocol             types.ProtocolType            `json:"protocol,omitempty"`
 	LBPoolAlgorithm      types.LoadBalancerAlgorithm   `json:"lb_algorithm,omitempty"`
-	HealthMonitor        *CreateHealthMonitorOpts      `json:"healthmonitor,omitempty"`
+	HealthMonitor        *CreateHealthMonitorOpts      `json:"healthmonitor"`
 	SessionPersistence   *CreateSessionPersistenceOpts `json:"session_persistence"`
 	TimeoutClientData    int                           `json:"timeout_client_data"`
 	TimeoutMemberData    int                           `json:"timeout_member_data"`
