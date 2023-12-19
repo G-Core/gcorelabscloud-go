@@ -2,6 +2,7 @@ package loadbalancers
 
 import (
 	"fmt"
+	"strings"
 
 	cmeta "github.com/G-Core/gcorelabscloud-go/client/utils/metadata"
 
@@ -13,12 +14,15 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/lbflavors"
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/loadbalancers"
+	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 
 	"github.com/urfave/cli/v2"
 )
 
 var loadBalancerIDText = "loadbalancer_id is mandatory argument"
+
+var vipIPFamilyType = types.IPFamilyType("").StringList()
 
 var loadBalancerListSubCommand = cli.Command{
 	Name:     "list",
@@ -66,6 +70,14 @@ var loadBalancerCreateSubCommand = cli.Command{
 			Usage:       "Loadbalancer vip subnet ID",
 			DefaultText: "<nil>",
 			Required:    false,
+		},
+		&cli.GenericFlag{
+			Name: "vip-ip-family",
+			Value: &utils.EnumValue{
+				Enum: vipIPFamilyType,
+			},
+			Usage:    fmt.Sprintf("Loadbalancer vip IP family. output in %s", strings.Join(vipIPFamilyType, ", ")),
+			Required: false,
 		},
 		&cli.StringSliceFlag{
 			Name:    "tags",
