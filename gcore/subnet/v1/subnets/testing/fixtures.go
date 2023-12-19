@@ -188,7 +188,7 @@ var ip = net.ParseIP("10.0.0.13")
 var gwip = net.ParseIP("10.0.0.1")
 var routeCidr, _ = gcorecloud.ParseCIDRString("10.0.3.0/24")
 
-func ipDual(i string) *big.Int {
+func IPDual(i string) *big.Int {
 	b := big.NewInt(0)
 	b.SetString(i, 10)
 	return b
@@ -209,8 +209,8 @@ var (
 		Region:         "RegionOne",
 		ProjectID:      fake.ProjectID,
 		RegionID:       fake.RegionID,
-		AvailableIps:   ipDual("18446744073709551999"),
-		TotalIps:       ipDual("18446744073709552000"),
+		AvailableIps:   IPDual("18446744073709551999"),
+		TotalIps:       IPDual("18446744073709552000"),
 		HasRouter:      true,
 		DNSNameservers: []net.IP{ip},
 		GatewayIP:      gwip,
