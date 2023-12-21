@@ -98,6 +98,7 @@ var loadBalancerCreateSubCommand = cli.Command{
 			VipNetworkID: c.String("vip-network-id"),
 			VipSubnetID:  c.String("vip-subnet-id"),
 			Tags:         c.StringSlice("tags"),
+			VIPIPFamily:  types.IPFamilyType(c.String("vip-ip-family")),
 		}
 		flavor := c.String("flavor")
 		if flavor != "" {
