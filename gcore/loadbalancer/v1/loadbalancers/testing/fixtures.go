@@ -57,7 +57,8 @@ var ListResponse = fmt.Sprintf(`
       "project_id": 1,
       "region_id": 1,
  	    "metadata": [%s],
-      "vrrp_ips": [%s]
+      "vrrp_ips": [%s],
+      "vip_ip_family": "dual"
     }
   ]
 }
@@ -95,7 +96,8 @@ var GetResponse = fmt.Sprintf(`
   "project_id": 1,
   "region_id": 1,
   "metadata": [%s],
-  "vrrp_ips": [%s]
+  "vrrp_ips": [%s],
+  "vip_ip_family": "dual"
 }
 `, testing.MetadataResponse, VrrpIPsResponse)
 
@@ -199,6 +201,7 @@ var (
 			{IpAddress: net.ParseIP("10.94.76.179"), SubnetID: "db5ebada-a86a-4702-8a19-00b23a1acb05"},
 			{IpAddress: net.ParseIP("aa:bb:cc:dd::2b5"), SubnetID: "abd99b68-e139-4715-b8c2-37ca324285b8"},
 		},
+    VipIPFamilyType: types.DualStackIPFamilyType,
 	}
 	Tasks1 = tasks.TaskResults{
 		Tasks: []tasks.TaskID{"50f53a35-42ed-40c4-82b2-5a37fb3e00bc"},
