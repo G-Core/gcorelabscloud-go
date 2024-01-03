@@ -162,11 +162,11 @@ type UpdateOpts struct {
 	Members              []CreatePoolMemberOpts        `json:"members,omitempty"`
 	Protocol             types.ProtocolType            `json:"protocol,omitempty"`
 	LBPoolAlgorithm      types.LoadBalancerAlgorithm   `json:"lb_algorithm,omitempty"`
-	HealthMonitor        *CreateHealthMonitorOpts      `json:"healthmonitor"`
-	SessionPersistence   *CreateSessionPersistenceOpts `json:"session_persistence"`
-	TimeoutClientData    int                           `json:"timeout_client_data"`
-	TimeoutMemberData    int                           `json:"timeout_member_data"`
-	TimeoutMemberConnect int                           `json:"timeout_member_connect"`
+	HealthMonitor        *CreateHealthMonitorOpts      `json:"healthmonitor,omitempty"`
+	SessionPersistence   *CreateSessionPersistenceOpts `json:"session_persistence,omitempty"`
+	TimeoutClientData    int                           `json:"timeout_client_data,omitempty"`
+	TimeoutMemberData    int                           `json:"timeout_member_data,omitempty"`
+	TimeoutMemberConnect int                           `json:"timeout_member_connect,omitempty"`
 }
 
 // ToLBPoolUpdateMap builds a request body from UpdateOpts.
