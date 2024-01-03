@@ -206,7 +206,8 @@ func TestCreate(t *testing.T) {
 				SessionPersistence:    nil,
 			}},
 		}},
-		VipPortID: "169942e0-9b53-42df-95ef-1a8b6525c2bd",
+		VipPortID:   "169942e0-9b53-42df-95ef-1a8b6525c2bd",
+		VIPIPFamily: types.DualStackIPFamilyType,
 	}
 
 	client := fake.ServiceTokenClient("loadbalancers", "v1")

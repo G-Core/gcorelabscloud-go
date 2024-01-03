@@ -8,6 +8,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/network/v1/networks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/reservedfixedip/v1/reservedfixedips"
 	"github.com/G-Core/gcorelabscloud-go/gcore/subnet/v1/subnets"
+	"github.com/G-Core/gcorelabscloud-go/gcore/subnet/v1/subnets/testing"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 )
 
@@ -279,8 +280,8 @@ var (
 					Region:        "Luxembourg 1",
 					ProjectID:     1,
 					RegionID:      3,
-					AvailableIps:  250,
-					TotalIps:      253,
+					AvailableIps:  testing.IPDual("250"),
+					TotalIps:      testing.IPDual("253"),
 					HasRouter:     false,
 					DNSNameservers: []net.IP{
 						net.ParseIP("8.8.8.8"),

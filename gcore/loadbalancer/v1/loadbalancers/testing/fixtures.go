@@ -2,9 +2,10 @@ package testing
 
 import (
 	"fmt"
-	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"net"
 	"time"
+
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/loadbalancers"
@@ -13,6 +14,25 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata/testing"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 )
+
+const VrrpIPsResponse = `
+{
+  "ip_address": "10.94.79.54",
+  "subnet_id": "db5ebada-a86a-4702-8a19-00b23a1acb05"
+},
+{
+  "ip_address": "aa:bb:cc:dd::1d4",
+  "subnet_id": "abd99b68-e139-4715-b8c2-37ca324285b8"
+},
+{
+  "ip_address": "10.94.76.179",
+  "subnet_id": "db5ebada-a86a-4702-8a19-00b23a1acb05"
+},
+{
+  "ip_address": "aa:bb:cc:dd::2b5",
+  "subnet_id": "abd99b68-e139-4715-b8c2-37ca324285b8"
+}
+`
 
 var ListResponse = fmt.Sprintf(`
 {
@@ -36,11 +56,13 @@ var ListResponse = fmt.Sprintf(`
       "operating_status": "ONLINE",
       "project_id": 1,
       "region_id": 1,
- 	  "metadata": [%s]
+ 	    "metadata": [%s],
+      "vrrp_ips": [%s],
+      "vip_ip_family": "dual"
     }
   ]
 }
-`, testing.MetadataResponse)
+`, testing.MetadataResponse, VrrpIPsResponse)
 
 const ListCustomSecurityGroupResponse = `
 {
@@ -73,14 +95,17 @@ var GetResponse = fmt.Sprintf(`
   "operating_status": "ONLINE",
   "project_id": 1,
   "region_id": 1,
-  "metadata": [%s]
+  "metadata": [%s],
+  "vrrp_ips": [%s],
+  "vip_ip_family": "dual"
 }
-`, testing.MetadataResponse)
+`, testing.MetadataResponse, VrrpIPsResponse)
 
 const CreateRequest = `
 {
   "name": "lbname",
   "vip_port_id": "169942e0-9b53-42df-95ef-1a8b6525c2bd",
+  "vip_ip_family": "dual",
   "listeners": [
     {
       "name": "listener_name",
@@ -170,6 +195,13 @@ var (
 		RegionID:      fake.RegionID,
 		Region:        "RegionOne",
 		Metadata:      []metadata.Metadata{testing.ResourceMetadataReadOnly},
+		VrrpIPs: []loadbalancers.NetworkPortFixedIP{
+			{IpAddress: net.ParseIP("10.94.79.54"), SubnetID: "db5ebada-a86a-4702-8a19-00b23a1acb05"},
+			{IpAddress: net.ParseIP("aa:bb:cc:dd::1d4"), SubnetID: "abd99b68-e139-4715-b8c2-37ca324285b8"},
+			{IpAddress: net.ParseIP("10.94.76.179"), SubnetID: "db5ebada-a86a-4702-8a19-00b23a1acb05"},
+			{IpAddress: net.ParseIP("aa:bb:cc:dd::2b5"), SubnetID: "abd99b68-e139-4715-b8c2-37ca324285b8"},
+		},
+    VipIPFamilyType: types.DualStackIPFamilyType,
 	}
 	Tasks1 = tasks.TaskResults{
 		Tasks: []tasks.TaskID{"50f53a35-42ed-40c4-82b2-5a37fb3e00bc"},

@@ -91,6 +91,14 @@ type LoadBalancer struct {
 	Flavor             lbflavors.Flavor         `json:"flavor"`
 	Metadata           []metadata.Metadata      `json:"metadata"`
 	DdosProfile        *ddos.Profile            `json:"ddos_profile"`
+	VrrpIPs            []NetworkPortFixedIP     `json:"vrrp_ips"`
+	VipIPFamilyType	   types.IPFamilyType		`json:"vip_ip_family"`
+}
+
+// NetworkPortFixedIP represents VRRP entry structure.
+type NetworkPortFixedIP struct {
+	IpAddress net.IP `json:"ip_address"`
+	SubnetID  string `json:"subnet_id"`
 }
 
 func (lb LoadBalancer) IsDeleted() bool {
