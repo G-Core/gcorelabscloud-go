@@ -15,11 +15,10 @@ type ListOptsBuilder interface {
 
 // ListOpts allows the filtering and sorting of paginated collections through the API.
 type ListOpts struct {
-	Name            string            `q:"name"`
-	FlavorID        string            `q:"flavor_id"`
-	Metadata        map[string]string `q:"metadata_kv" validate:"omitempty"`
-	WithDdos        bool              `q:"with_ddos" validate:"omitempty"`
-	IncludeAllBmIps bool              `q:"include_all_bm_ips" validate:"omitempty"`
+	Name     string            `q:"name"`
+	FlavorID string            `q:"flavor_id"`
+	Metadata map[string]string `q:"metadata_kv" validate:"omitempty"`
+	WithDdos bool              `q:"with_ddos" validate:"omitempty"`
 }
 
 // ToInstanceListQuery formats a ListOpts into a query string.

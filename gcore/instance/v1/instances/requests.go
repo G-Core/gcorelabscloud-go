@@ -29,7 +29,6 @@ type ListOpts struct {
 	Offset            int               `q:"offset" validate:"omitempty,gt=0"`
 	Metadata          map[string]string `q:"metadata_kv" validate:"omitempty"`
 	WithDdos          bool              `q:"with_ddos" validate:"omitempty"`
-	IncludeAllBmIps   bool              `q:"include_all_bm_ips" validate:"omitempty"`
 }
 
 // ToInstanceListQuery formats a ListOpts into a query string.
