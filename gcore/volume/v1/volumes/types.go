@@ -229,12 +229,7 @@ func (vt *VolumeType) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &s); err != nil {
 		return err
 	}
-	v := VolumeType(s)
-	err := v.IsValid()
-	if err != nil {
-		return err
-	}
-	*vt = v
+	*vt = VolumeType(s)
 	return nil
 }
 
