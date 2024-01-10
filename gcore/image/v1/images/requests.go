@@ -38,14 +38,16 @@ type CreateOptsBuilder interface {
 
 // CreateOpts represents options used to create an image.
 type CreateOpts struct {
-	Name           string                `json:"name" required:"true" validate:"required"`
-	HwMachineType  types.HwMachineType   `json:"hw_machine_type" validate:"required,enum"`
-	SshKey         types.SshKeyType      `json:"ssh_key" validate:"required,enum"`
-	OSType         types.OSType          `json:"os_type" validate:"required,enum"`
-	IsBaremetal    *bool                 `json:"is_baremetal,omitempty"`
-	HwFirmwareType types.HwFirmwareType  `json:"hw_firmware_type" validate:"required,enum"`
-	Source         types.ImageSourceType `json:"source" validate:"required,enum"`
-	VolumeID       string                `json:"volume_id" required:"true" validate:"required"`
+	Name           string                      `json:"name" required:"true" validate:"required"`
+	HwMachineType  types.HwMachineType         `json:"hw_machine_type,omitempty" validate:"enum"`
+	SshKey         types.SshKeyType            `json:"ssh_key,omitempty" validate:"required,enum"`
+	OSType         types.OSType                `json:"os_type" validate:"required,enum"`
+	IsBaremetal    *bool                       `json:"is_baremetal,omitempty"`
+	HwFirmwareType types.HwFirmwareType        `json:"hw_firmware_type,omitempty" validate:"enum"`
+	Source         types.ImageSourceType       `json:"source" validate:"required,enum"`
+	VolumeID       string                      `json:"volume_id" required:"true" validate:"required"`
+	Metadata       map[string]string           `json:"metadata,omitempty"`
+	Architecture   types.ImageArchitectureType `json:"architecture,omitempty" validate:"enum"`
 }
 
 /*
@@ -102,18 +104,18 @@ type UploadOptsBuilder interface {
 
 // UploadOpts represents options used to upload an image.
 type UploadOpts struct {
-	OsVersion      string               `json:"os_version,omitempty"`
-	HwMachineType  types.HwMachineType  `json:"hw_machine_type" validate:"required,enum"`
-	SshKey         types.SshKeyType     `json:"ssh_key" validate:"required,enum"`
-	Name           string               `json:"name" required:"true" validate:"required"`
-	OsDistro       string               `json:"os_distro,omitempty"`
-	OSType         types.OSType         `json:"os_type" validate:"required,enum"`
-	URL            string               `json:"url" required:"true" validate:"required,url"`
-	IsBaremetal    *bool                `json:"is_baremetal,omitempty"`
-	HwFirmwareType types.HwFirmwareType `json:"hw_firmware_type" validate:"required,enum"`
-	CowFormat      bool                 `json:"cow_format"`
-	Metadata       map[string]string    `json:"metadata,omitempty"`
-	Architecture   string               `json:"architecture,omitempty"`
+	OsVersion      string                      `json:"os_version,omitempty"`
+	HwMachineType  types.HwMachineType         `json:"hw_machine_type,omitempty" validate:"enum"`
+	SshKey         types.SshKeyType            `json:"ssh_key,omitempty" validate:"enum"`
+	Name           string                      `json:"name" required:"true" validate:"required"`
+	OsDistro       string                      `json:"os_distro,omitempty"`
+	OSType         types.OSType                `json:"os_type" validate:"enum"`
+	URL            string                      `json:"url" required:"true" validate:"required,url"`
+	IsBaremetal    *bool                       `json:"is_baremetal,omitempty"`
+	HwFirmwareType types.HwFirmwareType        `json:"hw_firmware_type,omitempty" validate:"enum"`
+	CowFormat      bool                        `json:"cow_format"`
+	Metadata       map[string]string           `json:"metadata,omitempty"`
+	Architecture   types.ImageArchitectureType `json:"architecture,omitempty" validate:"enum"`
 }
 
 // Validate

@@ -140,38 +140,49 @@ var imageCreateCommand = cli.Command{
 		&cli.StringFlag{
 			Name:     "volume-id",
 			Aliases:  []string{"v"},
-			Usage:    "Required if source is volume",
+			Usage:    "Id of the source volume",
 			Required: true,
 		},
 		&cli.StringFlag{
-			Name:     "hw-firmware-type",
-			Usage:    "Specifies the type of firmware with which to boot the guest. Available value is 'bios', 'uefi'",
-			Required: true,
+			Name:  "hw-firmware-type",
+			Usage: "Specifies the type of firmware with which to boot the guest. Available value is 'bios', 'uefi'",
 		},
 		&cli.StringFlag{
-			Name:     "hw-machine-type",
-			Usage:    "A virtual chipset type. Available value is 'i440', 'q35'",
-			Required: true,
+			Name:  "hw-machine-type",
+			Usage: "A virtual chipset type. Available value is 'i440', 'q35'. Cannot be provided for 'aarch64' images",
 		},
 		&cli.StringFlag{
-			Name:     "ssh-key",
-			Usage:    "Permission to use a ssh key in instances. Available value is 'allow', 'deny', 'required'",
-			Required: true,
+			Name:  "architecture",
+			Usage: "The architecture of the image. Available values are 'x86_64', 'aarch64'. Default to 'x86_64'",
 		},
 		&cli.StringFlag{
-			Name:     "os-type",
-			Usage:    "The operating system installed on the image. Available value is 'windows', 'linux'",
-			Required: true,
+			Name:  "ssh-key",
+			Usage: "Permission to use a ssh key in instances. Available value is 'allow', 'deny', 'required'. Default to 'allow'",
+		},
+		&cli.StringFlag{
+			Name:  "os-type",
+			Usage: "The operating system installed on the image. Available value is 'windows', 'linux'",
 		},
 		&cli.BoolFlag{
 			Name:  "is-baremetal",
 			Usage: "Set to true if the image will be used by baremetal instances. Defaults to false.",
+		},
+		&cli.StringSliceFlag{
+			Name:     "metadata",
+			Usage:    "Image metadata. Example: --metadata one=two --metadata three=four",
+			Required: false,
 		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
 		downloadClient, err := client.NewDownloadImageClientV1(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		metadata, err := StringSliceToMetadata(c.StringSlice("metadata"))
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "create")
 			return cli.NewExitError(err, 1)
 		}
 
@@ -182,8 +193,10 @@ var imageCreateCommand = cli.Command{
 			OSType:         types.OSType(c.String("os-type")),
 			IsBaremetal:    utils.BoolToPointer(c.Bool("is-baremetal")),
 			HwFirmwareType: types.HwFirmwareType(c.String("hw-firmware-type")),
+			Architecture:   types.ImageArchitectureType(c.String("architecture")),
 			Source:         types.ImageSourceVolume,
 			VolumeID:       c.String("volume-id"),
+			Metadata:       metadata,
 		}
 
 		results, err := images.Create(downloadClient, opts).Extract()
@@ -333,29 +346,24 @@ var imageUploadCommand = cli.Command{
 			Required: true,
 		},
 		&cli.StringFlag{
-			Name:     "hw-firmware-type",
-			Usage:    "Specifies the type of firmware with which to boot the guest. Available values are 'bios', 'uefi'",
-			Required: true,
+			Name:  "hw-firmware-type",
+			Usage: "Specifies the type of firmware with which to boot the guest. Available values are 'bios', 'uefi'",
 		},
 		&cli.StringFlag{
-			Name:     "hw-machine-type",
-			Usage:    "A virtual chipset type. Available values are 'i440', 'q35'",
-			Required: true,
+			Name:  "hw-machine-type",
+			Usage: "A virtual chipset type. Available values are 'i440', 'q35'. Cannot be provided for 'aarch64' images",
 		},
 		&cli.StringFlag{
-			Name:     "ssh-key",
-			Usage:    "Permission to use a ssh key in instances. Available values are 'allow', 'deny', 'required'",
-			Required: true,
+			Name:  "ssh-key",
+			Usage: "Permission to use a ssh key in instances. Available values are 'allow', 'deny', 'required'. Default to 'allow'",
 		},
 		&cli.StringFlag{
-			Name:     "os-type",
-			Usage:    "The operating system installed on the image. Available values are 'windows', 'linux'",
-			Required: true,
+			Name:  "os-type",
+			Usage: "The operating system installed on the image. Available values are 'windows', 'linux'",
 		},
 		&cli.StringFlag{
-			Name:     "architecture",
-			Usage:    "The architecture of the image. Available values are 'x86_64', 'aarch64'",
-			Required: true,
+			Name:  "architecture",
+			Usage: "The architecture of the image. Available values are 'x86_64', 'aarch64'. Default to 'x86_64'",
 		},
 		&cli.BoolFlag{
 			Name:  "is-baremetal",
@@ -381,7 +389,7 @@ var imageUploadCommand = cli.Command{
 		}
 
 		opts := images.UploadOpts{
-			Architecture:   c.String("architecture"),
+			Architecture:   types.ImageArchitectureType(c.String("architecture")),
 			OsVersion:      c.String("os-version"),
 			HwMachineType:  types.HwMachineType(c.String("hw-machine-type")),
 			SshKey:         types.SshKeyType(c.String("ssh-key")),

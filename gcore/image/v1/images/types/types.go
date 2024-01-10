@@ -10,6 +10,9 @@ type Visibility string
 // HwMachineType virtual chipset type.
 type HwMachineType string
 
+// ImageArchitectureType an image architecture type.
+type ImageArchitectureType string
+
 // SshKeyType whether the image supports SSH key or not
 type SshKeyType string
 
@@ -28,6 +31,9 @@ const (
 
 	HwMachineI440 HwMachineType = "i440"
 	HwMachineQ35  HwMachineType = "q35"
+
+	ArchitectureAarch64 ImageArchitectureType = "aarch64"
+	ArchitectureX8664   ImageArchitectureType = "x86_64"
 
 	SshKeyAllow    SshKeyType = "allow"
 	SshKeyDeny     SshKeyType = "deny"
@@ -149,6 +155,61 @@ func (v *HwMachineType) UnmarshalJSON(data []byte) error {
 
 // MarshalJSON - implements Marshaler interface for HwMachineType
 func (v *HwMachineType) MarshalJSON() ([]byte, error) {
+	return json.Marshal(v.String())
+}
+
+func (v ImageArchitectureType) IsValid() error {
+	switch v {
+	case ArchitectureAarch64, ArchitectureX8664:
+		return nil
+	}
+	return fmt.Errorf("invalid ImageArchitectureType type: %v", v)
+}
+
+func (v ImageArchitectureType) ValidOrNil() (*ImageArchitectureType, error) {
+	if v.String() == "" {
+		return nil, nil
+	}
+	err := v.IsValid()
+	if err != nil {
+		return &v, err
+	}
+	return &v, nil
+}
+
+func (v ImageArchitectureType) String() string {
+	return string(v)
+}
+
+func (v ImageArchitectureType) List() []ImageArchitectureType {
+	return []ImageArchitectureType{ArchitectureAarch64, ArchitectureX8664}
+}
+
+func (v ImageArchitectureType) StringList() []string {
+	var s []string
+	for _, v := range v.List() {
+		s = append(s, v.String())
+	}
+	return s
+}
+
+// UnmarshalJSON - implements Unmarshaler interface for ImageArchitectureType
+func (v *ImageArchitectureType) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	vt := ImageArchitectureType(s)
+	err := vt.IsValid()
+	if err != nil {
+		return err
+	}
+	*v = vt
+	return nil
+}
+
+// MarshalJSON - implements Marshaler interface for ImageArchitectureType
+func (v *ImageArchitectureType) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.String())
 }
 
