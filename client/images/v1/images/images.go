@@ -193,7 +193,7 @@ var imageCreateCommand = cli.Command{
 			OSType:         types.OSType(c.String("os-type")),
 			IsBaremetal:    utils.BoolToPointer(c.Bool("is-baremetal")),
 			HwFirmwareType: types.HwFirmwareType(c.String("hw-firmware-type")),
-			Architecture:   c.String("architecture"),
+			Architecture:   types.ImageArchitectureType(c.String("architecture")),
 			Source:         types.ImageSourceVolume,
 			VolumeID:       c.String("volume-id"),
 			Metadata:       metadata,
@@ -389,7 +389,7 @@ var imageUploadCommand = cli.Command{
 		}
 
 		opts := images.UploadOpts{
-			Architecture:   c.String("architecture"),
+			Architecture:   types.ImageArchitectureType(c.String("architecture")),
 			OsVersion:      c.String("os-version"),
 			HwMachineType:  types.HwMachineType(c.String("hw-machine-type")),
 			SshKey:         types.SshKeyType(c.String("ssh-key")),

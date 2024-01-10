@@ -105,7 +105,7 @@ const UploadRequest = `
 
 const UpdateRequest = `
 {
-  "hw_machine_type": "i440",
+  "hw_machine_type": "pc",
   "ssh_key": "allow",
   "name": "string",
   "os_type": "linux",

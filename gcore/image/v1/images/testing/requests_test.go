@@ -171,6 +171,7 @@ func TestCreate(t *testing.T) {
 	options := images.CreateOpts{
 		Name:           "test_image",
 		HwMachineType:  types.HwMachineQ35,
+		Architecture:   types.ArchitectureX8664,
 		SshKey:         types.SshKeyAllow,
 		OSType:         types.OsLinux,
 		IsBaremetal:    &isBm,

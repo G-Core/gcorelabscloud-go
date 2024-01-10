@@ -34,6 +34,7 @@ func TestImageMetadata(t *testing.T) {
 		URL:            "http://mirror.noris.net/cirros/0.4.0/cirros-0.4.0-x86_64-disk.img",
 		HwFirmwareType: "uefi",
 		Metadata:       map[string]string{"key1": "val1", "key2": "val2"},
+		Architecture:   "x86_64",
 	}
 
 	res, err := images.Upload(downloadClient, opts).Extract()
