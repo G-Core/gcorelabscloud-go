@@ -55,14 +55,17 @@ func (opts ListOpts) ToListenerListQuery() (string, error) {
 
 // CreateOpts represents options used to create a listener pool.
 type CreateOpts struct {
-	Name             string             `json:"name" required:"true" validate:"required,name"`
-	Protocol         types.ProtocolType `json:"protocol" required:"true"`
-	ProtocolPort     int                `json:"protocol_port" required:"true"`
-	LoadBalancerID   string             `json:"loadbalancer_id" required:"true"`
-	InsertXForwarded bool               `json:"insert_x_forwarded"`
-	SecretID         string             `json:"secret_id,omitempty"`
-	SNISecretID      []string           `json:"sni_secret_id,omitempty"`
-	AllowedCIDRS     []string           `json:"allowed_cidrs,omitempty" validate:"omitempty,dive,cidr"`
+	Name                 string             `json:"name" required:"true" validate:"required,name"`
+	Protocol             types.ProtocolType `json:"protocol" required:"true"`
+	ProtocolPort         int                `json:"protocol_port" required:"true"`
+	LoadBalancerID       string             `json:"loadbalancer_id" required:"true"`
+	InsertXForwarded     bool               `json:"insert_x_forwarded"`
+	SecretID             string             `json:"secret_id,omitempty"`
+	SNISecretID          []string           `json:"sni_secret_id,omitempty"`
+	AllowedCIDRS         []string           `json:"allowed_cidrs,omitempty" validate:"omitempty,dive,cidr"`
+	TimeoutClientData    *int               `json:"timeout_client_data,omitempty"`
+	TimeoutMemberData    *int               `json:"timeout_member_data,omitempty"`
+	TimeoutMemberConnect *int               `json:"timeout_member_connect,omitempty"`
 }
 
 // ToListenerCreateMap builds a request body from CreateOpts.
@@ -91,10 +94,13 @@ type UpdateOptsBuilder interface {
 
 // UpdateOpts represents options used to update a listener.
 type UpdateOpts struct {
-	Name         string   `json:"name,omitempty"`
-	SecretID     string   `json:"secret_id,omitempty"`
-	SNISecretID  []string `json:"sni_secret_id,omitempty"`
-	AllowedCIDRS []string `json:"allowed_cidrs,omitempty" validate:"omitempty,dive,cidr"`
+	Name                 string   `json:"name,omitempty"`
+	SecretID             string   `json:"secret_id,omitempty"`
+	SNISecretID          []string `json:"sni_secret_id,omitempty"`
+	AllowedCIDRS         []string `json:"allowed_cidrs,omitempty" validate:"omitempty,dive,cidr"`
+	TimeoutClientData    *int     `json:"timeout_client_data,omitempty"`
+	TimeoutMemberData    *int     `json:"timeout_member_data,omitempty"`
+	TimeoutMemberConnect *int     `json:"timeout_member_connect,omitempty"`
 }
 
 // ToListenerUpdateMap builds a request body from UpdateOpts.
