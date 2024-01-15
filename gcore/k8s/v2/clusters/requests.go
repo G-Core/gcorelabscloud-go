@@ -16,14 +16,17 @@ type CreateOptsBuilder interface {
 
 // CreateOpts represents options used to create a cluster.
 type CreateOpts struct {
-	Name           string             `json:"name" required:"true" validate:"required,gt=0,lte=20"`
-	FixedNetwork   string             `json:"fixed_network" required:"true" validate:"required,uuid4"`
-	FixedSubnet    string             `json:"fixed_subnet" required:"true" validate:"required,uuid4"`
-	PodsIPPool     *gcorecloud.CIDR   `json:"pods_ip_pool,omitempty" validate:"omitempty,cidr"`
-	ServicesIPPool *gcorecloud.CIDR   `json:"services_ip_pool,omitempty" validate:"omitempty,cidr"`
-	KeyPair        string             `json:"keypair" required:"true" validate:"required"`
-	Version        string             `json:"version" required:"true" validate:"required"`
-	Pools          []pools.CreateOpts `json:"pools" required:"true" validate:"required,min=1,dive"`
+	Name             string             `json:"name" required:"true" validate:"required,gt=0,lte=20"`
+	FixedNetwork     string             `json:"fixed_network" required:"true" validate:"required,uuid4"`
+	FixedSubnet      string             `json:"fixed_subnet" required:"true" validate:"required,uuid4"`
+	PodsIPPool       *gcorecloud.CIDR   `json:"pods_ip_pool,omitempty" validate:"omitempty,cidr"`
+	ServicesIPPool   *gcorecloud.CIDR   `json:"services_ip_pool,omitempty" validate:"omitempty,cidr"`
+	PodsIPV6Pool     *gcorecloud.CIDR   `json:"pods_ipv6_pool,omitempty" validate:"omitempty,cidr"`
+	ServicesIPV6Pool *gcorecloud.CIDR   `json:"services_ipv6_pool,omitempty" validate:"omitempty,cidr"`
+	KeyPair          string             `json:"keypair" required:"true" validate:"required"`
+	Version          string             `json:"version" required:"true" validate:"required"`
+	IsIPV6           bool               `json:"is_ipv6,omitempty"`
+	Pools            []pools.CreateOpts `json:"pools" required:"true" validate:"required,min=1,dive"`
 }
 
 // ToClusterCreateMap builds a request body from CreateOpts.

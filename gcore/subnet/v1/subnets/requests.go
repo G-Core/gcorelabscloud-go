@@ -59,6 +59,7 @@ type CreateOpts struct {
 	DNSNameservers         []net.IP          `json:"dns_nameservers,omitempty"`
 	HostRoutes             []HostRoute       `json:"host_routes,omitempty"`
 	GatewayIP              *net.IP           `json:"gateway_ip"`
+	IPVersion              int               `json:"ip_version,omitempty"`
 	Metadata               map[string]string `json:"metadata,omitempty"`
 }
 
