@@ -17,8 +17,8 @@ type CreateOptsBuilder interface {
 // CreateOpts represents options used to create a cluster.
 type CreateOpts struct {
 	Name             string             `json:"name" required:"true" validate:"required,gt=0,lte=20"`
-	FixedNetwork     string             `json:"fixed_network" validate:"uuid4"`
-	FixedSubnet      string             `json:"fixed_subnet" validate:"uuid4"`
+	FixedNetwork     string             `json:"fixed_network" validate:"omitempty,uuid4"`
+	FixedSubnet      string             `json:"fixed_subnet" validate:"omitempty,uuid4"`
 	PodsIPPool       *gcorecloud.CIDR   `json:"pods_ip_pool,omitempty" validate:"omitempty,cidr"`
 	ServicesIPPool   *gcorecloud.CIDR   `json:"services_ip_pool,omitempty" validate:"omitempty,cidr"`
 	PodsIPV6Pool     *gcorecloud.CIDR   `json:"pods_ipv6_pool,omitempty" validate:"omitempty,cidr"`
