@@ -191,6 +191,44 @@ func Update(c *gcorecloud.ServiceClient, lbpoolID string, opts UpdateOptsBuilder
 	return
 }
 
+// UnsetOptsBuilder allows extensions to add additional parameters to the Unset request.
+type UnsetOptsBuilder interface {
+	ToLBPoolUnsetMap() (map[string]interface{}, error)
+}
+
+// UnsetOpts represents options used to unset lbpool fields.
+type UnsetOpts struct {
+	SessionPersistence  bool  `json:"session_persistence"`
+}
+
+// ToLBPoolUnsetMap builds a request body from UnsetOpts.
+func (opts UnsetOpts) ToLBPoolUnsetMap() (map[string]interface{}, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return nil, err
+	}
+	return gcorecloud.BuildRequestBody(opts, "")
+}
+
+// Unset accepts a UnsetOpts struct and unsets an existing lbpool fields using the
+// values provided.
+func Unset(c *gcorecloud.ServiceClient, lbpoolID string, opts UnsetOptsBuilder) (r tasks.Result) {
+	b, err := opts.ToLBPoolUnsetMap()
+	sp, ok := b["session_persistence"]
+	if ok && sp.(bool) {
+		b["session_persistence"] = nil
+	} else {
+		delete(b, "session_persistence")
+	}
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = c.Patch(updateURL(c, lbpoolID), b, &r.Body, &gcorecloud.RequestOpts{
+		OkCodes: []int{200, 201},
+	})
+	return
+}
+
 // Delete accepts a unique ID and deletes the lbpool associated with it.
 func Delete(c *gcorecloud.ServiceClient, lbpoolID string) (r tasks.Result) {
 	_, r.Err = c.DeleteWithResponse(deleteURL(c, lbpoolID), &r.Body, nil)

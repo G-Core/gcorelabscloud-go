@@ -880,6 +880,52 @@ var lbpoolUpdateSubCommand = cli.Command{
 	},
 }
 
+var lbpoolUnsetSubCommand = cli.Command{
+	Name:      "unset",
+	Usage:     "unset loadbalancer pool fields",
+	ArgsUsage: "<pool_id>",
+	Category:  "pool",
+	Flags: append([]cli.Flag{
+		&cli.BoolFlag{
+			Name:     "session-persistence",
+			Aliases:  []string{"sp"},
+			Usage:    "Disables session persistence on the pool",
+			Required: false,
+		},
+	}, flags.WaitCommandFlags...),
+	Action: func(c *cli.Context) error {
+		lbPoolID, err := flags.GetFirstStringArg(c, lbpoolIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "unset")
+			return err
+		}
+		client, err := client.NewLBPoolClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+		opts := lbpools.UnsetOpts{
+			SessionPersistence: c.Bool("session-persistence"),
+		}
+		results, err := lbpools.Unset(client, lbPoolID, opts).Extract()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		return utils.WaitTaskAndShowResult(c, client, results, true, func(task tasks.TaskID) (interface{}, error) {
+			_, err := tasks.Get(client, string(task)).Extract()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
+			}
+			lbpool, err := lbpools.Get(client, lbPoolID).Extract()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get lbpool with ID: %s. Error: %w", lbPoolID, err)
+			}
+			utils.ShowResults(lbpool, c.String("format"))
+			return nil, nil
+		})
+	},
+}
+
 var lbpoolCreateHealthMonitorSubCommand = cli.Command{
 	Name:      "create",
 	Usage:     "create pool's health monitor",
@@ -1016,6 +1062,7 @@ var PoolCommands = cli.Command{
 		&lbpoolUpdateSubCommand,
 		&lbpoolDeleteSubCommand,
 		&lbpoolCreateSubCommand,
+		&lbpoolUnsetSubCommand,
 		{
 			Name:  "member",
 			Usage: "GCloud loadbalancer pool members API",
