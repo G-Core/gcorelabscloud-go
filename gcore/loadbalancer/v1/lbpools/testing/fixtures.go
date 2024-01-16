@@ -145,6 +145,12 @@ const UpdateRequest = `
 }	
 `
 
+const UnsetRequest = `
+{
+  "session_persistence": null
+}
+`
+
 const CreateResponse = `
 {
   "tasks": [
@@ -178,6 +184,14 @@ const DeleteMemberResponse = `
 `
 
 const UpdateResponse = `
+{
+  "tasks": [
+    "50f53a35-42ed-40c4-82b2-5a37fb3e00bc"
+  ]
+}
+`
+
+const UnsetResponse = `
 {
   "tasks": [
     "50f53a35-42ed-40c4-82b2-5a37fb3e00bc"
