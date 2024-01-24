@@ -123,6 +123,19 @@ type CreateListenerOpts struct {
 	AllowedCIDRS     []string           `json:"allowed_cidrs,omitempty" validate:"omitempty,dive,cidr"`
 }
 
+// CreateLoggingOpts represents options used to configure logging for a loadbalancer.
+type CreateLoggingOpts struct {
+	Enabled             bool                       `json:"enabled"`
+	TopicName           string                     `json:"topic_name,omitempty"`
+	DestinationRegionID int                        `json:"destination_region_id,omitempty"`
+	RetentionPolicy     *CreateRetentionPolicyOpts `json:"retention_policy,omitempty" validate:"omitempty,dive"`
+}
+
+// CreateRetentionPolicyOpts represents options used to configure logging topic retention policy for a loadbalancer.
+type CreateRetentionPolicyOpts struct {
+	Period int `json:"period,omitempty"`
+}
+
 // CreateOpts represents options used to create a loadbalancer.
 type CreateOpts struct {
 	Name         string                                      `json:"name" required:"true" validate:"required,name"`
@@ -135,6 +148,7 @@ type CreateOpts struct {
 	Tags         []string                                    `json:"tag,omitempty"`
 	Metadata     map[string]string                           `json:"metadata,omitempty"`
 	FloatingIP   *instances.CreateNewInterfaceFloatingIPOpts `json:"floating_ip,omitempty"`
+	Logging      *CreateLoggingOpts                          `json:"logging,omitempty"`
 }
 
 // ToLoadBalancerCreateMap builds a request body from CreateOpts.
@@ -161,9 +175,23 @@ type UpdateOptsBuilder interface {
 	ToLoadBalancerUpdateMap() (map[string]interface{}, error)
 }
 
+// UpdateLoggingOpts represents options used to configure logging for a loadbalancer.
+type UpdateLoggingOpts struct {
+	Enabled             bool                       `json:"enabled"`
+	TopicName           string                     `json:"topic_name,omitempty"`
+	DestinationRegionID int                        `json:"destination_region_id,omitempty"`
+	RetentionPolicy     *UpdateRetentionPolicyOpts `json:"retention_policy,omitempty" validate:"omitempty,dive"`
+}
+
+// UpdateRetentionPolicyOpts represents options used to configure logging topic retention policy for a loadbalancer.
+type UpdateRetentionPolicyOpts struct {
+	Period int `json:"period,omitempty"`
+}
+
 // UpdateOpts represents options used to update a loadbalancer.
 type UpdateOpts struct {
-	Name string `json:"name,omitempty" required:"true" validate:"required,name"`
+	Name    string             `json:"name,omitempty"`
+	Logging *UpdateLoggingOpts `json:"logging,omitempty"`
 }
 
 // ToLoadBalancerUpdateMap builds a request body from UpdateOpts.

@@ -92,7 +92,8 @@ type LoadBalancer struct {
 	Metadata           []metadata.Metadata      `json:"metadata"`
 	DdosProfile        *ddos.Profile            `json:"ddos_profile"`
 	VrrpIPs            []NetworkPortFixedIP     `json:"vrrp_ips"`
-	VipIPFamilyType	   types.IPFamilyType		`json:"vip_ip_family"`
+	VipIPFamilyType    types.IPFamilyType       `json:"vip_ip_family"`
+	Logging            *Logging                 `json:"logging"`
 }
 
 // NetworkPortFixedIP represents VRRP entry structure.
@@ -103,6 +104,19 @@ type NetworkPortFixedIP struct {
 
 func (lb LoadBalancer) IsDeleted() bool {
 	return lb.ProvisioningStatus == types.ProvisioningStatusDeleted
+}
+
+// Logging represents logging configuration for a loadbalancer.
+type Logging struct {
+	Enabled             bool             `json:"enabled"`
+	TopicName           string           `json:"topic_name"`
+	DestinationRegionID int              `json:"destination_region_id"`
+	RetentionPolicy     *RetentionPolicy `json:"retention_policy"`
+}
+
+// RetentionPolicy represents log retention policy configuration for a loadbalancer.
+type RetentionPolicy struct {
+	Period int `json:"period"`
 }
 
 // LoadBalancerPage is the page returned by a pager when traversing over a
