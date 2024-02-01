@@ -97,6 +97,34 @@ var listenerCreateSubCommand = cli.Command{
 			Name:  "allowed-cidrs",
 			Usage: "List of networks from which listener is accessible",
 		},
+		&cli.IntFlag{
+			Name:     "timeout-client-data",
+			Aliases:  []string{"tcd"},
+			Usage:    "Frontend client inactivity timeout in milliseconds",
+			Value: 50000,
+			Required: false,
+		},
+		&cli.IntFlag{
+			Name:     "timeout-member-connect",
+			Aliases:  []string{"tmc"},
+			Usage:    "Backend member connection timeout in milliseconds",
+			Value: 5000,
+			Required: false,
+		},
+		&cli.IntFlag{
+			Name:     "timeout-member-data",
+			Aliases:  []string{"tmd"},
+			Usage:    "Backend member inactivity timeout in milliseconds",
+			Value: 50000,
+			Required: false,
+		},
+		&cli.IntFlag{
+			Name:     "connection-limit",
+			Aliases:  []string{"cl"},
+			Usage:    "Limit of the simultaneous connections",
+			Value: 100000,
+			Required: false,
+		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
 		client, err := client.NewLBListenerClientV1(c)
@@ -118,6 +146,26 @@ var listenerCreateSubCommand = cli.Command{
 			SecretID:       c.String("secret-id"),
 			SNISecretID:    c.StringSlice("sni-secret-id"),
 			AllowedCIDRS:	c.StringSlice("allowed-cidrs") ,
+		}
+		timeoutClientDataSet := c.IsSet("timeout-client-data")
+		if timeoutClientDataSet {
+			timeoutClientData := c.Int("timeout-client-data")
+			opts.TimeoutClientData = &timeoutClientData
+		}
+		timeoutMemberConnectSet := c.IsSet("timeout-member-connect")
+		if timeoutMemberConnectSet {
+			timeoutMemberConnect := c.Int("timeout-member-connect")
+			opts.TimeoutMemberConnect = &timeoutMemberConnect
+		}
+		timeoutMemberDataSet := c.IsSet("timeout-member-data")
+		if timeoutMemberDataSet {
+			timeoutMemberData := c.Int("timeout-member-data")
+			opts.TimeoutMemberData = &timeoutMemberData
+		}
+		connectionLimitSet := c.IsSet("connection-limit")
+		if connectionLimitSet {
+			connectionLimit := c.Int("connection-limit")
+			opts.ConnectionLimit = &connectionLimit
 		}
 	
 		results, err := listeners.Create(client, opts).Extract()
@@ -217,11 +265,43 @@ var listenerUpdateSubCommand = cli.Command{
 			Name:     "name",
 			Aliases:  []string{"n"},
 			Usage:    "listener name",
-			Required: true,
+		},
+		&cli.StringFlag{
+			Name:    "secret-id",
+			Aliases: []string{"s"},
+			Usage:   "ID of the secret where PKCS12 file is stored for TERMINATED_HTTPS load balancer",
+		},
+		&cli.StringSliceFlag{
+			Name:  "sni-secret-id",
+			Usage: "List of secret's ID containing PKCS12 format certificate/key bundles for TERMINATED_HTTPS listeners",
+		},
+		&cli.StringSliceFlag{
+			Name:  "allowed-cidrs",
+			Usage: "List of networks from which listener is accessible",
+		},
+		&cli.IntFlag{
+			Name:     "timeout-client-data",
+			Aliases:  []string{"tcd"},
+			Usage:    "Frontend client inactivity timeout in milliseconds",
+		},
+		&cli.IntFlag{
+			Name:     "timeout-member-connect",
+			Aliases:  []string{"tmc"},
+			Usage:    "Backend member connection timeout in milliseconds",
+		},
+		&cli.IntFlag{
+			Name:     "timeout-member-data",
+			Aliases:  []string{"tmd"},
+			Usage:    "Backend member inactivity timeout in milliseconds",
+		},
+		&cli.IntFlag{
+			Name:     "connection-limit",
+			Aliases:  []string{"cl"},
+			Usage:    "Limit of the simultaneous connections",
 		},
 	},
 	Action: func(c *cli.Context) error {
-		clusterID, err := flags.GetFirstStringArg(c, listenerIDText)
+		listenerID, err := flags.GetFirstStringArg(c, listenerIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "update")
 			return err
@@ -231,10 +311,34 @@ var listenerUpdateSubCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
+		opts := listeners.UpdateOpts{
+			Name: c.String("name"),
+			SecretID: c.String("secret-id"),
+			SNISecretID: c.StringSlice("sni-secret-id"),
+			AllowedCIDRS: c.StringSlice("allowed-cidrs"),
+		}
+		timeoutClientDataSet := c.IsSet("timeout-client-data")
+		if timeoutClientDataSet {
+			timeoutClientData := c.Int("timeout-client-data")
+			opts.TimeoutClientData = &timeoutClientData
+		}
+		timeoutMemberConnectSet := c.IsSet("timeout-member-connect")
+		if timeoutMemberConnectSet {
+			timeoutMemberConnect := c.Int("timeout-member-connect")
+			opts.TimeoutMemberConnect = &timeoutMemberConnect
+		}
+		timeoutMemberDataSet := c.IsSet("timeout-member-data")
+		if timeoutMemberDataSet {
+			timeoutMemberData := c.Int("timeout-member-data")
+			opts.TimeoutMemberData = &timeoutMemberData
+		}
+		connectionLimitSet := c.IsSet("connection-limit")
+		if connectionLimitSet {
+			connectionLimit := c.Int("connection-limit")
+			opts.ConnectionLimit = &connectionLimit
+		}
 
-		opts := listeners.UpdateOpts{Name: c.String("name")}
-
-		result, err := listeners.Update(client, clusterID, opts).Extract()
+		result, err := listeners.Update(client, listenerID, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}

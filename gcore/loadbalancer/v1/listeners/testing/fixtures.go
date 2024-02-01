@@ -20,7 +20,11 @@ const ListResponse = `
       "id": "43658ea9-54bd-4807-90b1-925921c9a0d1",
       "protocol": "TCP",
       "provisioning_status": "ACTIVE",
-      "allowed_cidrs": ["10.10.0.0/24"]
+      "allowed_cidrs": ["10.10.0.0/24"],
+      "timeout_client_data": 50000,
+      "timeout_member_data": 50000,
+      "timeout_member_connect": 5000,
+      "connection_limit": 100000
     }
   ]
 }
@@ -37,7 +41,11 @@ const GetResponse = `
   "id": "43658ea9-54bd-4807-90b1-925921c9a0d1",
   "protocol": "TCP",
   "provisioning_status": "ACTIVE",
-  "allowed_cidrs": ["10.10.0.0/24"]
+  "allowed_cidrs": ["10.10.0.0/24"],
+  "timeout_client_data": 50000,
+  "timeout_member_data": 50000,
+  "timeout_member_connect": 5000,
+  "connection_limit": 100000
 }
 `
 
@@ -82,20 +90,28 @@ const DeleteResponse = `
 `
 
 var (
-	creatorTaskID = "9f3ec11e-bcd4-4fe6-924a-a4439a56ad22"
-	taskID        = "9f3ec11e-bcd4-4fe6-924a-a4439a56ad22"
+	creatorTaskID        = "9f3ec11e-bcd4-4fe6-924a-a4439a56ad22"
+	taskID               = "9f3ec11e-bcd4-4fe6-924a-a4439a56ad22"
+	timeoutClientData    = 50000
+	timeoutMemberData    = 50000
+	timeoutMemberConnect = 5000
+	connectionLimit      = 100000
 
 	Listener1 = listeners.Listener{
-		PoolCount:          1,
-		ProtocolPort:       80,
-		Protocol:           types.ProtocolTypeTCP,
-		Name:               "lbaas_test_listener",
-		ID:                 "43658ea9-54bd-4807-90b1-925921c9a0d1",
-		ProvisioningStatus: types.ProvisioningStatusActive,
-		OperationStatus:    types.OperatingStatusOnline,
-		CreatorTaskID:      &creatorTaskID,
-		TaskID:             &taskID,
-    AllowedCIDRS:       []string{"10.10.0.0/24"},
+		PoolCount:            1,
+		ProtocolPort:         80,
+		Protocol:             types.ProtocolTypeTCP,
+		Name:                 "lbaas_test_listener",
+		ID:                   "43658ea9-54bd-4807-90b1-925921c9a0d1",
+		ProvisioningStatus:   types.ProvisioningStatusActive,
+		OperationStatus:      types.OperatingStatusOnline,
+		CreatorTaskID:        &creatorTaskID,
+		TaskID:               &taskID,
+		AllowedCIDRS:         []string{"10.10.0.0/24"},
+		TimeoutClientData:    &timeoutClientData,
+		TimeoutMemberData:    &timeoutMemberData,
+		TimeoutMemberConnect: &timeoutMemberConnect,
+		ConnectionLimit:      &connectionLimit,
 	}
 	Tasks1 = tasks.TaskResults{
 		Tasks: []tasks.TaskID{"50f53a35-42ed-40c4-82b2-5a37fb3e00bc"},

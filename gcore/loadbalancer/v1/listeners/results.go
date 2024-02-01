@@ -38,18 +38,22 @@ type UpdateResult struct {
 
 // Listener represents a listener structure.
 type Listener struct {
-	PoolCount          int                      `json:"pool_count"`
-	ProtocolPort       int                      `json:"protocol_port"`
-	Protocol           types.ProtocolType       `json:"protocol"`
-	Name               string                   `json:"name"`
-	ID                 string                   `json:"id"`
-	ProvisioningStatus types.ProvisioningStatus `json:"provisioning_status"`
-	OperationStatus    types.OperatingStatus    `json:"operating_status"`
-	CreatorTaskID      *string                  `json:"creator_task_id"`
-	TaskID             *string                  `json:"task_id"`
-	SecretID           *string                  `json:"secret_id"`
-	SNISecretID        []string                 `json:"sni_secret_id,omitempty"`
-	AllowedCIDRS       []string                 `json:"allowed_cidrs,omitempty" validate:"omitempty,dive,cidr"`
+	PoolCount            int                      `json:"pool_count"`
+	ProtocolPort         int                      `json:"protocol_port"`
+	Protocol             types.ProtocolType       `json:"protocol"`
+	Name                 string                   `json:"name"`
+	ID                   string                   `json:"id"`
+	ProvisioningStatus   types.ProvisioningStatus `json:"provisioning_status"`
+	OperationStatus      types.OperatingStatus    `json:"operating_status"`
+	CreatorTaskID        *string                  `json:"creator_task_id"`
+	TaskID               *string                  `json:"task_id"`
+	SecretID             *string                  `json:"secret_id"`
+	SNISecretID          []string                 `json:"sni_secret_id,omitempty"`
+	AllowedCIDRS         []string                 `json:"allowed_cidrs,omitempty" validate:"omitempty,dive,cidr"`
+	TimeoutClientData    *int                     `json:"timeout_client_data,omitempty"`
+	TimeoutMemberData    *int                     `json:"timeout_member_data,omitempty"`
+	TimeoutMemberConnect *int                     `json:"timeout_member_connect,omitempty"`
+	ConnectionLimit      *int                     `json:"connection_limit"`
 }
 
 func (l Listener) IsDeleted() bool {
