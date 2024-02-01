@@ -66,7 +66,7 @@ type CreateOpts struct {
 	TimeoutClientData    *int               `json:"timeout_client_data,omitempty"`
 	TimeoutMemberData    *int               `json:"timeout_member_data,omitempty"`
 	TimeoutMemberConnect *int               `json:"timeout_member_connect,omitempty"`
-	ConnectionLimit		 *int				`json:"connection_limit,omitempty"`
+	ConnectionLimit      *int               `json:"connection_limit,omitempty"`
 }
 
 // ToListenerCreateMap builds a request body from CreateOpts.
@@ -102,7 +102,7 @@ type UpdateOpts struct {
 	TimeoutClientData    *int     `json:"timeout_client_data,omitempty"`
 	TimeoutMemberData    *int     `json:"timeout_member_data,omitempty"`
 	TimeoutMemberConnect *int     `json:"timeout_member_connect,omitempty"`
-	ConnectionLimit		 *int	  `json:"connection_limit,omitempty"`
+	ConnectionLimit      *int     `json:"connection_limit,omitempty"`
 }
 
 // ToListenerUpdateMap builds a request body from UpdateOpts.
