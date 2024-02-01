@@ -317,23 +317,19 @@ var listenerUpdateSubCommand = cli.Command{
 			SNISecretID: c.StringSlice("sni-secret-id"),
 			AllowedCIDRS: c.StringSlice("allowed-cidrs"),
 		}
-		timeoutClientDataSet := c.IsSet("timeout-client-data")
-		if timeoutClientDataSet {
+		if c.IsSet("timeout-client-data") {
 			timeoutClientData := c.Int("timeout-client-data")
 			opts.TimeoutClientData = &timeoutClientData
 		}
-		timeoutMemberConnectSet := c.IsSet("timeout-member-connect")
-		if timeoutMemberConnectSet {
+		if c.IsSet("timeout-member-connect") {
 			timeoutMemberConnect := c.Int("timeout-member-connect")
 			opts.TimeoutMemberConnect = &timeoutMemberConnect
 		}
-		timeoutMemberDataSet := c.IsSet("timeout-member-data")
-		if timeoutMemberDataSet {
+		if c.IsSet("timeout-member-data") {
 			timeoutMemberData := c.Int("timeout-member-data")
 			opts.TimeoutMemberData = &timeoutMemberData
 		}
-		connectionLimitSet := c.IsSet("connection-limit")
-		if connectionLimitSet {
+		if c.IsSet("connection-limit") {
 			connectionLimit := c.Int("connection-limit")
 			opts.ConnectionLimit = &connectionLimit
 		}
