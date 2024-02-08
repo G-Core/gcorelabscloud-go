@@ -17,7 +17,9 @@ import (
 )
 
 // DefaultUserAgent is the default User-Agent string set in the request header.
-const DefaultUserAgent = "gcorecloud/0.0.1"
+const DefaultUserAgent = "gcorecloud/%s"
+
+var AppVersion = "0.0.1"
 
 // UserAgent represents a User-Agent header.
 type UserAgent struct {
@@ -36,7 +38,7 @@ func (ua *UserAgent) Prepend(s ...string) {
 // GCore cloud User-Agent string.
 func (ua *UserAgent) Join() string {
 	// nolint:gocritic
-	uaSlice := append(ua.prepend, DefaultUserAgent)
+	uaSlice := append(ua.prepend, fmt.Sprintf(DefaultUserAgent, AppVersion))
 	return strings.Join(uaSlice, " ")
 }
 
