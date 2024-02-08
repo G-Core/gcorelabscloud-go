@@ -321,7 +321,7 @@ func (jt *JSONRFC3339Milli) UnmarshalJSON(data []byte) error {
 	if err := dec.Decode(&s); err != nil {
 		return err
 	}
-	t, err := time.Parse(RFC3339Milli, s)
+	t, err := ParseHelper(RFC3339Milli, s)
 	if err != nil {
 		return err
 	}
@@ -346,7 +346,7 @@ func (jt *JSONRFC3339MilliNoZ) UnmarshalJSON(data []byte) error {
 	if s == "" {
 		return nil
 	}
-	t, err := time.Parse(RFC3339MilliNoZ, s)
+	t, err := ParseHelper(RFC3339MilliNoZ, s)
 	if err != nil {
 		return err
 	}
@@ -366,7 +366,7 @@ func (jt *JSONRFC1123) UnmarshalJSON(data []byte) error {
 	if s == "" {
 		return nil
 	}
-	t, err := time.Parse(time.RFC1123, s)
+	t, err := ParseHelper(time.RFC1123, s)
 	if err != nil {
 		return err
 	}
@@ -412,7 +412,7 @@ func (jt *JSONRFC3339NoZ) UnmarshalJSON(data []byte) error {
 	if s == "" {
 		return nil
 	}
-	t, err := time.Parse(RFC3339NoZ, s)
+	t, err := ParseHelper(RFC3339NoZ, s)
 	if err != nil {
 		return err
 	}
@@ -446,7 +446,7 @@ func (jt *JSONRFC3339Z) UnmarshalJSON(data []byte) error {
 	if s == "" {
 		return nil
 	}
-	t, err := time.Parse(RFC3339Z, s)
+	t, err := ParseHelper(RFC3339Z, s)
 	if err != nil {
 		return err
 	}
@@ -476,7 +476,7 @@ func (jt *JSONRFC3339ZColon) UnmarshalJSON(data []byte) error {
 	if s == "" {
 		return nil
 	}
-	t, err := time.Parse(RFC3339ZColon, s)
+	t, err := ParseHelper(RFC3339ZColon, s)
 	if err != nil {
 		return err
 	}
@@ -534,7 +534,7 @@ func (jt *JSONRFC3339ZNoT) UnmarshalJSON(data []byte) error {
 	if s == "" {
 		return nil
 	}
-	t, err := time.Parse(RFC3339ZNoT, s)
+	t, err := ParseHelper(RFC3339ZNoT, s)
 	if err != nil {
 		return err
 	}
@@ -557,7 +557,7 @@ func (jt *JSONRFC3339ZNoTNoZ) UnmarshalJSON(data []byte) error {
 	if s == "" {
 		return nil
 	}
-	t, err := time.Parse(RFC3339ZNoTNoZ, s)
+	t, err := ParseHelper(RFC3339ZNoTNoZ, s)
 	if err != nil {
 		return err
 	}
@@ -814,4 +814,14 @@ type ItemIDName struct {
 
 type ItemID struct {
 	ID string `json:"id"`
+}
+
+// ParseHelper try to parse date with provided layout, if it was failed we try to parse it as RFC3339ZZ
+func ParseHelper(layout, date string) (time.Time, error) {
+	t, err := time.Parse(layout, date)
+	if err != nil {
+		t, err = time.Parse(RFC3339ZZ, date)
+	}
+
+	return t, err
 }
