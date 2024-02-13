@@ -14,9 +14,25 @@ type CreateOptsBuilder interface {
 	ToClusterCreateMap() (map[string]interface{}, error)
 }
 
+type CiliumCreateOpts struct {
+	MaskSize                 int             `json:"mask_size,omitempty"`
+	MaskSizeV6               int             `json:"mask_size_v6,omitempty"`
+	Tunnel                   TunnelType      `json:"tunnel,omitempty"`
+	Encryption               bool            `json:"encryption"`
+	LoadBalancerMode         LBModeType      `json:"lb_mode,omitemtpy"`
+	LoadBalancerAcceleration bool            `json:"lb_acceleration"`
+	RoutingMode              RoutingModeType `json:"routing_mode,omitempty"`
+}
+
+type CNICreateOpts struct {
+	Provider CNIProvider       `json:"provider" required:"true" validate:"required"`
+	Cilium   *CiliumCreateOpts `json:"cilium,omitempty"`
+}
+
 // CreateOpts represents options used to create a cluster.
 type CreateOpts struct {
 	Name             string             `json:"name" required:"true" validate:"required,gt=0,lte=20"`
+	CNI              *CNICreateOpts     `json:"cni,omitempty" validate:"omitempty"`
 	FixedNetwork     string             `json:"fixed_network" validate:"omitempty,uuid4"`
 	FixedSubnet      string             `json:"fixed_subnet" validate:"omitempty,uuid4"`
 	PodsIPPool       *gcorecloud.CIDR   `json:"pods_ip_pool,omitempty" validate:"omitempty,cidr"`
