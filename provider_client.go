@@ -427,6 +427,11 @@ func (client *ProviderClient) doRequest(method, url string, options *RequestOpts
 	// Set the User-Agent header
 	req.Header.Set("User-Agent", client.UserAgent.Join())
 
+	// get latest token from client
+	for k, v := range client.AuthenticatedHeaders() {
+		req.Header.Set(k, v)
+	}
+
 	if options.MoreHeaders != nil {
 		for k, v := range options.MoreHeaders {
 			if v != "" {
@@ -435,11 +440,6 @@ func (client *ProviderClient) doRequest(method, url string, options *RequestOpts
 				req.Header.Del(k)
 			}
 		}
-	}
-
-	// get latest token from client
-	for k, v := range client.AuthenticatedHeaders() {
-		req.Header.Set(k, v)
 	}
 
 	// Set connection parameter to close the connection immediately when we've got the response
