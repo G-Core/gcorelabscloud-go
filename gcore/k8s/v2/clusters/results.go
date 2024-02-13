@@ -55,6 +55,21 @@ type GetResult struct {
 	commonResult
 }
 
+type Cilium struct {
+	MaskSize                 int             `json:"mask_size,omitempty"`
+	MaskSizeV6               int             `json:"mask_size_v6,omitempty"`
+	Tunnel                   TunnelType      `json:"tunnel,omitempty"`
+	Encryption               bool            `json:"encryption"`
+	LoadBalancerMode         LBModeType      `json:"lb_mode,omitemtpy"`
+	LoadBalancerAcceleration bool            `json:"lb_acceleration"`
+	RoutingMode              RoutingModeType `json:"routing_mode,omitempty"`
+}
+
+type CNI struct {
+	Provider CNIProvider `json:"provider"`
+	Cilium   *Cilium     `json:"cilium,omitempty"`
+}
+
 // Cluster represents a cluster structure.
 type Cluster struct {
 	ID            string              `json:"id"`
@@ -66,6 +81,7 @@ type Cluster struct {
 	Pools         []pools.ClusterPool `json:"pools"`
 	Version       string              `json:"version"`
 	IsPublic      bool                `json:"is_public"`
+	CNI           *CNI                `json:"cni,omitempty"`
 	FixedNetwork  string              `json:"fixed_network"`
 	FixedSubnet   string              `json:"fixed_subnet"`
 	CreatedAt     time.Time           `json:"created_at"`
