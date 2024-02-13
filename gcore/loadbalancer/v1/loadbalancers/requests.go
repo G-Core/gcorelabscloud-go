@@ -31,9 +31,11 @@ func List(c *gcorecloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
 type ListOpts struct {
 	ShowStats        bool              `q:"show_stats" validate:"omitempty"`
 	AssignedFloating bool              `q:"assigned_floating" validate:"omitempty"`
+	LoggingEnabled   bool              `q:"logging_enabled" validate:"omitempty"`
 	MetadataK        string            `q:"metadata_k" validate:"omitempty"`
 	MetadataKV       map[string]string `q:"metadata_kv" validate:"omitempty"`
 	WithDdos         bool              `q:"with_ddos" validate:"omitempty"`
+	Name             string            `q:"name" validate:"omitempty"`
 }
 
 // ToLoadBalancerListQuery formats a ListOpts into a query string.
