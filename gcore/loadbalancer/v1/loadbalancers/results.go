@@ -93,6 +93,7 @@ type LoadBalancer struct {
 	DdosProfile        *ddos.Profile            `json:"ddos_profile"`
 	VrrpIPs            []NetworkPortFixedIP     `json:"vrrp_ips"`
 	VipIPFamilyType    types.IPFamilyType       `json:"vip_ip_family"`
+	AdditionalVips     []NetworkPortFixedIP     `json:"additional_vips"`
 	Logging            *Logging                 `json:"logging"`
 }
 
