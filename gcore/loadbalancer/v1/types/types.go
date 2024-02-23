@@ -45,6 +45,7 @@ const (
 	ProtocolTypeTerminatedHTTPS ProtocolType = "TERMINATED_HTTPS"
 	ProtocolTypeUDP             ProtocolType = "UDP"
 	ProtocolTypePROXY           ProtocolType = "PROXY"
+	ProtocolTypePROXYV2         ProtocolType = "PROXYV2"
 
 	HealthMonitorTypeHTTP       HealthMonitorType = "HTTP"
 	HealthMonitorTypeHTTPS      HealthMonitorType = "HTTPS"
@@ -333,7 +334,7 @@ func (lbspt *PersistenceType) MarshalJSON() ([]byte, error) {
 
 func (pt ProtocolType) IsValid() error {
 	switch pt {
-	case ProtocolTypeHTTP, ProtocolTypeHTTPS, ProtocolTypeTCP, ProtocolTypeTerminatedHTTPS, ProtocolTypeUDP, ProtocolTypePROXY, ProtocolTypePrometheus:
+	case ProtocolTypeHTTP, ProtocolTypeHTTPS, ProtocolTypeTCP, ProtocolTypeTerminatedHTTPS, ProtocolTypeUDP, ProtocolTypePROXY, ProtocolTypePROXYV2, ProtocolTypePrometheus:
 		return nil
 	}
 	return fmt.Errorf("invalid ProtocolType: %v", pt)
@@ -355,7 +356,7 @@ func (pt ProtocolType) String() string {
 }
 
 func (pt ProtocolType) List() []ProtocolType {
-	return []ProtocolType{ProtocolTypeHTTP, ProtocolTypeHTTPS, ProtocolTypeTCP, ProtocolTypeTerminatedHTTPS, ProtocolTypeUDP, ProtocolTypePROXY, ProtocolTypePrometheus}
+	return []ProtocolType{ProtocolTypeHTTP, ProtocolTypeHTTPS, ProtocolTypeTCP, ProtocolTypeTerminatedHTTPS, ProtocolTypeUDP, ProtocolTypePROXY, ProtocolTypePROXYV2, ProtocolTypePrometheus}
 }
 
 func (pt ProtocolType) StringList() []string {
