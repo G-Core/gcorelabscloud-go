@@ -72,24 +72,29 @@ type CNI struct {
 
 // Cluster represents a cluster structure.
 type Cluster struct {
-	ID            string              `json:"id"`
-	Name          string              `json:"name"`
-	KeyPair       string              `json:"keypair"`
-	NodeCount     int                 `json:"node_count"`
-	FlavorID      string              `json:"flavor_id"`
-	Status        string              `json:"status"`
-	Pools         []pools.ClusterPool `json:"pools"`
-	Version       string              `json:"version"`
-	IsPublic      bool                `json:"is_public"`
-	CNI           *CNI                `json:"cni,omitempty"`
-	FixedNetwork  string              `json:"fixed_network"`
-	FixedSubnet   string              `json:"fixed_subnet"`
-	CreatedAt     time.Time           `json:"created_at"`
-	CreatorTaskID string              `json:"creator_task_id"`
-	TaskID        string              `json:"task_id"`
-	ProjectID     int                 `json:"project_id"`
-	RegionID      int                 `json:"region_id"`
-	Region        string              `json:"region"`
+	ID               string              `json:"id"`
+	Name             string              `json:"name"`
+	KeyPair          string              `json:"keypair"`
+	NodeCount        int                 `json:"node_count"`
+	FlavorID         string              `json:"flavor_id"`
+	Status           string              `json:"status"`
+	Pools            []pools.ClusterPool `json:"pools"`
+	Version          string              `json:"version"`
+	IsPublic         bool                `json:"is_public"`
+	CNI              *CNI                `json:"cni,omitempty"`
+	FixedNetwork     string              `json:"fixed_network"`
+	FixedSubnet      string              `json:"fixed_subnet"`
+	PodsIPPool       *gcorecloud.CIDR    `json:"pods_ip_pool,omitempty" validate:"omitempty,cidr"`
+	ServicesIPPool   *gcorecloud.CIDR    `json:"services_ip_pool,omitempty" validate:"omitempty,cidr"`
+	PodsIPV6Pool     *gcorecloud.CIDR    `json:"pods_ipv6_pool,omitempty" validate:"omitempty,cidr"`
+	ServicesIPV6Pool *gcorecloud.CIDR    `json:"services_ipv6_pool,omitempty" validate:"omitempty,cidr"`
+	IsIPV6           bool                `json:"is_ipv6,omitempty"`
+	CreatedAt        time.Time           `json:"created_at"`
+	CreatorTaskID    string              `json:"creator_task_id"`
+	TaskID           string              `json:"task_id"`
+	ProjectID        int                 `json:"project_id"`
+	RegionID         int                 `json:"region_id"`
+	Region           string              `json:"region"`
 }
 
 // Certificate represents a cluster CA certificate.
