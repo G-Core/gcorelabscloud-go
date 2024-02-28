@@ -262,3 +262,32 @@ func ListCustomSecurityGroup(c *gcorecloud.ServiceClient, loadbalancerID string)
 	_, r.Err = c.Get(createCustomSecurityGroupURL(c, loadbalancerID), &r.Body, nil)
 	return
 }
+
+// ResizeOptsBuilder allows extensions to add additional parameters to the Resize request.
+type ResizeOptsBuilder interface {
+	ToLoadBalancerResizeMap() (map[string]interface{}, error)
+}
+
+// ResizeOpts represents options used to resize a loadbalancer.
+type ResizeOpts struct {
+	Flavor string `json:"flavor" required:"true"`
+}
+
+// ToLoadBalancerResizeMap builds a request body from ResizeOpts.
+func (opts ResizeOpts) ToLoadBalancerResizeMap() (map[string]interface{}, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return nil, err
+	}
+	return gcorecloud.BuildRequestBody(opts, "")
+}
+
+// Resize accepts a ResizeOpts struct and resizes a loadbalancer using the values provided.
+func Resize(c *gcorecloud.ServiceClient, loadbalancerID string, opts ResizeOptsBuilder) (r tasks.Result) {
+	b, err := opts.ToLoadBalancerResizeMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = c.Post(resizeLoadBalancerUrl(c, loadbalancerID), b, &r.Body, nil)
+	return
+}

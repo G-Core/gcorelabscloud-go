@@ -31,6 +31,10 @@ func prepareCustomSecurityGroupTestURL(id string) string {
 	return fmt.Sprintf("/v1/loadbalancers/%d/%d/%s/securitygroup", fake.ProjectID, fake.RegionID, id)
 }
 
+func prepareResizeLoadBalancerURL(id string) string {
+	return fmt.Sprintf("/v1/loadbalancers/%d/%d/%s/resize", fake.ProjectID, fake.RegionID, id)
+}
+
 func prepareListTestURL() string {
 	return prepareListTestURLParams(fake.ProjectID, fake.RegionID)
 }
@@ -316,6 +320,35 @@ func TestCreateCustomSecurityGroup(t *testing.T) {
 
 	err := loadbalancers.CreateCustomSecurityGroup(client, LoadBalancer1.ID).ExtractErr()
 	require.NoError(t, err)
+}
+
+func TestResizeLoadBalancer(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareResizeLoadBalancerURL(LoadBalancer1.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestJSONRequest(t, r, ResizeRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, ResizeResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("loadbalancers", "v1")
+
+	opts := loadbalancers.ResizeOpts{
+		Flavor: Flavor,
+	}
+
+	tasks, err := loadbalancers.Resize(client, LoadBalancer1.ID, opts).Extract()
+	require.NoError(t, err)
+	require.Equal(t, Tasks1, *tasks)
 }
 
 func TestMetadataListAll(t *testing.T) {

@@ -231,6 +231,50 @@ var loadBalancerUpdateSubCommand = cli.Command{
 	},
 }
 
+var loadBalancerResizeSubCommand = cli.Command{
+	Name:      "resize",
+	Usage:     "resize loadbalancer",
+	ArgsUsage: "<loadbalancer_id>",
+	Category:  "loadbalancer",
+	Flags: append([]cli.Flag{
+		&cli.StringFlag{
+			Name:     "flavor",
+			Aliases:  []string{"fl"},
+			Usage:    "Loadbalancer flavor",
+			Required: true,
+		},
+	}, flags.WaitCommandFlags...),
+	Action: func(c *cli.Context) error {
+		loadBalancerID, err := flags.GetFirstStringArg(c, loadBalancerIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "resize")
+			return err
+		}
+
+		client, err := client.NewLoadbalancerClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		opts := loadbalancers.ResizeOpts{
+			Flavor: c.String("flavor"),
+		}
+
+		results, err := loadbalancers.Resize(client, loadBalancerID, opts).Extract()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		return utils.WaitTaskAndShowResult(c, client, results, true, func(task tasks.TaskID) (interface{}, error) {
+			loadBalancer, err := loadbalancers.Get(client, loadBalancerID).Extract()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get loadbalancer with ID: %s. Error: %w", loadBalancerID, err)
+			}
+			return loadBalancer, nil
+		})
+	},
+}
+
 var flavorListSubCommand = cli.Command{
 	Name:     "list",
 	Usage:    "List loadbalancer flavor",
@@ -324,6 +368,7 @@ var Commands = cli.Command{
 		&loadBalancerUpdateSubCommand,
 		&loadBalancerDeleteSubCommand,
 		&loadBalancerCreateSubCommand,
+		&loadBalancerResizeSubCommand,
 		&flavorSubCommand,
 		&listeners.ListenerCommands,
 		&lbpools.PoolCommands,
