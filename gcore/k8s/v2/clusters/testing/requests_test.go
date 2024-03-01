@@ -8,6 +8,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v2/clusters"
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v2/pools"
+	"github.com/G-Core/gcorelabscloud-go/gcore/servergroup/v1/servergroups"
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 
@@ -146,6 +147,7 @@ func TestCreate(t *testing.T) {
 		Version:      "v1.26.7",
 		Pools: []pools.CreateOpts{
 			{
+				ServerGroupPolicy:  servergroups.AffinityPolicy,
 				Name:               "pool-1",
 				FlavorID:           "g0-standard-2-4",
 				MinNodeCount:       1,

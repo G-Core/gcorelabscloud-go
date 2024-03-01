@@ -51,6 +51,9 @@ type ClusterPool struct {
 	AutoHealingEnabled bool               `json:"auto_healing_enabled"`
 	CreatedAt          time.Time          `json:"created_at"`
 	IsPublicIPv4       bool               `json:"is_public_ipv4"`
+	ServerGroupID      string             `json:"servergroup_id"`
+	ServerGroupName    string             `json:"servergroup_name"`
+	ServerGroupPolicy  string             `json:"servergroup_policy"`
 }
 
 // ClusterPoolPage is the page returned by a pager when traversing over a

@@ -7,6 +7,7 @@ import (
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v2/pools"
+	"github.com/G-Core/gcorelabscloud-go/gcore/servergroup/v1/servergroups"
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 
@@ -128,12 +129,13 @@ func TestCreate(t *testing.T) {
 	})
 
 	options := pools.CreateOpts{
-		Name:           "pool-1",
-		FlavorID:       "g0-standard-2-4",
-		MinNodeCount:   1,
-		MaxNodeCount:   2,
-		BootVolumeSize: 50,
-		BootVolumeType: volumes.SsdHiIops,
+		Name:              "pool-1",
+		FlavorID:          "g0-standard-2-4",
+		MinNodeCount:      1,
+		MaxNodeCount:      2,
+		BootVolumeSize:    50,
+		BootVolumeType:    volumes.SsdHiIops,
+		ServerGroupPolicy: servergroups.AffinityPolicy,
 	}
 	client := fake.ServiceTokenClient("k8s/clusters", "v2")
 	tasks, err := pools.Create(client, Cluster1Name, options).Extract()

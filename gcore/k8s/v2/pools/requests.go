@@ -3,6 +3,7 @@ package pools
 import (
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
+	"github.com/G-Core/gcorelabscloud-go/gcore/servergroup/v1/servergroups"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
@@ -16,14 +17,15 @@ type CreateOptsBuilder interface {
 
 // CreateOpts represents options used to create a cluster Pool.
 type CreateOpts struct {
-	Name               string             `json:"name" required:"true" validate:"required"`
-	FlavorID           string             `json:"flavor_id" required:"true" validate:"required"`
-	MinNodeCount       int                `json:"min_node_count" required:"true" validate:"required,gt=0,ltefield=MaxNodeCount"`
-	MaxNodeCount       int                `json:"max_node_count,omitempty" validate:"omitempty,gt=0,gtefield=MinNodeCount"`
-	BootVolumeSize     int                `json:"boot_volume_size,omitempty" validate:"omitempty,gt=0"`
-	BootVolumeType     volumes.VolumeType `json:"boot_volume_type,omitempty" validate:"omitempty,enum"`
-	AutoHealingEnabled bool               `json:"auto_healing_enabled,omitempty"`
-	IsPublicIPv4       bool               `json:"is_public_ipv4,omitempty"`
+	Name               string                         `json:"name" required:"true" validate:"required"`
+	FlavorID           string                         `json:"flavor_id" required:"true" validate:"required"`
+	MinNodeCount       int                            `json:"min_node_count" required:"true" validate:"required,gt=0,ltefield=MaxNodeCount"`
+	MaxNodeCount       int                            `json:"max_node_count,omitempty" validate:"omitempty,gt=0,gtefield=MinNodeCount"`
+	BootVolumeSize     int                            `json:"boot_volume_size,omitempty" validate:"omitempty,gt=0"`
+	BootVolumeType     volumes.VolumeType             `json:"boot_volume_type,omitempty" validate:"omitempty,enum"`
+	AutoHealingEnabled bool                           `json:"auto_healing_enabled,omitempty"`
+	ServerGroupPolicy  servergroups.ServerGroupPolicy `json:"servergroup_policy" validate:"omitempty,enum"`
+	IsPublicIPv4       bool                           `json:"is_public_ipv4,omitempty"`
 }
 
 // Validate CreateOpts

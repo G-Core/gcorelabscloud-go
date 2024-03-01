@@ -67,6 +67,7 @@ var CreateRequest = `
       "flavor_id": "g0-standard-2-4",
       "auto_healing_enabled": true,
       "boot_volume_size": 50,
+      "servergroup_policy": "affinity",
       "boot_volume_type": "ssd_hiiops"
     }
   ],
@@ -108,7 +109,10 @@ const GetResponse = `
       "is_public_ipv4": false,
       "id": "f3446423-0a82-475a-a1bd-31ce788ace9e",
       "auto_healing_enabled": true,
-      "node_count": 1
+      "node_count": 1,
+      "servergroup_policy": "affinity",
+      "servergroup_id": "f3446423-0a82-475a-a1bd-31ce788ace9e",
+      "servergroup_name": "affinity"
     }
   ],
   "keypair": "keypair",
@@ -318,6 +322,9 @@ var (
 				AutoHealingEnabled: true,
 				CreatedAt:          createdTime,
 				IsPublicIPv4:       false,
+				ServerGroupPolicy:  "affinity",
+				ServerGroupID:      "f3446423-0a82-475a-a1bd-31ce788ace9e",
+				ServerGroupName:    "affinity",
 			},
 		},
 		Version:       "v1.26.7",

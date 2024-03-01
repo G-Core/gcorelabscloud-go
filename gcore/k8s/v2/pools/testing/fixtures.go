@@ -42,7 +42,8 @@ const CreateRequest = `
   "min_node_count": 1,
   "max_node_count": 2,
   "boot_volume_size": 50,
-  "boot_volume_type": "ssd_hiiops"
+  "boot_volume_type": "ssd_hiiops",
+  "servergroup_policy": "affinity"
 }
 `
 
@@ -67,7 +68,10 @@ const GetResponse = `
   "status": "Running",
   "node_count": 1,
   "boot_volume_type": "ssd_hiiops",
-  "auto_healing_enabled": false
+  "auto_healing_enabled": false,
+  "servergroup_policy": "affinity",
+  "servergroup_id": "f3446423-0a82-475a-a1bd-31ce788ace9e",
+  "servergroup_name": "affinity"
 }
 `
 
@@ -91,7 +95,10 @@ const UpdateResponse = `
   "status": "Running",
   "node_count": 2,
   "boot_volume_type": "ssd_hiiops",
-  "auto_healing_enabled": false
+  "auto_healing_enabled": false,
+  "servergroup_policy": "affinity",
+  "servergroup_id": "f3446423-0a82-475a-a1bd-31ce788ace9e",
+  "servergroup_name": "affinity"
 }
 `
 
@@ -242,6 +249,9 @@ var (
 		AutoHealingEnabled: false,
 		CreatedAt:          createdTime,
 		IsPublicIPv4:       false,
+		ServerGroupPolicy:  "affinity",
+		ServerGroupID:      "f3446423-0a82-475a-a1bd-31ce788ace9e",
+		ServerGroupName:    "affinity",
 	}
 	Instance1 = instances.Instance{
 		ID:        "2246207d-fb9f-4ea4-acea-5b2cf77ff46b",
