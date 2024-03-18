@@ -118,7 +118,7 @@ var loadBalancerCreateSubCommand = cli.Command{
 			if err != nil {
 				return nil, fmt.Errorf("cannot retrieve loadbalancer ID from task info: %w", err)
 			}
-			loadBalancer, err := loadbalancers.Get(client, loadBalancerID).Extract()
+			loadBalancer, err := loadbalancers.Get(client, loadBalancerID, nil).Extract()
 			if err != nil {
 				return nil, fmt.Errorf("cannot get loadbalancer with ID: %s. Error: %w", loadBalancerID, err)
 			}
@@ -144,7 +144,7 @@ var loadBalancerGetSubCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		result, err := loadbalancers.Get(client, loadBalancerID).Extract()
+		result, err := loadbalancers.Get(client, loadBalancerID, nil).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -175,7 +175,7 @@ var loadBalancerDeleteSubCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 		return utils.WaitTaskAndShowResult(c, client, results, false, func(task tasks.TaskID) (interface{}, error) {
-			loadbalancer, err := loadbalancers.Get(client, loadBalancerID).Extract()
+			loadbalancer, err := loadbalancers.Get(client, loadBalancerID, nil).Extract()
 			if err == nil {
 				if loadbalancer != nil && loadbalancer.IsDeleted() {
 					return nil, nil
@@ -266,7 +266,7 @@ var loadBalancerResizeSubCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 		return utils.WaitTaskAndShowResult(c, client, results, true, func(task tasks.TaskID) (interface{}, error) {
-			loadBalancer, err := loadbalancers.Get(client, loadBalancerID).Extract()
+			loadBalancer, err := loadbalancers.Get(client, loadBalancerID, nil).Extract()
 			if err != nil {
 				return nil, fmt.Errorf("cannot get loadbalancer with ID: %s. Error: %w", loadBalancerID, err)
 			}
