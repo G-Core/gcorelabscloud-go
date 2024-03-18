@@ -6,6 +6,7 @@ import (
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/ddos/v1/ddos"
+	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/lbflavors"
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
@@ -94,6 +95,7 @@ type LoadBalancer struct {
 	VrrpIPs            []NetworkPortFixedIP     `json:"vrrp_ips"`
 	VipIPFamilyType    types.IPFamilyType       `json:"vip_ip_family"`
 	AdditionalVips     []NetworkPortFixedIP     `json:"additional_vips"`
+	FloatingIPs        []instances.FloatingIP   `json:"floating_ips"`
 	Logging            *Logging                 `json:"logging"`
 }
 
