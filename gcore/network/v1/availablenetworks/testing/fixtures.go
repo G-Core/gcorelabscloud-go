@@ -3,12 +3,12 @@ package testing
 import (
 	"fmt"
 	"net"
+	"strconv"
 	"time"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/network/v1/availablenetworks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/subnet/v1/subnets"
-	"github.com/G-Core/gcorelabscloud-go/gcore/subnet/v1/subnets/testing"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 )
 
@@ -72,8 +72,8 @@ var updatedTimeParsed, _ = time.Parse(gcorecloud.RFC3339Z, updatedTimeString)
 var updatedTime = gcorecloud.JSONRFC3339Z{Time: updatedTimeParsed}
 var cidr, _ = gcorecloud.ParseCIDRString("192.168.10.0/24")
 var taskID = "50f53a35-42ed-40c4-82b2-5a37fb3e00bc"
-var availableIps = testing.IPDual("241")
-var totalIps = testing.IPDual("243")
+var availableIps, _ = strconv.ParseFloat("241", 32)
+var totalIps, _ = strconv.ParseFloat("243", 32)
 var ip = net.ParseIP("10.0.0.13")
 var gwip = net.ParseIP("10.0.0.1")
 var routeCidr, _ = gcorecloud.ParseCIDRString("10.0.3.0/24")
@@ -93,8 +93,8 @@ var (
 		Region:         "RegionOne",
 		ProjectID:      fake.ProjectID,
 		RegionID:       fake.RegionID,
-		AvailableIps:   availableIps,
-		TotalIps:       totalIps,
+		AvailableIps:   &availableIps,
+		TotalIps:       &totalIps,
 		HasRouter:      true,
 		DNSNameservers: []net.IP{ip},
 		GatewayIP:      gwip,

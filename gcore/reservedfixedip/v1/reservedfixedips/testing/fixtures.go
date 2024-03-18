@@ -2,13 +2,13 @@ package testing
 
 import (
 	"net"
+	"strconv"
 	"time"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/network/v1/networks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/reservedfixedip/v1/reservedfixedips"
 	"github.com/G-Core/gcorelabscloud-go/gcore/subnet/v1/subnets"
-	"github.com/G-Core/gcorelabscloud-go/gcore/subnet/v1/subnets/testing"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 )
 
@@ -259,6 +259,8 @@ var (
 	Tasks1 = tasks.TaskResults{
 		Tasks: []tasks.TaskID{"50f53a35-42ed-40c4-82b2-5a37fb3e00bc"},
 	}
+	availableIps, _ = strconv.ParseFloat("250", 32)
+	totalIps, _     = strconv.ParseFloat("253", 32)
 
 	Device1 = reservedfixedips.Device{
 		PortID: "351b0dd7-ca09-431c-be53-935db3785067",
@@ -280,8 +282,8 @@ var (
 					Region:        "Luxembourg 1",
 					ProjectID:     1,
 					RegionID:      3,
-					AvailableIps:  testing.IPDual("250"),
-					TotalIps:      testing.IPDual("253"),
+					AvailableIps:  &availableIps,
+					TotalIps:      &totalIps,
 					HasRouter:     false,
 					DNSNameservers: []net.IP{
 						net.ParseIP("8.8.8.8"),

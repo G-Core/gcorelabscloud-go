@@ -2,8 +2,8 @@ package testing
 
 import (
 	"fmt"
-	"math/big"
 	"net"
+	"strconv"
 	"time"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
@@ -29,7 +29,7 @@ var ListResponse = fmt.Sprintf(`
 		  "task_id": "50f53a35-42ed-40c4-82b2-5a37fb3e00bc",
 		  "creator_task_id": "50f53a35-42ed-40c4-82b2-5a37fb3e00bc",
 		  "region": "RegionOne",
-		  "available_ips": 18446744073709551999,
+		  "available_ips": 7.922816251426434e+28,
 		  "total_ips": 18446744073709552000,
 		  "project_id": 1,
 		  "region_id": 1,
@@ -65,7 +65,7 @@ var GetResponse = fmt.Sprintf(`
   "region": "RegionOne",
   "project_id": 1,
   "region_id": 1,
-  "available_ips": 18446744073709551999,
+  "available_ips": 7.922816251426434e+28,
   "total_ips": 18446744073709552000,
   "dns_nameservers": [
 	"10.0.0.13"
@@ -188,14 +188,10 @@ var ip = net.ParseIP("10.0.0.13")
 var gwip = net.ParseIP("10.0.0.1")
 var routeCidr, _ = gcorecloud.ParseCIDRString("10.0.3.0/24")
 
-func IPDual(i string) *big.Int {
-	b := big.NewInt(0)
-	b.SetString(i, 10)
-	return b
-}
-
 var (
-	Subnet1 = subnets.Subnet{
+	availableIps, _ = strconv.ParseFloat("7.922816251426434e+28", 32)
+	totalIps, _     = strconv.ParseFloat("18446744073709552000", 32)
+	Subnet1         = subnets.Subnet{
 		ID:             "e7944e55-f957-413d-aa56-fdc876543113",
 		Name:           "subnet",
 		IPVersion:      4,
@@ -209,8 +205,8 @@ var (
 		Region:         "RegionOne",
 		ProjectID:      fake.ProjectID,
 		RegionID:       fake.RegionID,
-		AvailableIps:   IPDual("18446744073709551999"),
-		TotalIps:       IPDual("18446744073709552000"),
+		AvailableIps:   &availableIps,
+		TotalIps:       &totalIps,
 		HasRouter:      true,
 		DNSNameservers: []net.IP{ip},
 		GatewayIP:      gwip,
@@ -224,10 +220,6 @@ var (
 	}
 
 	ExpectedSubnetSlice = []subnets.Subnet{Subnet1}
-
-	ResourceMetadata = map[string]interface{}{
-		"some_key": "some_val",
-	}
 
 	ResourceMetadataReadOnly = metadata.Metadata{
 		Key:      "some_key",
