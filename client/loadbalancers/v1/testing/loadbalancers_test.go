@@ -72,7 +72,7 @@ func TestLBSMetadata(t *testing.T) {
 	defer loadbalancers.Delete(client, resourceID)
 
 	err = gtest.MetadataTest(func() ([]metadata.Metadata, error) {
-		res, err := loadbalancers.Get(client, resourceID).Extract()
+		res, err := loadbalancers.Get(client, resourceID, nil).Extract()
 		if err != nil {
 			return nil, err
 		}

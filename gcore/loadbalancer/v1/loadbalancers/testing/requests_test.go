@@ -2,10 +2,11 @@ package testing
 
 import (
 	"fmt"
-	metadataV1Testing "github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata/testing"
 	"net"
 	"net/http"
 	"testing"
+
+	metadataV1Testing "github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata/testing"
 
 	"github.com/stretchr/testify/require"
 
@@ -136,7 +137,7 @@ func TestGet(t *testing.T) {
 
 	client := fake.ServiceTokenClient("loadbalancers", "v1")
 
-	ct, err := loadbalancers.Get(client, LoadBalancer1.ID).Extract()
+	ct, err := loadbalancers.Get(client, LoadBalancer1.ID, nil).Extract()
 
 	require.NoError(t, err)
 	require.Equal(t, LoadBalancer1, *ct)

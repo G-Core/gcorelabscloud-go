@@ -4,12 +4,10 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
-
-	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
-
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/types"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
@@ -57,10 +55,42 @@ type ListOptsBuilder interface {
 }
 
 // Get retrieves a specific loadbalancer based on its unique ID.
-func Get(c *gcorecloud.ServiceClient, id string) (r GetResult) {
+func Get(c *gcorecloud.ServiceClient, id string, opts GetOptsBuilder) (r GetResult) {
 	url := getURL(c, id)
+	if opts != nil {
+		query, err := opts.ToLoadBalancerGetQuery()
+		if err != nil {
+			r.Err = err
+			return
+		}
+		url += query
+	}
 	_, r.Err = c.Get(url, &r.Body, nil)
 	return
+}
+
+// GetOpts allows the filtering and sorting Get API response.
+type GetOpts struct {
+	ShowStats bool `q:"show_stats" validate:"omitempty"`
+	WithDdos  bool `q:"with_ddos" validate:"omitempty"`
+}
+
+// ToLoadBalancerListQuery formats a ListOpts into a query string.
+func (opts GetOpts) ToLoadBalancerGetQuery() (string, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return "", err
+	}
+
+	q, err := gcorecloud.BuildQueryString(opts)
+	if err != nil {
+		return "", err
+	}
+	return q.String(), err
+}
+
+// GetOptsBuilder allows extensions to add additional parameters to the Get request.
+type GetOptsBuilder interface {
+	ToLoadBalancerGetQuery() (string, error)
 }
 
 // CreateOptsBuilder allows extensions to add additional parameters to the
@@ -146,9 +176,9 @@ type CreateRetentionPolicyOpts struct {
 type CreateOpts struct {
 	Name         string                                      `json:"name" required:"true" validate:"required,name"`
 	Listeners    []CreateListenerOpts                        `json:"listeners,omitempty" validate:"omitempty,dive"`
-	VipNetworkID string                                      `json:"vip_network_id,allowed_without=VipPortID,omitempty"`
+	VipNetworkID string                                      `json:"vip_network_id,omitempty" validate:"omitempty,allowed_without=VipPortID"`
 	VipSubnetID  string                                      `json:"vip_subnet_id,omitempty"`
-	VipPortID    string                                      `json:"vip_port_id,allowed_without=VipNetworkID,omitempty"`
+	VipPortID    string                                      `json:"vip_port_id,omitempty" validate:"omitempty,allowed_without=VipNetworkID"`
 	VIPIPFamily  types.IPFamilyType                          `json:"vip_ip_family,omitempty" validate:"omitempty,enum"`
 	Flavor       *string                                     `json:"flavor,omitempty"`
 	Tags         []string                                    `json:"tag,omitempty"`
