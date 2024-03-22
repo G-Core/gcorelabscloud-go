@@ -121,7 +121,23 @@ type UpdateOptsBuilder interface {
 
 // UpdateOpts represents options used to update a security group.
 type UpdateOpts struct {
-	Name string `json:"name" required:"true"`
+	Name         string                        `json:"name,omitempty"`
+	ChangedRules []UpdateSecurityGroupRuleOpts `json:"changed_rules,omitempty"`
+}
+
+// UpdateSecurityGroupRuleOpts represents options used to change a security group rule.
+type UpdateSecurityGroupRuleOpts struct {
+	Action              types.Action        `json:"action" required:"true"`
+	SecurityGroupRuleID string              `json:"security_group_rule_id,omitempty"`
+	Direction           types.RuleDirection `json:"direction,omitempty"`
+	EtherType           types.EtherType     `json:"ethertype,omitempty"`
+	Protocol            types.Protocol      `json:"protocol,omitempty"`
+	SecurityGroupID     *string             `json:"security_group_id,omitempty"`
+	RemoteGroupID       *string             `json:"remote_group_id,omitempty"`
+	PortRangeMax        *int                `json:"port_range_max,omitempty"`
+	PortRangeMin        *int                `json:"port_range_min,omitempty"`
+	Description         *string             `json:"description,omitempty"`
+	RemoteIPPrefix      *string             `json:"remote_ip_prefix,omitempty"`
 }
 
 // ToSecurityGroupUpdateMap builds a request body from UpdateOpts.
