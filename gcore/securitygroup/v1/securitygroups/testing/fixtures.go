@@ -136,6 +136,24 @@ const CreateRuleRequest = `
 
 const UpdateRequest = `
 {
+  "name": "default",
+  "changed_rules": [
+    {
+      "action":"delete",
+      "security_group_rule_id":"2f89cda7-a6fb-4b3a-a41d-c4afd91e5251"
+    },
+    {
+      "action":"create",
+      "direction":"ingress",
+      "ethertype":"IPv4",
+      "protocol":"any"
+    }
+  ]
+}
+`
+
+const DeepCopyRequest = `
+{
   "name": "default"
 }
 `

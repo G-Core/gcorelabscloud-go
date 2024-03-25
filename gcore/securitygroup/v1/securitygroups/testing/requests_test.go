@@ -7,6 +7,7 @@ import (
 
 	instancestesting "github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances/testing"
 	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/securitygroups"
+	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/types"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 
 	"github.com/stretchr/testify/require"
@@ -234,6 +235,18 @@ func TestUpdate(t *testing.T) {
 
 	opts := securitygroups.UpdateOpts{
 		Name: SecurityGroup1.Name,
+		ChangedRules: []securitygroups.UpdateSecurityGroupRuleOpts{
+			{
+				Action:              types.ActionDelete,
+				SecurityGroupRuleID: "2f89cda7-a6fb-4b3a-a41d-c4afd91e5251",
+			},
+			{
+				Action:    types.ActionCreate,
+				Direction: types.RuleDirectionIngress,
+				EtherType: types.EtherTypeIPv4,
+				Protocol:  types.ProtocolAny,
+			},
+		},
 	}
 
 	ct, err := securitygroups.Update(client, SecurityGroup1.ID, opts).Extract()
@@ -335,7 +348,7 @@ func TestDeepCopy(t *testing.T) {
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 		th.TestHeader(t, r, "Content-Type", "application/json")
 		th.TestHeader(t, r, "Accept", "application/json")
-		th.TestJSONRequest(t, r, UpdateRequest)
+		th.TestJSONRequest(t, r, DeepCopyRequest)
 		w.WriteHeader(http.StatusOK)
 	})
 

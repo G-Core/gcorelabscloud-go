@@ -8,6 +8,7 @@ import (
 type RuleDirection string
 type EtherType string
 type Protocol string
+type Action string
 
 const (
 	RuleDirectionIngress RuleDirection = "ingress"
@@ -43,6 +44,8 @@ const (
 	ProtocolIPinIP       Protocol      = "4"
 	ProtocolIPIP         Protocol      = "ipip"
 	ProtocolIPEncap      Protocol      = "ipencap"
+	ActionCreate         Action        = "create"
+	ActionDelete         Action        = "delete"
 )
 
 func (rd RuleDirection) IsValid() error {
@@ -274,4 +277,63 @@ func (p *Protocol) UnmarshalJSON(data []byte) error {
 // MarshalJSON - implements Marshaler interface
 func (p *Protocol) MarshalJSON() ([]byte, error) {
 	return json.Marshal(p.String())
+}
+
+func (a Action) IsValid() error {
+	switch a {
+	case ActionCreate,
+		ActionDelete:
+		return nil
+	}
+	return fmt.Errorf("invalid Action type: %v", a)
+}
+
+func (a Action) ValidOrNil() (*Action, error) {
+	if a.String() == "" {
+		return nil, nil
+	}
+	err := a.IsValid()
+	if err != nil {
+		return &a, err
+	}
+	return &a, nil
+}
+
+func (a Action) String() string {
+	return string(a)
+}
+
+func (a Action) List() []Action {
+	return []Action{
+		ActionCreate,
+		ActionDelete,
+	}
+}
+
+func (a Action) StringList() []string {
+	var s []string
+	for _, v := range a.List() {
+		s = append(s, v.String())
+	}
+	return s
+}
+
+// UnmarshalJSON - implements Unmarshaler interface
+func (a *Action) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	v := Action(s)
+	err := v.IsValid()
+	if err != nil {
+		return err
+	}
+	*a = v
+	return nil
+}
+
+// MarshalJSON - implements Marshaler interface
+func (a *Action) MarshalJSON() ([]byte, error) {
+	return json.Marshal(a.String())
 }
