@@ -43,6 +43,7 @@ type CreateOpts struct {
 	NetworkID string              `json:"network_id,omitempty" validate:"rfe=Type:ip_address;any_subnet,omitempty,uuid4"`
 	SubnetID  string              `json:"subnet_id,omitempty" validate:"rfe=Type:subnet,omitempty,uuid4"`
 	IPAddress net.IP              `json:"ip_address,omitempty" validate:"rfe=Type:ip_address,omitempty"`
+	PortID    string              `json:"port_id,omitempty" validate:"rfe=Type:port,omitempty,uuid4"`
 	IsVip     bool                `json:"is_vip"`
 }
 
