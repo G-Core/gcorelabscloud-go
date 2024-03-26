@@ -38,7 +38,7 @@ func (t ReservedFixedIPType) StringList() []string {
 
 func (t ReservedFixedIPType) IsValid() error {
 	switch t {
-	case External, Subnet, AnySubnet, IPAddress:
+	case External, Subnet, AnySubnet, IPAddress, Port:
 		return nil
 	}
 	return fmt.Errorf("invalid ReservedFixedIPType type: %v", t)
