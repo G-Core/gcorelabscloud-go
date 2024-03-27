@@ -13,6 +13,7 @@ const (
 	Subnet    ReservedFixedIPType = "subnet"
 	AnySubnet ReservedFixedIPType = "any_subnet"
 	IPAddress ReservedFixedIPType = "ip_address"
+	Port      ReservedFixedIPType = "port"
 
 	IPv4IPFamilyType      IPFamilyType = "ipv4"
 	IPv6IPFamilyType      IPFamilyType = "ipv6"
@@ -24,7 +25,7 @@ func (t ReservedFixedIPType) String() string {
 }
 
 func (t ReservedFixedIPType) List() []ReservedFixedIPType {
-	return []ReservedFixedIPType{External, Subnet, AnySubnet, IPAddress}
+	return []ReservedFixedIPType{External, Subnet, AnySubnet, IPAddress, Port}
 }
 
 func (t ReservedFixedIPType) StringList() []string {
@@ -37,7 +38,7 @@ func (t ReservedFixedIPType) StringList() []string {
 
 func (t ReservedFixedIPType) IsValid() error {
 	switch t {
-	case External, Subnet, AnySubnet, IPAddress:
+	case External, Subnet, AnySubnet, IPAddress, Port:
 		return nil
 	}
 	return fmt.Errorf("invalid ReservedFixedIPType type: %v", t)
