@@ -36,6 +36,7 @@ type UpdateResult struct {
 	commonResult
 }
 
+// UserList represents a user list structure.
 type UserList struct {
 	Username          string `json:"username"`
 	EncryptedPassword string `json:"encrypted_password"`

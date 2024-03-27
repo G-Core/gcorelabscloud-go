@@ -53,6 +53,7 @@ func (opts ListOpts) ToListenerListQuery() (string, error) {
 	return q.String(), err
 }
 
+// CreateUserListOpts represent options used to create a user list.
 type CreateUserListOpts struct {
 	Username          string `json:"username" required:"true"`
 	EncryptedPassword string `json:"encrypted_password" required:"true"`
