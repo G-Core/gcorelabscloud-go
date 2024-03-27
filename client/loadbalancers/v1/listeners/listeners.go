@@ -20,6 +20,45 @@ var (
 	protocolTypes  = types.ProtocolType("").StringList()
 )
 
+func getUserList(c *cli.Context) ([]listeners.CreateUserListOpts, error) {
+	usernames := c.StringSlice("userlist-username")
+	if len(usernames) == 0 {
+		return nil, nil
+	}
+	encryptedPasswords := c.StringSlice("userlist-encrypted-password")
+	if len(usernames) != len(encryptedPasswords) {
+		return nil, fmt.Errorf("number of --userlist-username should be equal --userlist-encrypted-password")
+	}
+	var userlists []listeners.CreateUserListOpts
+
+	type usernamePasswordPair struct {
+		username string
+		password string
+	}
+
+	mp := map[usernamePasswordPair]int{}
+
+	for idx, username := range usernames {
+		userlist := listeners.CreateUserListOpts{
+			Username:          username,
+			EncryptedPassword: encryptedPasswords[idx],
+		}
+		userlists = append(userlists, userlist)
+		mp[usernamePasswordPair{
+			username: username,
+			password: encryptedPasswords[idx],
+		}]++
+	}
+
+	for key, value := range mp {
+		if value > 1 {
+			return nil, fmt.Errorf("same username and password %s:%s have been set %d times", key.username, key.password, value)
+		}
+	}
+
+	return userlists, nil
+}
+
 var listenerListSubCommand = cli.Command{
 	Name:     "list",
 	Usage:    "loadbalancer listeners list",
@@ -101,28 +140,40 @@ var listenerCreateSubCommand = cli.Command{
 			Name:     "timeout-client-data",
 			Aliases:  []string{"tcd"},
 			Usage:    "Frontend client inactivity timeout in milliseconds",
-			Value: 50000,
+			Value:    50000,
 			Required: false,
 		},
 		&cli.IntFlag{
 			Name:     "timeout-member-connect",
 			Aliases:  []string{"tmc"},
 			Usage:    "Backend member connection timeout in milliseconds",
-			Value: 5000,
+			Value:    5000,
 			Required: false,
 		},
 		&cli.IntFlag{
 			Name:     "timeout-member-data",
 			Aliases:  []string{"tmd"},
 			Usage:    "Backend member inactivity timeout in milliseconds",
-			Value: 50000,
+			Value:    50000,
 			Required: false,
 		},
 		&cli.IntFlag{
 			Name:     "connection-limit",
 			Aliases:  []string{"cl"},
 			Usage:    "Limit of the simultaneous connections",
-			Value: 100000,
+			Value:    100000,
+			Required: false,
+		},
+		&cli.StringSliceFlag{
+			Name:     "userlist-username",
+			Aliases:  []string{"uu"},
+			Usage:    "Username to auth via Basic Authentication",
+			Required: false,
+		},
+		&cli.StringSliceFlag{
+			Name:     "userlist-encrypted-password",
+			Aliases:  []string{"uep"},
+			Usage:    "Encrypted password to auth via Basic Authentication",
 			Required: false,
 		},
 	}, flags.WaitCommandFlags...),
@@ -138,6 +189,16 @@ var listenerCreateSubCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
+		userlist, err := getUserList(c)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "create")
+			return cli.NewExitError(err, 1)
+		}
+
+		if userlist == nil {
+			userlist = []listeners.CreateUserListOpts{}
+		}
+
 		opts := listeners.CreateOpts{
 			Name:           c.String("name"),
 			Protocol:       pt,
@@ -145,7 +206,8 @@ var listenerCreateSubCommand = cli.Command{
 			LoadBalancerID: c.String("loadbalancer-id"),
 			SecretID:       c.String("secret-id"),
 			SNISecretID:    c.StringSlice("sni-secret-id"),
-			AllowedCIDRS:	c.StringSlice("allowed-cidrs") ,
+			AllowedCIDRS:   c.StringSlice("allowed-cidrs"),
+			UserList:       userlist,
 		}
 		if c.IsSet("timeout-client-data") {
 			timeoutClientData := c.Int("timeout-client-data")
@@ -163,7 +225,7 @@ var listenerCreateSubCommand = cli.Command{
 			connectionLimit := c.Int("connection-limit")
 			opts.ConnectionLimit = &connectionLimit
 		}
-	
+
 		results, err := listeners.Create(client, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
@@ -258,9 +320,9 @@ var listenerUpdateSubCommand = cli.Command{
 	Category:  "listener",
 	Flags: []cli.Flag{
 		&cli.StringFlag{
-			Name:     "name",
-			Aliases:  []string{"n"},
-			Usage:    "listener name",
+			Name:    "name",
+			Aliases: []string{"n"},
+			Usage:   "listener name",
 		},
 		&cli.StringFlag{
 			Name:    "secret-id",
@@ -276,24 +338,36 @@ var listenerUpdateSubCommand = cli.Command{
 			Usage: "List of networks from which listener is accessible",
 		},
 		&cli.IntFlag{
-			Name:     "timeout-client-data",
-			Aliases:  []string{"tcd"},
-			Usage:    "Frontend client inactivity timeout in milliseconds",
+			Name:    "timeout-client-data",
+			Aliases: []string{"tcd"},
+			Usage:   "Frontend client inactivity timeout in milliseconds",
 		},
 		&cli.IntFlag{
-			Name:     "timeout-member-connect",
-			Aliases:  []string{"tmc"},
-			Usage:    "Backend member connection timeout in milliseconds",
+			Name:    "timeout-member-connect",
+			Aliases: []string{"tmc"},
+			Usage:   "Backend member connection timeout in milliseconds",
 		},
 		&cli.IntFlag{
-			Name:     "timeout-member-data",
-			Aliases:  []string{"tmd"},
-			Usage:    "Backend member inactivity timeout in milliseconds",
+			Name:    "timeout-member-data",
+			Aliases: []string{"tmd"},
+			Usage:   "Backend member inactivity timeout in milliseconds",
 		},
 		&cli.IntFlag{
-			Name:     "connection-limit",
-			Aliases:  []string{"cl"},
-			Usage:    "Limit of the simultaneous connections",
+			Name:    "connection-limit",
+			Aliases: []string{"cl"},
+			Usage:   "Limit of the simultaneous connections",
+		},
+		&cli.StringSliceFlag{
+			Name:     "userlist-username",
+			Aliases:  []string{"uu"},
+			Usage:    "Username to auth via Basic Authentication",
+			Required: false,
+		},
+		&cli.StringSliceFlag{
+			Name:     "userlist-encrypted-password",
+			Aliases:  []string{"uep"},
+			Usage:    "Encrypted password to auth via Basic Authentication",
+			Required: false,
 		},
 	},
 	Action: func(c *cli.Context) error {
@@ -307,11 +381,21 @@ var listenerUpdateSubCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
+		userlist, err := getUserList(c)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "create")
+			return cli.NewExitError(err, 1)
+		}
+
+		if userlist == nil {
+			userlist = []listeners.CreateUserListOpts{}
+		}
 		opts := listeners.UpdateOpts{
-			Name: c.String("name"),
-			SecretID: c.String("secret-id"),
-			SNISecretID: c.StringSlice("sni-secret-id"),
+			Name:         c.String("name"),
+			SecretID:     c.String("secret-id"),
+			SNISecretID:  c.StringSlice("sni-secret-id"),
 			AllowedCIDRS: c.StringSlice("allowed-cidrs"),
+			UserList:     userlist,
 		}
 		if c.IsSet("timeout-client-data") {
 			timeoutClientData := c.Int("timeout-client-data")
