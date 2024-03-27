@@ -36,6 +36,12 @@ type UpdateResult struct {
 	commonResult
 }
 
+// UserList represents a user list structure.
+type UserList struct {
+	Username          string `json:"username"`
+	EncryptedPassword string `json:"encrypted_password"`
+}
+
 // Listener represents a listener structure.
 type Listener struct {
 	PoolCount            int                      `json:"pool_count"`
@@ -54,6 +60,7 @@ type Listener struct {
 	TimeoutMemberData    *int                     `json:"timeout_member_data,omitempty"`
 	TimeoutMemberConnect *int                     `json:"timeout_member_connect,omitempty"`
 	ConnectionLimit      *int                     `json:"connection_limit"`
+	UserList             []UserList               `json:"user_list"`
 }
 
 func (l Listener) IsDeleted() bool {

@@ -24,7 +24,13 @@ const ListResponse = `
       "timeout_client_data": 50000,
       "timeout_member_data": 50000,
       "timeout_member_connect": 5000,
-      "connection_limit": 100000
+      "connection_limit": 100000,
+      "user_list": [
+        {
+          "username": "admin",
+          "encrypted_password": "$5$isRr.HJ1IrQP38.m$oViu3DJOpUG2ZsjCBtbITV3mqpxxbZfyWJojLPNSPO5"
+        }
+      ]
     }
   ]
 }
@@ -45,7 +51,13 @@ const GetResponse = `
   "timeout_client_data": 50000,
   "timeout_member_data": 50000,
   "timeout_member_connect": 5000,
-  "connection_limit": 100000
+  "connection_limit": 100000,
+  "user_list": [
+    {
+      "username": "admin",
+      "encrypted_password": "$5$isRr.HJ1IrQP38.m$oViu3DJOpUG2ZsjCBtbITV3mqpxxbZfyWJojLPNSPO5"
+    }
+  ]
 }
 `
 
@@ -96,6 +108,10 @@ var (
 	timeoutMemberData    = 50000
 	timeoutMemberConnect = 5000
 	connectionLimit      = 100000
+	userList             = listeners.UserList{
+		Username:          "admin",
+		EncryptedPassword: "$5$isRr.HJ1IrQP38.m$oViu3DJOpUG2ZsjCBtbITV3mqpxxbZfyWJojLPNSPO5",
+	}
 
 	Listener1 = listeners.Listener{
 		PoolCount:            1,
@@ -112,6 +128,7 @@ var (
 		TimeoutMemberData:    &timeoutMemberData,
 		TimeoutMemberConnect: &timeoutMemberConnect,
 		ConnectionLimit:      &connectionLimit,
+		UserList:             []listeners.UserList{userList},
 	}
 	Tasks1 = tasks.TaskResults{
 		Tasks: []tasks.TaskID{"50f53a35-42ed-40c4-82b2-5a37fb3e00bc"},
