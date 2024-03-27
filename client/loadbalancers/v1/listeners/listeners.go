@@ -20,6 +20,45 @@ var (
 	protocolTypes  = types.ProtocolType("").StringList()
 )
 
+func getUserList(c *cli.Context) ([]listeners.CreateUserListOpts, error) {
+	usernames := c.StringSlice("userlist-username")
+	if len(usernames) == 0 {
+		return nil, nil
+	}
+	encryptedPasswords := c.StringSlice("userlist-encrypted-password")
+	if len(usernames) != len(encryptedPasswords) {
+		return nil, fmt.Errorf("number of --userlist-username should be equal --userlist-encrypted-password")
+	}
+	var userlists []listeners.CreateUserListOpts
+
+	type usernamePasswordPair struct {
+		username string
+		password string
+	}
+
+	mp := map[usernamePasswordPair]int{}
+
+	for idx, username := range usernames {
+		userlist := listeners.CreateUserListOpts{
+			Username:          username,
+			EncryptedPassword: encryptedPasswords[idx],
+		}
+		userlists = append(userlists, userlist)
+		mp[usernamePasswordPair{
+			username: username,
+			password: encryptedPasswords[idx],
+		}]++
+	}
+
+	for key, value := range mp {
+		if value > 1 {
+			return nil, fmt.Errorf("same username and password %s:%s have been set %d times", key.username, key.password, value)
+		}
+	}
+
+	return userlists, nil
+}
+
 var listenerListSubCommand = cli.Command{
 	Name:     "list",
 	Usage:    "loadbalancer listeners list",
@@ -136,6 +175,16 @@ var listenerCreateSubCommand = cli.Command{
 		pt := types.ProtocolType(c.String("protocol-type"))
 		if err := pt.IsValid(); err != nil {
 			return cli.NewExitError(err, 1)
+		}
+
+		userlist, err := getUserList(c)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "create")
+			return cli.NewExitError(err, 1)
+		}
+
+		if userlist == nil {
+			userlist = []listeners.CreateUserListOpts{}
 		}
 
 		opts := listeners.CreateOpts{
@@ -307,11 +356,21 @@ var listenerUpdateSubCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
+		userlist, err := getUserList(c)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "create")
+			return cli.NewExitError(err, 1)
+		}
+
+		if userlist == nil {
+			userlist = []listeners.CreateUserListOpts{}
+		}
 		opts := listeners.UpdateOpts{
 			Name:         c.String("name"),
 			SecretID:     c.String("secret-id"),
 			SNISecretID:  c.StringSlice("sni-secret-id"),
 			AllowedCIDRS: c.StringSlice("allowed-cidrs"),
+			UserList:     userlist,
 		}
 		if c.IsSet("timeout-client-data") {
 			timeoutClientData := c.Int("timeout-client-data")
