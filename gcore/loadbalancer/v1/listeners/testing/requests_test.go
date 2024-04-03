@@ -255,7 +255,6 @@ func TestUnset(t *testing.T) {
 	tasks, err := listeners.Unset(client, Listener1.ID, opts).Extract()
 
 	require.NoError(t, err)
-	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 
 }
