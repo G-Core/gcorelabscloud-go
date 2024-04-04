@@ -171,6 +171,8 @@ func Unset(c *gcorecloud.ServiceClient, listenerID string, opts UnsetOptsBuilder
 	userList, ok := b["user_list"]
 	if ok && userList.(bool) {
 		b["user_list"] = make([]CreateUserListOpts, 0)
+	} else {
+		delete(b, "user_list")
 	}
 	_, r.Err = c.Patch(updateURL(c, listenerID), b, &r.Body, &gcorecloud.RequestOpts{
 		OkCodes: []int{200, 201},
