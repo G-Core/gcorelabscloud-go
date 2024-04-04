@@ -143,6 +143,7 @@ type UnsetOptsBuilder interface {
 // UnsetOpts represents options used to unset lbpool fields.
 type UnsetOpts struct {
 	AllowedCIDRS bool `json:"allowed_cidrs"`
+	UserList bool `json:"user_list"`
 }
 
 // ToLbListenerUnsetMap builds a request body from UnsetOpts.
@@ -166,6 +167,10 @@ func Unset(c *gcorecloud.ServiceClient, listenerID string, opts UnsetOptsBuilder
 		b["allowed_cidrs"] = nil
 	} else {
 		delete(b, "allowed_cidrs")
+	}
+	userList, ok := b["user_list"]
+	if ok && userList.(bool) {
+		b["user_list"] = make([]CreateUserListOpts, 0)
 	}
 	_, r.Err = c.Patch(updateURL(c, listenerID), b, &r.Body, &gcorecloud.RequestOpts{
 		OkCodes: []int{200, 201},
