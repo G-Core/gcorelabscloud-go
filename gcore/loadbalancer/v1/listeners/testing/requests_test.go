@@ -223,3 +223,38 @@ func TestUpdate(t *testing.T) {
 	require.Equal(t, Tasks1, *task)
 
 }
+
+func TestUnset(t *testing.T) {
+
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	testURL := prepareGetTestURLv2(Listener1.ID)
+
+	th.Mux.HandleFunc(testURL, func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "PATCH")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestJSONRequest(t, r, UnsetRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, UnsetResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("lblisteners", "v2")
+
+	opts := listeners.UnsetOpts{
+		AllowedCIDRS: true,
+	}
+
+	tasks, err := listeners.Unset(client, Listener1.ID, opts).Extract()
+
+	require.NoError(t, err)
+	require.Equal(t, Tasks1, *tasks)
+
+}

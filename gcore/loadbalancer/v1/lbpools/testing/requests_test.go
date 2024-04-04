@@ -287,7 +287,6 @@ func TestUnset(t *testing.T) {
 	tasks, err := lbpools.Unset(client, LBPool1.ID, opts).Extract()
 
 	require.NoError(t, err)
-	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 
 }

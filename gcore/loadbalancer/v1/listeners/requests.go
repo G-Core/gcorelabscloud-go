@@ -135,6 +135,49 @@ func Update(c *gcorecloud.ServiceClient, listenerID string, opts UpdateOptsBuild
 	return
 }
 
+// UnsetOptsBuilder allows extensions to add additional parameters to the Unset request.
+type UnsetOptsBuilder interface {
+	ToListenerUnsetMap() (map[string]interface{}, error)
+}
+
+// UnsetOpts represents options used to unset lbpool fields.
+type UnsetOpts struct {
+	AllowedCIDRS bool `json:"allowed_cidrs"`
+	UserList bool `json:"user_list"`
+}
+
+// ToLbListenerUnsetMap builds a request body from UnsetOpts.
+func (opts UnsetOpts) ToListenerUnsetMap() (map[string]interface{}, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return nil, err
+	}
+	return gcorecloud.BuildRequestBody(opts, "")
+}
+
+// Unset accepts an UnsetOpts struct and unsets an existing listner fields using
+// values provided.
+func Unset(c *gcorecloud.ServiceClient, listenerID string, opts UnsetOptsBuilder) (r tasks.Result) {
+	b, err := opts.ToListenerUnsetMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	allowedCIDRS, ok := b["allowed_cidrs"]
+	if ok && allowedCIDRS.(bool) {
+		b["allowed_cidrs"] = nil
+	} else {
+		delete(b, "allowed_cidrs")
+	}
+	userList, ok := b["user_list"]
+	if ok && userList.(bool) {
+		b["user_list"] = make([]CreateUserListOpts, 0)
+	}
+	_, r.Err = c.Patch(updateURL(c, listenerID), b, &r.Body, &gcorecloud.RequestOpts{
+		OkCodes: []int{200, 201},
+	})
+	return
+}
+
 // Delete accepts a unique ID and deletes the listener associated with it.
 func Delete(c *gcorecloud.ServiceClient, listenerID string) (r tasks.Result) {
 	_, r.Err = c.DeleteWithResponse(deleteURL(c, listenerID), &r.Body, nil)

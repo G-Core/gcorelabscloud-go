@@ -342,6 +342,51 @@ var listenerUpdateSubCommand = cli.Command{
 	},
 }
 
+var listenerUnsetSubCommand = cli.Command{
+	Name:      "unset",
+	Usage:     "clear loadbalancer listener settings",
+	ArgsUsage: "<listener_id>",
+	Category:  "listener",
+	Flags: append([]cli.Flag{
+		&cli.BoolFlag{
+			Name:     "allowed-cidrs",
+			Usage:    "Clear all allowed CIDRs from the listener",
+			Required: false,
+		},
+	}, flags.WaitCommandFlags...),
+	Action: func(c *cli.Context) error {
+		listenerID, err := flags.GetFirstStringArg(c, listenerIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "unset")
+			return err
+		}
+		client, err := client.NewLBListenerClientV2(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+		opts := listeners.UnsetOpts{
+			AllowedCIDRS: c.Bool("allowed-cidrs"),
+		}
+		results, err := listeners.Unset(client, listenerID, opts).Extract()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		return utils.WaitTaskAndShowResult(c, client, results, true, func(task tasks.TaskID) (interface{}, error) {
+			_, err := tasks.Get(client, string(task)).Extract()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
+			}
+			listener, err := listeners.Get(client, listenerID).Extract()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get listener with ID: %s. Error: %w", listenerID, err)
+			}
+			utils.ShowResults(listener, c.String("format"))
+			return nil, nil
+		})
+	},
+}
+
 var ListenerCommands = cli.Command{
 	Name:  "listener",
 	Usage: "GCloud loadbalancer listeners API",
@@ -351,5 +396,6 @@ var ListenerCommands = cli.Command{
 		&listenerUpdateSubCommand,
 		&listenerDeleteSubCommand,
 		&listenerCreateSubCommand,
+		&listenerUnsetSubCommand,
 	},
 }

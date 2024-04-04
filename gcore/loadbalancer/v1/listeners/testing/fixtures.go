@@ -78,6 +78,12 @@ const UpdateRequest = `
 }	
 `
 
+const UnsetRequest = `
+{
+  "allowed_cidrs": null
+}
+`
+
 const CreateResponse = `
 {
   "tasks": [
@@ -94,6 +100,14 @@ const UpdateResponse = `
 `
 
 const DeleteResponse = `
+{
+  "tasks": [
+    "50f53a35-42ed-40c4-82b2-5a37fb3e00bc"
+  ]
+}
+`
+
+const UnsetResponse = `
 {
   "tasks": [
     "50f53a35-42ed-40c4-82b2-5a37fb3e00bc"
