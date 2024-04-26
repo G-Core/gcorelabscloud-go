@@ -549,3 +549,11 @@ type ErrAppCredMissingSecret struct{ BaseError }
 func (e ErrAppCredMissingSecret) Error() string {
 	return "You must provide an Application Credential Secret"
 }
+
+// ErrConflictRetry is the error type returned when request
+// could not finish successfully despite retries
+type ErrConflictRetry struct{ BaseError }
+
+func (e ErrConflictRetry) Error() string {
+	return "Request is unable to finish successfully after retry"
+}
