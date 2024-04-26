@@ -32,7 +32,6 @@ const (
 	LoadBalancerAlgorithmRoundRobin       LoadBalancerAlgorithm = "ROUND_ROBIN"
 	LoadBalancerAlgorithmLeastConnections LoadBalancerAlgorithm = "LEAST_CONNECTIONS"
 	LoadBalancerAlgorithmSourceIP         LoadBalancerAlgorithm = "SOURCE_IP"
-	LoadBalancerAlgorithmSourceIPPort     LoadBalancerAlgorithm = "SOURCE_IP_PORT"
 
 	PersistenceTypeAppCookie  PersistenceType = "APP_COOKIE"
 	PersistenceTypeHTTPCookie PersistenceType = "HTTP_COOKIE"
@@ -208,8 +207,7 @@ func (lba LoadBalancerAlgorithm) IsValid() error {
 	switch lba {
 	case LoadBalancerAlgorithmRoundRobin,
 		LoadBalancerAlgorithmLeastConnections,
-		LoadBalancerAlgorithmSourceIP,
-		LoadBalancerAlgorithmSourceIPPort:
+		LoadBalancerAlgorithmSourceIP:
 		return nil
 	}
 	return fmt.Errorf("invalid LoadBalancerAlgorithm: %v", lba)
@@ -235,7 +233,6 @@ func (lba LoadBalancerAlgorithm) List() []LoadBalancerAlgorithm {
 		LoadBalancerAlgorithmRoundRobin,
 		LoadBalancerAlgorithmLeastConnections,
 		LoadBalancerAlgorithmSourceIP,
-		LoadBalancerAlgorithmSourceIPPort,
 	}
 }
 
