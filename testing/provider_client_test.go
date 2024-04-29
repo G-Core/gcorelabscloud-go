@@ -437,3 +437,110 @@ func TestRequestWithContext(t *testing.T) {
 		t.Fatalf("expecting error to contain: %q, got %q", ctx.Err().Error(), err.Error())
 	}
 }
+
+func TestConflictRetrySuccess(t *testing.T) {
+
+	numconc := 20
+	mut := new(sync.RWMutex)
+
+	p := new(gcorecloud.ProviderClient)
+
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	requestCounter := 0
+	var requestCounterMutex sync.Mutex
+
+	th.Mux.HandleFunc("/conflict", func(w http.ResponseWriter, r *http.Request) {
+		requestCounterMutex.Lock()
+		requestCounter++
+
+		// Simulate success after retry
+		if requestCounter == 10 {
+			w.WriteHeader(http.StatusOK)
+		}
+		requestCounterMutex.Unlock()
+
+		// by default, respond with 409
+		w.WriteHeader(http.StatusConflict)
+	})
+
+	reqopts := &gcorecloud.RequestOpts{
+		ConflictRetryAmount:   3,
+		ConflictRetryInterval: 1,
+	}
+
+	// counters for the upcoming errors
+	errors := 0
+
+	wg := new(sync.WaitGroup)
+	for i := 0; i < numconc; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			resp, err := p.Request("GET", fmt.Sprintf("%s/conflict", th.Endpoint()), reqopts)
+			mut.Lock()
+			defer mut.Unlock()
+
+			// After conflict retry amount has passed without success,
+			// since endpoint returns 409, final error will be 409 as well
+			if _, ok := err.(gcorecloud.ErrDefault409); ok {
+				errors++
+			}
+
+			if err == nil {
+				th.AssertEquals(t, resp.StatusCode == http.StatusOK, true)
+			}
+
+		}()
+	}
+
+	wg.Wait()
+	th.AssertEquals(t, errors > 0, true)
+	th.AssertEquals(t, errors < 20, true)
+}
+
+func TestConflictRetryError(t *testing.T) {
+
+	numconc := 20
+	mut := new(sync.RWMutex)
+
+	p := new(gcorecloud.ProviderClient)
+
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc("/conflict", func(w http.ResponseWriter, r *http.Request) {
+		// conflict always returns 409
+		w.WriteHeader(http.StatusConflict)
+	})
+
+	reqopts := &gcorecloud.RequestOpts{
+		ConflictRetryAmount:   3,
+		ConflictRetryInterval: 1,
+	}
+
+	// counters for the upcoming errors
+	errors := 0
+
+	wg := new(sync.WaitGroup)
+	for i := 0; i < numconc; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			_, err := p.Request("GET", fmt.Sprintf("%s/conflict", th.Endpoint()), reqopts)
+			mut.Lock()
+			defer mut.Unlock()
+
+			// After conflict retry amount has passed without success,
+			// since endpoint returns 409, final error will be 409 as well
+			if _, ok := err.(gcorecloud.ErrDefault409); ok {
+				errors++
+			}
+
+		}()
+	}
+
+	wg.Wait()
+	th.AssertEquals(t, errors == 20, true)
+}

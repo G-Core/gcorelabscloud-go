@@ -141,13 +141,13 @@ func (opts CreatePoolMemberOpts) ToLBPoolMemberCreateMap() (map[string]interface
 }
 
 // Create accepts a CreateOpts struct and creates a new lbpool using the values provided.
-func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r tasks.Result) {
+func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder, reqOpts *gcorecloud.RequestOpts) (r tasks.Result) {
 	b, err := opts.ToLBPoolCreateMap()
 	if err != nil {
 		r.Err = err
 		return
 	}
-	_, r.Err = c.Post(createURL(c), b, &r.Body, nil)
+	_, r.Err = c.Post(createURL(c), b, &r.Body, reqOpts)
 	return
 }
 
@@ -179,15 +179,14 @@ func (opts UpdateOpts) ToLBPoolUpdateMap() (map[string]interface{}, error) {
 
 // Update accepts a UpdateOpts struct and updates an existing lbpool using the
 // values provided. For more information, see the Create function.
-func Update(c *gcorecloud.ServiceClient, lbpoolID string, opts UpdateOptsBuilder) (r tasks.Result) {
+func Update(c *gcorecloud.ServiceClient, lbpoolID string, opts UpdateOptsBuilder, reqOpts *gcorecloud.RequestOpts) (r tasks.Result) {
 	b, err := opts.ToLBPoolUpdateMap()
 	if err != nil {
 		r.Err = err
 		return
 	}
-	_, r.Err = c.Patch(updateURL(c, lbpoolID), b, &r.Body, &gcorecloud.RequestOpts{
-		OkCodes: []int{200, 201},
-	})
+	reqOpts.OkCodes = []int{200, 201}
+	_, r.Err = c.Patch(updateURL(c, lbpoolID), b, &r.Body, reqOpts)
 	return
 }
 
@@ -198,7 +197,7 @@ type UnsetOptsBuilder interface {
 
 // UnsetOpts represents options used to unset lbpool fields.
 type UnsetOpts struct {
-	SessionPersistence  bool  `json:"session_persistence"`
+	SessionPersistence bool `json:"session_persistence"`
 }
 
 // ToLBPoolUnsetMap builds a request body from UnsetOpts.
@@ -211,7 +210,7 @@ func (opts UnsetOpts) ToLBPoolUnsetMap() (map[string]interface{}, error) {
 
 // Unset accepts a UnsetOpts struct and unsets an existing lbpool fields using the
 // values provided.
-func Unset(c *gcorecloud.ServiceClient, lbpoolID string, opts UnsetOptsBuilder) (r tasks.Result) {
+func Unset(c *gcorecloud.ServiceClient, lbpoolID string, opts UnsetOptsBuilder, reqOpts *gcorecloud.RequestOpts) (r tasks.Result) {
 	b, err := opts.ToLBPoolUnsetMap()
 	sp, ok := b["session_persistence"]
 	if ok && sp.(bool) {
@@ -223,15 +222,14 @@ func Unset(c *gcorecloud.ServiceClient, lbpoolID string, opts UnsetOptsBuilder) 
 		r.Err = err
 		return
 	}
-	_, r.Err = c.Patch(updateURL(c, lbpoolID), b, &r.Body, &gcorecloud.RequestOpts{
-		OkCodes: []int{200, 201},
-	})
+	reqOpts.OkCodes = []int{200, 201}
+	_, r.Err = c.Patch(updateURL(c, lbpoolID), b, &r.Body, reqOpts)
 	return
 }
 
 // Delete accepts a unique ID and deletes the lbpool associated with it.
-func Delete(c *gcorecloud.ServiceClient, lbpoolID string) (r tasks.Result) {
-	_, r.Err = c.DeleteWithResponse(deleteURL(c, lbpoolID), &r.Body, nil)
+func Delete(c *gcorecloud.ServiceClient, lbpoolID string, reqOpts *gcorecloud.RequestOpts) (r tasks.Result) {
+	_, r.Err = c.DeleteWithResponse(deleteURL(c, lbpoolID), &r.Body, reqOpts)
 	return
 }
 
@@ -245,35 +243,36 @@ func ListAll(c *gcorecloud.ServiceClient, opts ListOptsBuilder) ([]Pool, error) 
 }
 
 // CreateMember creates LB pool member
-func CreateMember(c *gcorecloud.ServiceClient, lbpoolID string, opts CreateMemberOptsBuilder) (r tasks.Result) {
+func CreateMember(c *gcorecloud.ServiceClient, lbpoolID string, opts CreateMemberOptsBuilder, reqOpts *gcorecloud.RequestOpts) (r tasks.Result) {
 	b, err := opts.ToLBPoolMemberCreateMap()
 	if err != nil {
 		r.Err = err
 		return
 	}
-	_, r.Err = c.Post(createMemberURL(c, lbpoolID), b, &r.Body, nil)
+	_, r.Err = c.Post(createMemberURL(c, lbpoolID), b, &r.Body, reqOpts)
 	return
 }
 
 // DeleteMember accepts a unique pool and member ID and deletes pool member.
-func DeleteMember(c *gcorecloud.ServiceClient, lbpoolID string, memberID string) (r tasks.Result) {
-	_, r.Err = c.DeleteWithResponse(deleteMemberURL(c, lbpoolID, memberID), &r.Body, nil)
+func DeleteMember(c *gcorecloud.ServiceClient, lbpoolID string, memberID string, reqOpts *gcorecloud.RequestOpts) (r tasks.Result) {
+	_, r.Err = c.DeleteWithResponse(deleteMemberURL(c, lbpoolID, memberID), &r.Body, reqOpts)
 	return
 }
 
 // DeleteHealthMonitor accepts a unique ID and deletes the lbpool's healthmonitor associated with it.
-func DeleteHealthMonitor(c *gcorecloud.ServiceClient, lbpoolID string) (r DeleteHealthMonitorResult) {
-	_, r.Err = c.Delete(healthMonitorURL(c, lbpoolID), &gcorecloud.RequestOpts{OkCodes: []int{http.StatusNoContent}})
+func DeleteHealthMonitor(c *gcorecloud.ServiceClient, lbpoolID string, reqOpts *gcorecloud.RequestOpts) (r DeleteHealthMonitorResult) {
+	reqOpts.OkCodes = []int{http.StatusNoContent}
+	_, r.Err = c.Delete(healthMonitorURL(c, lbpoolID), reqOpts)
 	return
 }
 
 // CreateHealthMonitor creates LB pool healthmonitor
-func CreateHealthMonitor(c *gcorecloud.ServiceClient, lbpoolID string, opts CreateHealthMonitorOptsBuilder) (r tasks.Result) {
+func CreateHealthMonitor(c *gcorecloud.ServiceClient, lbpoolID string, opts CreateHealthMonitorOptsBuilder, reqOpts *gcorecloud.RequestOpts) (r tasks.Result) {
 	b, err := opts.ToHealthMonitorCreateMap()
 	if err != nil {
 		r.Err = err
 		return
 	}
-	_, r.Err = c.Post(healthMonitorURL(c, lbpoolID), b, &r.Body, nil)
+	_, r.Err = c.Post(healthMonitorURL(c, lbpoolID), b, &r.Body, reqOpts)
 	return
 }

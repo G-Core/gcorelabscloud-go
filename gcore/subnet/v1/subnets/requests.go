@@ -92,13 +92,14 @@ func (opts ListOpts) ToSubnetListQuery() (string, error) {
 }
 
 // Create accepts a CreateOpts struct and creates a new subnet using the values provided.
-func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r tasks.Result) {
+func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder, reqOpts *gcorecloud.RequestOpts) (r tasks.Result) {
 	b, err := opts.ToSubnetCreateMap()
 	if err != nil {
 		r.Err = err
 		return
 	}
-	_, r.Err = c.Post(createURL(c), b, &r.Body, nil)
+
+	_, r.Err = c.Post(createURL(c), b, &r.Body, reqOpts)
 	return
 }
 
@@ -144,8 +145,8 @@ func Update(c *gcorecloud.ServiceClient, subnetID string, opts UpdateOptsBuilder
 }
 
 // Delete accepts a unique ID and deletes the subnet associated with it.
-func Delete(c *gcorecloud.ServiceClient, subnetID string) (r tasks.Result) {
-	_, r.Err = c.DeleteWithResponse(deleteURL(c, subnetID), &r.Body, nil)
+func Delete(c *gcorecloud.ServiceClient, subnetID string, reqOpts *gcorecloud.RequestOpts) (r tasks.Result) {
+	_, r.Err = c.DeleteWithResponse(deleteURL(c, subnetID), &r.Body, reqOpts)
 	return
 }
 

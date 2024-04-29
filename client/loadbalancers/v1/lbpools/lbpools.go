@@ -230,7 +230,7 @@ var lbpoolDeleteSubCommand = cli.Command{
 	Usage:     "delete loadbalancer pool",
 	ArgsUsage: "<pool_id>",
 	Category:  "pool",
-	Flags:     flags.WaitCommandFlags,
+	Flags:     flags.ClientRequestFlags,
 	Action: func(c *cli.Context) error {
 		lbpoolID, err := flags.GetFirstStringArg(c, lbpoolIDText)
 		if err != nil {
@@ -242,7 +242,10 @@ var lbpoolDeleteSubCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		results, err := lbpools.Delete(client, lbpoolID).Extract()
+		results, err := lbpools.Delete(client, lbpoolID, &gcorecloud.RequestOpts{
+			ConflictRetryAmount:   c.Int("retry-amount"),
+			ConflictRetryInterval: c.Int("retry-interval"),
+		}).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -437,7 +440,7 @@ var lbpoolCreateSubCommand = cli.Command{
 			Usage:    "backend member inactivity timeout in milliseconds",
 			Required: false,
 		},
-	}, flags.WaitCommandFlags...),
+	}, flags.ClientRequestFlags...),
 	Action: func(c *cli.Context) error {
 		client, err := client.NewLBPoolClientV1(c)
 		if err != nil {
@@ -505,7 +508,10 @@ var lbpoolCreateSubCommand = cli.Command{
 			TimeoutMemberData:    timeoutMemberData,
 		}
 
-		results, err := lbpools.Create(client, opts).Extract()
+		results, err := lbpools.Create(client, opts, &gcorecloud.RequestOpts{
+			ConflictRetryAmount:   c.Int("retry-amount"),
+			ConflictRetryInterval: c.Int("retry-interval"),
+		}).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -564,7 +570,7 @@ var lbpoolCreateMemberSubCommand = cli.Command{
 			Usage:    "pool instance ID",
 			Required: false,
 		},
-	}, flags.WaitCommandFlags...),
+	}, flags.ClientRequestFlags...),
 	Action: func(c *cli.Context) error {
 		lbpoolID, err := flags.GetFirstStringArg(c, lbpoolIDText)
 		if err != nil {
@@ -590,7 +596,10 @@ var lbpoolCreateMemberSubCommand = cli.Command{
 			InstanceID:   c.String("instance-id"),
 		}
 
-		results, err := lbpools.CreateMember(client, lbpoolID, opts).Extract()
+		results, err := lbpools.CreateMember(client, lbpoolID, opts, &gcorecloud.RequestOpts{
+			ConflictRetryAmount:   c.Int("retry-amount"),
+			ConflictRetryInterval: c.Int("retry-interval"),
+		}).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -625,7 +634,7 @@ var lbpoolDeleteMemberSubCommand = cli.Command{
 			Usage:    "pool ID",
 			Required: true,
 		},
-	}, flags.WaitCommandFlags...),
+	}, flags.ClientRequestFlags...),
 	Action: func(c *cli.Context) error {
 		memberID, err := flags.GetFirstStringArg(c, memberIDText)
 		if err != nil {
@@ -638,7 +647,10 @@ var lbpoolDeleteMemberSubCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 		lbpoolID := c.String("pool-id")
-		results, err := lbpools.DeleteMember(client, lbpoolID, memberID).Extract()
+		results, err := lbpools.DeleteMember(client, lbpoolID, memberID, &gcorecloud.RequestOpts{
+			ConflictRetryAmount:   c.Int("retry-amount"),
+			ConflictRetryInterval: c.Int("retry-interval"),
+		}).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -803,7 +815,7 @@ var lbpoolUpdateSubCommand = cli.Command{
 			Usage:    "pool instance ID",
 			Required: false,
 		},
-	}, flags.WaitCommandFlags...),
+	}, flags.ClientRequestFlags...),
 	Action: func(c *cli.Context) error {
 		lbPoolID, err := flags.GetFirstStringArg(c, lbpoolIDText)
 		if err != nil {
@@ -858,7 +870,10 @@ var lbpoolUpdateSubCommand = cli.Command{
 			opts.LBPoolAlgorithm = *lba
 		}
 
-		results, err := lbpools.Update(client, lbPoolID, opts).Extract()
+		results, err := lbpools.Update(client, lbPoolID, opts, &gcorecloud.RequestOpts{
+			ConflictRetryAmount:   c.Int("retry-amount"),
+			ConflictRetryInterval: c.Int("retry-interval"),
+		}).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -892,7 +907,7 @@ var lbpoolUnsetSubCommand = cli.Command{
 			Usage:    "Disables session persistence on the pool",
 			Required: false,
 		},
-	}, flags.WaitCommandFlags...),
+	}, flags.ClientRequestFlags...),
 	Action: func(c *cli.Context) error {
 		lbPoolID, err := flags.GetFirstStringArg(c, lbpoolIDText)
 		if err != nil {
@@ -907,7 +922,10 @@ var lbpoolUnsetSubCommand = cli.Command{
 		opts := lbpools.UnsetOpts{
 			SessionPersistence: c.Bool("session-persistence"),
 		}
-		results, err := lbpools.Unset(client, lbPoolID, opts).Extract()
+		results, err := lbpools.Unset(client, lbPoolID, opts, &gcorecloud.RequestOpts{
+			ConflictRetryAmount:   c.Int("retry-amount"),
+			ConflictRetryInterval: c.Int("retry-interval"),
+		}).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -987,7 +1005,7 @@ var lbpoolCreateHealthMonitorSubCommand = cli.Command{
 			Usage:    "health monitor checking url path",
 			Required: false,
 		},
-	}, flags.WaitCommandFlags...),
+	}, flags.ClientRequestFlags...),
 	Action: func(c *cli.Context) error {
 		lbPoolID, err := flags.GetFirstStringArg(c, lbpoolIDText)
 		if err != nil {
@@ -1006,7 +1024,10 @@ var lbpoolCreateHealthMonitorSubCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
-		results, err := lbpools.CreateHealthMonitor(client, lbPoolID, hm).Extract()
+		results, err := lbpools.CreateHealthMonitor(client, lbPoolID, hm, &gcorecloud.RequestOpts{
+			ConflictRetryAmount:   c.Int("retry-amount"),
+			ConflictRetryInterval: c.Int("retry-interval"),
+		}).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -1033,7 +1054,7 @@ var lbpoolDeleteHealthMonitorSubCommand = cli.Command{
 	Usage:     "delete loadbalancer pool's health monitor",
 	ArgsUsage: "<pool_id>",
 	Category:  "pool",
-	Flags:     flags.WaitCommandFlags,
+	Flags:     flags.ClientRequestFlags,
 	Action: func(c *cli.Context) error {
 		lbpoolID, err := flags.GetFirstStringArg(c, lbpoolIDText)
 		if err != nil {
@@ -1046,7 +1067,10 @@ var lbpoolDeleteHealthMonitorSubCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
-		if err = lbpools.DeleteHealthMonitor(client, lbpoolID).ExtractErr(); err != nil {
+		if err = lbpools.DeleteHealthMonitor(client, lbpoolID, &gcorecloud.RequestOpts{
+			ConflictRetryAmount:   c.Int("retry-amount"),
+			ConflictRetryInterval: c.Int("retry-interval"),
+		}).ExtractErr(); err != nil {
 			return cli.NewExitError(err, 1)
 		}
 		return nil

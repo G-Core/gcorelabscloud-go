@@ -12,6 +12,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -363,6 +364,11 @@ type RequestOpts struct {
 	// ErrorContext specifies the resource error type to return if an error is encountered.
 	// This lets resources override default error messages based on the response status code.
 	ErrorContext error
+	// ConflictRetryAmount specifies number of retries to perform in case of encountering conflict
+	// during performed request
+	ConflictRetryAmount int
+	// ConflictRetryInterval specifies time (in seconds) between next retry requests
+	ConflictRetryInterval int
 }
 
 // requestState contains temporary state for a single ProviderClient.Request() call.
@@ -372,6 +378,9 @@ type requestState struct {
 	// reauthenticate, but keep getting 401 responses with the fresh token, reauthenticating some more
 	// will just get us into an infinite loop.
 	hasReauthenticated bool
+	// This flag indicates if issued request has already been retried. It ensures that we don't
+	// end inside an infinite loop.
+	hasRetriedConflict bool
 }
 
 var applicationJSON = "application/json"
@@ -381,6 +390,7 @@ var applicationJSON = "application/json"
 func (client *ProviderClient) Request(method, url string, options *RequestOpts) (*http.Response, error) {
 	return client.doRequest(method, url, options, &requestState{
 		hasReauthenticated: false,
+		hasRetriedConflict: false,
 	})
 }
 
@@ -550,6 +560,25 @@ func (client *ProviderClient) doRequest(method, url string, options *RequestOpts
 				err = error408er.Error408(respErr)
 			}
 		case http.StatusConflict:
+			if options.ConflictRetryAmount > 0 && !state.hasRetriedConflict {
+				state.hasRetriedConflict = true
+				for attempt := 1; attempt <= options.ConflictRetryAmount; attempt++ {
+					resp, err := client.doRequest(method, url, options, state)
+
+					if err != nil {
+						log.Warningf("Retried request fails, trying again in %d seconds.\nDetails: %v", options.ConflictRetryInterval, err)
+					}
+
+					// Validate the HTTP response status.
+					for _, code := range okc {
+						if resp.StatusCode == code && err == nil {
+							return resp, err
+						}
+					}
+
+					time.Sleep(time.Duration(options.ConflictRetryInterval) * time.Second)
+				}
+			}
 			err = ErrDefault409{respErr}
 			if error409er, ok := errType.(Err409er); ok {
 				err = error409er.Error409(respErr)
