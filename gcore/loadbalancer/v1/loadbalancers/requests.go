@@ -196,13 +196,13 @@ func (opts CreateOpts) ToLoadBalancerCreateMap() (map[string]interface{}, error)
 }
 
 // Create accepts a CreateOpts struct and creates a new loadbalancer using the values provided.
-func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r tasks.Result) {
+func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder, reqOpts *gcorecloud.RequestOpts) (r tasks.Result) {
 	b, err := opts.ToLoadBalancerCreateMap()
 	if err != nil {
 		r.Err = err
 		return
 	}
-	_, r.Err = c.Post(createURL(c), b, &r.Body, nil)
+	_, r.Err = c.Post(createURL(c), b, &r.Body, reqOpts)
 	return
 }
 
@@ -253,8 +253,8 @@ func Update(c *gcorecloud.ServiceClient, loadbalancerID string, opts UpdateOptsB
 }
 
 // Delete accepts a unique ID and deletes the loadbalancer associated with it.
-func Delete(c *gcorecloud.ServiceClient, loadbalancerID string) (r tasks.Result) {
-	_, r.Err = c.DeleteWithResponse(deleteURL(c, loadbalancerID), &r.Body, nil)
+func Delete(c *gcorecloud.ServiceClient, loadbalancerID string, reqOpts *gcorecloud.RequestOpts) (r tasks.Result) {
+	_, r.Err = c.DeleteWithResponse(deleteURL(c, loadbalancerID), &r.Body, reqOpts)
 	return
 }
 
@@ -312,12 +312,12 @@ func (opts ResizeOpts) ToLoadBalancerResizeMap() (map[string]interface{}, error)
 }
 
 // Resize accepts a ResizeOpts struct and resizes a loadbalancer using the values provided.
-func Resize(c *gcorecloud.ServiceClient, loadbalancerID string, opts ResizeOptsBuilder) (r tasks.Result) {
+func Resize(c *gcorecloud.ServiceClient, loadbalancerID string, opts ResizeOptsBuilder, reqOpts *gcorecloud.RequestOpts) (r tasks.Result) {
 	b, err := opts.ToLoadBalancerResizeMap()
 	if err != nil {
 		r.Err = err
 		return
 	}
-	_, r.Err = c.Post(resizeLoadBalancerUrl(c, loadbalancerID), b, &r.Body, nil)
+	_, r.Err = c.Post(resizeLoadBalancerUrl(c, loadbalancerID), b, &r.Body, reqOpts)
 	return
 }

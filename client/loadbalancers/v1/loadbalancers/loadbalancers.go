@@ -84,7 +84,7 @@ var loadBalancerCreateSubCommand = cli.Command{
 			Aliases: []string{"t"},
 			Usage:   "Loadbalancer tags",
 		},
-	}, flags.WaitCommandFlags...),
+	}, flags.ClientRequestFlags...),
 	Action: func(c *cli.Context) error {
 		client, err := client.NewLoadbalancerClientV1(c)
 		if err != nil {
@@ -105,7 +105,10 @@ var loadBalancerCreateSubCommand = cli.Command{
 			opts.Flavor = &flavor
 		}
 
-		results, err := loadbalancers.Create(client, opts).Extract()
+		results, err := loadbalancers.Create(client, opts, &gcorecloud.RequestOpts{
+			ConflictRetryAmount:   c.Int("retry-amount"),
+			ConflictRetryInterval: c.Int("retry-interval"),
+		}).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -158,7 +161,7 @@ var loadBalancerDeleteSubCommand = cli.Command{
 	Usage:     "delete loadbalancer",
 	ArgsUsage: "<loadbalancer_id>",
 	Category:  "loadbalancer",
-	Flags:     flags.WaitCommandFlags,
+	Flags:     flags.ClientRequestFlags,
 	Action: func(c *cli.Context) error {
 		loadBalancerID, err := flags.GetFirstStringArg(c, loadBalancerIDText)
 		if err != nil {
@@ -170,7 +173,10 @@ var loadBalancerDeleteSubCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		results, err := loadbalancers.Delete(client, loadBalancerID).Extract()
+		results, err := loadbalancers.Delete(client, loadBalancerID, &gcorecloud.RequestOpts{
+			ConflictRetryAmount:   c.Int("retry-amount"),
+			ConflictRetryInterval: c.Int("retry-interval"),
+		}).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -243,7 +249,7 @@ var loadBalancerResizeSubCommand = cli.Command{
 			Usage:    "Loadbalancer flavor",
 			Required: true,
 		},
-	}, flags.WaitCommandFlags...),
+	}, flags.ClientRequestFlags...),
 	Action: func(c *cli.Context) error {
 		loadBalancerID, err := flags.GetFirstStringArg(c, loadBalancerIDText)
 		if err != nil {
@@ -261,7 +267,10 @@ var loadBalancerResizeSubCommand = cli.Command{
 			Flavor: c.String("flavor"),
 		}
 
-		results, err := loadbalancers.Resize(client, loadBalancerID, opts).Extract()
+		results, err := loadbalancers.Resize(client, loadBalancerID, opts, &gcorecloud.RequestOpts{
+			ConflictRetryAmount:   c.Int("retry-amount"),
+			ConflictRetryInterval: c.Int("retry-interval"),
+		}).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
