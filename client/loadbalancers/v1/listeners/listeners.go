@@ -125,7 +125,7 @@ var listenerCreateSubCommand = cli.Command{
 			Value:    100000,
 			Required: false,
 		},
-	}, flags.WaitCommandFlags...),
+	}, flags.ClientRequestFlags...),
 	Action: func(c *cli.Context) error {
 		client, err := client.NewLBListenerClientV1(c)
 		if err != nil {
@@ -164,7 +164,10 @@ var listenerCreateSubCommand = cli.Command{
 			opts.ConnectionLimit = &connectionLimit
 		}
 
-		results, err := listeners.Create(client, opts).Extract()
+		results, err := listeners.Create(client, opts, &gcorecloud.RequestOpts{
+			ConflictRetryAmount:   c.Int("retry-amount"),
+			ConflictRetryInterval: c.Int("retry-interval"),
+		}).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -217,7 +220,7 @@ var listenerDeleteSubCommand = cli.Command{
 	Usage:     "delete loadbalancer listener",
 	ArgsUsage: "<listener_id>",
 	Category:  "listener",
-	Flags:     flags.WaitCommandFlags,
+	Flags:     flags.ClientRequestFlags,
 	Action: func(c *cli.Context) error {
 		listenerID, err := flags.GetFirstStringArg(c, listenerIDText)
 		if err != nil {
@@ -229,7 +232,10 @@ var listenerDeleteSubCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		results, err := listeners.Delete(client, listenerID).Extract()
+		results, err := listeners.Delete(client, listenerID, &gcorecloud.RequestOpts{
+			ConflictRetryAmount:   c.Int("retry-amount"),
+			ConflictRetryInterval: c.Int("retry-interval"),
+		}).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -256,7 +262,7 @@ var listenerUpdateSubCommand = cli.Command{
 	Usage:     "update loadbalancer listener",
 	ArgsUsage: "<listener_id>",
 	Category:  "listener",
-	Flags: []cli.Flag{
+	Flags: append([]cli.Flag{
 		&cli.StringFlag{
 			Name:    "name",
 			Aliases: []string{"n"},
@@ -295,7 +301,7 @@ var listenerUpdateSubCommand = cli.Command{
 			Aliases: []string{"cl"},
 			Usage:   "Limit of the simultaneous connections",
 		},
-	},
+	}, flags.ClientRequestFlags...),
 	Action: func(c *cli.Context) error {
 		listenerID, err := flags.GetFirstStringArg(c, listenerIDText)
 		if err != nil {
@@ -330,7 +336,10 @@ var listenerUpdateSubCommand = cli.Command{
 			opts.ConnectionLimit = &connectionLimit
 		}
 
-		result, err := listeners.Update(client, listenerID, opts).Extract()
+		result, err := listeners.Update(client, listenerID, opts, &gcorecloud.RequestOpts{
+			ConflictRetryAmount:   c.Int("retry-amount"),
+			ConflictRetryInterval: c.Int("retry-interval"),
+		}).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -353,7 +362,7 @@ var listenerUnsetSubCommand = cli.Command{
 			Usage:    "Clear all allowed CIDRs from the listener",
 			Required: false,
 		},
-	}, flags.WaitCommandFlags...),
+	}, flags.ClientRequestFlags...),
 	Action: func(c *cli.Context) error {
 		listenerID, err := flags.GetFirstStringArg(c, listenerIDText)
 		if err != nil {
@@ -368,7 +377,10 @@ var listenerUnsetSubCommand = cli.Command{
 		opts := listeners.UnsetOpts{
 			AllowedCIDRS: c.Bool("allowed-cidrs"),
 		}
-		results, err := listeners.Unset(client, listenerID, opts).Extract()
+		results, err := listeners.Unset(client, listenerID, opts, &gcorecloud.RequestOpts{
+			ConflictRetryAmount:   c.Int("retry-amount"),
+			ConflictRetryInterval: c.Int("retry-interval"),
+		}).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}

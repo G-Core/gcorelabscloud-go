@@ -136,7 +136,10 @@ var subnetDeleteCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		results, err := subnets.Delete(client, subnetID).Extract()
+		results, err := subnets.Delete(client, subnetID, &gcorecloud.RequestOpts{
+			ConflictRetryAmount: c.Int("retry-amount"),
+			ConflictRetryInterval: c.Int("retry-interval"),
+		}).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -281,7 +284,7 @@ var subnetCreateCommand = cli.Command{
 			Usage:    "Gateway ip",
 			Required: false,
 		},
-	}, flags.WaitCommandFlags...,
+	}, flags.ClientRequestFlags...,
 	),
 	Action: func(c *cli.Context) error {
 		client, err := client.NewSubnetClientV1(c)
@@ -318,7 +321,10 @@ var subnetCreateCommand = cli.Command{
 			opts.GatewayIP = &gatewayIP
 		}
 
-		results, err := subnets.Create(client, opts).Extract()
+		results, err := subnets.Create(client, opts, &gcorecloud.RequestOpts{
+			ConflictRetryAmount: c.Int("retry-amount"),
+			ConflictRetryInterval: c.Int("retry-interval"),
+		}).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}

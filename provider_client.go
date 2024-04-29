@@ -367,7 +367,7 @@ type RequestOpts struct {
 	// ConflictRetryAmount specifies number of retries to perform in case of encountering conflict
 	// during performed request
 	ConflictRetryAmount int
-	// ConflictRetryInterval specifies time between next retry requests
+	// ConflictRetryInterval specifies time (in seconds) between next retry requests
 	ConflictRetryInterval int
 }
 
@@ -378,6 +378,9 @@ type requestState struct {
 	// reauthenticate, but keep getting 401 responses with the fresh token, reauthenticating some more
 	// will just get us into an infinite loop.
 	hasReauthenticated bool
+	// This flag indicates if issued request has already been retried. It ensures that we don't
+	// end inside an infinite loop.
+	hasRetriedConflict bool
 }
 
 var applicationJSON = "application/json"
@@ -387,6 +390,7 @@ var applicationJSON = "application/json"
 func (client *ProviderClient) Request(method, url string, options *RequestOpts) (*http.Response, error) {
 	return client.doRequest(method, url, options, &requestState{
 		hasReauthenticated: false,
+		hasRetriedConflict: false,
 	})
 }
 
@@ -556,16 +560,13 @@ func (client *ProviderClient) doRequest(method, url string, options *RequestOpts
 				err = error408er.Error408(respErr)
 			}
 		case http.StatusConflict:
-			if options.ConflictRetryAmount > 0 {
+			if options.ConflictRetryAmount > 0 && !state.hasRetriedConflict {
+				state.hasRetriedConflict = true
 				for attempt := 1; attempt <= options.ConflictRetryAmount; attempt++ {
-					if attempt == options.ConflictRetryAmount {
-						return nil, &ErrConflictRetry{}
-					}
-
-					resp, err := client.HTTPClient.Do(req)
+					resp, err := client.doRequest(method, url, options, state)
 
 					if err != nil {
-						return resp, err
+						log.Warningf("Retried request fails, trying again in %d seconds.\nDetails: %v", options.ConflictRetryInterval, err)
 					}
 
 					// Validate the HTTP response status.

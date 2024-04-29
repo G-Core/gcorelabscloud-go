@@ -85,13 +85,13 @@ func (opts CreateOpts) ToListenerCreateMap() (map[string]interface{}, error) {
 }
 
 // Create accepts a CreateOpts struct and creates a new listener using the values provided.
-func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r tasks.Result) {
+func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder, reqOpts *gcorecloud.RequestOpts) (r tasks.Result) {
 	b, err := opts.ToListenerCreateMap()
 	if err != nil {
 		r.Err = err
 		return
 	}
-	_, r.Err = c.Post(createURL(c), b, &r.Body, nil)
+	_, r.Err = c.Post(createURL(c), b, &r.Body, reqOpts)
 	return
 }
 
@@ -123,15 +123,14 @@ func (opts UpdateOpts) ToListenerUpdateMap() (map[string]interface{}, error) {
 
 // Update accepts a UpdateOpts struct and updates an existing listener using the
 // values provided. For more information, see the Create function.
-func Update(c *gcorecloud.ServiceClient, listenerID string, opts UpdateOptsBuilder) (r tasks.Result) {
+func Update(c *gcorecloud.ServiceClient, listenerID string, opts UpdateOptsBuilder, reqOpts *gcorecloud.RequestOpts) (r tasks.Result) {
 	b, err := opts.ToListenerUpdateMap()
 	if err != nil {
 		r.Err = err
 		return
 	}
-	_, r.Err = c.Patch(updateURL(c, listenerID), b, &r.Body, &gcorecloud.RequestOpts{
-		OkCodes: []int{200, 201},
-	})
+	reqOpts.OkCodes = []int{200, 201}
+	_, r.Err = c.Patch(updateURL(c, listenerID), b, &r.Body, reqOpts)
 	return
 }
 
@@ -143,7 +142,7 @@ type UnsetOptsBuilder interface {
 // UnsetOpts represents options used to unset lbpool fields.
 type UnsetOpts struct {
 	AllowedCIDRS bool `json:"allowed_cidrs"`
-	UserList bool `json:"user_list"`
+	UserList     bool `json:"user_list"`
 }
 
 // ToLbListenerUnsetMap builds a request body from UnsetOpts.
@@ -156,7 +155,7 @@ func (opts UnsetOpts) ToListenerUnsetMap() (map[string]interface{}, error) {
 
 // Unset accepts an UnsetOpts struct and unsets an existing listner fields using
 // values provided.
-func Unset(c *gcorecloud.ServiceClient, listenerID string, opts UnsetOptsBuilder) (r tasks.Result) {
+func Unset(c *gcorecloud.ServiceClient, listenerID string, opts UnsetOptsBuilder, reqOpts *gcorecloud.RequestOpts) (r tasks.Result) {
 	b, err := opts.ToListenerUnsetMap()
 	if err != nil {
 		r.Err = err
@@ -174,15 +173,14 @@ func Unset(c *gcorecloud.ServiceClient, listenerID string, opts UnsetOptsBuilder
 	} else {
 		delete(b, "user_list")
 	}
-	_, r.Err = c.Patch(updateURL(c, listenerID), b, &r.Body, &gcorecloud.RequestOpts{
-		OkCodes: []int{200, 201},
-	})
+	reqOpts.OkCodes = []int{200, 201}
+	_, r.Err = c.Patch(updateURL(c, listenerID), b, &r.Body, reqOpts)
 	return
 }
 
 // Delete accepts a unique ID and deletes the listener associated with it.
-func Delete(c *gcorecloud.ServiceClient, listenerID string) (r tasks.Result) {
-	_, r.Err = c.DeleteWithResponse(deleteURL(c, listenerID), &r.Body, nil)
+func Delete(c *gcorecloud.ServiceClient, listenerID string, reqOpts *gcorecloud.RequestOpts) (r tasks.Result) {
+	_, r.Err = c.DeleteWithResponse(deleteURL(c, listenerID), &r.Body, reqOpts)
 	return
 }
 

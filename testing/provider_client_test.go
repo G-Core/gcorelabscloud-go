@@ -482,9 +482,9 @@ func TestConflictRetrySuccess(t *testing.T) {
 			mut.Lock()
 			defer mut.Unlock()
 
-			// ErrConflictRetry happens after conflict retry amount has passed
-			// without success
-			if _, ok := err.(*gcorecloud.ErrConflictRetry); ok {
+			// After conflict retry amount has passed without success,
+			// since endpoint returns 409, final error will be 409 as well
+			if _, ok := err.(gcorecloud.ErrDefault409); ok {
 				errors++
 			}
 
@@ -496,6 +496,7 @@ func TestConflictRetrySuccess(t *testing.T) {
 	}
 
 	wg.Wait()
+	th.AssertEquals(t, errors > 0, true)
 	th.AssertEquals(t, errors < 20, true)
 }
 
@@ -531,9 +532,9 @@ func TestConflictRetryError(t *testing.T) {
 			mut.Lock()
 			defer mut.Unlock()
 
-			// ErrConflictRetry happens after conflict retry amount has passed
-			// without success
-			if _, ok := err.(*gcorecloud.ErrConflictRetry); ok {
+			// After conflict retry amount has passed without success,
+			// since endpoint returns 409, final error will be 409 as well
+			if _, ok := err.(gcorecloud.ErrDefault409); ok {
 				errors++
 			}
 

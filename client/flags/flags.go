@@ -135,6 +135,23 @@ var WaitCommandFlags = []cli.Flag{
 	},
 }
 
+var retryFlags = []cli.Flag{
+	&cli.IntFlag{
+		Name:     "retry-amount",
+		Aliases:  []string{"ra"},
+		Usage:    "Amount of retries on a conflicting request",
+		Value:    0,
+		Required: false,
+	},
+	&cli.IntFlag{
+		Name:     "retry-interval",
+		Aliases:  []string{"ri"},
+		Usage:    "Required amount of time in seconds to wait between retries",
+		Value:    0,
+		Required: false,
+	},
+}
+
 func buildTokenClientFlags() []cli.Flag {
 	var flags []cli.Flag
 	flags = append(flags, commonFlags...)
@@ -156,9 +173,17 @@ func buildAPITokenClientFlags() []cli.Flag {
 	return flags
 }
 
+func buildClientRequestFlags() []cli.Flag {
+	var flags []cli.Flag
+	flags = append(flags, WaitCommandFlags...)
+	flags = append(flags, retryFlags...)
+	return flags
+}
+
 var TokenClientFlags = buildTokenClientFlags()
 var PlatformClientFlags = buildPlatformClientFlags()
 var APITokenClientFlags = buildAPITokenClientFlags()
+var ClientRequestFlags = buildClientRequestFlags()
 
 var TokenClientHelpText = `
    Environment variables example:
