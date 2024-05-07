@@ -1,10 +1,12 @@
 package testing
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
 
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v2/volumes"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 
@@ -82,4 +84,13 @@ func TestDetach(t *testing.T) {
 	tasks, err := volumes.Detach(client, Volume1.ID, options).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
+}
+
+func TestExtractVolumeIDFromAttachTask(t *testing.T) {
+	var task tasks.Task
+	err := json.Unmarshal(rawAttachTask, &task)
+	require.NoError(t, err)
+	volumeID, err := volumes.ExtractVolumeIDFromAttachTask(&task)
+	require.NoError(t, err)
+	require.Equal(t, Volume1.ID, volumeID)
 }

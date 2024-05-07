@@ -31,6 +31,36 @@ const DetachResponse = `
 }
 `
 
+var rawAttachTask = []byte(`
+{
+	"job_id": null,
+	"request_id": "76f8464efaa7f41bb201e6aaca309262",
+	"state": "FINISHED",
+	"error": null,
+	"id": "c44ba6f3-e371-498f-91bb-618eb38d1b3a",
+	"acknowledged_by": null,
+	"lifecycle_policy_id": null,
+	"detailed_state": null,
+	"schedule_id": null,
+	"region_id": 76,
+	"data": {
+		"volume_id": "726ecfcc-7fd0-4e30-a86e-7892524aa483",
+		"instance_id": "dab284e9-1fb5-47e8-870e-3b67a350ac17",
+		"attachment_tag": null
+	},
+	"task_type": "attach_volume",
+	"client_id": 65393,
+	"updated_on": "2024-05-07T08:24:02",
+	"acknowledged_at": null,
+	"project_id": 302434,
+	"created_resources": null,
+	"user_id": 18339,
+	"user_client_id": 65393,
+	"created_on": "2024-05-07T08:23:54",
+	"finished_on": "2024-05-07T08:24:02"
+}
+`)
+
 const createdTimeString = "2019-05-29T05:32:41+0000"
 const updatedTimeString = "2019-05-29T05:39:20+0000"
 const attachedTimeString = "2019-07-26T14:22:03+0000"

@@ -7,18 +7,18 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 )
 
-type VolumeTaskResult struct {
-	Volumes []string `json:"volumes"`
+type volumeAttachTaskResult struct {
+	Volume_ID string `json:"volume_id"`
 }
 
-func ExtractVolumeIDFromTask(task *tasks.Task) (string, error) {
-	var result VolumeTaskResult
-	err := gcorecloud.NativeMapToStruct(task.CreatedResources, &result)
+func ExtractVolumeIDFromAttachTask(task *tasks.Task) (string, error) {
+	var result volumeAttachTaskResult
+	err := gcorecloud.NativeMapToStruct(task.Data, &result)
 	if err != nil {
 		return "", fmt.Errorf("cannot decode volume information in task structure: %w", err)
 	}
-	if len(result.Volumes) == 0 {
+	if result.Volume_ID == "" {
 		return "", fmt.Errorf("cannot decode volume information in task structure: %w", err)
 	}
-	return result.Volumes[0], nil
+	return result.Volume_ID, nil
 }
