@@ -29,7 +29,10 @@ const ListResponse = `
       "status": "Running",
       "node_count": 1,
       "boot_volume_type": "ssd_hiiops",
-      "auto_healing_enabled": false
+      "auto_healing_enabled": false,
+      "servergroup_id": "f3446423-0a82-475a-a1bd-31ce788ace9e",
+      "servergroup_name": "affinity",
+      "servergroup_policy": "affinity"
     }
   ]
 }
@@ -75,17 +78,83 @@ const GetResponse = `
 }
 `
 
-const UpdateRequest = `
+const UpdateRequest1 = `
 {
-  "min_mode_count": 1,
-  "max_mode_count": 3,
+  "auto_healing_enabled": true
 }
 `
 
-const UpdateResponse = `
+const UpdateRequest2 = `
+{
+  "auto_healing_enabled": false
+}
+`
+
+const UpdateRequest3 = `
+{
+  "min_node_count": 2,
+  "max_node_count": 3
+}
+`
+
+const UpdateRequest4 = `
+{
+  "labels": {"foo": "bar"},
+  "taints": {"qux": "wat:NoSchedule"}
+}
+`
+
+const UpdateRequest5 = `
+{
+  "labels": {},
+  "taints": {}
+}
+`
+
+const UpdateResponse1 = `
 {
   "flavor_id": "g0-standard-2-4",
   "min_node_count": 1,
+  "name": "pool-1",
+  "created_at": "2023-08-28T09:40:39Z",
+  "id": "f3446423-0a82-475a-a1bd-31ce788ace9e",
+  "boot_volume_size": 50,
+  "max_node_count": 1,
+  "is_public_ipv4": false,
+  "status": "Running",
+  "node_count": 1,
+  "boot_volume_type": "ssd_hiiops",
+  "auto_healing_enabled": true,
+  "servergroup_policy": "affinity",
+  "servergroup_id": "f3446423-0a82-475a-a1bd-31ce788ace9e",
+  "servergroup_name": "affinity"
+}
+`
+
+const UpdateResponse2 = `
+{
+  "flavor_id": "g0-standard-2-4",
+  "min_node_count": 1,
+  "name": "pool-1",
+  "created_at": "2023-08-28T09:40:39Z",
+  "id": "f3446423-0a82-475a-a1bd-31ce788ace9e",
+  "boot_volume_size": 50,
+  "max_node_count": 1,
+  "is_public_ipv4": false,
+  "status": "Running",
+  "node_count": 1,
+  "boot_volume_type": "ssd_hiiops",
+  "auto_healing_enabled": false,
+  "servergroup_policy": "affinity",
+  "servergroup_id": "f3446423-0a82-475a-a1bd-31ce788ace9e",
+  "servergroup_name": "affinity"
+}
+`
+
+const UpdateResponse3 = `
+{
+  "flavor_id": "g0-standard-2-4",
+  "min_node_count": 2,
   "name": "pool-1",
   "created_at": "2023-08-28T09:40:39Z",
   "id": "f3446423-0a82-475a-a1bd-31ce788ace9e",
@@ -99,6 +168,50 @@ const UpdateResponse = `
   "servergroup_policy": "affinity",
   "servergroup_id": "f3446423-0a82-475a-a1bd-31ce788ace9e",
   "servergroup_name": "affinity"
+}
+`
+
+const UpdateResponse4 = `
+{
+  "flavor_id": "g0-standard-2-4",
+  "min_node_count": 1,
+  "name": "pool-1",
+  "created_at": "2023-08-28T09:40:39Z",
+  "id": "f3446423-0a82-475a-a1bd-31ce788ace9e",
+  "boot_volume_size": 50,
+  "max_node_count": 1,
+  "is_public_ipv4": false,
+  "status": "Running",
+  "node_count": 1,
+  "boot_volume_type": "ssd_hiiops",
+  "auto_healing_enabled": false,
+  "servergroup_policy": "affinity",
+  "servergroup_id": "f3446423-0a82-475a-a1bd-31ce788ace9e",
+  "servergroup_name": "affinity",
+  "labels": {"foo": "bar"},
+  "taints": {"qux": "wat:NoSchedule"}
+}
+`
+
+const UpdateResponse5 = `
+{
+  "flavor_id": "g0-standard-2-4",
+  "min_node_count": 1,
+  "name": "pool-1",
+  "created_at": "2023-08-28T09:40:39Z",
+  "id": "f3446423-0a82-475a-a1bd-31ce788ace9e",
+  "boot_volume_size": 50,
+  "max_node_count": 1,
+  "is_public_ipv4": false,
+  "status": "Running",
+  "node_count": 1,
+  "boot_volume_type": "ssd_hiiops",
+  "auto_healing_enabled": false,
+  "servergroup_policy": "affinity",
+  "servergroup_id": "f3446423-0a82-475a-a1bd-31ce788ace9e",
+  "servergroup_name": "affinity",
+  "labels": {},
+  "taints": {}
 }
 `
 

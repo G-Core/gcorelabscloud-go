@@ -54,6 +54,8 @@ type ClusterPool struct {
 	ServerGroupID      string             `json:"servergroup_id"`
 	ServerGroupName    string             `json:"servergroup_name"`
 	ServerGroupPolicy  string             `json:"servergroup_policy"`
+	Labels             map[string]string  `json:"labels,omitempty"`
+	Taints             map[string]string  `json:"taints,omitempty"`
 }
 
 // ClusterPoolPage is the page returned by a pager when traversing over a
