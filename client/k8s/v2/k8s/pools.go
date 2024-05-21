@@ -215,8 +215,9 @@ var poolUpdateSubCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
+		autoHealingEnabled := c.Bool("auto-healing-enabled")
 		opts := pools.UpdateOpts{
-			AutoHealingEnabled: c.Bool("auto-healing-enabled"),
+			AutoHealingEnabled: &autoHealingEnabled,
 			MinNodeCount:       c.Int("min-node-count"),
 			MaxNodeCount:       c.Int("max-node-count"),
 		}

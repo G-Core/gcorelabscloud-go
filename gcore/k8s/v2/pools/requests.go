@@ -26,6 +26,8 @@ type CreateOpts struct {
 	AutoHealingEnabled bool                           `json:"auto_healing_enabled,omitempty"`
 	ServerGroupPolicy  servergroups.ServerGroupPolicy `json:"servergroup_policy" validate:"omitempty,enum"`
 	IsPublicIPv4       bool                           `json:"is_public_ipv4,omitempty"`
+	Labels             map[string]string              `json:"labels,omitempty"`
+	Taints             map[string]string              `json:"taints,omitempty"`
 }
 
 // Validate CreateOpts
@@ -49,9 +51,11 @@ type UpdateOptsBuilder interface {
 
 // UpdateOpts represents options used to update a pool.
 type UpdateOpts struct {
-	AutoHealingEnabled bool `json:"auto_healing_enabled,omitempty"`
-	MinNodeCount       int  `json:"min_node_count,omitempty" validate:"omitempty,gt=0,lte=20,ltefield=MaxNodeCount"`
-	MaxNodeCount       int  `json:"max_node_count,omitempty" validate:"omitempty,gt=0,lte=20,gtefield=MinNodeCount"`
+	AutoHealingEnabled *bool              `json:"auto_healing_enabled,omitempty"`
+	MinNodeCount       int                `json:"min_node_count,omitempty" validate:"omitempty,gt=0,lte=20,ltefield=MaxNodeCount"`
+	MaxNodeCount       int                `json:"max_node_count,omitempty" validate:"omitempty,gt=0,lte=20,gtefield=MinNodeCount"`
+	Labels             *map[string]string `json:"labels,omitempty"`
+	Taints             *map[string]string `json:"taints,omitempty"`
 }
 
 // Validate UpdateOpts

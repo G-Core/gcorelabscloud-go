@@ -171,34 +171,159 @@ func TestGet(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	th.SetupHTTP()
-	defer th.TeardownHTTP()
+	t.Run("EnableAutoHealing", func(t *testing.T) {
+		th.SetupHTTP()
+		defer th.TeardownHTTP()
 
-	th.Mux.HandleFunc(prepareGetTestURL(Cluster1Name, Pool1.Name), func(w http.ResponseWriter, r *http.Request) {
-		th.TestMethod(t, r, "PATCH")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.Mux.HandleFunc(prepareGetTestURL(Cluster1Name, Pool1.Name), func(w http.ResponseWriter, r *http.Request) {
+			th.TestMethod(t, r, "PATCH")
+			th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+			th.TestJSONRequest(t, r, UpdateRequest1)
 
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
+			w.Header().Add("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
 
-		_, err := fmt.Fprint(w, UpdateResponse)
-		if err != nil {
-			log.Error(err)
+			_, err := fmt.Fprint(w, UpdateResponse1)
+			if err != nil {
+				log.Error(err)
+			}
+		})
+
+		client := fake.ServiceTokenClient("k8s/clusters", "v2")
+
+		enabled := true
+		options := pools.UpdateOpts{
+			AutoHealingEnabled: &enabled,
 		}
+
+		ct, err := pools.Update(client, Cluster1Name, Pool1.Name, options).Extract()
+
+		require.NoError(t, err)
+		require.Equal(t, true, ct.AutoHealingEnabled)
 	})
+	t.Run("DisableAutoHealing", func(t *testing.T) {
+		th.SetupHTTP()
+		defer th.TeardownHTTP()
 
-	client := fake.ServiceTokenClient("k8s/clusters", "v2")
+		th.Mux.HandleFunc(prepareGetTestURL(Cluster1Name, Pool1.Name), func(w http.ResponseWriter, r *http.Request) {
+			th.TestMethod(t, r, "PATCH")
+			th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+			th.TestJSONRequest(t, r, UpdateRequest2)
 
-	options := pools.UpdateOpts{
-		MinNodeCount: 1,
-		MaxNodeCount: 3,
-	}
+			w.Header().Add("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
 
-	ct, err := pools.Update(client, Cluster1Name, Pool1.Name, options).Extract()
+			_, err := fmt.Fprint(w, UpdateResponse2)
+			if err != nil {
+				log.Error(err)
+			}
+		})
 
-	require.NoError(t, err)
-	require.Equal(t, 1, ct.MinNodeCount)
-	require.Equal(t, 3, ct.MaxNodeCount)
+		client := fake.ServiceTokenClient("k8s/clusters", "v2")
+
+		disabled := false
+		options := pools.UpdateOpts{
+			AutoHealingEnabled: &disabled,
+		}
+
+		ct, err := pools.Update(client, Cluster1Name, Pool1.Name, options).Extract()
+
+		require.NoError(t, err)
+		require.Equal(t, false, ct.AutoHealingEnabled)
+	})
+	t.Run("NodeCount", func(t *testing.T) {
+		th.SetupHTTP()
+		defer th.TeardownHTTP()
+
+		th.Mux.HandleFunc(prepareGetTestURL(Cluster1Name, Pool1.Name), func(w http.ResponseWriter, r *http.Request) {
+			th.TestMethod(t, r, "PATCH")
+			th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+			th.TestJSONRequest(t, r, UpdateRequest3)
+
+			w.Header().Add("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+
+			_, err := fmt.Fprint(w, UpdateResponse3)
+			if err != nil {
+				log.Error(err)
+			}
+		})
+
+		client := fake.ServiceTokenClient("k8s/clusters", "v2")
+
+		options := pools.UpdateOpts{
+			MinNodeCount: 2,
+			MaxNodeCount: 3,
+		}
+
+		ct, err := pools.Update(client, Cluster1Name, Pool1.Name, options).Extract()
+
+		require.NoError(t, err)
+		require.Equal(t, 2, ct.MinNodeCount)
+		require.Equal(t, 3, ct.MaxNodeCount)
+	})
+	t.Run("LabelsTaints", func(t *testing.T) {
+		th.SetupHTTP()
+		defer th.TeardownHTTP()
+
+		th.Mux.HandleFunc(prepareGetTestURL(Cluster1Name, Pool1.Name), func(w http.ResponseWriter, r *http.Request) {
+			th.TestMethod(t, r, "PATCH")
+			th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+			th.TestJSONRequest(t, r, UpdateRequest4)
+
+			w.Header().Add("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+
+			_, err := fmt.Fprint(w, UpdateResponse4)
+			if err != nil {
+				log.Error(err)
+			}
+		})
+
+		client := fake.ServiceTokenClient("k8s/clusters", "v2")
+
+		options := pools.UpdateOpts{
+			Labels: &map[string]string{"foo": "bar"},
+			Taints: &map[string]string{"qux": "wat:NoSchedule"},
+		}
+
+		ct, err := pools.Update(client, Cluster1Name, Pool1.Name, options).Extract()
+
+		require.NoError(t, err)
+		require.Equal(t, map[string]string{"foo": "bar"}, ct.Labels)
+		require.Equal(t, map[string]string{"qux": "wat:NoSchedule"}, ct.Taints)
+	})
+	t.Run("ClearLabelsTaints", func(t *testing.T) {
+		th.SetupHTTP()
+		defer th.TeardownHTTP()
+
+		th.Mux.HandleFunc(prepareGetTestURL(Cluster1Name, Pool1.Name), func(w http.ResponseWriter, r *http.Request) {
+			th.TestMethod(t, r, "PATCH")
+			th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+			th.TestJSONRequest(t, r, UpdateRequest5)
+
+			w.Header().Add("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+
+			_, err := fmt.Fprint(w, UpdateResponse5)
+			if err != nil {
+				log.Error(err)
+			}
+		})
+
+		client := fake.ServiceTokenClient("k8s/clusters", "v2")
+
+		options := pools.UpdateOpts{
+			Labels: &map[string]string{},
+			Taints: &map[string]string{},
+		}
+
+		ct, err := pools.Update(client, Cluster1Name, Pool1.Name, options).Extract()
+
+		require.NoError(t, err)
+		require.Equal(t, map[string]string{}, ct.Labels)
+		require.Equal(t, map[string]string{}, ct.Taints)
+	})
 }
 
 func TestDelete(t *testing.T) {
