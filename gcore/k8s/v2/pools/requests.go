@@ -24,7 +24,7 @@ type CreateOpts struct {
 	BootVolumeSize     int                            `json:"boot_volume_size,omitempty" validate:"omitempty,gt=0"`
 	BootVolumeType     volumes.VolumeType             `json:"boot_volume_type,omitempty" validate:"omitempty,enum"`
 	AutoHealingEnabled bool                           `json:"auto_healing_enabled,omitempty"`
-	ServerGroupPolicy  servergroups.ServerGroupPolicy `json:"servergroup_policy" validate:"omitempty,enum"`
+	ServerGroupPolicy  servergroups.ServerGroupPolicy `json:"servergroup_policy,omitempty" validate:"omitempty,enum"`
 	IsPublicIPv4       bool                           `json:"is_public_ipv4,omitempty"`
 	Labels             map[string]string              `json:"labels,omitempty"`
 	Taints             map[string]string              `json:"taints,omitempty"`
