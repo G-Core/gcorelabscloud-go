@@ -14,6 +14,10 @@ func resourceActionURL(c *gcorecloud.ServiceClient, clusterName, action string) 
 	return c.ServiceURL(clusterName, action)
 }
 
+func checkLimitsURL(c *gcorecloud.ServiceClient) string {
+	return c.ServiceURL("check_limits")
+}
+
 func listURL(c *gcorecloud.ServiceClient) string {
 	return rootURL(c)
 }
