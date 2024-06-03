@@ -18,7 +18,7 @@ import (
 )
 
 // DefaultUserAgent is the default User-Agent string set in the request header.
-const DefaultUserAgent = "gcorecloud/%s"
+const DefaultUserAgent = "CloudAPI-GoLib/%s"
 
 var AppVersion = "0.0.1"
 
