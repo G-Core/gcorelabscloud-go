@@ -4,9 +4,40 @@ import (
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v2/pools"
+	"github.com/G-Core/gcorelabscloud-go/gcore/quota/v2/quotas"
+	"github.com/G-Core/gcorelabscloud-go/gcore/servergroup/v1/servergroups"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
+
+// CreateOptsBuilder allows extensions to add additional parameters
+// to the CheckLimits request.
+
+type CheckLimitsOptsBuilder interface {
+	ToCheckLimitsMap() (map[string]interface{}, error)
+}
+
+type CheckLimitsOpts struct {
+	Pools []CheckLimitsPoolOpts `json:"pools,omitempty"`
+}
+
+type CheckLimitsPoolOpts struct {
+	Name              string                         `json:"name,omitempty" validate:"omitempty"`
+	FlavorID          string                         `json:"flavor_id" required:"true" validate:"required"`
+	MinNodeCount      int                            `json:"min_node_count,omitempty" validate:"omitempty,gt=0,ltefield=MaxNodeCount"`
+	MaxNodeCount      int                            `json:"max_node_count,omitempty" validate:"omitempty,gt=0,gtefield=MinNodeCount"`
+	NodeCount         int                            `json:"node_count,omitempty" validate:"omitempty"`
+	BootVolumeSize    int                            `json:"boot_volume_size,omitempty" validate:"omitempty,gt=0"`
+	ServerGroupPolicy servergroups.ServerGroupPolicy `json:"servergroup_policy,omitempty" validate:"omitempty,enum"`
+}
+
+// ToCheckLimitsMap builds a request body from CheckLimitsOpts.
+func (opts CheckLimitsOpts) ToCheckLimitsMap() (map[string]interface{}, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return nil, err
+	}
+	return gcorecloud.BuildRequestBody(opts, "")
+}
 
 // CreateOptsBuilder allows extensions to add additional parameters
 // to the Create request.
@@ -69,6 +100,17 @@ func (opts UpgradeOpts) ToClusterUpgradeMap() (map[string]interface{}, error) {
 		return nil, err
 	}
 	return gcorecloud.BuildRequestBody(opts, "")
+}
+
+// CheckLimits checks quota limits for the values provided and returns the diff for exceeded quota.
+func CheckLimits(c *gcorecloud.ServiceClient, opts CheckLimitsOptsBuilder) (r quotas.CommonResult) {
+	b, err := opts.ToCheckLimitsMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = c.Post(checkLimitsURL(c), b, &r.Body, nil)
+	return
 }
 
 // List returns a Pager which allows you to iterate over a collection of clusters.
