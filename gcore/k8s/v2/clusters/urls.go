@@ -30,6 +30,10 @@ func getURL(c *gcorecloud.ServiceClient, clusterName string) string {
 	return resourceURL(c, clusterName)
 }
 
+func updateURL(c *gcorecloud.ServiceClient, clusterName string) string {
+	return resourceURL(c, clusterName)
+}
+
 func deleteURL(c *gcorecloud.ServiceClient, clusterName string) string {
 	return resourceURL(c, clusterName)
 }
