@@ -55,14 +55,31 @@ type GetResult struct {
 	commonResult
 }
 
+type Authentication struct {
+	OIDC *OIDC `json:"oidc,omitempty"`
+}
+
+type OIDC struct {
+	ClientID       string            `json:"client_id,omitempty"`
+	GroupsClaim    string            `json:"groups_claim,omitempty"`
+	GroupsPrefix   string            `json:"groups_prefix,omitempty"`
+	IssuerURL      string            `json:"issuer_url,omitempty"`
+	RequiredClaims map[string]string `json:"required_claims,omitempty"`
+	SigningAlgs    []string          `json:"signing_algs,omitempty"`
+	UsernameClaim  string            `json:"username_claim,omitempty"`
+	UsernamePrefix string            `json:"username_prefix,omitempty"`
+}
+
 type Cilium struct {
 	MaskSize                 int             `json:"mask_size,omitempty"`
 	MaskSizeV6               int             `json:"mask_size_v6,omitempty"`
 	Tunnel                   TunnelType      `json:"tunnel,omitempty"`
 	Encryption               bool            `json:"encryption"`
-	LoadBalancerMode         LBModeType      `json:"lb_mode,omitemtpy"`
+	LoadBalancerMode         LBModeType      `json:"lb_mode,omitempty"`
 	LoadBalancerAcceleration bool            `json:"lb_acceleration"`
 	RoutingMode              RoutingModeType `json:"routing_mode,omitempty"`
+	HubbleRelay              bool            `json:"hubble_relay"`
+	HubbleUI                 bool            `json:"hubble_ui"`
 }
 
 type CNI struct {
@@ -81,6 +98,8 @@ type Cluster struct {
 	Pools            []pools.ClusterPool `json:"pools"`
 	Version          string              `json:"version"`
 	IsPublic         bool                `json:"is_public"`
+	Authentication   *Authentication     `json:"authentication,omitempty"`
+	AutoscalerConfig map[string]string   `json:"autoscaler_config,omitempty"`
 	CNI              *CNI                `json:"cni,omitempty"`
 	FixedNetwork     string              `json:"fixed_network"`
 	FixedSubnet      string              `json:"fixed_subnet"`

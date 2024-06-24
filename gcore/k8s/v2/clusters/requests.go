@@ -45,14 +45,31 @@ type CreateOptsBuilder interface {
 	ToClusterCreateMap() (map[string]interface{}, error)
 }
 
+type AuthenticationCreateOpts struct {
+	OIDC *OIDCCreateOpts `json:"oidc,omitempty" validate:"omitempty"`
+}
+
+type OIDCCreateOpts struct {
+	ClientID       string            `json:"client_id,omitempty" validate:"omitempty"`
+	GroupsClaim    string            `json:"groups_claim,omitempty" validate:"omitempty"`
+	GroupsPrefix   string            `json:"groups_prefix,omitempty" validate:"omitempty"`
+	IssuerURL      string            `json:"issuer_url,omitempty" validate:"omitempty"`
+	RequiredClaims map[string]string `json:"required_claims,omitempty" validate:"omitempty"`
+	SigningAlgs    []string          `json:"signing_algs,omitempty" validate:"omitempty"`
+	UsernameClaim  string            `json:"username_claim,omitempty" validate:"omitempty"`
+	UsernamePrefix string            `json:"username_prefix,omitempty" validate:"omitempty"`
+}
+
 type CiliumCreateOpts struct {
 	MaskSize                 int             `json:"mask_size,omitempty"`
 	MaskSizeV6               int             `json:"mask_size_v6,omitempty"`
 	Tunnel                   TunnelType      `json:"tunnel,omitempty"`
 	Encryption               bool            `json:"encryption"`
-	LoadBalancerMode         LBModeType      `json:"lb_mode,omitemtpy"`
+	LoadBalancerMode         LBModeType      `json:"lb_mode,omitempty"`
 	LoadBalancerAcceleration bool            `json:"lb_acceleration"`
 	RoutingMode              RoutingModeType `json:"routing_mode,omitempty"`
+	HubbleRelay              bool            `json:"hubble_relay"`
+	HubbleUI                 bool            `json:"hubble_ui"`
 }
 
 type CNICreateOpts struct {
@@ -62,22 +79,45 @@ type CNICreateOpts struct {
 
 // CreateOpts represents options used to create a cluster.
 type CreateOpts struct {
-	Name             string             `json:"name" required:"true" validate:"required,gt=0,lte=20"`
-	CNI              *CNICreateOpts     `json:"cni,omitempty" validate:"omitempty"`
-	FixedNetwork     string             `json:"fixed_network" validate:"omitempty,uuid4"`
-	FixedSubnet      string             `json:"fixed_subnet" validate:"omitempty,uuid4"`
-	PodsIPPool       *gcorecloud.CIDR   `json:"pods_ip_pool,omitempty" validate:"omitempty,cidr"`
-	ServicesIPPool   *gcorecloud.CIDR   `json:"services_ip_pool,omitempty" validate:"omitempty,cidr"`
-	PodsIPV6Pool     *gcorecloud.CIDR   `json:"pods_ipv6_pool,omitempty" validate:"omitempty,cidr"`
-	ServicesIPV6Pool *gcorecloud.CIDR   `json:"services_ipv6_pool,omitempty" validate:"omitempty,cidr"`
-	KeyPair          string             `json:"keypair" required:"true" validate:"required"`
-	Version          string             `json:"version" required:"true" validate:"required"`
-	IsIPV6           bool               `json:"is_ipv6,omitempty"`
-	Pools            []pools.CreateOpts `json:"pools" required:"true" validate:"required,min=1,dive"`
+	Name             string                    `json:"name" required:"true" validate:"required,gt=0,lte=20"`
+	Authentication   *AuthenticationCreateOpts `json:"authentication,omitempty" validate:"omitempty"`
+	AutoscalerConfig map[string]string         `json:"autoscaler_config,omitempty" validate:"omitempty"`
+	CNI              *CNICreateOpts            `json:"cni,omitempty" validate:"omitempty"`
+	FixedNetwork     string                    `json:"fixed_network" validate:"omitempty,uuid4"`
+	FixedSubnet      string                    `json:"fixed_subnet" validate:"omitempty,uuid4"`
+	PodsIPPool       *gcorecloud.CIDR          `json:"pods_ip_pool,omitempty" validate:"omitempty,cidr"`
+	ServicesIPPool   *gcorecloud.CIDR          `json:"services_ip_pool,omitempty" validate:"omitempty,cidr"`
+	PodsIPV6Pool     *gcorecloud.CIDR          `json:"pods_ipv6_pool,omitempty" validate:"omitempty,cidr"`
+	ServicesIPV6Pool *gcorecloud.CIDR          `json:"services_ipv6_pool,omitempty" validate:"omitempty,cidr"`
+	KeyPair          string                    `json:"keypair" required:"true" validate:"required"`
+	Version          string                    `json:"version" required:"true" validate:"required"`
+	IsIPV6           bool                      `json:"is_ipv6,omitempty"`
+	Pools            []pools.CreateOpts        `json:"pools" required:"true" validate:"required,min=1,dive"`
 }
 
 // ToClusterCreateMap builds a request body from CreateOpts.
 func (opts CreateOpts) ToClusterCreateMap() (map[string]interface{}, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return nil, err
+	}
+	return gcorecloud.BuildRequestBody(opts, "")
+}
+
+type AuthenticationUpdateOpts = AuthenticationCreateOpts
+
+// UpdateOptsBuilder allows extensions to add additional parameters to the Update request.
+type UpdateOptsBuilder interface {
+	ToClusterUpdateMap() (map[string]interface{}, error)
+}
+
+// UpdateOpts represents options used to upgrade a cluster.
+type UpdateOpts struct {
+	Authentication   *AuthenticationUpdateOpts `json:"authentication,omitempty" validate:"omitempty"`
+	AutoscalerConfig map[string]string         `json:"autoscaler_config,omitempty" validate:"omitempty"`
+}
+
+// ToClusterUpdateMap builds a request body from UpdateOpts.
+func (opts UpdateOpts) ToClusterUpdateMap() (map[string]interface{}, error) {
 	if err := gcorecloud.ValidateStruct(opts); err != nil {
 		return nil, err
 	}
@@ -184,6 +224,19 @@ func ListInstancesAll(c *gcorecloud.ServiceClient, clusterID string) ([]instance
 		return nil, err
 	}
 	return instances.ExtractInstances(page)
+}
+
+// Update accepts a UpdateOpts struct and updates an existing cluster using the values provided.
+func Update(c *gcorecloud.ServiceClient, clusterID string, opts UpdateOptsBuilder) (r tasks.Result) {
+	b, err := opts.ToClusterUpdateMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = c.Patch(updateURL(c, clusterID), b, &r.Body, &gcorecloud.RequestOpts{
+		OkCodes: []int{200, 201},
+	})
+	return
 }
 
 // Upgrade accepts a UpgradeOpts struct and upgrades an existing cluster using the values provided.

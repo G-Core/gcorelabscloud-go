@@ -56,6 +56,8 @@ type ClusterPool struct {
 	ServerGroupPolicy  string             `json:"servergroup_policy"`
 	Labels             map[string]string  `json:"labels,omitempty"`
 	Taints             map[string]string  `json:"taints,omitempty"`
+	CrioConfig         map[string]string  `json:"crio_config,omitempty"`
+	KubeletConfig      map[string]string  `json:"kubelet_config,omitempty"`
 }
 
 // ClusterPoolPage is the page returned by a pager when traversing over a

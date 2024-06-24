@@ -28,6 +28,8 @@ type CreateOpts struct {
 	IsPublicIPv4       bool                           `json:"is_public_ipv4,omitempty"`
 	Labels             map[string]string              `json:"labels,omitempty"`
 	Taints             map[string]string              `json:"taints,omitempty"`
+	CrioConfig         map[string]string              `json:"crio_config,omitempty" validate:"omitempty"`
+	KubeletConfig      map[string]string              `json:"kubelet_config,omitempty" validate:"omitempty"`
 }
 
 // Validate CreateOpts
