@@ -6,12 +6,13 @@ import (
 
 	"github.com/G-Core/gcorelabscloud-go/client/regions/v1/client"
 
+	"github.com/urfave/cli/v2"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
 	"github.com/G-Core/gcorelabscloud-go/gcore/region/v1/regions"
 	"github.com/G-Core/gcorelabscloud-go/gcore/region/v1/types"
-	"github.com/urfave/cli/v2"
 )
 
 var (
@@ -28,11 +29,11 @@ var regionListCommand = cli.Command{
 		client, err := client.NewRegionClientV1(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		results, err := regions.ListAll(client, nil)
 		if err != nil {
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		utils.ShowResults(results, c.String("format"))
 		return nil

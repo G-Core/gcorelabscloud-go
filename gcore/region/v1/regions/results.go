@@ -50,10 +50,10 @@ type Region struct {
 	TaskID               *string                   `json:"task_id"`
 	EndpointType         types.EndpointType        `json:"endpoint_type"`
 	ExternalNetworkID    string                    `json:"external_network_id"`
-	SpiceProxyURL        gcorecloud.URL            `json:"spice_proxy_url"`
+	SpiceProxyURL        *gcorecloud.URL           `json:"spice_proxy_url"`
 	CreatedOn            gcorecloud.JSONRFC3339NoZ `json:"created_on"`
 	KeystoneID           int                       `json:"keystone_id"`
-	Keystone             keystones.Keystone        `json:"keystone"`
+	Keystone             *keystones.Keystone       `json:"keystone,omitempty"`
 	HasBaremetal         bool                      `json:"has_baremetal"`
 	AvailableVolumeTypes []string                  `json:"available_volume_types"`
 	Zone                 string                    `json:"zone"`
