@@ -99,10 +99,10 @@ var (
 		TaskID:            nil,
 		EndpointType:      types.EndpointTypePublic,
 		ExternalNetworkID: "0521f854-8e34-4e67-8827-2aeb27fb3872",
-		SpiceProxyURL:     *spiceURL,
+		SpiceProxyURL:     spiceURL,
 		CreatedOn:         createdTime,
 		KeystoneID:        1,
-		Keystone: keystones.Keystone{
+		Keystone: &keystones.Keystone{
 			ID:                        1,
 			URL:                       *keystoneURL,
 			State:                     keystonetypes.KeystoneStateNew,
