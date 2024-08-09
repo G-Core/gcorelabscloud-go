@@ -63,7 +63,7 @@ type OIDCCreateOpts struct {
 type CiliumCreateOpts struct {
 	MaskSize                 int             `json:"mask_size,omitempty"`
 	MaskSizeV6               int             `json:"mask_size_v6,omitempty"`
-	Tunnel                   TunnelType      `json:"tunnel,omitempty"`
+	Tunnel                   TunnelType      `json:"tunnel"`
 	Encryption               bool            `json:"encryption"`
 	LoadBalancerMode         LBModeType      `json:"lb_mode,omitempty"`
 	LoadBalancerAcceleration bool            `json:"lb_acceleration"`
