@@ -114,6 +114,7 @@ type UpdateOptsBuilder interface {
 type UpdateOpts struct {
 	Authentication   *AuthenticationUpdateOpts `json:"authentication,omitempty" validate:"omitempty"`
 	AutoscalerConfig map[string]string         `json:"autoscaler_config,omitempty" validate:"omitempty"`
+	CNI              *CNICreateOpts            `json:"cni,omitempty" validate:"omitempty"`
 }
 
 // ToClusterUpdateMap builds a request body from UpdateOpts.
