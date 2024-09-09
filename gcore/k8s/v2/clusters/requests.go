@@ -63,7 +63,7 @@ type OIDCCreateOpts struct {
 type CiliumCreateOpts struct {
 	MaskSize                 int             `json:"mask_size,omitempty"`
 	MaskSizeV6               int             `json:"mask_size_v6,omitempty"`
-	Tunnel                   TunnelType      `json:"tunnel,omitempty"`
+	Tunnel                   TunnelType      `json:"tunnel"`
 	Encryption               bool            `json:"encryption"`
 	LoadBalancerMode         LBModeType      `json:"lb_mode,omitempty"`
 	LoadBalancerAcceleration bool            `json:"lb_acceleration"`
@@ -114,6 +114,7 @@ type UpdateOptsBuilder interface {
 type UpdateOpts struct {
 	Authentication   *AuthenticationUpdateOpts `json:"authentication,omitempty" validate:"omitempty"`
 	AutoscalerConfig map[string]string         `json:"autoscaler_config,omitempty" validate:"omitempty"`
+	CNI              *CNICreateOpts            `json:"cni,omitempty" validate:"omitempty"`
 }
 
 // ToClusterUpdateMap builds a request body from UpdateOpts.

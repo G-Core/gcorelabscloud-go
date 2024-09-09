@@ -15,10 +15,12 @@ const (
 	CiliumProvider    CNIProvider     = "cilium"
 	VXLANTunnel       TunnelType      = "vxlan"
 	GeneveTunnel      TunnelType      = "geneve"
+	EmptyTunnel       TunnelType      = ""
 	SNATLBMode        LBModeType      = "snat"
 	DSRLBMode         LBModeType      = "dsr"
 	HybridLBMode      LBModeType      = "hybrid"
-	NormalRoutingMode RoutingModeType = "normal"
+	NativeRoutingMode RoutingModeType = "native"
+	TunnelRoutingMode RoutingModeType = "tunnel"
 )
 
 func (cn CNIProvider) IsValid() error {
@@ -81,7 +83,7 @@ func (cn *CNIProvider) MarshalJSON() ([]byte, error) {
 
 func (t TunnelType) IsValid() error {
 	switch t {
-	case VXLANTunnel, GeneveTunnel:
+	case VXLANTunnel, GeneveTunnel, EmptyTunnel:
 		return nil
 	}
 	return fmt.Errorf("invalid TunnelType type: %v", t)
@@ -106,6 +108,7 @@ func (t TunnelType) List() []TunnelType {
 	return []TunnelType{
 		VXLANTunnel,
 		GeneveTunnel,
+		EmptyTunnel,
 	}
 }
 
@@ -197,7 +200,8 @@ func (t *LBModeType) MarshalJSON() ([]byte, error) {
 }
 
 func (t RoutingModeType) IsValid() error {
-	if t == NormalRoutingMode {
+	switch t {
+	case NativeRoutingMode, TunnelRoutingMode:
 		return nil
 	}
 	return fmt.Errorf("invalid RoutingModeType type: %v", t)
@@ -220,7 +224,8 @@ func (t RoutingModeType) String() string {
 
 func (t RoutingModeType) List() []RoutingModeType {
 	return []RoutingModeType{
-		NormalRoutingMode,
+		NativeRoutingMode,
+		TunnelRoutingMode,
 	}
 }
 

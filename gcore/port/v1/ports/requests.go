@@ -14,7 +14,7 @@ type AllowAddressPairsOptsBuilder interface {
 
 // AllowAddressPairsOpts represents options used to allow address pairs.
 type AllowAddressPairsOpts struct {
-	AllowedAddressPairs []reservedfixedips.AllowedAddressPairs `json:"allowed_address_pairs"`
+	AllowedAddressPairs []reservedfixedips.AllowedAddressPairs `json:"allowed_address_pairs,omitempty"`
 }
 
 // ToAllowAddressPairsMap builds a request body from AllowAddressPairsOpts.
