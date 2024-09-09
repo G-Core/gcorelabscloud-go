@@ -167,6 +167,7 @@ type Instance struct {
 
 // Interface represents a instance port interface.
 type Interface struct {
+	Name                *string        `json:"interface_name"`
 	PortID              string         `json:"port_id"`
 	MacAddress          gcorecloud.MAC `json:"mac_address"`
 	NetworkID           string         `json:"network_id"`
