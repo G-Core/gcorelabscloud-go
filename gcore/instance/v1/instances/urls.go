@@ -121,3 +121,11 @@ func getInstanceConsoleURL(c *gcorecloud.ServiceClient, id string) string {
 func listInstanceLocationURL(c *gcorecloud.ServiceClient) string {
 	return c.BaseServiceURL("instances", "search")
 }
+
+func putServerToServerGroupURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "put_from_servergroup")
+}
+
+func removeServerFromServerGroupURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "remove_from_servergroup")
+}

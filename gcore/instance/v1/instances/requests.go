@@ -728,3 +728,40 @@ func ListInstanceLocation(client *gcorecloud.ServiceClient, opts ListInstanceLoc
 	_, r.Err = client.Get(url, &r.Body, nil)
 	return
 }
+
+type PutServerGroupOpts struct {
+	ServerGroupID string `json:"servergroup_id" required:"true" validate:"required,uuid4"`
+}
+
+func (opts PutServerGroupOpts) Validate() error {
+	return gcorecloud.ValidateStruct(opts)
+}
+
+func (opts PutServerGroupOpts) ToPutToServerGroupActionMap() (map[string]interface{}, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, err
+	}
+	return gcorecloud.BuildRequestBody(opts, "")
+
+}
+
+type PutToServerGroupOptsBuilder interface {
+	ToPutToServerGroupActionMap() (map[string]interface{}, error)
+}
+
+// PutToServerGroup instance.
+func PutToServerGroup(client *gcorecloud.ServiceClient, id string, opts PutToServerGroupOptsBuilder) (r tasks.Result) {
+	b, err := opts.ToPutToServerGroupActionMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = client.Post(putServerToServerGroupURL(client, id), b, &r.Body, nil) // nolint
+	return
+}
+
+// RemoveFromServerGroup instance.
+func RemoveFromServerGroup(client *gcorecloud.ServiceClient, id string) (r tasks.Result) {
+	_, r.Err = client.Post(removeServerFromServerGroupURL(client, id), nil, &r.Body, nil) // nolint
+	return
+}
