@@ -123,7 +123,7 @@ func listInstanceLocationURL(c *gcorecloud.ServiceClient) string {
 }
 
 func putServerToServerGroupURL(c *gcorecloud.ServiceClient, id string) string {
-	return resourceActionURL(c, id, "put_from_servergroup")
+	return resourceActionURL(c, id, "put_into_servergroup")
 }
 
 func removeServerFromServerGroupURL(c *gcorecloud.ServiceClient, id string) string {
