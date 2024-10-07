@@ -54,6 +54,10 @@ func upgradeURL(c *gcorecloud.ServiceClient, clusterName string) string {
 	return resourceActionURL(c, clusterName, "upgrade")
 }
 
-func versionsURL(c *gcorecloud.ServiceClient) string {
-	return c.BaseServiceURL("k8s", "versions")
+func createVersionsURL(c *gcorecloud.ServiceClient) string {
+	return c.ServiceURL("create_versions")
+}
+
+func upgradeVersionsURL(c *gcorecloud.ServiceClient, clusterName string) string {
+	return resourceActionURL(c, clusterName, "upgrade_versions")
 }

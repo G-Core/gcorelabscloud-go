@@ -130,7 +130,7 @@ var clusterListSubCommand = cli.Command{
 	Usage:    "List clusters",
 	Category: "cluster",
 	Action: func(c *cli.Context) error {
-		client, err := client.NewK8sClientV2(c)
+		client, err := client.NewK8sClustersClientV2(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -155,7 +155,7 @@ var clusterGetSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
 		}
-		client, err := client.NewK8sClientV2(c)
+		client, err := client.NewK8sClustersClientV2(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -261,7 +261,7 @@ var clusterCreateSubCommand = cli.Command{
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
 		clusterName := c.String("name")
-		client, err := client.NewK8sClientV2(c)
+		client, err := client.NewK8sClustersClientV2(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -321,7 +321,7 @@ var clusterUpgradeSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "upgrade")
 			return err
 		}
-		client, err := client.NewK8sClientV2(c)
+		client, err := client.NewK8sClustersClientV2(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -356,7 +356,7 @@ var clusterDeleteSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "delete")
 			return err
 		}
-		client, err := client.NewK8sClientV2(c)
+		client, err := client.NewK8sClustersClientV2(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -392,7 +392,7 @@ var clusterCertificateSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "certificate")
 			return err
 		}
-		client, err := client.NewK8sClientV2(c)
+		client, err := client.NewK8sClustersClientV2(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -443,7 +443,7 @@ var clusterConfigSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "config")
 			return err
 		}
-		client, err := client.NewK8sClientV2(c)
+		client, err := client.NewK8sClustersClientV2(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -488,9 +488,9 @@ var clusterConfigSubCommand = cli.Command{
 	},
 }
 
-var clusterVersionsSubCommand = cli.Command{
-	Name:     "versions",
-	Usage:    "List supported k8s versions",
+var clusterCreateVersionsSubCommand = cli.Command{
+	Name:     "create-versions",
+	Usage:    "List supported k8s versions for cluster creation",
 	Category: "cluster",
 	Action: func(c *cli.Context) error {
 		client, err := client.NewK8sClientV2(c)
@@ -498,7 +498,32 @@ var clusterVersionsSubCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		results, err := clusters.VersionsAll(client)
+		results, err := clusters.CreateVersionsAll(client)
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		utils.ShowResults(results, c.String("format"))
+		return nil
+	},
+}
+
+var clusterUpgradeVersionsSubCommand = cli.Command{
+	Name:      "upgrade-versions",
+	Usage:     "List supported k8s versions for cluster upgrade",
+	ArgsUsage: "<cluster_name>",
+	Category:  "cluster",
+	Action: func(c *cli.Context) error {
+		clusterName, err := flags.GetFirstStringArg(c, clusterNameText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "upgrade")
+			return err
+		}
+		client, err := client.NewK8sClustersClientV2(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+		results, err := clusters.UpgradeVersionsAll(client, clusterName)
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
@@ -518,7 +543,7 @@ var clusterInstancesSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "instances")
 			return err
 		}
-		client, err := client.NewK8sClientV2(c)
+		client, err := client.NewK8sClustersClientV2(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -543,7 +568,8 @@ var Commands = cli.Command{
 		&clusterDeleteSubCommand,
 		&clusterCertificateSubCommand,
 		&clusterConfigSubCommand,
-		&clusterVersionsSubCommand,
+		&clusterCreateVersionsSubCommand,
+		&clusterUpgradeVersionsSubCommand,
 		&clusterInstancesSubCommand,
 		&poolCommands,
 	},

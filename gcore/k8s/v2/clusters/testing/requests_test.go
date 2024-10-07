@@ -56,8 +56,12 @@ func prepareUpgradeTestURL(clusterName string) string {
 	return prepareActionTestURLParams(fake.ProjectID, fake.RegionID, clusterName, "upgrade")
 }
 
-func prepareVersionTestURL() string {
-	return "/v2/k8s/versions"
+func prepareCreateVersionsTestURL() string {
+	return fmt.Sprintf("/v2/k8s/%d/%d/create_versions", fake.ProjectID, fake.RegionID)
+}
+
+func prepareUpgradeVersionsTestURL(clusterName string) string {
+	return prepareActionTestURLParams(fake.ProjectID, fake.RegionID, clusterName, "upgrade_versions")
 }
 
 func TestList(t *testing.T) {
@@ -351,11 +355,11 @@ func TestUpgrade(t *testing.T) {
 	require.Equal(t, Tasks1, *tasks)
 }
 
-func TestVersions(t *testing.T) {
+func TestCreateVersions(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
 
-	th.Mux.HandleFunc(prepareVersionTestURL(), func(w http.ResponseWriter, r *http.Request) {
+	th.Mux.HandleFunc(prepareCreateVersionsTestURL(), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "GET")
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 
@@ -367,10 +371,10 @@ func TestVersions(t *testing.T) {
 		}
 	})
 
-	client := fake.ServiceTokenClient("k8s/clusters", "v2")
+	client := fake.ServiceTokenClient("k8s", "v2")
 	count := 0
 
-	err := clusters.Versions(client).EachPage(func(page pagination.Page) (bool, error) {
+	err := clusters.CreateVersions(client).EachPage(func(page pagination.Page) (bool, error) {
 		count++
 		actual, err := clusters.ExtractVersions(page)
 		require.NoError(t, err)
@@ -387,11 +391,33 @@ func TestVersions(t *testing.T) {
 	}
 }
 
-func TestVersionsAll(t *testing.T) {
+func TestCreateVersionsAll(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
 
-	th.Mux.HandleFunc(prepareVersionTestURL(), func(w http.ResponseWriter, r *http.Request) {
+	th.Mux.HandleFunc(prepareCreateVersionsTestURL(), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, VersionResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("k8s", "v2")
+	actual, err := clusters.CreateVersionsAll(client)
+	require.NoError(t, err)
+	require.Equal(t, ExpectedVersionSlice, actual)
+}
+
+func TestUpgradeVersions(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareUpgradeVersionsTestURL(Cluster1.Name), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "GET")
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 
@@ -404,7 +430,43 @@ func TestVersionsAll(t *testing.T) {
 	})
 
 	client := fake.ServiceTokenClient("k8s/clusters", "v2")
-	actual, err := clusters.VersionsAll(client)
+	count := 0
+
+	err := clusters.UpgradeVersions(client, Cluster1.Name).EachPage(func(page pagination.Page) (bool, error) {
+		count++
+		actual, err := clusters.ExtractVersions(page)
+		require.NoError(t, err)
+		ct := actual[0]
+		require.Equal(t, Version1, ct)
+		require.Equal(t, ExpectedVersionSlice, actual)
+		return true, nil
+	})
+
+	th.AssertNoErr(t, err)
+
+	if count != 1 {
+		t.Errorf("Expected 1 page, got %d", count)
+	}
+}
+
+func TestUpgradeVersionsAll(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareUpgradeVersionsTestURL(Cluster1.Name), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, VersionResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("k8s/clusters", "v2")
+	actual, err := clusters.UpgradeVersionsAll(client, Cluster1.Name)
 	require.NoError(t, err)
 	require.Equal(t, ExpectedVersionSlice, actual)
 }
