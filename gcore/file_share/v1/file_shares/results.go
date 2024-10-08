@@ -50,6 +50,7 @@ type FileShare struct {
 	VolumeType       string                          `json:"volume_type"`
 	CreatedAt        *gcorecloud.JSONRFC3339MilliNoZ `json:"created_at"`
 	ShareNetworkName string                          `json:"share_network_name"`
+	NetworkID        string                          `json:"network_id"`
 	NetworkName      string                          `json:"network_name"`
 	SubnetName       string                          `json:"subnet_name"`
 	ConnectionPoint  string                          `json:"connection_point"`
