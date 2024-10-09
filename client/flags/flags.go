@@ -17,7 +17,7 @@ const (
 
 var (
 	ClientType  string
-	ClientTypes = []string{ClientTypeToken, ClientTypePlatform}
+	ClientTypes = []string{ClientTypeToken, ClientTypePlatform, ClientTypeAPIToken}
 )
 
 var commonFlags = []cli.Flag{

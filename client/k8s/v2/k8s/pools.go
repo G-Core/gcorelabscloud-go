@@ -32,7 +32,7 @@ var poolListSubCommand = cli.Command{
 	},
 	Action: func(c *cli.Context) error {
 		clusterName := c.String("cluster-name")
-		client, err := client.NewK8sClientV2(c)
+		client, err := client.NewK8sClustersClientV2(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -66,7 +66,7 @@ var poolGetSubCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 		clusterName := c.String("cluster-name")
-		client, err := client.NewK8sClientV2(c)
+		client, err := client.NewK8sClustersClientV2(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -145,7 +145,7 @@ var poolCreateSubCommand = cli.Command{
 	Action: func(c *cli.Context) error {
 		clusterName := c.String("cluster-name")
 		poolName := c.String("name")
-		client, err := client.NewK8sClientV2(c)
+		client, err := client.NewK8sClustersClientV2(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -210,7 +210,7 @@ var poolUpdateSubCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 		clusterName := c.String("cluster-name")
-		client, err := client.NewK8sClientV2(c)
+		client, err := client.NewK8sClustersClientV2(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -255,7 +255,7 @@ var poolResizeSubCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 		clusterName := c.String("cluster-name")
-		client, err := client.NewK8sClientV2(c)
+		client, err := client.NewK8sClustersClientV2(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -298,7 +298,7 @@ var poolDeleteSubCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 		clusterName := c.String("cluster-name")
-		client, err := client.NewK8sClientV2(c)
+		client, err := client.NewK8sClustersClientV2(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -343,7 +343,7 @@ var poolInstancesSubCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 		clusterName := c.String("cluster-name")
-		client, err := client.NewK8sClientV2(c)
+		client, err := client.NewK8sClustersClientV2(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)

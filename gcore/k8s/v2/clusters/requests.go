@@ -253,18 +253,36 @@ func Upgrade(c *gcorecloud.ServiceClient, clusterID string, opts UpgradeOptsBuil
 	return
 }
 
-// Versions returns a Pager which allows you to iterate over a collection of
-// supported cluster versions.
-func Versions(c *gcorecloud.ServiceClient) pagination.Pager {
-	url := versionsURL(c)
+// CreateVersions returns a Pager which allows you to iterate over a collection of
+// supported k8s versions for cluster creation.
+func CreateVersions(c *gcorecloud.ServiceClient) pagination.Pager {
+	url := createVersionsURL(c)
 	return pagination.NewPager(c, url, func(r pagination.PageResult) pagination.Page {
 		return VersionPage{pagination.LinkedPageBase{PageResult: r}}
 	})
 }
 
-// VersionsAll is a convenience function that returns all supported cluster versions.
-func VersionsAll(c *gcorecloud.ServiceClient) ([]Version, error) {
-	page, err := Versions(c).AllPages()
+// CreateVersionsAll is a convenience function that returns all supported k8s versions for cluster creation.
+func CreateVersionsAll(c *gcorecloud.ServiceClient) ([]Version, error) {
+	page, err := CreateVersions(c).AllPages()
+	if err != nil {
+		return nil, err
+	}
+	return ExtractVersions(page)
+}
+
+// UpgradeVersions returns a Pager which allows you to iterate over a collection of
+// supported k8s versions for cluster upgrade.
+func UpgradeVersions(c *gcorecloud.ServiceClient, clusterID string) pagination.Pager {
+	url := upgradeVersionsURL(c, clusterID)
+	return pagination.NewPager(c, url, func(r pagination.PageResult) pagination.Page {
+		return VersionPage{pagination.LinkedPageBase{PageResult: r}}
+	})
+}
+
+// UpgradeVersionsAll is a convenience function that returns all supported k8s versions for cluster upgrade.
+func UpgradeVersionsAll(c *gcorecloud.ServiceClient, clusterID string) ([]Version, error) {
+	page, err := UpgradeVersions(c, clusterID).AllPages()
 	if err != nil {
 		return nil, err
 	}
