@@ -28,7 +28,7 @@ func createTestSubnet(client *gcorecloud.ServiceClient, opts subnets.CreateOpts,
 	gccidr.Mask = netIPNet.Mask
 	opts.CIDR = gccidr
 
-	res, err := subnets.Create(client, opts).Extract()
+	res, err := subnets.Create(client, opts, nil).Extract()
 	if err != nil {
 		return "", err
 	}
@@ -51,7 +51,7 @@ func createTestSubnet(client *gcorecloud.ServiceClient, opts subnets.CreateOpts,
 }
 
 func deleteTestSubnet(client *gcorecloud.ServiceClient, subnetID string) error {
-	results, err := subnets.Delete(client, subnetID).Extract()
+	results, err := subnets.Delete(client, subnetID, nil).Extract()
 	if err != nil {
 		return err
 	}

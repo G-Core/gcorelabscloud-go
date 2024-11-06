@@ -137,7 +137,7 @@ var subnetDeleteCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 		results, err := subnets.Delete(client, subnetID, &gcorecloud.RequestOpts{
-			ConflictRetryAmount: c.Int("retry-amount"),
+			ConflictRetryAmount:   c.Int("retry-amount"),
 			ConflictRetryInterval: c.Int("retry-interval"),
 		}).Extract()
 		if err != nil {
@@ -322,7 +322,7 @@ var subnetCreateCommand = cli.Command{
 		}
 
 		results, err := subnets.Create(client, opts, &gcorecloud.RequestOpts{
-			ConflictRetryAmount: c.Int("retry-amount"),
+			ConflictRetryAmount:   c.Int("retry-amount"),
 			ConflictRetryInterval: c.Int("retry-interval"),
 		}).Extract()
 		if err != nil {

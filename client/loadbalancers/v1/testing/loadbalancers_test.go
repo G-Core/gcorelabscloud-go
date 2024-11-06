@@ -22,7 +22,7 @@ const (
 )
 
 func createTestLoadBalancerWithListener(client *gcorecloud.ServiceClient, opts loadbalancers.CreateOpts) (string, error) {
-	res, err := loadbalancers.Create(client, opts).Extract()
+	res, err := loadbalancers.Create(client, opts, nil).Extract()
 	if err != nil {
 		return "", err
 	}
@@ -69,7 +69,7 @@ func TestLBSMetadata(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	defer loadbalancers.Delete(client, resourceID)
+	defer loadbalancers.Delete(client, resourceID, nil)
 
 	err = gtest.MetadataTest(func() ([]metadata.Metadata, error) {
 		res, err := loadbalancers.Get(client, resourceID, nil).Extract()

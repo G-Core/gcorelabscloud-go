@@ -129,6 +129,9 @@ func Update(c *gcorecloud.ServiceClient, listenerID string, opts UpdateOptsBuild
 		r.Err = err
 		return
 	}
+	if reqOpts == nil {
+		reqOpts = &gcorecloud.RequestOpts{}
+	}
 	reqOpts.OkCodes = []int{200, 201}
 	_, r.Err = c.Patch(updateURL(c, listenerID), b, &r.Body, reqOpts)
 	return
@@ -172,6 +175,9 @@ func Unset(c *gcorecloud.ServiceClient, listenerID string, opts UnsetOptsBuilder
 		b["user_list"] = make([]CreateUserListOpts, 0)
 	} else {
 		delete(b, "user_list")
+	}
+	if reqOpts == nil {
+		reqOpts = &gcorecloud.RequestOpts{}
 	}
 	reqOpts.OkCodes = []int{200, 201}
 	_, r.Err = c.Patch(updateURL(c, listenerID), b, &r.Body, reqOpts)

@@ -159,11 +159,11 @@ func TestCreate(t *testing.T) {
 		Protocol:       types.ProtocolTypeTCP,
 		ProtocolPort:   80,
 		LoadBalancerID: Listener1.ID,
-		AllowedCIDRS: []string{"10.10.0.0/24"},
+		AllowedCIDRS:   []string{"10.10.0.0/24"},
 	}
 
 	client := fake.ServiceTokenClient("lblisteners", "v1")
-	tasks, err := listeners.Create(client, options).Extract()
+	tasks, err := listeners.Create(client, options, nil).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 }
@@ -183,7 +183,7 @@ func TestDelete(t *testing.T) {
 	})
 
 	client := fake.ServiceTokenClient("lblisteners", "v1")
-	tasks, err := listeners.Delete(client, Listener1.ID).Extract()
+	tasks, err := listeners.Delete(client, Listener1.ID, nil).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 
@@ -217,7 +217,7 @@ func TestUpdate(t *testing.T) {
 		Name: Listener1.Name,
 	}
 
-	task, err := listeners.Update(client, Listener1.ID, opts).Extract()
+	task, err := listeners.Update(client, Listener1.ID, opts, nil).Extract()
 
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *task)
@@ -252,7 +252,7 @@ func TestUnset(t *testing.T) {
 		AllowedCIDRS: true,
 	}
 
-	tasks, err := listeners.Unset(client, Listener1.ID, opts).Extract()
+	tasks, err := listeners.Unset(client, Listener1.ID, opts, nil).Extract()
 
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)

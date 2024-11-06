@@ -194,7 +194,7 @@ func TestCreate(t *testing.T) {
 	}
 
 	client := fake.ServiceTokenClient("lbpools", "v1")
-	tasks, err := lbpools.Create(client, options).Extract()
+	tasks, err := lbpools.Create(client, options, nil).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 }
@@ -214,7 +214,7 @@ func TestDelete(t *testing.T) {
 	})
 
 	client := fake.ServiceTokenClient("lbpools", "v1")
-	tasks, err := lbpools.Delete(client, LBPool1.ID).Extract()
+	tasks, err := lbpools.Delete(client, LBPool1.ID, nil).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 
@@ -248,7 +248,7 @@ func TestUpdate(t *testing.T) {
 		Name: LBPool1.Name,
 	}
 
-	tasks, err := lbpools.Update(client, LBPool1.ID, opts).Extract()
+	tasks, err := lbpools.Update(client, LBPool1.ID, opts, nil).Extract()
 
 	require.NoError(t, err)
 	require.NoError(t, err)
@@ -284,7 +284,7 @@ func TestUnset(t *testing.T) {
 		SessionPersistence: true,
 	}
 
-	tasks, err := lbpools.Unset(client, LBPool1.ID, opts).Extract()
+	tasks, err := lbpools.Unset(client, LBPool1.ID, opts, nil).Extract()
 
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
@@ -308,7 +308,7 @@ func TestDeleteMember(t *testing.T) {
 	})
 
 	client := fake.ServiceTokenClient("lbpools", "v1")
-	tasks, err := lbpools.DeleteMember(client, LBPool1.ID, memberID).Extract()
+	tasks, err := lbpools.DeleteMember(client, LBPool1.ID, memberID, nil).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 
@@ -342,7 +342,7 @@ func TestCreateMember(t *testing.T) {
 	}
 
 	client := fake.ServiceTokenClient("lbpools", "v1")
-	tasks, err := lbpools.CreateMember(client, LBPool1.ID, options).Extract()
+	tasks, err := lbpools.CreateMember(client, LBPool1.ID, options, nil).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 }
@@ -358,7 +358,7 @@ func TestDeleteHealthMonitor(t *testing.T) {
 	})
 
 	client := fake.ServiceTokenClient("lbpools", "v1")
-	err := lbpools.DeleteHealthMonitor(client, LBPool1.ID).ExtractErr()
+	err := lbpools.DeleteHealthMonitor(client, LBPool1.ID, nil).ExtractErr()
 	require.NoError(t, err)
 
 }
@@ -395,7 +395,7 @@ func TestCreateHealthMonitor(t *testing.T) {
 	}
 
 	client := fake.ServiceTokenClient("lbpools", "v1")
-	tasks, err := lbpools.CreateHealthMonitor(client, LBPool1.ID, opts).Extract()
+	tasks, err := lbpools.CreateHealthMonitor(client, LBPool1.ID, opts, nil).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 }
