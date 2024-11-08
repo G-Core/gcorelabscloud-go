@@ -27,7 +27,7 @@ const (
 )
 
 func createTestLoadBalancerWithListener(client *gcorecloud.ServiceClient, opts loadbalancers.CreateOpts) (string, error) {
-	res, err := loadbalancers.Create(client, opts).Extract()
+	res, err := loadbalancers.Create(client, opts, nil).Extract()
 	if err != nil {
 		return "", err
 	}
@@ -146,7 +146,7 @@ func TestLBSMetadataV2(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	defer loadbalancers.Delete(clientV1, resourceID)
+	defer loadbalancers.Delete(clientV1, resourceID, nil)
 
 	clientV2, err := v2client.NewLoadbalancerClientV2(ctx)
 	if err != nil {

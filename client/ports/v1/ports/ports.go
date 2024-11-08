@@ -2,10 +2,15 @@ package ports
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/G-Core/gcorelabscloud-go/client/ports/v1/client"
+	client2 "github.com/G-Core/gcorelabscloud-go/client/ports/v2/client"
 	"github.com/G-Core/gcorelabscloud-go/gcore/port/v1/ports"
+	ports1 "github.com/G-Core/gcorelabscloud-go/gcore/port/v1/ports"
+	ports2 "github.com/G-Core/gcorelabscloud-go/gcore/port/v2/ports"
 	"github.com/G-Core/gcorelabscloud-go/gcore/reservedfixedip/v1/reservedfixedips"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
@@ -73,7 +78,7 @@ var assignAllowedAddressPairsSubCommand = cli.Command{
 	Usage:     "Assign allowed address pairs for instance port",
 	ArgsUsage: "<port_id>",
 	Category:  "portsecurity",
-	Flags: []cli.Flag{
+	Flags: append([]cli.Flag{
 		&cli.StringSliceFlag{
 			Name:  "ip-address",
 			Usage: "IP address of the port specified in allowed_address_pairs",
@@ -82,14 +87,19 @@ var assignAllowedAddressPairsSubCommand = cli.Command{
 			Name:  "mac-address",
 			Usage: "MAC address of the port specified in allowed_address_pairs",
 		},
-	},
+	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
 		portID, err := flags.GetFirstStringArg(c, portIDText)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "assign")
 			return err
 		}
-		client, err := client.NewPortClientV1(c)
+		clientV1, err := client.NewPortClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+		clientV2, err := client2.NewPortClientV2(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -101,16 +111,22 @@ var assignAllowedAddressPairsSubCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
-		opts := ports.AllowAddressPairsOpts{
+		opts := ports1.AllowAddressPairsOpts{
 			AllowedAddressPairs: addressPairs,
 		}
 
-		result, err := ports.AllowAddressPairs(client, portID, opts).Extract()
+		results, err := ports2.AllowAddressPairs(clientV2, portID, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
-		utils.ShowResults(result, c.String("format"))
-		return nil
+
+		return utils.WaitTaskAndShowResult(c, clientV1, results, true, func(task tasks.TaskID) (interface{}, error) {
+			_, err := tasks.Get(clientV1, string(task)).Extract()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
+			}
+			return nil, nil
+		})
 	},
 }
 

@@ -170,7 +170,7 @@ func TestCreateNoGW(t *testing.T) {
 	}
 
 	client := fake.ServiceTokenClient("subnets", "v1")
-	tasks, err := subnets.Create(client, options).Extract()
+	tasks, err := subnets.Create(client, options, nil).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 }
@@ -205,7 +205,7 @@ func TestCreateGW(t *testing.T) {
 	}
 
 	client := fake.ServiceTokenClient("subnets", "v1")
-	tasks, err := subnets.Create(client, options).Extract()
+	tasks, err := subnets.Create(client, options, nil).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 }
@@ -225,7 +225,7 @@ func TestDelete(t *testing.T) {
 	})
 
 	client := fake.ServiceTokenClient("subnets", "v1")
-	tasks, err := subnets.Delete(client, Subnet1.ID).Extract()
+	tasks, err := subnets.Delete(client, Subnet1.ID, nil).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 

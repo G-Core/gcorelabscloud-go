@@ -216,7 +216,7 @@ func TestCreate(t *testing.T) {
 	}
 
 	client := fake.ServiceTokenClient("loadbalancers", "v1")
-	tasks, err := loadbalancers.Create(client, options).Extract()
+	tasks, err := loadbalancers.Create(client, options, nil).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 }
@@ -236,7 +236,7 @@ func TestDelete(t *testing.T) {
 	})
 
 	client := fake.ServiceTokenClient("loadbalancers", "v1")
-	tasks, err := loadbalancers.Delete(client, LoadBalancer1.ID).Extract()
+	tasks, err := loadbalancers.Delete(client, LoadBalancer1.ID, nil).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 
@@ -347,7 +347,7 @@ func TestResizeLoadBalancer(t *testing.T) {
 		Flavor: Flavor,
 	}
 
-	tasks, err := loadbalancers.Resize(client, LoadBalancer1.ID, opts).Extract()
+	tasks, err := loadbalancers.Resize(client, LoadBalancer1.ID, opts, nil).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
 }

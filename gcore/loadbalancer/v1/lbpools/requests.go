@@ -185,6 +185,9 @@ func Update(c *gcorecloud.ServiceClient, lbpoolID string, opts UpdateOptsBuilder
 		r.Err = err
 		return
 	}
+	if reqOpts == nil {
+		reqOpts = &gcorecloud.RequestOpts{}
+	}
 	reqOpts.OkCodes = []int{200, 201}
 	_, r.Err = c.Patch(updateURL(c, lbpoolID), b, &r.Body, reqOpts)
 	return
@@ -221,6 +224,9 @@ func Unset(c *gcorecloud.ServiceClient, lbpoolID string, opts UnsetOptsBuilder, 
 	if err != nil {
 		r.Err = err
 		return
+	}
+	if reqOpts == nil {
+		reqOpts = &gcorecloud.RequestOpts{}
 	}
 	reqOpts.OkCodes = []int{200, 201}
 	_, r.Err = c.Patch(updateURL(c, lbpoolID), b, &r.Body, reqOpts)
@@ -261,6 +267,9 @@ func DeleteMember(c *gcorecloud.ServiceClient, lbpoolID string, memberID string,
 
 // DeleteHealthMonitor accepts a unique ID and deletes the lbpool's healthmonitor associated with it.
 func DeleteHealthMonitor(c *gcorecloud.ServiceClient, lbpoolID string, reqOpts *gcorecloud.RequestOpts) (r DeleteHealthMonitorResult) {
+	if reqOpts == nil {
+		reqOpts = &gcorecloud.RequestOpts{}
+	}
 	reqOpts.OkCodes = []int{http.StatusNoContent}
 	_, r.Err = c.Delete(healthMonitorURL(c, lbpoolID), reqOpts)
 	return

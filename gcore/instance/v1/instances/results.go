@@ -9,6 +9,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/ddos/v1/ddos"
 	"github.com/G-Core/gcorelabscloud-go/gcore/flavor/v1/flavors"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
+	"github.com/G-Core/gcorelabscloud-go/gcore/reservedfixedip/v1/reservedfixedips"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
@@ -167,15 +168,16 @@ type Instance struct {
 
 // Interface represents a instance port interface.
 type Interface struct {
-	Name                *string        `json:"interface_name"`
-	PortID              string         `json:"port_id"`
-	MacAddress          gcorecloud.MAC `json:"mac_address"`
-	NetworkID           string         `json:"network_id"`
-	PortSecurityEnabled bool           `json:"port_security_enabled"`
-	IPAssignments       []PortIP       `json:"ip_assignments"`
-	NetworkDetails      NetworkDetail  `json:"network_details"`
-	FloatingIPDetails   []FloatingIP   `json:"floatingip_details"`
-	SubPorts            []SubPort      `json:"sub_ports"`
+	Name                *string                                `json:"interface_name"`
+	PortID              string                                 `json:"port_id"`
+	MacAddress          gcorecloud.MAC                         `json:"mac_address"`
+	NetworkID           string                                 `json:"network_id"`
+	PortSecurityEnabled bool                                   `json:"port_security_enabled"`
+	IPAssignments       []PortIP                               `json:"ip_assignments"`
+	NetworkDetails      NetworkDetail                          `json:"network_details"`
+	FloatingIPDetails   []FloatingIP                           `json:"floatingip_details"`
+	SubPorts            []SubPort                              `json:"sub_ports"`
+	AllowedAddressPairs []reservedfixedips.AllowedAddressPairs `json:"allowed_address_pairs"`
 }
 
 // SubPort represent a instance sub port interface
