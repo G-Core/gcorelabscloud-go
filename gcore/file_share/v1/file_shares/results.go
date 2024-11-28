@@ -8,6 +8,37 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
+// FileShareStatus defines valid statuses for FileShare.
+type FileShareStatus string
+
+const (
+	StatusAvailable      FileShareStatus = "available"
+	StatusCreating       FileShareStatus = "creating"
+	StatusDeleting       FileShareStatus = "deleting"
+	StatusError          FileShareStatus = "error"
+	StatusErrorDeleting  FileShareStatus = "error_deleting"
+	StatusExtending      FileShareStatus = "extending"
+	StatusExtendingError FileShareStatus = "extending_error"
+)
+
+var validStatuses = map[FileShareStatus]struct{}{
+	StatusAvailable:      {},
+	StatusCreating:       {},
+	StatusDeleting:       {},
+	StatusError:          {},
+	StatusErrorDeleting:  {},
+	StatusExtending:      {},
+	StatusExtendingError: {},
+}
+
+// Validate checks if the status is valid.
+func (s FileShareStatus) Validate() error {
+	if _, ok := validStatuses[s]; !ok {
+		return fmt.Errorf("invalid status: %s", s)
+	}
+	return nil
+}
+
 type commonResult struct {
 	gcorecloud.Result
 }
@@ -21,7 +52,15 @@ type DeleteResult struct {
 func (r commonResult) Extract() (*FileShare, error) {
 	var s FileShare
 	err := r.ExtractInto(&s)
-	return &s, err
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.Validate(); err != nil {
+		return nil, fmt.Errorf("validation failed after extraction: %w", err)
+	}
+
+	return &s, nil
 }
 
 func (r commonResult) ExtractInto(v interface{}) error {
@@ -45,7 +84,7 @@ type FileShare struct {
 	Name             string                          `json:"name"`
 	ID               string                          `json:"id"`
 	Protocol         string                          `json:"protocol"`
-	Status           string                          `json:"status"`
+	Status           FileShareStatus                 `json:"status"`
 	Size             int                             `json:"size"`
 	VolumeType       string                          `json:"volume_type"`
 	CreatedAt        *gcorecloud.JSONRFC3339MilliNoZ `json:"created_at"`
@@ -61,6 +100,14 @@ type FileShare struct {
 	RegionID         int                             `json:"region_id"`
 	Region           string                          `json:"region"`
 	Metadata         map[string]interface{}          `json:"metadata"`
+}
+
+// Validate validates the FileShare structure.
+func (fs *FileShare) Validate() error {
+	if err := fs.Status.Validate(); err != nil {
+		return fmt.Errorf("file share validation failed: %w", err)
+	}
+	return nil
 }
 
 // FileSharePage is the page returned by a pager when traversing over a
@@ -95,7 +142,17 @@ func (r FileSharePage) IsEmpty() (bool, error) {
 func ExtractFileShares(r pagination.Page) ([]FileShare, error) {
 	var s []FileShare
 	err := ExtractFileSharesInto(r, &s)
-	return s, err
+	if err != nil {
+		return nil, err
+	}
+
+	for i, share := range s {
+		if err := share.Validate(); err != nil {
+			return nil, fmt.Errorf("validation failed for file share at index %d: %w", i, err)
+		}
+	}
+
+	return s, nil
 }
 
 func ExtractFileSharesInto(r pagination.Page, v interface{}) error {
