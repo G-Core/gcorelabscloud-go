@@ -233,6 +233,12 @@ const MetadataListResponse = `
 }
 `
 
+var fileShareNetworkConfigWithoutSubnet = `
+{
+	"network_id": "9b17dd07-1281-4fe0-8c13-d80c5725e297"
+}
+`
+
 var createdTimeString = "2023-08-01T14:32:41.465031"
 var createdTimeParsed, _ = time.Parse(gcorecloud.RFC3339MilliNoZ, createdTimeString)
 var createdTime = gcorecloud.JSONRFC3339MilliNoZ{Time: createdTimeParsed}

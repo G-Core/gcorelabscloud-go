@@ -9,9 +9,8 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
-
 // List returns a Pager which allows you to iterate over a collection of
-// file shares. 
+// file shares.
 func List(c *gcorecloud.ServiceClient) pagination.Pager {
 	url := listURL(c)
 	return pagination.NewPager(c, url, func(r pagination.PageResult) pagination.Page {
@@ -34,7 +33,7 @@ type CreateOptsBuilder interface {
 
 type FileShareNetworkOpts struct {
 	NetworkID string `json:"network_id,omitempty" validate:"uuid4"`
-	SubnetID  string `json:"subnet_id,omitempty" validate:"uuid4"`
+	SubnetID  string `json:"subnet_id,omitempty" validate:"omitempty,uuid4"`
 }
 
 type CreateAccessRuleOpts struct {
@@ -59,7 +58,6 @@ func (opts CreateOpts) ToFileShareCreateMap() (map[string]interface{}, error) {
 	}
 	return gcorecloud.BuildRequestBody(opts, "")
 }
-
 
 // Validate
 func (opts CreateOpts) Validate() error {
@@ -91,7 +89,6 @@ type UpdateOpts struct {
 type ResizeOptsBuilder interface {
 	ToFileShareResizeMap() (map[string]interface{}, error)
 }
-
 
 // ToFileShareUpdateMap builds a request body from UpdateOpts.
 func (opts UpdateOpts) ToFileShareUpdateMap() (map[string]interface{}, error) {
@@ -173,9 +170,8 @@ func ListAll(client *gcorecloud.ServiceClient) ([]FileShare, error) {
 
 }
 
-
 // List returns a Pager which allows you to iterate over a collection of
-// file shares. 
+// file shares.
 func ListAccessRules(c *gcorecloud.ServiceClient, fileShareID string) pagination.Pager {
 	url := accessRuleURL(c, fileShareID)
 	return pagination.NewPager(c, url, func(r pagination.PageResult) pagination.Page {
