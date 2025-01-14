@@ -23,6 +23,7 @@ import (
 var loadBalancerIDText = "loadbalancer_id is mandatory argument"
 
 var vipIPFamilyType = types.IPFamilyType("").StringList()
+var preferredConnectivityType = types.PreferredConnectivityType("").StringList()
 
 var loadBalancerListSubCommand = cli.Command{
 	Name:     "list",
@@ -84,6 +85,14 @@ var loadBalancerCreateSubCommand = cli.Command{
 			Aliases: []string{"t"},
 			Usage:   "Loadbalancer tags",
 		},
+		&cli.GenericFlag{
+			Name: "preferred-connectivity",
+			Value: &utils.EnumValue{
+				Enum: preferredConnectivityType,
+			},
+			Usage:    "Loadbalancer preferred connectivity type",
+			Required: false,
+		},
 	}, flags.ClientRequestFlags...),
 	Action: func(c *cli.Context) error {
 		client, err := client.NewLoadbalancerClientV1(c)
@@ -93,12 +102,13 @@ var loadBalancerCreateSubCommand = cli.Command{
 		}
 
 		opts := loadbalancers.CreateOpts{
-			Name:         c.String("name"),
-			Listeners:    []loadbalancers.CreateListenerOpts{},
-			VipNetworkID: c.String("vip-network-id"),
-			VipSubnetID:  c.String("vip-subnet-id"),
-			Tags:         c.StringSlice("tags"),
-			VIPIPFamily:  types.IPFamilyType(c.String("vip-ip-family")),
+			Name:                  c.String("name"),
+			Listeners:             []loadbalancers.CreateListenerOpts{},
+			VipNetworkID:          c.String("vip-network-id"),
+			VipSubnetID:           c.String("vip-subnet-id"),
+			Tags:                  c.StringSlice("tags"),
+			VIPIPFamily:           types.IPFamilyType(c.String("vip-ip-family")),
+			PreferredConnectivity: types.PreferredConnectivityType(c.String(("preferred-connectivity"))),
 		}
 		flavor := c.String("flavor")
 		if flavor != "" {
@@ -208,7 +218,15 @@ var loadBalancerUpdateSubCommand = cli.Command{
 			Name:     "name",
 			Aliases:  []string{"n"},
 			Usage:    "Loadbalancer name",
-			Required: true,
+			Required: false,
+		},
+		&cli.GenericFlag{
+			Name: "preferred-connectivity",
+			Value: &utils.EnumValue{
+				Enum: preferredConnectivityType,
+			},
+			Usage:    "Loadbalancer preferred connectivity type",
+			Required: false,
 		},
 	},
 	Action: func(c *cli.Context) error {
@@ -223,8 +241,13 @@ var loadBalancerUpdateSubCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
-		opts := loadbalancers.UpdateOpts{Name: c.String("name")}
-
+		opts := loadbalancers.UpdateOpts{
+			Name:                  c.String("name"),
+			PreferredConnectivity: types.PreferredConnectivityType(c.String(("preferred-connectivity"))),
+		}
+		if opts.Name == "" && opts.PreferredConnectivity == "" {
+			return nil
+		}
 		result, err := loadbalancers.Update(client, loadBalancerID, opts).Extract()
 		if err != nil {
 			return cli.NewExitError(err, 1)

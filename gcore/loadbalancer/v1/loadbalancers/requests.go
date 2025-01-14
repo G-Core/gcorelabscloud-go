@@ -178,17 +178,18 @@ type CreateRetentionPolicyOpts struct {
 
 // CreateOpts represents options used to create a loadbalancer.
 type CreateOpts struct {
-	Name         string                                      `json:"name" required:"true" validate:"required,name"`
-	Listeners    []CreateListenerOpts                        `json:"listeners,omitempty" validate:"omitempty,dive"`
-	VipNetworkID string                                      `json:"vip_network_id,omitempty" validate:"omitempty,allowed_without=VipPortID"`
-	VipSubnetID  string                                      `json:"vip_subnet_id,omitempty"`
-	VipPortID    string                                      `json:"vip_port_id,omitempty" validate:"omitempty,allowed_without=VipNetworkID"`
-	VIPIPFamily  types.IPFamilyType                          `json:"vip_ip_family,omitempty" validate:"omitempty,enum"`
-	Flavor       *string                                     `json:"flavor,omitempty"`
-	Tags         []string                                    `json:"tag,omitempty"`
-	Metadata     map[string]string                           `json:"metadata,omitempty"`
-	FloatingIP   *instances.CreateNewInterfaceFloatingIPOpts `json:"floating_ip,omitempty"`
-	Logging      *CreateLoggingOpts                          `json:"logging,omitempty"`
+	Name                  string                                      `json:"name" required:"true" validate:"required,name"`
+	Listeners             []CreateListenerOpts                        `json:"listeners,omitempty" validate:"omitempty,dive"`
+	VipNetworkID          string                                      `json:"vip_network_id,omitempty" validate:"omitempty,allowed_without=VipPortID"`
+	VipSubnetID           string                                      `json:"vip_subnet_id,omitempty"`
+	VipPortID             string                                      `json:"vip_port_id,omitempty" validate:"omitempty,allowed_without=VipNetworkID"`
+	VIPIPFamily           types.IPFamilyType                          `json:"vip_ip_family,omitempty" validate:"omitempty,enum"`
+	Flavor                *string                                     `json:"flavor,omitempty"`
+	Tags                  []string                                    `json:"tag,omitempty"`
+	Metadata              map[string]string                           `json:"metadata,omitempty"`
+	FloatingIP            *instances.CreateNewInterfaceFloatingIPOpts `json:"floating_ip,omitempty"`
+	Logging               *CreateLoggingOpts                          `json:"logging,omitempty"`
+	PreferredConnectivity types.PreferredConnectivityType             `json:"preferred_connectivity,omitempty"`
 }
 
 // ToLoadBalancerCreateMap builds a request body from CreateOpts.
@@ -230,8 +231,9 @@ type UpdateRetentionPolicyOpts struct {
 
 // UpdateOpts represents options used to update a loadbalancer.
 type UpdateOpts struct {
-	Name    string             `json:"name,omitempty"`
-	Logging *UpdateLoggingOpts `json:"logging,omitempty"`
+	Name                  string                          `json:"name,omitempty"`
+	Logging               *UpdateLoggingOpts              `json:"logging,omitempty"`
+	PreferredConnectivity types.PreferredConnectivityType `json:"preferred_connectivity,omitempty"`
 }
 
 // ToLoadBalancerUpdateMap builds a request body from UpdateOpts.
@@ -251,7 +253,7 @@ func Update(c *gcorecloud.ServiceClient, loadbalancerID string, opts UpdateOptsB
 		return
 	}
 	_, r.Err = c.Patch(updateURL(c, loadbalancerID), b, &r.Body, &gcorecloud.RequestOpts{
-		OkCodes: []int{http.StatusOK, http.StatusCreated},
+		OkCodes: []int{http.StatusOK, http.StatusCreated, http.StatusNoContent},
 	})
 	return
 }
