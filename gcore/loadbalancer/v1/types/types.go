@@ -13,6 +13,7 @@ type ProtocolType string
 type HealthMonitorType string
 type HTTPMethod string
 type IPFamilyType string
+type PreferredConnectivityType string
 
 const (
 	ProvisioningStatusActive        ProvisioningStatus = "ACTIVE"
@@ -67,6 +68,9 @@ const (
 	IPv4IPFamilyType      IPFamilyType = "ipv4"
 	IPv6IPFamilyType      IPFamilyType = "ipv6"
 	DualStackIPFamilyType IPFamilyType = "dual"
+
+	PreferredConnectivityL2 PreferredConnectivityType = "L2"
+	PreferredConnectivityL3 PreferredConnectivityType = "L3"
 )
 
 func (ps ProvisioningStatus) IsValid() error {
@@ -591,4 +595,23 @@ func (it *IPFamilyType) UnmarshalJSON(data []byte) error {
 // MarshalJSON - implements Marshaler interface
 func (it *IPFamilyType) MarshalJSON() ([]byte, error) {
 	return json.Marshal(it.String())
+}
+
+func (pc PreferredConnectivityType) String() string {
+	return string(pc)
+}
+
+func (pc PreferredConnectivityType) List() []PreferredConnectivityType {
+	return []PreferredConnectivityType{
+		PreferredConnectivityL2,
+		PreferredConnectivityL3,
+	}
+}
+
+func (pc PreferredConnectivityType) StringList() []string {
+	var s []string
+	for _, v := range pc.List() {
+		s = append(s, v.String())
+	}
+	return s
 }

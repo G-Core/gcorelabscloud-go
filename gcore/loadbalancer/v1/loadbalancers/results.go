@@ -74,29 +74,30 @@ type CustomSecurityGroup struct {
 
 // LoadBalancer represents a loadbalancer structure.
 type LoadBalancer struct {
-	Name               string                   `json:"name"`
-	ID                 string                   `json:"id"`
-	ProvisioningStatus types.ProvisioningStatus `json:"provisioning_status"`
-	OperationStatus    types.OperatingStatus    `json:"operating_status"`
-	VipAddress         net.IP                   `json:"vip_address"`
-	VipPortID          string                   `json:"vip_port_id"`
-	Listeners          []gcorecloud.ItemID      `json:"listeners"`
-	CreatorTaskID      *string                  `json:"creator_task_id"`
-	TaskID             *string                  `json:"task_id"`
-	CreatedAt          gcorecloud.JSONRFC3339Z  `json:"created_at"`
-	UpdatedAt          *gcorecloud.JSONRFC3339Z `json:"updated_at"`
-	ProjectID          int                      `json:"project_id"`
-	RegionID           int                      `json:"region_id"`
-	Region             string                   `json:"region"`
-	Tags               []string                 `json:"tags"`
-	Flavor             lbflavors.Flavor         `json:"flavor"`
-	Metadata           []metadata.Metadata      `json:"metadata"`
-	DdosProfile        *ddos.Profile            `json:"ddos_profile"`
-	VrrpIPs            []NetworkPortFixedIP     `json:"vrrp_ips"`
-	VipIPFamilyType    types.IPFamilyType       `json:"vip_ip_family"`
-	AdditionalVips     []NetworkPortFixedIP     `json:"additional_vips"`
-	FloatingIPs        []instances.FloatingIP   `json:"floating_ips"`
-	Logging            *Logging                 `json:"logging"`
+	Name                  string                   `json:"name"`
+	ID                    string                   `json:"id"`
+	ProvisioningStatus    types.ProvisioningStatus `json:"provisioning_status"`
+	OperationStatus       types.OperatingStatus    `json:"operating_status"`
+	VipAddress            net.IP                   `json:"vip_address"`
+	VipPortID             string                   `json:"vip_port_id"`
+	Listeners             []gcorecloud.ItemID      `json:"listeners"`
+	CreatorTaskID         *string                  `json:"creator_task_id"`
+	TaskID                *string                  `json:"task_id"`
+	CreatedAt             gcorecloud.JSONRFC3339Z  `json:"created_at"`
+	UpdatedAt             *gcorecloud.JSONRFC3339Z `json:"updated_at"`
+	ProjectID             int                      `json:"project_id"`
+	RegionID              int                      `json:"region_id"`
+	Region                string                   `json:"region"`
+	Tags                  []string                 `json:"tags"`
+	Flavor                lbflavors.Flavor         `json:"flavor"`
+	Metadata              []metadata.Metadata      `json:"metadata"`
+	DdosProfile           *ddos.Profile            `json:"ddos_profile"`
+	VrrpIPs               []NetworkPortFixedIP     `json:"vrrp_ips"`
+	VipIPFamilyType       types.IPFamilyType       `json:"vip_ip_family"`
+	AdditionalVips        []NetworkPortFixedIP     `json:"additional_vips"`
+	FloatingIPs           []instances.FloatingIP   `json:"floating_ips"`
+	Logging               *Logging                 `json:"logging"`
+	PreferredConnectivity string                   `json:"preferred_connectivity"`
 }
 
 // NetworkPortFixedIP represents VRRP entry structure.
