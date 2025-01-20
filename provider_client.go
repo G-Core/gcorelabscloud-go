@@ -18,9 +18,9 @@ import (
 )
 
 // DefaultUserAgent is the default User-Agent string set in the request header.
-const DefaultUserAgent = "CloudAPI-GoLib/%s"
+const DefaultUserAgent = "cloud-api-go-sdk/%s"
 
-var AppVersion = "0.0.1"
+var AppVersion = "dev"
 
 // UserAgent represents a User-Agent header.
 type UserAgent struct {
