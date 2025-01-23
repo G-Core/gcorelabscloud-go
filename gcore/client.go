@@ -15,7 +15,6 @@ Most users will probably prefer using the AuthenticatedClient function instead.
 
 This is useful if you wish to explicitly control the version of the identity
 service that's used for authentication explicitly, for example.
-
 */
 func NewGCoreClient(endpoint string) (*gcorecloud.ProviderClient, error) {
 	base, err := utils.BaseRootEndpoint(endpoint)
@@ -321,6 +320,7 @@ func initClientOpts(client *gcorecloud.ProviderClient, eo gcorecloud.EndpointOpt
 	sc.ResourceBase = url
 	sc.Type = clientType
 	sc.RegionID = eo.Region
+	sc.ProjectID = eo.Project
 	return sc, nil
 }
 
