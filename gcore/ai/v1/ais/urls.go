@@ -101,3 +101,7 @@ func metadataURL(c *gcorecloud.ServiceClient, id string) string {
 func metadataItemURL(c *gcorecloud.ServiceClient, id string, key string) string {
 	return resourceActionURL(c, id, fmt.Sprintf("metadata_item?key=%s", key))
 }
+
+func rebuildGPUAIURL(c *gcorecloud.ServiceClient, clusterID string) string {
+	return c.ServiceURL(clusterID, "rebuild")
+}
