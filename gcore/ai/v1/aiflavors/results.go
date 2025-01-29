@@ -60,7 +60,6 @@ func ExtractAIFlavorsInto(r pagination.Page, v interface{}) error {
 	return r.(AIFlavorPage).Result.ExtractIntoSlicePtr(v, "results")
 }
 
-
 type HardwareDescription struct {
 	CPU         string `json:"cpu,omitempty"`
 	Disk        string `json:"disk,omitempty"`
@@ -69,7 +68,7 @@ type HardwareDescription struct {
 	Ephemeral   string `json:"ephemeral,omitempty"`
 	GPU         string `json:"gpu,omitempty"`
 	IPU         string `json:"ipu,omitempty"`
-	PoplarCount string `json:"poplar_count,omitempty"`
+	PoplarCount int    `json:"poplar_count,omitempty"`
 	SGXEPCSize  string `json:"sgx_epc_size,omitempty"`
 }
 
@@ -84,8 +83,7 @@ type AIFlavor struct {
 	PricePerHour        *decimal.Decimal     `json:"price_per_hour,omitempty"`
 	PricePerMonth       *decimal.Decimal     `json:"price_per_month,omitempty"`
 	HardwareDescription *HardwareDescription `json:"hardware_description,omitempty"`
-	RAM                 *int                  `json:"ram,omitempty"`
-	VCPUS               *int                  `json:"vcpus,omitempty"`
-	Capacity            *int                  `json:"capacity,omitempty"`
+	RAM                 *int                 `json:"ram,omitempty"`
+	VCPUS               *int                 `json:"vcpus,omitempty"`
+	Capacity            *int                 `json:"capacity,omitempty"`
 }
-
