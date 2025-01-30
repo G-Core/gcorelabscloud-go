@@ -132,6 +132,7 @@ var Commands = cli.Command{
 		&aiClusterCreateCommand,
 		&aiClusterDeleteCommand,
 		&aiClusterPowerCycleCommand,
+		&aiClusterRebuildCommand,
 		&aiClusterRebootCommand,
 		&aiClusterSuspendCommand,
 		&aiClusterResumeCommand,
