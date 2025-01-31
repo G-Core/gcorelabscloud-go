@@ -825,139 +825,15 @@ var aiClusterCreateCommand = cli.Command{
 var aiClusterResizeCommand = cli.Command{
 	Name: "resize",
 	Usage: `
-	Resize AI cluster
-	Example: token ai resize --flavor g2a-ai-fake-v1pod-8 --image 06e62653-1f88-4d38-9aa6-62833e812b4f --keypair sshkey --it any_subnet --interface-network-id 518ba531-496b-4676-8ea4-68e2ed3b2e4b --interface-floating-source new --volume-type standard --volume-source image  --volume-image-id 06e62653-1f88-4d38-9aa6-62833e812b4f --volume-size  20  e673bba0-fcef-44d9-904c-824546b608ec -d -w`,
+	Resize AI GPU cluster
+	Example: gcoreclient ai resize --instances-count 2 <cluster_id> -d -w`,
 	ArgsUsage: "<cluster_id>",
 	Category:  "cluster",
 	Flags: append([]cli.Flag{
-		&cli.StringFlag{
-			Name:     "flavor",
-			Usage:    "AI cluster flavor",
+		&cli.IntFlag{
+			Name:     "instances-count",
+			Usage:    "Resized (total) number of instances",
 			Required: true,
-		},
-		&cli.StringFlag{
-			Name:     "image",
-			Usage:    "AI cluster image",
-			Required: true,
-		},
-		&cli.StringFlag{
-			Name:     "keypair",
-			Aliases:  []string{"k"},
-			Usage:    "AI cluster ssh keypair",
-			Required: false,
-		},
-		&cli.StringFlag{
-			Name:     "password",
-			Aliases:  []string{"p"},
-			Usage:    "AI cluster password",
-			Required: false,
-		},
-		&cli.StringFlag{
-			Name:     "username",
-			Aliases:  []string{"u"},
-			Usage:    "AI cluster username",
-			Required: false,
-		},
-		&cli.StringFlag{
-			Name:     "user-data",
-			Usage:    "AI cluster user data",
-			Required: false,
-		},
-		&cli.StringFlag{
-			Name:     "user-data-file",
-			Usage:    "instance user data file",
-			Required: false,
-		},
-		&cli.GenericFlag{
-			Name:    "volume-source",
-			Aliases: []string{"vs"},
-			Value: &utils.EnumStringSliceValue{
-				Enum: volumeSourceType,
-			},
-			Usage:    fmt.Sprintf("instance volume source. output in %s", strings.Join(volumeSourceType, ", ")),
-			Required: false,
-		},
-		&cli.IntSliceFlag{
-			Name:     "volume-boot-index",
-			Usage:    "instance volume boot index",
-			Required: false,
-		},
-		&cli.IntSliceFlag{
-			Name:     "volume-size",
-			Usage:    "instance volume size",
-			Required: false,
-		},
-		&cli.GenericFlag{
-			Name:    "volume-type",
-			Aliases: []string{"vt"},
-			Value: &utils.EnumStringSliceValue{
-				Enum: volumeType,
-			},
-			Usage:    fmt.Sprintf("instance volume types. output in %s", strings.Join(volumeType, ", ")),
-			Required: false,
-		},
-		&cli.StringSliceFlag{
-			Name:     "volume-name",
-			Usage:    "instance volume name",
-			Required: false,
-		},
-		&cli.StringSliceFlag{
-			Name:     "volume-image-id",
-			Usage:    "instance volume image id",
-			Required: false,
-		},
-		&cli.StringSliceFlag{
-			Name:     "volume-snapshot-id",
-			Usage:    "instance volume snapshot id",
-			Required: false,
-		},
-		&cli.StringSliceFlag{
-			Name:     "volume-volume-id",
-			Usage:    "instance volume volume id",
-			Required: false,
-		},
-		&cli.GenericFlag{
-			Name:    "interface-type",
-			Aliases: []string{"it"},
-			Value: &utils.EnumStringSliceValue{
-				Enum: interfaceTypes,
-			},
-			Usage:    fmt.Sprintf("instance interface type. output in %s", strings.Join(interfaceTypes, ", ")),
-			Required: true,
-		},
-		&cli.StringSliceFlag{
-			Name:     "interface-network-id",
-			Usage:    "instance interface network id",
-			Required: false,
-		},
-		&cli.StringSliceFlag{
-			Name:     "interface-subnet-id",
-			Usage:    "instance interface subnet id",
-			Required: false,
-		},
-		&cli.GenericFlag{
-			Name:    "interface-floating-source",
-			Aliases: []string{"ifs"},
-			Value: &utils.EnumStringSliceValue{
-				Enum: interfaceFloatingIPSource,
-			},
-			Usage:    fmt.Sprintf("instance floating ip source. output in %s", strings.Join(interfaceFloatingIPSource, ", ")),
-			Required: false,
-		},
-		&cli.StringSliceFlag{
-			Name:     "interface-floating-ip",
-			Usage:    "instance interface existing floating ip. Required when --interface-floating-source set as `existing`",
-			Required: false,
-		},
-		&cli.StringSliceFlag{
-			Name:     "security-group",
-			Usage:    "instance security group",
-			Required: false,
-		},
-		&cli.StringSliceFlag{
-			Name:     "metadata",
-			Usage:    "instance metadata. Example: --metadata one=two --metadata three=four",
-			Required: false,
 		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
@@ -966,60 +842,24 @@ var aiClusterResizeCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "show")
 			return err
 		}
-		client, err := client.NewAIClusterClientV1(c)
+		client, err := client.NewAIGPUClusterClientV1(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 
-		userData, err := instance_client.GetUserData(c)
-		if err != nil {
-			_ = cli.ShowCommandHelp(c, "create")
-			return cli.NewExitError(err, 1)
-		}
-
-		instanceVolumes, err := instance_client.GetInstanceVolumes(c)
-		if err != nil {
-			_ = cli.ShowCommandHelp(c, "create")
-			return cli.NewExitError(err, 1)
-		}
-
-		// todo add security group mapping
-		instanceInterfaces, err := instance_client.GetInterfaces(c)
-		if err != nil {
-			_ = cli.ShowCommandHelp(c, "create")
-			return cli.NewExitError(err, 1)
-		}
-
-		securityGroups := instance_client.GetSecurityGroups(c)
-
-		metadata, err := StringSliceToMetadata(c.StringSlice("metadata"))
-		if err != nil {
-			_ = cli.ShowCommandHelp(c, "create")
-			return cli.NewExitError(err, 1)
-		}
-
-		opts := ai.ResizeAIClusterOpts{
-			Flavor:         c.String("flavor"),
-			ImageID:        c.String("image"),
-			Volumes:        instanceVolumes,
-			Interfaces:     instanceInterfaces,
-			SecurityGroups: securityGroups,
-			Keypair:        c.String("keypair"),
-			Password:       c.String("password"),
-			Username:       c.String("username"),
-			UserData:       userData,
-			Metadata:       metadata,
+		opts := ai.ResizeGPUAIClusterOpts{
+			InstancesCount: c.Int("instances-count"),
 		}
 
 		err = gcorecloud.TranslateValidationError(opts.Validate())
 		if err != nil {
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 
 		results, err := ai.Resize(client, clusterID, opts).Extract()
 		if err != nil {
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 
 		return utils.WaitTaskAndShowResult(c, client, results, c.Bool("d"), func(task tasks.TaskID) (interface{}, error) {

@@ -547,26 +547,8 @@ const CreateRequest = `
 
 const ResizeRequest = `
 {
-  "flavor": "g2a-ai-fake-v1pod-8",
-  "image_id": "06e62653-1f88-4d38-9aa6-62833e812b4f",
-  "interfaces": [
-      {
-          "network_id": "518ba531-496b-4676-8ea4-68e2ed3b2e4b",
-          "type": "any_subnet"
-      }
-  ],
-  "username": "useruser",
-  "password": "secret",
-  "volumes": [
-      {
-          "boot_index": 0,
-          "image_id": "06e62653-1f88-4d38-9aa6-62833e812b4f",
-          "size": 20,                                                                                                                                                                                                                                     
-          "source": "image",                                                                                                                                                                                                                               
-          "type_name": "standard"                                                                                                                                                                                                                        
-      }                                                                                                                                                                                                                                                    
-  ]
-}       
+  "instances_count": 2
+}
 `
 
 const PortsListResponse = `
