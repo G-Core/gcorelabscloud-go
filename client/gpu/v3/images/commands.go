@@ -79,133 +79,35 @@ var imageUploadFlags = []cli.Flag{
 
 var uploadBaremetalCommand = cli.Command{
 	Name:        "baremetal",
-	Usage:       "Upload baremetal GPU image",
-	Description: "Upload a new baremetal GPU image with the specified URL and name",
-	Category:    "images",
-	ArgsUsage:   " ",
-	Flags:       append(imageUploadFlags, flags.WaitCommandFlags...),
-	Action: func(c *cli.Context) error {
-		if c.Args().Len() > 0 {
-			return cli.ShowCommandHelp(c, "")
-		}
-
-		// Only validate if not showing help
-		if !c.Bool("help") && (c.String("url") == "" || c.String("name") == "") {
-			_ = cli.ShowCommandHelp(c, "")
-			return cli.NewExitError("Required flags 'url' and 'name' must be set", 1)
-		}
-
-		client, err := client.NewGPUImageClientV3(c)
-		if err != nil {
-			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
-		}
-
-		sshKey := images.SshKeyType(c.String("ssh-key"))
-		cowFormat := c.Bool("cow-format")
-		osType := images.ImageOsType(c.String("os-type"))
-		hwType := images.ImageHwFirmwareType(c.String("hw-firmware-type"))
-
-		opts := images.UploadBaremetalImageOpts{
-			URL:            c.String("url"),
-			Name:           c.String("name"),
-			SshKey:         &sshKey,
-			CowFormat:      &cowFormat,
-			Architecture:   stringPtr(c.String("architecture")),
-			OsDistro:       stringPtr(c.String("os-distro")),
-			OsType:         &osType,
-			OsVersion:      stringPtr(c.String("os-version")),
-			HwFirmwareType: &hwType,
-		}
-
-		if c.IsSet("metadata") {
-			metadata, err := stringToMap(c.StringSlice("metadata"))
-			if err != nil {
-				return cli.NewExitError(err, 1)
-			}
-			metadataInterface := make(map[string]interface{})
-			for k, v := range metadata {
-				metadataInterface[k] = v
-			}
-			opts.Metadata = metadataInterface
-		}
-
-		serviceClient := &images.ServiceClient{ServiceClient: client}
-		results, err := serviceClient.UploadBaremetalImage(opts)
-		if err != nil {
-			return cli.NewExitError(err, 1)
-		}
-
-		taskResults := &tasks.TaskResults{Tasks: []tasks.TaskID{tasks.TaskID(results.ID)}}
-		return utils.WaitTaskAndShowResult(c, client, taskResults, true, func(task tasks.TaskID) (interface{}, error) {
-			return task, nil
-		})
+	Usage:       "Manage baremetal GPU resources",
+	Description: "Commands for managing baremetal GPU resources",
+	Subcommands: []*cli.Command{
+		{
+			Name:        "images",
+			Usage:       "Upload baremetal GPU image",
+			Description: "Upload a new baremetal GPU image with the specified URL and name",
+			Category:    "images",
+			ArgsUsage:   " ",
+			Flags:       append(imageUploadFlags, flags.WaitCommandFlags...),
+			Action:      uploadBaremetalImageAction,
+		},
 	},
 }
 
 var uploadVirtualCommand = cli.Command{
 	Name:        "virtual",
-	Usage:       "Upload virtual GPU image",
-	Description: "Upload a new virtual GPU image with the specified URL and name",
-	Category:    "images",
-	ArgsUsage:   " ",
-	Flags:       append(imageUploadFlags, flags.WaitCommandFlags...),
-	Action: func(c *cli.Context) error {
-		if c.Args().Len() > 0 {
-			return cli.ShowCommandHelp(c, "")
-		}
-
-		// Only validate if not showing help
-		if !c.Bool("help") && (c.String("url") == "" || c.String("name") == "") {
-			_ = cli.ShowCommandHelp(c, "")
-			return cli.NewExitError("Required flags 'url' and 'name' must be set", 1)
-		}
-
-		client, err := client.NewGPUImageClientV3(c)
-		if err != nil {
-			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
-		}
-
-		sshKey := images.SshKeyType(c.String("ssh-key"))
-		cowFormat := c.Bool("cow-format")
-		osType := images.ImageOsType(c.String("os-type"))
-		hwType := images.ImageHwFirmwareType(c.String("hw-firmware-type"))
-
-		opts := images.UploadVirtualImageOpts{
-			URL:            c.String("url"),
-			Name:           c.String("name"),
-			SshKey:         &sshKey,
-			CowFormat:      &cowFormat,
-			Architecture:   stringPtr(c.String("architecture")),
-			OsDistro:       stringPtr(c.String("os-distro")),
-			OsType:         &osType,
-			OsVersion:      stringPtr(c.String("os-version")),
-			HwFirmwareType: &hwType,
-		}
-
-		if c.IsSet("metadata") {
-			metadata, err := stringToMap(c.StringSlice("metadata"))
-			if err != nil {
-				return cli.NewExitError(err, 1)
-			}
-			metadataInterface := make(map[string]interface{})
-			for k, v := range metadata {
-				metadataInterface[k] = v
-			}
-			opts.Metadata = metadataInterface
-		}
-
-		serviceClient := &images.ServiceClient{ServiceClient: client}
-		results, err := serviceClient.UploadVirtualImage(opts)
-		if err != nil {
-			return cli.NewExitError(err, 1)
-		}
-
-		taskResults := &tasks.TaskResults{Tasks: []tasks.TaskID{tasks.TaskID(results.ID)}}
-		return utils.WaitTaskAndShowResult(c, client, taskResults, true, func(task tasks.TaskID) (interface{}, error) {
-			return task, nil
-		})
+	Usage:       "Manage virtual GPU resources",
+	Description: "Commands for managing virtual GPU resources",
+	Subcommands: []*cli.Command{
+		{
+			Name:        "images",
+			Usage:       "Upload virtual GPU image",
+			Description: "Upload a new virtual GPU image with the specified URL and name",
+			Category:    "images",
+			ArgsUsage:   " ",
+			Flags:       append(imageUploadFlags, flags.WaitCommandFlags...),
+			Action:      uploadVirtualImageAction,
+		},
 	},
 }
 
@@ -223,14 +125,124 @@ var Commands = cli.Command{
 	Description: "Parent command for GPU-related operations",
 	Category:    "gpu",
 	Subcommands: []*cli.Command{
-		{
-			Name:        "images",
-			Usage:       "Manage GPU images",
-			Description: "Upload and manage GPU images for both baremetal and virtual instances",
-			Subcommands: []*cli.Command{
-				&uploadBaremetalCommand,
-				&uploadVirtualCommand,
-			},
-		},
+		&uploadBaremetalCommand,
+		&uploadVirtualCommand,
 	},
+}
+
+// Move the action functions to separate named functions for better organization
+func uploadBaremetalImageAction(c *cli.Context) error {
+	if c.Args().Len() > 0 {
+		return cli.ShowCommandHelp(c, "")
+	}
+
+	// Only validate if not showing help
+	if !c.Bool("help") && (c.String("url") == "" || c.String("name") == "") {
+		_ = cli.ShowCommandHelp(c, "")
+		return cli.NewExitError("Required flags 'url' and 'name' must be set", 1)
+	}
+
+	client, err := client.NewGPUImageClientV3(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.NewExitError(err, 1)
+	}
+
+	sshKey := images.SshKeyType(c.String("ssh-key"))
+	cowFormat := c.Bool("cow-format")
+	osType := images.ImageOsType(c.String("os-type"))
+	hwType := images.ImageHwFirmwareType(c.String("hw-firmware-type"))
+
+	opts := images.UploadBaremetalImageOpts{
+		URL:            c.String("url"),
+		Name:           c.String("name"),
+		SshKey:         &sshKey,
+		CowFormat:      &cowFormat,
+		Architecture:   stringPtr(c.String("architecture")),
+		OsDistro:       stringPtr(c.String("os-distro")),
+		OsType:         &osType,
+		OsVersion:      stringPtr(c.String("os-version")),
+		HwFirmwareType: &hwType,
+	}
+
+	if c.IsSet("metadata") {
+		metadata, err := stringToMap(c.StringSlice("metadata"))
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		metadataInterface := make(map[string]interface{})
+		for k, v := range metadata {
+			metadataInterface[k] = v
+		}
+		opts.Metadata = metadataInterface
+	}
+
+	serviceClient := &images.ServiceClient{ServiceClient: client}
+	results, err := serviceClient.UploadBaremetalImage(opts)
+	if err != nil {
+		return cli.NewExitError(err, 1)
+	}
+
+	taskResults := &tasks.TaskResults{Tasks: []tasks.TaskID{tasks.TaskID(results.ID)}}
+	return utils.WaitTaskAndShowResult(c, client, taskResults, true, func(task tasks.TaskID) (interface{}, error) {
+		return task, nil
+	})
+}
+
+func uploadVirtualImageAction(c *cli.Context) error {
+	if c.Args().Len() > 0 {
+		return cli.ShowCommandHelp(c, "")
+	}
+
+	// Only validate if not showing help
+	if !c.Bool("help") && (c.String("url") == "" || c.String("name") == "") {
+		_ = cli.ShowCommandHelp(c, "")
+		return cli.NewExitError("Required flags 'url' and 'name' must be set", 1)
+	}
+
+	client, err := client.NewGPUImageClientV3(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.NewExitError(err, 1)
+	}
+
+	sshKey := images.SshKeyType(c.String("ssh-key"))
+	cowFormat := c.Bool("cow-format")
+	osType := images.ImageOsType(c.String("os-type"))
+	hwType := images.ImageHwFirmwareType(c.String("hw-firmware-type"))
+
+	opts := images.UploadVirtualImageOpts{
+		URL:            c.String("url"),
+		Name:           c.String("name"),
+		SshKey:         &sshKey,
+		CowFormat:      &cowFormat,
+		Architecture:   stringPtr(c.String("architecture")),
+		OsDistro:       stringPtr(c.String("os-distro")),
+		OsType:         &osType,
+		OsVersion:      stringPtr(c.String("os-version")),
+		HwFirmwareType: &hwType,
+	}
+
+	if c.IsSet("metadata") {
+		metadata, err := stringToMap(c.StringSlice("metadata"))
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		metadataInterface := make(map[string]interface{})
+		for k, v := range metadata {
+			metadataInterface[k] = v
+		}
+		opts.Metadata = metadataInterface
+	}
+
+	serviceClient := &images.ServiceClient{ServiceClient: client}
+	results, err := serviceClient.UploadVirtualImage(opts)
+	if err != nil {
+		return cli.NewExitError(err, 1)
+	}
+
+	taskResults := &tasks.TaskResults{Tasks: []tasks.TaskID{tasks.TaskID(results.ID)}}
+	return utils.WaitTaskAndShowResult(c, client, taskResults, true, func(task tasks.TaskID) (interface{}, error) {
+		return task, nil
+	})
 }
