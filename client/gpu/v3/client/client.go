@@ -9,11 +9,10 @@ import (
 
 // NewGPUImageClientV3 creates a new GPU image client
 func NewGPUImageClientV3(c *cli.Context) (*gcorecloud.ServiceClient, error) {
-	client, err := common.BuildClient(c, "gpu", "v3")
+	client, err := common.BuildClient(c, "gpu/baremetal", "v3")
 	if err != nil {
 		return nil, err
 	}
 
-	// BuildClient already adds the version prefix and base path
 	return client, nil
 }

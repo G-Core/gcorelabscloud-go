@@ -86,7 +86,7 @@ func (opts UploadVirtualImageOpts) ToImageCreateMap() (map[string]interface{}, e
 }
 
 func (c *ServiceClient) uploadBaremetalURL() string {
-	return c.ServiceURL("baremetal", "images")
+	return c.ServiceURL("images")
 }
 
 func (c *ServiceClient) uploadVirtualURL() string {
