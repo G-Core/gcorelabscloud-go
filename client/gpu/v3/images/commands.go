@@ -148,6 +148,9 @@ func uploadBaremetalImageAction(c *cli.Context) error {
 		return cli.NewExitError(err, 1)
 	}
 
+	// Update the client endpoint to use the correct URL structure
+	client.ResourceBase = strings.TrimSuffix(client.ResourceBase, "/") + "/baremetal/"
+
 	sshKey := images.SshKeyType(c.String("ssh-key"))
 	cowFormat := c.Bool("cow-format")
 	osType := images.ImageOsType(c.String("os-type"))
@@ -205,6 +208,9 @@ func uploadVirtualImageAction(c *cli.Context) error {
 		_ = cli.ShowAppHelp(c)
 		return cli.NewExitError(err, 1)
 	}
+
+	// Update the client endpoint to use the correct URL structure
+	client.ResourceBase = strings.TrimSuffix(client.ResourceBase, "/") + "/virtual/"
 
 	sshKey := images.SshKeyType(c.String("ssh-key"))
 	cowFormat := c.Bool("cow-format")
