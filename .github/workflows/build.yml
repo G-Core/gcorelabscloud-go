@@ -2,7 +2,7 @@ name: build
 
 on:
   push:
-    branches: [ master, main ]
+    branches: [ master, main, test-artifacts-upload ]
   pull_request:
     branches: [ master, main ]
 
