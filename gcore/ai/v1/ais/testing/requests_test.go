@@ -27,6 +27,10 @@ func prepareGetActionTestURLParams(version string, id string, action string) str
 	return fmt.Sprintf("/%s/ai/clusters/%d/%d/%s/%s", version, fake.ProjectID, fake.RegionID, id, action)
 }
 
+func prepareGetActionGPUTestURLParams(version string, id string, action string) string { // nolint
+	return fmt.Sprintf("/%s/ai/clusters/gpu/%d/%d/%s/%s", version, fake.ProjectID, fake.RegionID, id, action)
+}
+
 func prepareListTestURL() string {
 	return prepareListTestURLParams("v1", fake.ProjectID, fake.RegionID)
 }
@@ -83,7 +87,7 @@ func prepareResumeTestURL(id string) string {
 }
 
 func prepareResizeTestURL(id string) string {
-	return prepareGetActionTestURLParams("v1", id, "resize")
+	return prepareGetActionGPUTestURLParams("v1", id, "resize")
 }
 
 func prepareGetTestURL(id string) string {
@@ -390,32 +394,12 @@ func TestResize(t *testing.T) {
 		}
 	})
 
-	options := ai.ResizeAIClusterOpts{
-		Flavor:  "g2a-ai-fake-v1pod-8",
-		ImageID: "06e62653-1f88-4d38-9aa6-62833e812b4f",
-		Volumes: []instances.CreateVolumeOpts{
-			{
-				Source:    types.Image,
-				BootIndex: 0,
-				Size:      20,
-				TypeName:  volumes.Standard,
-				ImageID:   "06e62653-1f88-4d38-9aa6-62833e812b4f",
-			},
-		},
-		Interfaces: []instances.InterfaceInstanceCreateOpts{
-			{
-				InterfaceOpts: instances.InterfaceOpts{
-					Type:      types.AnySubnetInterfaceType,
-					NetworkID: "518ba531-496b-4676-8ea4-68e2ed3b2e4b",
-				},
-			},
-		},
-		Password: "secret",
-		Username: "useruser",
+	options := ai.ResizeGPUAIClusterOpts{
+		InstancesCount: 2,
 	}
 	err := options.Validate()
 	require.NoError(t, err)
-	client := fake.ServiceTokenClient("ai/clusters", "v1")
+	client := fake.ServiceTokenClient("ai/clusters/gpu", "v1")
 	tasks, err := ai.Resize(client, AICluster1.ClusterID, options).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
