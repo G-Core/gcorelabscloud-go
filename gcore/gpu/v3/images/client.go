@@ -85,13 +85,13 @@ func (opts UploadVirtualImageOpts) ToImageCreateMap() (map[string]interface{}, e
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
-func (c *ServiceClient) UploadBaremetalImage(opts UploadBaremetalImageOpts) (*tasks.Task, error) {
+func (c *ServiceClient) UploadBaremetalImage(opts UploadBaremetalImageOpts) (*tasks.TaskResults, error) {
 	url := UploadBaremetalURL(c.ServiceClient)
 	b, err := opts.ToImageCreateMap()
 	if err != nil {
 		return nil, err
 	}
-	var result tasks.Task
+	var result tasks.TaskResults
 	_, err = c.Post(url, b, &result, &gcorecloud.RequestOpts{
 		OkCodes: []int{200, 201, 202},
 	})
@@ -101,13 +101,13 @@ func (c *ServiceClient) UploadBaremetalImage(opts UploadBaremetalImageOpts) (*ta
 	return &result, nil
 }
 
-func (c *ServiceClient) UploadVirtualImage(opts UploadVirtualImageOpts) (*tasks.Task, error) {
+func (c *ServiceClient) UploadVirtualImage(opts UploadVirtualImageOpts) (*tasks.TaskResults, error) {
 	url := UploadVirtualURL(c.ServiceClient)
 	b, err := opts.ToImageCreateMap()
 	if err != nil {
 		return nil, err
 	}
-	var result tasks.Task
+	var result tasks.TaskResults
 	_, err = c.Post(url, b, &result, &gcorecloud.RequestOpts{
 		OkCodes: []int{200, 201, 202},
 	})
