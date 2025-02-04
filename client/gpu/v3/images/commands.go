@@ -7,6 +7,7 @@ import (
 
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/client/gpu/v3/client"
+	taskclient "github.com/G-Core/gcorelabscloud-go/client/tasks/v1/client"
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
 	"github.com/G-Core/gcorelabscloud-go/gcore/gpu/v3/images"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
@@ -183,7 +184,12 @@ func uploadBaremetalImageAction(c *cli.Context) error {
 		return cli.NewExitError(err, 1)
 	}
 
-	return utils.WaitTaskAndShowResult(c, client, results, true, func(task tasks.TaskID) (interface{}, error) {
+	taskClient, err := taskclient.NewTaskClientV1(c)
+	if err != nil {
+		return cli.NewExitError(err, 1)
+	}
+
+	return utils.WaitTaskAndShowResult(c, taskClient, results, true, func(task tasks.TaskID) (interface{}, error) {
 		return task, nil
 	})
 }
@@ -240,7 +246,12 @@ func uploadVirtualImageAction(c *cli.Context) error {
 		return cli.NewExitError(err, 1)
 	}
 
-	return utils.WaitTaskAndShowResult(c, client, results, true, func(task tasks.TaskID) (interface{}, error) {
+	taskClient, err := taskclient.NewTaskClientV1(c)
+	if err != nil {
+		return cli.NewExitError(err, 1)
+	}
+
+	return utils.WaitTaskAndShowResult(c, taskClient, results, true, func(task tasks.TaskID) (interface{}, error) {
 		return task, nil
 	})
 }
