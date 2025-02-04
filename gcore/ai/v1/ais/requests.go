@@ -418,3 +418,39 @@ func GetInstanceConsole(client *gcorecloud.ServiceClient, id string) (r RemoteCo
 	_, r.Err = client.Get(url, &r.Body, nil) // nolint
 	return
 }
+
+// RebuildGPUAIClusterOptsBuilder allows extensions to add additional parameters to the Rebuild request.
+type RebuildGPUAIClusterOptsBuilder interface {
+	ToRebuildGPUAIClusterMap() (map[string]interface{}, error)
+}
+
+// RebuildGPUAIClusterOpts represents options used to rebuild a GPU AI cluster.
+type RebuildGPUAIClusterOpts struct {
+	ImageID  string   `json:"image_id,omitempty"`
+	UserData string   `json:"user_data,omitempty"`
+	Nodes    []string `json:"nodes" required:"true" validate:"required"`
+}
+
+// Validate implements basic validation for this request.
+func (opts RebuildGPUAIClusterOpts) Validate() error {
+	return gcorecloud.ValidateStruct(opts)
+}
+
+// ToRebuildGPUAIClusterMap builds a request body from RebuildGPUAIClusterOpts.
+func (opts RebuildGPUAIClusterOpts) ToRebuildGPUAIClusterMap() (map[string]interface{}, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, err
+	}
+	return gcorecloud.BuildRequestBody(opts, "")
+}
+
+// RebuildGPUAICluster rebuilds a GPU AI cluster.
+func RebuildGPUAICluster(client *gcorecloud.ServiceClient, clusterID string, opts RebuildGPUAIClusterOptsBuilder) (r tasks.Result) {
+	b, err := opts.ToRebuildGPUAIClusterMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = client.Post(rebuildGPUAIURL(client, clusterID), b, &r.Body, nil) // nolint
+	return
+}

@@ -35,6 +35,94 @@ var (
 	bootableIndex             = 0
 )
 
+// Command declarations
+var aiClusterRebuildCommand = cli.Command{
+	Name: "rebuild",
+	Usage: `
+	Rebuild GPU AI cluster nodes
+	Example: gcoreclient ai rebuild --image 06e62653-1f88-4d38-9aa6-62833e812b4f --user-data "test" --nodes node1 --nodes node2 <cluster_id> -d -w`,
+	ArgsUsage: "<cluster_id>",
+	Category:  "cluster",
+	Flags: append([]cli.Flag{
+		&cli.StringFlag{
+			Name:     "image",
+			Usage:    "AI cluster image",
+			Required: false,
+		},
+		&cli.StringFlag{
+			Name:     "user-data",
+			Usage:    "AI cluster user data",
+			Required: false,
+		},
+		&cli.StringFlag{
+			Name:     "user-data-file",
+			Usage:    "instance user data file",
+			Required: false,
+		},
+		&cli.StringSliceFlag{
+			Name:     "nodes",
+			Usage:    "List of node IDs to rebuild. Example: --nodes node1 --nodes node2",
+			Required: true,
+		},
+	}, flags.WaitCommandFlags...),
+	Action: func(c *cli.Context) error {
+		clusterID, err := flags.GetFirstStringArg(c, aiClusterIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "rebuild")
+			return err
+		}
+		client, err := client.NewAIGPUClusterClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		userData, err := instance_client.GetUserData(c)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "rebuild")
+			return cli.NewExitError(err, 1)
+		}
+
+		opts := ai.RebuildGPUAIClusterOpts{
+			ImageID:  c.String("image"),
+			UserData: userData,
+			Nodes:    c.StringSlice("nodes"),
+		}
+
+		err = gcorecloud.TranslateValidationError(opts.Validate())
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+
+		results, err := ai.RebuildGPUAICluster(client, clusterID, opts).Extract()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+
+		taskClient, err := task_client.NewTaskClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.NewExitError(err, 1)
+		}
+
+		return utils.WaitTaskAndShowResult(c, taskClient, results, c.Bool("d"), func(task tasks.TaskID) (interface{}, error) {
+			taskInfo, err := tasks.Get(taskClient, string(task)).Extract()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
+			}
+			clusterID, err := ai.ExtractAIClusterIDFromTask(taskInfo)
+			if err != nil {
+				return nil, fmt.Errorf("cannot retrieve AI cluster ID from task info: %w", err)
+			}
+			cluster, err := ai.Get(client, clusterID).Extract()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get AI cluster with ID: %s. Error: %w", clusterID, err)
+			}
+			return cluster, nil
+		})
+	},
+}
+
 var Commands = cli.Command{
 	Name:  "ai",
 	Usage: "GCloud AI API",
@@ -44,6 +132,7 @@ var Commands = cli.Command{
 		&aiClusterCreateCommand,
 		&aiClusterDeleteCommand,
 		&aiClusterPowerCycleCommand,
+		&aiClusterRebuildCommand,
 		&aiClusterRebootCommand,
 		&aiClusterSuspendCommand,
 		&aiClusterResumeCommand,
@@ -629,7 +718,7 @@ var aiClusterCreateCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
 		}
-		return utils.WaitTaskAndShowResult(c, taskClient, results, true, func(task tasks.TaskID) (interface{}, error) {
+		return utils.WaitTaskAndShowResult(c, taskClient, results, c.Bool("d"), func(task tasks.TaskID) (interface{}, error) {
 			taskInfo, err := tasks.Get(taskClient, string(task)).Extract()
 			if err != nil {
 				return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
@@ -847,7 +936,7 @@ var aiClusterResizeCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
-		return utils.WaitTaskAndShowResult(c, client, results, true, func(task tasks.TaskID) (interface{}, error) {
+		return utils.WaitTaskAndShowResult(c, client, results, c.Bool("d"), func(task tasks.TaskID) (interface{}, error) {
 			cluster, err := ai.Get(client, clusterID).Extract()
 			if err != nil {
 				return nil, fmt.Errorf("cannot get AI cluster with ID: %s. Error: %w", clusterID, err)
