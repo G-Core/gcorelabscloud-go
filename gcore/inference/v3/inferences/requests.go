@@ -84,6 +84,7 @@ type UpdateInferenceDeploymentOptsBuilder interface {
 
 // UpdateInferenceDeploymentOpts represents options used to update a function.
 type UpdateInferenceDeploymentOpts struct {
+	Description     *string               `json:"description,omitempty"`
 	Image           *string               `json:"image,omitempty"`
 	ListeningPort   *int                  `json:"listening_port,omitempty"`
 	AuthEnabled     *bool                 `json:"auth_enabled,omitempty"`
