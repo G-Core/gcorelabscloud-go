@@ -13,7 +13,7 @@ const ListResponse = `
             "hardware_description": {
                 "network": "2x100G",
                 "ipu": "vPOD-16 (Classic)",
-                "poplar_count": "2"
+                "poplar_count": 2
             },
             "disabled": false,
             "flavor_name": "bm1-ai-2xsmall-v1pod-16",
@@ -32,7 +32,7 @@ var (
 		HardwareDescription: &aiflavors.HardwareDescription{
 			Network:     "2x100G",
 			IPU:         "vPOD-16 (Classic)",
-			PoplarCount: "2",
+			PoplarCount: 2,
 		},
 	}
 	ExpectedAIFlavorSlice = []aiflavors.AIFlavor{AIFlavor1}
