@@ -7,12 +7,12 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/client/common"
 )
 
-// NewGPUImageClientV3 creates a new GPU image client
-func NewGPUImageClientV3(c *cli.Context) (*gcorecloud.ServiceClient, error) {
-	client, err := common.BuildClient(c, "gpu/baremetal", "v3")
-	if err != nil {
-		return nil, err
-	}
+// NewGPUBaremetalClientV3 creates a new GPU baremetal client
+func NewGPUBaremetalClientV3(c *cli.Context) (*gcorecloud.ServiceClient, error) {
+	return common.BuildClient(c, "gpu/baremetal", "v3")
+}
 
-	return client, nil
+// NewGPUVirtualClientV3 creates a new GPU virtual client
+func NewGPUVirtualClientV3(c *cli.Context) (*gcorecloud.ServiceClient, error) {
+	return common.BuildClient(c, "gpu/virtual", "v3")
 }

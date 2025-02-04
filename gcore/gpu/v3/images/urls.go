@@ -1,20 +1,20 @@
 package images
 
 import (
-	"fmt"
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 )
 
-// resourcePath is a base path for GPU image endpoints
-func resourcePath(projectID, regionID int) string {
-	return fmt.Sprintf("/v3/gpu/%d/%d", projectID, regionID)
+// Common path components
+const (
+	imagesPath = "images"
+)
+
+// UploadBaremetalURL returns URL for uploading baremetal GPU images
+func UploadBaremetalURL(c *gcorecloud.ServiceClient) string {
+	return c.ServiceURL(imagesPath)
 }
 
-// uploadBaremetalURL returns URL for uploading baremetal GPU images
-func uploadBaremetalURL(projectID, regionID int) string {
-	return resourcePath(projectID, regionID) + "/baremetal/images"
-}
-
-// uploadVirtualURL returns URL for uploading virtual GPU images
-func uploadVirtualURL(projectID, regionID int) string {
-	return resourcePath(projectID, regionID) + "/virtual/images"
+// UploadVirtualURL returns URL for uploading virtual GPU images
+func UploadVirtualURL(c *gcorecloud.ServiceClient) string {
+	return c.ServiceURL(imagesPath)
 }
