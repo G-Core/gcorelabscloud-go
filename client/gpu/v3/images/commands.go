@@ -183,8 +183,7 @@ func uploadBaremetalImageAction(c *cli.Context) error {
 		return cli.NewExitError(err, 1)
 	}
 
-	taskResults := &tasks.TaskResults{Tasks: []tasks.TaskID{tasks.TaskID(results.ID)}}
-	return utils.WaitTaskAndShowResult(c, client, taskResults, true, func(task tasks.TaskID) (interface{}, error) {
+	return utils.WaitTaskAndShowResult(c, client, results, true, func(task tasks.TaskID) (interface{}, error) {
 		return task, nil
 	})
 }
@@ -241,8 +240,7 @@ func uploadVirtualImageAction(c *cli.Context) error {
 		return cli.NewExitError(err, 1)
 	}
 
-	taskResults := &tasks.TaskResults{Tasks: []tasks.TaskID{tasks.TaskID(results.ID)}}
-	return utils.WaitTaskAndShowResult(c, client, taskResults, true, func(task tasks.TaskID) (interface{}, error) {
+	return utils.WaitTaskAndShowResult(c, client, results, true, func(task tasks.TaskID) (interface{}, error) {
 		return task, nil
 	})
 }
