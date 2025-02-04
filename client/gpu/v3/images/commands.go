@@ -142,13 +142,11 @@ func uploadBaremetalImageAction(c *cli.Context) error {
 		return cli.NewExitError("Required flags 'url' and 'name' must be set", 1)
 	}
 
-	client, err := client.NewGPUImageClientV3(c)
+	client, err := client.NewGPUBaremetalClientV3(c)
 	if err != nil {
 		_ = cli.ShowAppHelp(c)
 		return cli.NewExitError(err, 1)
 	}
-	
-
 
 	sshKey := images.SshKeyType(c.String("ssh-key"))
 	cowFormat := c.Bool("cow-format")
@@ -202,13 +200,11 @@ func uploadVirtualImageAction(c *cli.Context) error {
 		return cli.NewExitError("Required flags 'url' and 'name' must be set", 1)
 	}
 
-	client, err := client.NewGPUImageClientV3(c)
+	client, err := client.NewGPUVirtualClientV3(c)
 	if err != nil {
 		_ = cli.ShowAppHelp(c)
 		return cli.NewExitError(err, 1)
 	}
-
-
 
 	sshKey := images.SshKeyType(c.String("ssh-key"))
 	cowFormat := c.Bool("cow-format")
