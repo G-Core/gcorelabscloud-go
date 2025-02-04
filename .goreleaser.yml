@@ -10,7 +10,7 @@ builds:
     flags:
       - -trimpath
     ldflags:
-      - '-s -w -X github.com/G-Core/gcorelabscloud-go.AppVersion={{.Version}} -X github.com/G-Core/gcorelabscloud-go/cmd.AppVersion={{.Version}}'
+      - '-s -w -X github.com/G-Core/gcorelabscloud-go/cmd.AppVersion={{.Version}}'
     goos:
       - windows
       - linux
