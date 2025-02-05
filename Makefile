@@ -44,6 +44,12 @@ build:
 	-o $(BINARY) \
 	$(CMD_PACKAGE)
 
+build-with-dist:
+	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) go build \
+	-ldflags $(LDFLAGS) \
+	-o $(BINARY)-$(GOOS)-$(GOARCH) \
+	$(CMD_PACKAGE)
+
 install:
 	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) go install \
 	-ldflags $(LDFLAGS) \
