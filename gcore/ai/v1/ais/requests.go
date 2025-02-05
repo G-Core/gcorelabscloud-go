@@ -455,3 +455,44 @@ func RebuildGPUAICluster(client *gcorecloud.ServiceClient, clusterID string, opt
 	_, r.Err = client.Post(rebuildGPUAIURL(client, clusterID), b, &r.Body, nil) // nolint
 	return
 }
+
+// DeleteNodeOptsBuilder allows extensions to add additional parameters to the Delete request.
+type DeleteNodeOptsBuilder interface {
+	ToDeleteNodeFromGPUClusterQuery() (string, error)
+}
+
+// DeleteNodeOpts Set parameters for delete operation
+type DeleteNodeOpts struct {
+	DeleteFloatings bool `q:"delete_floatings" validate:"omitempty"`
+}
+
+// ToDeleteNodeFromGPUClusterQuery formats a DeleteNodeOpts into a query string.
+func (opts *DeleteNodeOpts) ToDeleteNodeFromGPUClusterQuery() (string, error) {
+	if err := opts.Validate(); err != nil {
+		return "", err
+	}
+	q, err := gcorecloud.BuildQueryString(opts)
+	if err != nil {
+		return "", err
+	}
+	return q.String(), err
+}
+
+func (opts *DeleteNodeOpts) Validate() error {
+	return gcorecloud.ValidateStruct(opts)
+}
+
+// DeleteNodeFromGPUCluster deletes a single node from a GPU cluster.
+func DeleteNodeFromGPUCluster(
+	client *gcorecloud.ServiceClient, clusterID, instanceID string, opts DeleteNodeOpts) (r tasks.Result) {
+
+	url := nodeFromGPUClusterURL(client, clusterID, instanceID)
+	query, err := opts.ToDeleteNodeFromGPUClusterQuery()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	url += query
+	_, r.Err = client.DeleteWithResponse(url, &r.Body, nil) // nolint
+	return
+}
