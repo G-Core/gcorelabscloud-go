@@ -130,6 +130,76 @@ var aiClusterRebuildCommand = cli.Command{
 	},
 }
 
+// Command declarations
+var deleteNodeFromGPUClusterCommand = cli.Command{
+	Name: "delete-node",
+	Usage: `
+	Delete node from GPU cluster
+	Example: gcoreclient ai delete-node <cluster_id> <instance_id> `,
+	ArgsUsage: "<cluster_id> <instance_id>",
+	Category:  "cluster",
+	Flags: append([]cli.Flag{
+		&cli.BoolFlag{
+			Name:     "delete-floating-ips",
+			Usage:    "delete all instance floating ips",
+			Required: false,
+		},
+	}, flags.WaitCommandFlags...),
+	Action: func(c *cli.Context) error {
+		clusterID, err := flags.GetFirstStringArg(c, aiClusterIDText)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "delete-node")
+			return err
+		}
+		instanceID, err := flags.GetNthStringArg(c, aiInstanceIDText, 1)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "delete-node")
+			return err
+		}
+		client, err := client.NewAIGPUClusterClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.Exit(err, 1)
+		}
+
+		opts := ai.DeleteNodeOpts{
+			DeleteFloatings: c.Bool("delete-floating-ips"),
+		}
+
+		err = gcorecloud.TranslateValidationError(opts.Validate())
+		if err != nil {
+			return cli.Exit(err, 1)
+		}
+
+		results, err := ai.DeleteNodeFromGPUCluster(client, clusterID, instanceID, opts).Extract()
+		if err != nil {
+			return cli.Exit(err, 1)
+		}
+
+		taskClient, err := task_client.NewTaskClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.Exit(err, 1)
+		}
+
+		return utils.WaitTaskAndShowResult(c, taskClient, results, c.Bool("d"), func(task tasks.TaskID) (interface{}, error) {
+			taskInfo, err := tasks.Get(taskClient, string(task)).Extract()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
+			}
+			clusterID, err := ai.ExtractAIClusterIDFromTask(taskInfo)
+			if err != nil {
+				return nil, fmt.Errorf("cannot retrieve AI cluster ID from task info: %w", err)
+			}
+			cluster, err := ai.Get(client, clusterID).Extract()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get AI cluster with ID: %s. Error: %w", clusterID, err)
+			}
+			return cluster, nil
+		})
+	},
+}
+
 var Commands = cli.Command{
 	Name:  "ai",
 	Usage: "GCloud AI API",
@@ -144,6 +214,7 @@ var Commands = cli.Command{
 		&aiClusterSuspendCommand,
 		&aiClusterResumeCommand,
 		&aiClusterResizeCommand,
+		&deleteNodeFromGPUClusterCommand,
 		{
 			Name:     "interface",
 			Usage:    "AI cluster interface action",
