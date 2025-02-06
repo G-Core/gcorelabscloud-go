@@ -58,6 +58,7 @@ type CreateOpts struct {
 	Username       string                                  `json:"username" validate:"omitempty,required_with=Password"`
 	UserData       string                                  `json:"user_data,omitempty" validate:"omitempty,base64"`
 	Metadata       map[string]string                       `json:"metadata,omitempty" validate:"omitempty,dive"`
+	InstancesCount int                                     `json:"instances_count,omitempty" validate:"omitempty,min=1"`
 }
 
 // Validate
