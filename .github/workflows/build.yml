@@ -23,16 +23,11 @@ jobs:
       - name: Build windows/amd64
         run: make build-with-dist GOOS=windows GOARCH=amd64
 
-      - name: Set truncated SHA
-        id: truncated_sha
-        run: |
-          GITHUB_SHA=${{ github.sha }}
-          echo "GITHUB_SHA is $GITHUB_SHA"
-          echo "github_short_sha=${GITHUB_SHA::8}" >> "$GITHUB_OUTPUT"
-          echo "github_short_sha is ${GITHUB_SHA::8}"
+      - name: Set truncated SHA as environment variable
+        run: echo "SHORT_SHA=${GITHUB_SHA::8}" >> $GITHUB_ENV
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: gcoreclient-${{ steps.truncated_sha.github_short_sha }}
+          name: gcoreclient-${{ env.SHORT_SHA }}
           path: gcoreclient*
