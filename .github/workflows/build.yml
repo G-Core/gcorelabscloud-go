@@ -25,7 +25,9 @@ jobs:
 
       - name: Set truncated SHA
         id: truncated_sha
-        run: echo "github_short_sha=${GITHUB_SHA::8}" >> "${GITHUB_OUTPUT}"
+        run: |
+          echo "GITHUB_SHA=${{ github.sha }}"
+          echo "github_short_sha=${GITHUB_SHA::8}" >> "$GITHUB_OUTPUT"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
