@@ -24,11 +24,11 @@ jobs:
         run: make build-with-dist GOOS=windows GOARCH=amd64
 
       - name: Set truncated SHA
-        id: vars
-        run: echo "::set-output name=short_sha::${GITHUB_SHA::8}"
+        id: truncated_sha
+        run: echo "github_short_sha=${GITHUB_SHA::8}" >> "${GITHUB_OUTPUT}"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: gcoreclient-${{ steps.vars.outputs.short_sha }}
+          name: gcoreclient-${{ steps.truncated_sha.github_short_sha }}
           path: gcoreclient*
