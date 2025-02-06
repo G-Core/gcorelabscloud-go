@@ -5,6 +5,7 @@ import (
 
 	"github.com/urfave/cli/v2"
 
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/client/gpu/v3/client"
 	taskclient "github.com/G-Core/gcorelabscloud-go/client/tasks/v1/client"
@@ -147,8 +148,8 @@ var Commands = cli.Command{
 	},
 }
 
-// Move the action functions to separate named functions for better organization
-func uploadBaremetalImageAction(c *cli.Context) error {
+// uploadImageAction handles the common logic for both virtual and baremetal image uploads
+func uploadImageAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud.ServiceClient, error)) error {
 	if c.Args().Len() > 0 {
 		return cli.ShowCommandHelp(c, "")
 	}
@@ -159,7 +160,7 @@ func uploadBaremetalImageAction(c *cli.Context) error {
 		return cli.NewExitError("Required flags 'url' and 'name' must be set", 1)
 	}
 
-	client, err := client.NewGPUBaremetalClientV3(c)
+	client, err := newClient(c)
 	if err != nil {
 		_ = cli.ShowAppHelp(c)
 		return cli.NewExitError(err, 1)
@@ -170,17 +171,16 @@ func uploadBaremetalImageAction(c *cli.Context) error {
 	osType := images.ImageOsType(c.String("os-type"))
 	hwType := images.ImageHwFirmwareType(c.String("hw-firmware-type"))
 
-	opts := images.UploadBaremetalImageOpts{
-		URL:            c.String("url"),
-		Name:           c.String("name"),
-		SshKey:         &sshKey,
-		CowFormat:      &cowFormat,
-		Architecture:   stringPtr(c.String("architecture")),
-		OsDistro:       stringPtr(c.String("os-distro")),
-		OsType:         &osType,
-		OsVersion:      stringPtr(c.String("os-version")),
-		HwFirmwareType: &hwType,
-	}
+	opts := images.NewImageOpts()
+	opts.URL = c.String("url")
+	opts.Name = c.String("name")
+	opts.SshKey = &sshKey
+	opts.CowFormat = &cowFormat
+	opts.Architecture = stringPtr(c.String("architecture"))
+	opts.OsDistro = stringPtr(c.String("os-distro"))
+	opts.OsType = &osType
+	opts.OsVersion = stringPtr(c.String("os-version"))
+	opts.HwFirmwareType = &hwType
 
 	if c.IsSet("metadata") {
 		metadata, err := stringToMap(c.StringSlice("metadata"))
@@ -195,7 +195,7 @@ func uploadBaremetalImageAction(c *cli.Context) error {
 	}
 
 	serviceClient := &images.ServiceClient{ServiceClient: client}
-	results, err := serviceClient.UploadBaremetalImage(opts)
+	results, err := serviceClient.UploadImage(opts)
 	if err != nil {
 		return cli.NewExitError(err, 1)
 	}
@@ -210,64 +210,10 @@ func uploadBaremetalImageAction(c *cli.Context) error {
 	})
 }
 
+func uploadBaremetalImageAction(c *cli.Context) error {
+	return uploadImageAction(c, client.NewGPUBaremetalClientV3)
+}
+
 func uploadVirtualImageAction(c *cli.Context) error {
-	if c.Args().Len() > 0 {
-		return cli.ShowCommandHelp(c, "")
-	}
-
-	// Only validate if not showing help
-	if !c.Bool("help") && (c.String("url") == "" || c.String("name") == "") {
-		_ = cli.ShowCommandHelp(c, "")
-		return cli.NewExitError("Required flags 'url' and 'name' must be set", 1)
-	}
-
-	client, err := client.NewGPUVirtualClientV3(c)
-	if err != nil {
-		_ = cli.ShowAppHelp(c)
-		return cli.NewExitError(err, 1)
-	}
-
-	sshKey := images.SshKeyType(c.String("ssh-key"))
-	cowFormat := c.Bool("cow-format")
-	osType := images.ImageOsType(c.String("os-type"))
-	hwType := images.ImageHwFirmwareType(c.String("hw-firmware-type"))
-
-	opts := images.UploadVirtualImageOpts{
-		URL:            c.String("url"),
-		Name:           c.String("name"),
-		SshKey:         &sshKey,
-		CowFormat:      &cowFormat,
-		Architecture:   stringPtr(c.String("architecture")),
-		OsDistro:       stringPtr(c.String("os-distro")),
-		OsType:         &osType,
-		OsVersion:      stringPtr(c.String("os-version")),
-		HwFirmwareType: &hwType,
-	}
-
-	if c.IsSet("metadata") {
-		metadata, err := stringToMap(c.StringSlice("metadata"))
-		if err != nil {
-			return cli.NewExitError(err, 1)
-		}
-		metadataInterface := make(map[string]interface{})
-		for k, v := range metadata {
-			metadataInterface[k] = v
-		}
-		opts.Metadata = metadataInterface
-	}
-
-	serviceClient := &images.ServiceClient{ServiceClient: client}
-	results, err := serviceClient.UploadVirtualImage(opts)
-	if err != nil {
-		return cli.NewExitError(err, 1)
-	}
-
-	taskClient, err := taskclient.NewTaskClientV1(c)
-	if err != nil {
-		return cli.NewExitError(err, 1)
-	}
-
-	return utils.WaitTaskAndShowResult(c, taskClient, results, true, func(task tasks.TaskID) (interface{}, error) {
-		return task, nil
-	})
+	return uploadImageAction(c, client.NewGPUVirtualClientV3)
 }
