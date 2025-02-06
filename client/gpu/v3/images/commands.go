@@ -86,20 +86,20 @@ var uploadBaremetalCommand = cli.Command{
 	Subcommands: []*cli.Command{
 		{
 			Name:        "images",
-			Usage:       "Manage baremetal GPU images",
-			Description: "Commands for managing baremetal GPU images",
+			Usage:       "Upload baremetal GPU image",
+			Description: "Upload a new baremetal GPU image with the specified URL and name",
 			Category:    "images",
-			Subcommands: []*cli.Command{
-				{
-					Name:        "upload",
-					Usage:       "Upload baremetal GPU image",
-					Description: "Upload a new baremetal GPU image with the specified URL and name",
-					Category:    "images",
-					ArgsUsage:   " ",
-					Flags:       append(imageUploadFlags, flags.WaitCommandFlags...),
-					Action:      uploadBaremetalImageAction,
-				},
-			},
+			ArgsUsage:   " ",
+			Flags:       append(imageUploadFlags, flags.WaitCommandFlags...),
+			Action:      uploadBaremetalImageAction,
+		},
+		{
+			Name:        "list",
+			Usage:       "List baremetal GPU images",
+			Description: "List all baremetal GPU images",
+			Category:    "images",
+			ArgsUsage:   " ",
+			Action:      listBaremetalImagesAction,
 		},
 	},
 }
@@ -111,20 +111,20 @@ var uploadVirtualCommand = cli.Command{
 	Subcommands: []*cli.Command{
 		{
 			Name:        "images",
-			Usage:       "Manage virtual GPU images",
-			Description: "Commands for managing virtual GPU images",
+			Usage:       "Upload virtual GPU image",
+			Description: "Upload a new virtual GPU image with the specified URL and name",
 			Category:    "images",
-			Subcommands: []*cli.Command{
-				{
-					Name:        "upload",
-					Usage:       "Upload virtual GPU image",
-					Description: "Upload a new virtual GPU image with the specified URL and name",
-					Category:    "images",
-					ArgsUsage:   " ",
-					Flags:       append(imageUploadFlags, flags.WaitCommandFlags...),
-					Action:      uploadVirtualImageAction,
-				},
-			},
+			ArgsUsage:   " ",
+			Flags:       append(imageUploadFlags, flags.WaitCommandFlags...),
+			Action:      uploadVirtualImageAction,
+		},
+		{
+			Name:        "list",
+			Usage:       "List virtual GPU images",
+			Description: "List all virtual GPU images",
+			Category:    "images",
+			ArgsUsage:   " ",
+			Action:      listVirtualImagesAction,
 		},
 	},
 }
@@ -216,4 +216,48 @@ func uploadBaremetalImageAction(c *cli.Context) error {
 
 func uploadVirtualImageAction(c *cli.Context) error {
 	return uploadImageAction(c, client.NewGPUVirtualClientV3)
+}
+
+func listBaremetalImagesAction(c *cli.Context) error {
+	client, err := client.NewGPUBaremetalClientV3(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.NewExitError(err, 1)
+	}
+
+	serviceClient := &images.ServiceClient{ServiceClient: client}
+	pages, err := serviceClient.ListBaremetalImages().AllPages()
+	if err != nil {
+		return cli.NewExitError(err, 1)
+	}
+
+	images, err := images.ExtractImages(pages)
+	if err != nil {
+		return cli.NewExitError(err, 1)
+	}
+
+	utils.ShowResults(images, "")
+	return nil
+}
+
+func listVirtualImagesAction(c *cli.Context) error {
+	client, err := client.NewGPUVirtualClientV3(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.NewExitError(err, 1)
+	}
+
+	serviceClient := &images.ServiceClient{ServiceClient: client}
+	pages, err := serviceClient.ListVirtualImages().AllPages()
+	if err != nil {
+		return cli.NewExitError(err, 1)
+	}
+
+	images, err := images.ExtractImages(pages)
+	if err != nil {
+		return cli.NewExitError(err, 1)
+	}
+
+	utils.ShowResults(images, "")
+	return nil
 }

@@ -61,6 +61,10 @@ type Image struct {
 	ID             string                   `json:"id"`
 	Name           string                   `json:"name"`
 	Status         string                   `json:"status"`
+	MinDisk        int                      `json:"min_disk"`
+	MinRAM         int                      `json:"min_ram"`
+	Size           int                      `json:"size"`
+	Visibility     string                   `json:"visibility"`
 	Architecture   string                   `json:"architecture"`
 	CowFormat      bool                     `json:"cow_format"`
 	HwFirmwareType *ImageHwFirmwareType     `json:"hw_firmware_type"`

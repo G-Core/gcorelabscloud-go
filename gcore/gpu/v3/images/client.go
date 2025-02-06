@@ -3,6 +3,7 @@ package images
 import (
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
+	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
 type ServiceClient struct {
@@ -67,4 +68,18 @@ func (c *ServiceClient) UploadImage(opts ImageOpts) (*tasks.TaskResults, error) 
 // NewImageOpts creates a new ImageOpts instance
 func NewImageOpts() ImageOpts {
 	return ImageOpts{}
+}
+
+// ListBaremetalImages retrieves list of baremetal GPU images
+func (c *ServiceClient) ListBaremetalImages() pagination.Pager {
+	return pagination.NewPager(c.ServiceClient, ImagesURL(c.ServiceClient), func(r pagination.PageResult) pagination.Page {
+		return ImagePage{pagination.LinkedPageBase{PageResult: r}}
+	})
+}
+
+// ListVirtualImages retrieves list of virtual GPU images
+func (c *ServiceClient) ListVirtualImages() pagination.Pager {
+	return pagination.NewPager(c.ServiceClient, ImagesURL(c.ServiceClient), func(r pagination.PageResult) pagination.Page {
+		return ImagePage{pagination.LinkedPageBase{PageResult: r}}
+	})
 }
