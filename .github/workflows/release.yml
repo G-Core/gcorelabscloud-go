@@ -34,7 +34,7 @@ jobs:
         run: |
           TAG_VERSION=${GITHUB_REF#refs/tags/}
           APP_VERSION=$(grep -oP 'var AppVersion = "\K[0-9]+\.[0-9]+\.[0-9]+' provider_client.go)
-          if [ "$TAG_VERSION" != "$APP_VERSION" ]; then
+          if [ "$TAG_VERSION" != "v$APP_VERSION" ]; then
             echo "Tag version ($TAG_VERSION) does not match AppVersion ($APP_VERSION)"
             exit 1
           fi
