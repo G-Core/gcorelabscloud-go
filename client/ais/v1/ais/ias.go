@@ -642,6 +642,12 @@ var aiClusterCreateCommand = cli.Command{
 			Usage:    "create gpu cluster else not gpu cluster",
 			Required: false,
 		},
+		&cli.IntFlag{
+			Name:     "instances-count",
+			Usage:    "number of instances to create",
+			Required: false,
+			Value:    1,
+		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
 		clusterClient, err := client.NewAIClusterClientV1(c)
@@ -655,6 +661,9 @@ var aiClusterCreateCommand = cli.Command{
 				_ = cli.ShowAppHelp(c)
 				return cli.NewExitError(err, 1)
 			}
+		}
+		if c.Int("instances-count") < 1 {
+			return cli.Exit("instances-count must be greater or equal than 1", 1)
 		}
 
 		clusterClientV2, err := client2.NewAIClusterClientV2(c)
@@ -702,6 +711,7 @@ var aiClusterCreateCommand = cli.Command{
 			Username:       c.String("username"),
 			UserData:       userData,
 			Metadata:       metadata,
+			InstancesCount: c.Int("instances-count"),
 		}
 
 		err = gcorecloud.TranslateValidationError(opts.Validate())
