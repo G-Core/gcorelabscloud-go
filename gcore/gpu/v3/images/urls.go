@@ -10,11 +10,6 @@ const (
 )
 
 // UploadBaremetalURL returns URL for uploading baremetal GPU images
-func UploadBaremetalURL(c *gcorecloud.ServiceClient) string {
-	return c.ServiceURL(imagesPath)
-}
-
-// UploadVirtualURL returns URL for uploading virtual GPU images
-func UploadVirtualURL(c *gcorecloud.ServiceClient) string {
+func ImageURL(c *gcorecloud.ServiceClient) string {
 	return c.ServiceURL(imagesPath)
 }
