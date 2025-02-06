@@ -97,3 +97,31 @@ func (c *ServiceClient) ListVirtualImages() pagination.Pager {
 		return ImagePage{pagination.LinkedPageBase{PageResult: r}}
 	})
 }
+
+// DeleteBaremetalImage deletes a baremetal GPU image by ID
+func (c *ServiceClient) DeleteBaremetalImage(imageID string) (*tasks.TaskResults, error) {
+	url := ImageURL(c.ServiceClient, imageID)
+	var result tasks.TaskResults
+	_, err := c.Delete(url, &gcorecloud.RequestOpts{
+		OkCodes:      []int{200, 201, 202, 204},
+		JSONResponse: &result,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// DeleteVirtualImage deletes a virtual GPU image by ID
+func (c *ServiceClient) DeleteVirtualImage(imageID string) (*tasks.TaskResults, error) {
+	url := ImageURL(c.ServiceClient, imageID)
+	var result tasks.TaskResults
+	_, err := c.Delete(url, &gcorecloud.RequestOpts{
+		OkCodes:      []int{200, 201, 202, 204},
+		JSONResponse: &result,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}

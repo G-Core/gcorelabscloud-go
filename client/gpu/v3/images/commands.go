@@ -101,6 +101,15 @@ var uploadBaremetalCommand = cli.Command{
 			ArgsUsage:   " ",
 			Action:      listBaremetalImagesAction,
 		},
+		{
+			Name:        "delete",
+			Usage:       "Delete baremetal GPU image",
+			Description: "Delete baremetal GPU image by ID",
+			Category:    "images",
+			ArgsUsage:   "<image_id>",
+			Flags:       flags.WaitCommandFlags,
+			Action:      deleteBaremetalImageAction,
+		},
 	},
 }
 
@@ -125,6 +134,15 @@ var uploadVirtualCommand = cli.Command{
 			Category:    "images",
 			ArgsUsage:   " ",
 			Action:      listVirtualImagesAction,
+		},
+		{
+			Name:        "delete",
+			Usage:       "Delete virtual GPU image",
+			Description: "Delete virtual GPU image by ID",
+			Category:    "images",
+			ArgsUsage:   "<image_id>",
+			Flags:       flags.WaitCommandFlags,
+			Action:      deleteVirtualImageAction,
 		},
 	},
 }
@@ -304,4 +322,62 @@ func listVirtualImagesAction(c *cli.Context) error {
 
 	utils.ShowResults(images, "")
 	return nil
+}
+
+func deleteBaremetalImageAction(c *cli.Context) error {
+	imageID := c.Args().First()
+	if imageID == "" {
+		_ = cli.ShowCommandHelp(c, "delete")
+		return cli.NewExitError("image ID is required", 1)
+	}
+
+	client, err := client.NewGPUBaremetalClientV3(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.NewExitError(err, 1)
+	}
+
+	serviceClient := &images.ServiceClient{ServiceClient: client}
+	results, err := serviceClient.DeleteBaremetalImage(imageID)
+	if err != nil {
+		return cli.NewExitError(err, 1)
+	}
+
+	taskClient, err := taskclient.NewTaskClientV1(c)
+	if err != nil {
+		return cli.NewExitError(err, 1)
+	}
+
+	return utils.WaitTaskAndShowResult(c, taskClient, results, true, func(task tasks.TaskID) (interface{}, error) {
+		return task, nil
+	})
+}
+
+func deleteVirtualImageAction(c *cli.Context) error {
+	imageID := c.Args().First()
+	if imageID == "" {
+		_ = cli.ShowCommandHelp(c, "delete")
+		return cli.NewExitError("image ID is required", 1)
+	}
+
+	client, err := client.NewGPUVirtualClientV3(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.NewExitError(err, 1)
+	}
+
+	serviceClient := &images.ServiceClient{ServiceClient: client}
+	results, err := serviceClient.DeleteVirtualImage(imageID)
+	if err != nil {
+		return cli.NewExitError(err, 1)
+	}
+
+	taskClient, err := taskclient.NewTaskClientV1(c)
+	if err != nil {
+		return cli.NewExitError(err, 1)
+	}
+
+	return utils.WaitTaskAndShowResult(c, taskClient, results, true, func(task tasks.TaskID) (interface{}, error) {
+		return task, nil
+	})
 }

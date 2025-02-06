@@ -10,3 +10,8 @@ const (
 func ImagesURL(c *gcorecloud.ServiceClient) string {
 	return c.ServiceURL(imagesPath)
 }
+
+// ImageURL returns URL for specific GPU image operations
+func ImageURL(c *gcorecloud.ServiceClient, imageID string) string {
+	return c.ServiceURL(imagesPath, imageID)
+}
