@@ -83,3 +83,17 @@ func (c *ServiceClient) ListVirtualImages() pagination.Pager {
 		return ImagePage{pagination.LinkedPageBase{PageResult: r}}
 	})
 }
+
+// ListBaremetalImages retrieves list of baremetal GPU images
+func (c *ServiceClient) ListBaremetalImages() pagination.Pager {
+	return pagination.NewPager(c.ServiceClient, ImagesURL(c.ServiceClient), func(r pagination.PageResult) pagination.Page {
+		return ImagePage{pagination.LinkedPageBase{PageResult: r}}
+	})
+}
+
+// ListVirtualImages retrieves list of virtual GPU images
+func (c *ServiceClient) ListVirtualImages() pagination.Pager {
+	return pagination.NewPager(c.ServiceClient, ImagesURL(c.ServiceClient), func(r pagination.PageResult) pagination.Page {
+		return ImagePage{pagination.LinkedPageBase{PageResult: r}}
+	})
+}
