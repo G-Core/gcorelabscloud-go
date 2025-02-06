@@ -44,7 +44,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var AppVersion = "v0.2.11"
+var AppVersion = "dev"
 
 var commands = []*cli.Command{
 	&networks.Commands,
