@@ -150,11 +150,7 @@ const UpdateRequest = `
     "KEY": "12345"
   },
   "flavor_name": "inference-16vcpu-232gib-1xh100-80gb",
-  "command": [
-    "nginx",
-    "-g",
-    "daemon off;"
-  ],
+  "command": "nginx -g daemon off;",
   "credentials_name": "dockerhub",
   "logging": {
     "destination_region_id": 1,
@@ -205,11 +201,7 @@ const GetResponse = `
 	"KEY": "12345"
   },
   "flavor_name": "inference-16vcpu-232gib-1xh100-80gb",
-  "command": [
-	"nginx",
-	"-g",
-	"daemon off;"
-  ],
+  "command": "nginx -g daemon off;",
   "credentials_name": "dockerhub",
   "logging": {
 	"destination_region_id": 1,
@@ -233,6 +225,7 @@ var (
 	retentionPolicy = 30
 	topicName       = "mynamespace.topic"
 	timeout         = 120
+	cmd             = "nginx -g daemon off;"
 	Inference1      = inferences.InferenceDeployment{
 		ProjectID:     fake.ProjectID,
 		Name:          "test-inf",
@@ -269,12 +262,8 @@ var (
 			"DEBUG_MODE": "False",
 			"KEY":        "12345",
 		},
-		FlavorName: "inference-16vcpu-232gib-1xh100-80gb",
-		Command: []string{
-			"nginx",
-			"-g",
-			"daemon off;",
-		},
+		FlavorName:      "inference-16vcpu-232gib-1xh100-80gb",
+		Command:         &cmd,
 		CredentialsName: "dockerhub",
 		Logging: &inferences.Logging{
 			DestinationRegionID:      &regionID,

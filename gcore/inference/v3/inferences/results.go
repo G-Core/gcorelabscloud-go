@@ -16,7 +16,7 @@ type InferenceDeployment struct {
 	Timeout         int               `json:"timeout"`
 	Envs            map[string]string `json:"envs"`
 	FlavorName      string            `json:"flavor_name"`
-	Command         []string          `json:"command"`
+	Command         *string           `json:"command"`
 	CredentialsName string            `json:"credentials_name"`
 	Logging         *Logging          `json:"logging"`
 	Probes          *Probes           `json:"probes"`
