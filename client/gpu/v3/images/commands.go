@@ -85,12 +85,20 @@ var uploadBaremetalCommand = cli.Command{
 	Subcommands: []*cli.Command{
 		{
 			Name:        "images",
-			Usage:       "Upload baremetal GPU image",
-			Description: "Upload a new baremetal GPU image with the specified URL and name",
+			Usage:       "Manage baremetal GPU images",
+			Description: "Commands for managing baremetal GPU images",
 			Category:    "images",
-			ArgsUsage:   " ",
-			Flags:       append(imageUploadFlags, flags.WaitCommandFlags...),
-			Action:      uploadBaremetalImageAction,
+			Subcommands: []*cli.Command{
+				{
+					Name:        "upload",
+					Usage:       "Upload baremetal GPU image",
+					Description: "Upload a new baremetal GPU image with the specified URL and name",
+					Category:    "images",
+					ArgsUsage:   " ",
+					Flags:       append(imageUploadFlags, flags.WaitCommandFlags...),
+					Action:      uploadBaremetalImageAction,
+				},
+			},
 		},
 	},
 }
@@ -102,12 +110,20 @@ var uploadVirtualCommand = cli.Command{
 	Subcommands: []*cli.Command{
 		{
 			Name:        "images",
-			Usage:       "Upload virtual GPU image",
-			Description: "Upload a new virtual GPU image with the specified URL and name",
+			Usage:       "Manage virtual GPU images",
+			Description: "Commands for managing virtual GPU images",
 			Category:    "images",
-			ArgsUsage:   " ",
-			Flags:       append(imageUploadFlags, flags.WaitCommandFlags...),
-			Action:      uploadVirtualImageAction,
+			Subcommands: []*cli.Command{
+				{
+					Name:        "upload",
+					Usage:       "Upload virtual GPU image",
+					Description: "Upload a new virtual GPU image with the specified URL and name",
+					Category:    "images",
+					ArgsUsage:   " ",
+					Flags:       append(imageUploadFlags, flags.WaitCommandFlags...),
+					Action:      uploadVirtualImageAction,
+				},
+			},
 		},
 	},
 }
