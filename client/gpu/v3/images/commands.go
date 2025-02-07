@@ -19,7 +19,7 @@ func stringToMap(slice []string) (map[string]string, error) {
 	for _, s := range slice {
 		parts := strings.SplitN(s, "=", 2)
 		if len(parts) != 2 {
-			return nil, cli.NewExitError("invalid metadata format", 1)
+			return nil, cli.Exit("invalid metadata format", 1)
 		}
 		result[parts[0]] = parts[1]
 	}
@@ -157,13 +157,13 @@ func uploadImageAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud
 	// Only validate if not showing help
 	if !c.Bool("help") && (c.String("url") == "" || c.String("name") == "") {
 		_ = cli.ShowCommandHelp(c, "")
-		return cli.NewExitError("Required flags 'url' and 'name' must be set", 1)
+		return cli.Exit("Required flags 'url' and 'name' must be set", 1)
 	}
 
 	client, err := newClient(c)
 	if err != nil {
 		_ = cli.ShowAppHelp(c)
-		return cli.NewExitError(err, 1)
+		return cli.Exit(err, 1)
 	}
 
 	sshKey := images.SshKeyType(c.String("ssh-key"))
@@ -185,7 +185,7 @@ func uploadImageAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud
 	if c.IsSet("metadata") {
 		metadata, err := stringToMap(c.StringSlice("metadata"))
 		if err != nil {
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		metadataInterface := make(map[string]interface{})
 		for k, v := range metadata {
@@ -197,12 +197,12 @@ func uploadImageAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud
 	serviceClient := &images.ServiceClient{ServiceClient: client}
 	results, err := serviceClient.UploadImage(opts)
 	if err != nil {
-		return cli.NewExitError(err, 1)
+		return cli.Exit(err, 1)
 	}
 
 	taskClient, err := taskclient.NewTaskClientV1(c)
 	if err != nil {
-		return cli.NewExitError(err, 1)
+		return cli.Exit(err, 1)
 	}
 
 	return utils.WaitTaskAndShowResult(c, taskClient, results, true, func(task tasks.TaskID) (interface{}, error) {
