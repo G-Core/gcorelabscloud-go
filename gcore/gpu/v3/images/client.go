@@ -49,7 +49,7 @@ func (opts ImageOpts) ToImageCreateMap() (map[string]interface{}, error) {
 }
 
 func (c *ServiceClient) UploadImage(opts ImageOpts) (*tasks.TaskResults, error) {
-	url := ImageURL(c.ServiceClient)
+	url := ImagesURL(c.ServiceClient)
 	b, err := opts.ToImageCreateMap()
 	if err != nil {
 		return nil, err
