@@ -112,9 +112,10 @@ func TestCreate(t *testing.T) {
 			{
 				RegionID: regionID,
 				Scale: inferences.ContainerScale{
-					CooldownPeriod: &cooldownPeriod,
-					Max:            3,
-					Min:            1,
+					CooldownPeriod:  &cooldownPeriod,
+					PollingInterval: &pollingInterval,
+					Max:             3,
+					Min:             1,
 					Triggers: inferences.ContainerScaleTrigger{
 						Cpu: &inferences.ScaleTriggerThreshold{
 							Threshold: 80,
@@ -206,9 +207,10 @@ func TestUpdate(t *testing.T) {
 			{
 				RegionID: regionID,
 				Scale: inferences.ContainerScale{
-					CooldownPeriod: &cooldownPeriod,
-					Max:            3,
-					Min:            1,
+					CooldownPeriod:  &cooldownPeriod,
+					PollingInterval: &pollingInterval,
+					Max:             3,
+					Min:             1,
 					Triggers: inferences.ContainerScaleTrigger{
 						Cpu: &inferences.ScaleTriggerThreshold{
 							Threshold: 80,
