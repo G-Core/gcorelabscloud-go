@@ -280,50 +280,6 @@ func listVirtualImagesAction(c *cli.Context) error {
 	return nil
 }
 
-func listBaremetalImagesAction(c *cli.Context) error {
-	client, err := client.NewGPUBaremetalClientV3(c)
-	if err != nil {
-		_ = cli.ShowAppHelp(c)
-		return cli.NewExitError(err, 1)
-	}
-
-	serviceClient := &images.ServiceClient{ServiceClient: client}
-	pages, err := serviceClient.ListBaremetalImages().AllPages()
-	if err != nil {
-		return cli.NewExitError(err, 1)
-	}
-
-	images, err := images.ExtractImages(pages)
-	if err != nil {
-		return cli.NewExitError(err, 1)
-	}
-
-	utils.ShowResults(images, "")
-	return nil
-}
-
-func listVirtualImagesAction(c *cli.Context) error {
-	client, err := client.NewGPUVirtualClientV3(c)
-	if err != nil {
-		_ = cli.ShowAppHelp(c)
-		return cli.NewExitError(err, 1)
-	}
-
-	serviceClient := &images.ServiceClient{ServiceClient: client}
-	pages, err := serviceClient.ListVirtualImages().AllPages()
-	if err != nil {
-		return cli.NewExitError(err, 1)
-	}
-
-	images, err := images.ExtractImages(pages)
-	if err != nil {
-		return cli.NewExitError(err, 1)
-	}
-
-	utils.ShowResults(images, "")
-	return nil
-}
-
 func deleteBaremetalImageAction(c *cli.Context) error {
 	imageID := c.Args().First()
 	if imageID == "" {

@@ -49,7 +49,7 @@ func (opts ImageOpts) ToImageCreateMap() (map[string]interface{}, error) {
 }
 
 func (c *ServiceClient) UploadImage(opts ImageOpts) (*tasks.TaskResults, error) {
-	url := ImageURL(c.ServiceClient)
+	url := ImagesURL(c.ServiceClient)
 	b, err := opts.ToImageCreateMap()
 	if err != nil {
 		return nil, err
@@ -68,20 +68,6 @@ func (c *ServiceClient) UploadImage(opts ImageOpts) (*tasks.TaskResults, error) 
 // NewImageOpts creates a new ImageOpts instance
 func NewImageOpts() ImageOpts {
 	return ImageOpts{}
-}
-
-// ListBaremetalImages retrieves list of baremetal GPU images
-func (c *ServiceClient) ListBaremetalImages() pagination.Pager {
-	return pagination.NewPager(c.ServiceClient, ImagesURL(c.ServiceClient), func(r pagination.PageResult) pagination.Page {
-		return ImagePage{pagination.LinkedPageBase{PageResult: r}}
-	})
-}
-
-// ListVirtualImages retrieves list of virtual GPU images
-func (c *ServiceClient) ListVirtualImages() pagination.Pager {
-	return pagination.NewPager(c.ServiceClient, ImagesURL(c.ServiceClient), func(r pagination.PageResult) pagination.Page {
-		return ImagePage{pagination.LinkedPageBase{PageResult: r}}
-	})
 }
 
 // ListBaremetalImages retrieves list of baremetal GPU images
