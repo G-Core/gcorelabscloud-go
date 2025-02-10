@@ -105,16 +105,23 @@ var aiClusterRebuildCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
+		clusterClientV2, err := client2.NewAIClusterClientV2(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.Exit(err, 1)
+		}
+
 		return utils.WaitTaskAndShowResult(c, taskClient, results, c.Bool("d"), func(task tasks.TaskID) (interface{}, error) {
 			taskInfo, err := tasks.Get(taskClient, string(task)).Extract()
 			if err != nil {
 				return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
 			}
-			clusterID, err := ai.ExtractAIClusterIDFromTask(taskInfo)
-			if err != nil {
-				return nil, fmt.Errorf("cannot retrieve AI cluster ID from task info: %w", err)
+			// on rebuild Task the cluster_id is inside the 'data' section
+			clusterID, ok := (*taskInfo.Data)["cluster_id"]
+			if !ok {
+				return nil, fmt.Errorf("cannot get cluster_id from task data section: %+v", taskInfo.Data)
 			}
-			cluster, err := ai.Get(client, clusterID).Extract()
+			cluster, err := ai.Get(clusterClientV2, clusterID.(string)).Extract()
 			if err != nil {
 				return nil, fmt.Errorf("cannot get AI cluster with ID: %s. Error: %w", clusterID, err)
 			}
@@ -642,6 +649,12 @@ var aiClusterCreateCommand = cli.Command{
 			Usage:    "create gpu cluster else not gpu cluster",
 			Required: false,
 		},
+		&cli.IntFlag{
+			Name:     "instances-count",
+			Usage:    "number of instances to create",
+			Required: false,
+			Value:    1,
+		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
 		clusterClient, err := client.NewAIClusterClientV1(c)
@@ -655,6 +668,9 @@ var aiClusterCreateCommand = cli.Command{
 				_ = cli.ShowAppHelp(c)
 				return cli.NewExitError(err, 1)
 			}
+		}
+		if c.Int("instances-count") < 1 {
+			return cli.Exit("instances-count must be greater or equal than 1", 1)
 		}
 
 		clusterClientV2, err := client2.NewAIClusterClientV2(c)
@@ -702,6 +718,7 @@ var aiClusterCreateCommand = cli.Command{
 			Username:       c.String("username"),
 			UserData:       userData,
 			Metadata:       metadata,
+			InstancesCount: c.Int("instances-count"),
 		}
 
 		err = gcorecloud.TranslateValidationError(opts.Validate())
@@ -723,10 +740,8 @@ var aiClusterCreateCommand = cli.Command{
 			if err != nil {
 				return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
 			}
-			clusterID, err := ai.ExtractAIClusterIDFromTask(taskInfo)
-			if err != nil {
-				return nil, fmt.Errorf("cannot retrieve AI cluster ID from task info: %w", err)
-			}
+			// on create cluster, the cluster_id is the same as the Task id
+			clusterID := taskInfo.ID
 			cluster, err := ai.Get(clusterClientV2, clusterID).Extract()
 			if err != nil {
 				return nil, fmt.Errorf("cannot get AI cluster with ID: %s. Error: %w", clusterID, err)

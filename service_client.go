@@ -32,6 +32,9 @@ type ServiceClient struct {
 
 	// RegionID is an id of chosen region
 	RegionID int
+
+	// ProjectID is an id of chosen project
+	ProjectID int
 }
 
 // ResourceBaseURL returns the base URL of any resources used by this service. It MUST end with a /.
