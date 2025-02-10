@@ -36,6 +36,7 @@ const ListResponse = `
           "region_id": 1,
           "scale": {
             "cooldown_period": 60,
+			"polling_interval": 60,
             "max": 3,
             "min": 1,
             "triggers": {
@@ -55,11 +56,7 @@ const ListResponse = `
         "KEY": "12345"
       },
       "flavor_name": "inference-16vcpu-232gib-1xh100-80gb",
-      "command": [
-        "nginx",
-        "-g",
-        "daemon off;"
-      ],
+	  "command": "nginx -g daemon off;",
       "credentials_name": "dockerhub",
       "logging": {
         "destination_region_id": 1,
@@ -85,6 +82,7 @@ const CreateRequest = `
       "region_id": 1,
       "scale": {
         "cooldown_period": 60,
+        "polling_interval": 60,
         "max": 3,
         "min": 1,
         "triggers": {
@@ -131,6 +129,7 @@ const UpdateRequest = `
       "region_id": 1,
       "scale": {
         "cooldown_period": 60,
+        "polling_interval": 60,
         "max": 3,
         "min": 1,
         "triggers": {
@@ -150,7 +149,11 @@ const UpdateRequest = `
     "KEY": "12345"
   },
   "flavor_name": "inference-16vcpu-232gib-1xh100-80gb",
-  "command": "nginx -g daemon off;",
+  "command": [
+    "nginx",
+    "-g",
+    "daemon off;"
+  ],
   "credentials_name": "dockerhub",
   "logging": {
     "destination_region_id": 1,
@@ -182,6 +185,7 @@ const GetResponse = `
 	  "region_id": 1,
 	  "scale": {
 		"cooldown_period": 60,
+		"polling_interval": 60,
 		"max": 3,
 		"min": 1,
 		"triggers": {
@@ -221,6 +225,7 @@ var (
 	credentialsName = "dockerhub"
 	createdAt       = "2023-08-22T11:21:00Z"
 	cooldownPeriod  = 60
+	pollingInterval = 60
 	regionID        = fake.RegionID
 	retentionPolicy = 30
 	topicName       = "mynamespace.topic"
@@ -243,9 +248,10 @@ var (
 				},
 				RegionID: fake.RegionID,
 				Scale: inferences.ContainerScale{
-					CooldownPeriod: &cooldownPeriod,
-					Max:            3,
-					Min:            1,
+					CooldownPeriod:  &cooldownPeriod,
+					PollingInterval: &pollingInterval,
+					Max:             3,
+					Min:             1,
 					Triggers: inferences.ContainerScaleTrigger{
 						Cpu: &inferences.ScaleTriggerThreshold{
 							Threshold: 80,
