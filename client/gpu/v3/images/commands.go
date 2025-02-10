@@ -88,7 +88,6 @@ var uploadBaremetalCommand = cli.Command{
 			Name:        "images",
 			Usage:       "Manage baremetal GPU images",
 			Description: "Commands for managing baremetal GPU images",
-			Category:    "images",
 			Subcommands: []*cli.Command{
 				{
 					Name:        "upload",
@@ -106,6 +105,14 @@ var uploadBaremetalCommand = cli.Command{
 					Category:    "images",
 					ArgsUsage:   " ",
 					Action:      listBaremetalImagesAction,
+				},
+				{
+					Name:        "show",
+					Usage:       "Show baremetal GPU image details",
+					Description: "Show details of a specific baremetal GPU image",
+					Category:    "images",
+					ArgsUsage:   "<image_id>",
+					Action:      showBaremetalImageAction,
 				},
 				{
 					Name:        "delete",
@@ -130,7 +137,6 @@ var uploadVirtualCommand = cli.Command{
 			Name:        "images",
 			Usage:       "Manage virtual GPU images",
 			Description: "Commands for managing virtual GPU images",
-			Category:    "images",
 			Subcommands: []*cli.Command{
 				{
 					Name:        "upload",
@@ -148,6 +154,14 @@ var uploadVirtualCommand = cli.Command{
 					Category:    "images",
 					ArgsUsage:   " ",
 					Action:      listVirtualImagesAction,
+				},
+				{
+					Name:        "show",
+					Usage:       "Show virtual GPU image details",
+					Description: "Show details of a specific virtual GPU image",
+					Category:    "images",
+					ArgsUsage:   "<image_id>",
+					Action:      showVirtualImageAction,
 				},
 				{
 					Name:        "delete",

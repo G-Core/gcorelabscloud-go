@@ -50,6 +50,7 @@ func (opts ImageOpts) ToImageCreateMap() (map[string]interface{}, error) {
 
 func (c *ServiceClient) UploadImage(opts ImageOpts) (*tasks.TaskResults, error) {
 	url := ImagesURL(c.ServiceClient)
+	url := ImagesURL(c.ServiceClient)
 	b, err := opts.ToImageCreateMap()
 	if err != nil {
 		return nil, err
@@ -89,4 +90,26 @@ func (c *ServiceClient) DeleteImage(imageID string) (*tasks.TaskResults, error) 
 		return nil, err
 	}
 	return &result, nil
+}
+
+// GetBaremetalImage retrieves a specific baremetal GPU image by ID
+func (c *ServiceClient) GetBaremetalImage(imageID string) (*Image, error) {
+	url := ImageURL(c.ServiceClient, imageID)
+	var result GetResult
+	_, err := c.Get(url, &result.Body, nil)
+	if err != nil {
+		return nil, err
+	}
+	return result.Extract()
+}
+
+// GetVirtualImage retrieves a specific virtual GPU image by ID
+func (c *ServiceClient) GetVirtualImage(imageID string) (*Image, error) {
+	url := ImageURL(c.ServiceClient, imageID)
+	var result GetResult
+	_, err := c.Get(url, &result.Body, nil)
+	if err != nil {
+		return nil, err
+	}
+	return result.Extract()
 }
