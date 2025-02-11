@@ -334,3 +334,34 @@ func deleteBaremetalImageAction(c *cli.Context) error {
 func deleteVirtualImageAction(c *cli.Context) error {
 	return deleteImageAction(c, client.NewGPUVirtualClientV3)
 }
+
+func showImageAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud.ServiceClient, error)) error {
+	imageID := c.Args().First()
+	if imageID == "" {
+		_ = cli.ShowCommandHelp(c, "show")
+		return cli.Exit("image ID is required", 1)
+	}
+
+	client, err := newClient(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.Exit(err, 1)
+	}
+
+	serviceClient := &images.ServiceClient{ServiceClient: client}
+	image, err := serviceClient.GetImage(imageID)
+	if err != nil {
+		return cli.Exit(err, 1)
+	}
+
+	utils.ShowResults(image, c.String("format"))
+	return nil
+}
+
+func showVirtualImageAction(c *cli.Context) error {
+	return showImageAction(c, client.NewGPUVirtualClientV3)
+}
+
+func showBaremetalImageAction(c *cli.Context) error {
+	return showImageAction(c, client.NewGPUBaremetalClientV3)
+}
