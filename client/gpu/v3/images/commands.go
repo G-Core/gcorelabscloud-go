@@ -208,7 +208,7 @@ func uploadImageAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud
 		return cli.Exit("Required flags 'url' and 'name' must be set", 1)
 	}
 
-	client, err := newClient(c)
+	gpuClient, err := newClient(c)
 	if err != nil {
 		_ = cli.ShowAppHelp(c)
 		return cli.Exit(err, 1)
@@ -242,7 +242,7 @@ func uploadImageAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud
 		opts.Metadata = metadataInterface
 	}
 
-	serviceClient := &images.ServiceClient{ServiceClient: client}
+	serviceClient := &images.ServiceClient{ServiceClient: gpuClient}
 	results, err := serviceClient.UploadImage(opts)
 	if err != nil {
 		return cli.Exit(err, 1)
@@ -268,24 +268,24 @@ func uploadVirtualImageAction(c *cli.Context) error {
 
 // listImagesAction handles the common logic for listing both virtual and baremetal images
 func listImagesAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud.ServiceClient, error)) error {
-	client, err := newClient(c)
+	gpuClient, err := newClient(c)
 	if err != nil {
 		_ = cli.ShowAppHelp(c)
 		return cli.Exit(err, 1)
 	}
 
-	serviceClient := &images.ServiceClient{ServiceClient: client}
+	serviceClient := &images.ServiceClient{ServiceClient: gpuClient}
 	pages, err := serviceClient.ListImages().AllPages()
 	if err != nil {
 		return cli.Exit(err, 1)
 	}
 
-	images, err := images.ExtractImages(pages)
+	imageList, err := images.ExtractImages(pages)
 	if err != nil {
 		return cli.Exit(err, 1)
 	}
 
-	utils.ShowResults(images, c.String("format"))
+	utils.ShowResults(imageList, c.String("format"))
 	return nil
 }
 
@@ -297,13 +297,13 @@ func deleteImageAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud
 		return cli.Exit("image ID is required", 1)
 	}
 
-	client, err := newClient(c)
+	gpuClient, err := newClient(c)
 	if err != nil {
 		_ = cli.ShowAppHelp(c)
 		return cli.Exit(err, 1)
 	}
 
-	serviceClient := &images.ServiceClient{ServiceClient: client}
+	serviceClient := &images.ServiceClient{ServiceClient: gpuClient}
 	results, err := serviceClient.DeleteImage(imageID)
 	if err != nil {
 		return cli.Exit(err, 1)
@@ -342,19 +342,19 @@ func showImageAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud.S
 		return cli.Exit("image ID is required", 1)
 	}
 
-	client, err := newClient(c)
+	gpuClient, err := newClient(c)
 	if err != nil {
 		_ = cli.ShowAppHelp(c)
 		return cli.Exit(err, 1)
 	}
 
-	serviceClient := &images.ServiceClient{ServiceClient: client}
-	image, err := serviceClient.GetImage(imageID)
+	serviceClient := &images.ServiceClient{ServiceClient: gpuClient}
+	imageDetails, err := serviceClient.GetImage(imageID)
 	if err != nil {
 		return cli.Exit(err, 1)
 	}
 
-	utils.ShowResults(image, c.String("format"))
+	utils.ShowResults(imageDetails, c.String("format"))
 	return nil
 }
 
