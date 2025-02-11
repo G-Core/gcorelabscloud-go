@@ -19,7 +19,7 @@ func stringToMap(slice []string) (map[string]string, error) {
 	for _, s := range slice {
 		parts := strings.SplitN(s, "=", 2)
 		if len(parts) != 2 {
-			return nil, cli.NewExitError("invalid metadata format", 1)
+			return nil, cli.Exit("invalid metadata format", 1)
 		}
 		result[parts[0]] = parts[1]
 	}
@@ -86,29 +86,37 @@ var uploadBaremetalCommand = cli.Command{
 	Subcommands: []*cli.Command{
 		{
 			Name:        "images",
-			Usage:       "Upload baremetal GPU image",
-			Description: "Upload a new baremetal GPU image with the specified URL and name",
+			Usage:       "Manage baremetal GPU images",
+			Description: "Commands for managing baremetal GPU images",
 			Category:    "images",
-			ArgsUsage:   " ",
-			Flags:       append(imageUploadFlags, flags.WaitCommandFlags...),
-			Action:      uploadBaremetalImageAction,
-		},
-		{
-			Name:        "list",
-			Usage:       "List baremetal GPU images",
-			Description: "List all baremetal GPU images",
-			Category:    "images",
-			ArgsUsage:   " ",
-			Action:      listBaremetalImagesAction,
-		},
-		{
-			Name:        "delete",
-			Usage:       "Delete baremetal GPU image",
-			Description: "Delete baremetal GPU image by ID",
-			Category:    "images",
-			ArgsUsage:   "<image_id>",
-			Flags:       flags.WaitCommandFlags,
-			Action:      deleteBaremetalImageAction,
+			Subcommands: []*cli.Command{
+				{
+					Name:        "upload",
+					Usage:       "Upload baremetal GPU image",
+					Description: "Upload a new baremetal GPU image with the specified URL and name",
+					Category:    "images",
+					ArgsUsage:   " ",
+					Flags:       append(imageUploadFlags, flags.WaitCommandFlags...),
+					Action:      uploadBaremetalImageAction,
+				},
+				{
+					Name:        "list",
+					Usage:       "List baremetal GPU images",
+					Description: "List all baremetal GPU images",
+					Category:    "images",
+					ArgsUsage:   " ",
+					Action:      listBaremetalImagesAction,
+				},
+				{
+					Name:        "delete",
+					Usage:       "Delete baremetal GPU image",
+					Description: "Delete baremetal GPU image by ID",
+					Category:    "images",
+					ArgsUsage:   "<image_id>",
+					Flags:       flags.WaitCommandFlags,
+					Action:      deleteBaremetalImageAction,
+				},
+			},
 		},
 	},
 }
@@ -120,29 +128,37 @@ var uploadVirtualCommand = cli.Command{
 	Subcommands: []*cli.Command{
 		{
 			Name:        "images",
-			Usage:       "Upload virtual GPU image",
-			Description: "Upload a new virtual GPU image with the specified URL and name",
+			Usage:       "Manage virtual GPU images",
+			Description: "Commands for managing virtual GPU images",
 			Category:    "images",
-			ArgsUsage:   " ",
-			Flags:       append(imageUploadFlags, flags.WaitCommandFlags...),
-			Action:      uploadVirtualImageAction,
-		},
-		{
-			Name:        "list",
-			Usage:       "List virtual GPU images",
-			Description: "List all virtual GPU images",
-			Category:    "images",
-			ArgsUsage:   " ",
-			Action:      listVirtualImagesAction,
-		},
-		{
-			Name:        "delete",
-			Usage:       "Delete virtual GPU image",
-			Description: "Delete virtual GPU image by ID",
-			Category:    "images",
-			ArgsUsage:   "<image_id>",
-			Flags:       flags.WaitCommandFlags,
-			Action:      deleteVirtualImageAction,
+			Subcommands: []*cli.Command{
+				{
+					Name:        "upload",
+					Usage:       "Upload virtual GPU image",
+					Description: "Upload a new virtual GPU image with the specified URL and name",
+					Category:    "images",
+					ArgsUsage:   " ",
+					Flags:       append(imageUploadFlags, flags.WaitCommandFlags...),
+					Action:      uploadVirtualImageAction,
+				},
+				{
+					Name:        "list",
+					Usage:       "List virtual GPU images",
+					Description: "List all virtual GPU images",
+					Category:    "images",
+					ArgsUsage:   " ",
+					Action:      listVirtualImagesAction,
+				},
+				{
+					Name:        "delete",
+					Usage:       "Delete virtual GPU image",
+					Description: "Delete virtual GPU image by ID",
+					Category:    "images",
+					ArgsUsage:   "<image_id>",
+					Flags:       flags.WaitCommandFlags,
+					Action:      deleteVirtualImageAction,
+				},
+			},
 		},
 	},
 }
@@ -175,13 +191,13 @@ func uploadImageAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud
 	// Only validate if not showing help
 	if !c.Bool("help") && (c.String("url") == "" || c.String("name") == "") {
 		_ = cli.ShowCommandHelp(c, "")
-		return cli.NewExitError("Required flags 'url' and 'name' must be set", 1)
+		return cli.Exit("Required flags 'url' and 'name' must be set", 1)
 	}
 
 	client, err := newClient(c)
 	if err != nil {
 		_ = cli.ShowAppHelp(c)
-		return cli.NewExitError(err, 1)
+		return cli.Exit(err, 1)
 	}
 
 	sshKey := images.SshKeyType(c.String("ssh-key"))
@@ -203,7 +219,7 @@ func uploadImageAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud
 	if c.IsSet("metadata") {
 		metadata, err := stringToMap(c.StringSlice("metadata"))
 		if err != nil {
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		metadataInterface := make(map[string]interface{})
 		for k, v := range metadata {
@@ -215,12 +231,12 @@ func uploadImageAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud
 	serviceClient := &images.ServiceClient{ServiceClient: client}
 	results, err := serviceClient.UploadImage(opts)
 	if err != nil {
-		return cli.NewExitError(err, 1)
+		return cli.Exit(err, 1)
 	}
 
 	taskClient, err := taskclient.NewTaskClientV1(c)
 	if err != nil {
-		return cli.NewExitError(err, 1)
+		return cli.Exit(err, 1)
 	}
 
 	return utils.WaitTaskAndShowResult(c, taskClient, results, true, func(task tasks.TaskID) (interface{}, error) {
@@ -236,104 +252,71 @@ func uploadVirtualImageAction(c *cli.Context) error {
 	return uploadImageAction(c, client.NewGPUVirtualClientV3)
 }
 
-func listBaremetalImagesAction(c *cli.Context) error {
-	client, err := client.NewGPUBaremetalClientV3(c)
+// listImagesAction handles the common logic for listing both virtual and baremetal images
+func listImagesAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud.ServiceClient, error)) error {
+	client, err := newClient(c)
 	if err != nil {
 		_ = cli.ShowAppHelp(c)
-		return cli.NewExitError(err, 1)
+		return cli.Exit(err, 1)
 	}
 
 	serviceClient := &images.ServiceClient{ServiceClient: client}
-	pages, err := serviceClient.ListBaremetalImages().AllPages()
+	pages, err := serviceClient.ListImages().AllPages()
 	if err != nil {
-		return cli.NewExitError(err, 1)
+		return cli.Exit(err, 1)
 	}
 
 	images, err := images.ExtractImages(pages)
 	if err != nil {
-		return cli.NewExitError(err, 1)
+		return cli.Exit(err, 1)
 	}
 
-	utils.ShowResults(images, "")
+	utils.ShowResults(images, c.String("format"))
 	return nil
+}
+
+// deleteImageAction handles the common logic for deleting both virtual and baremetal images
+func deleteImageAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud.ServiceClient, error)) error {
+	imageID := c.Args().First()
+	if imageID == "" {
+		_ = cli.ShowCommandHelp(c, "delete")
+		return cli.Exit("image ID is required", 1)
+	}
+
+	client, err := newClient(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.Exit(err, 1)
+	}
+
+	serviceClient := &images.ServiceClient{ServiceClient: client}
+	results, err := serviceClient.DeleteImage(imageID)
+	if err != nil {
+		return cli.Exit(err, 1)
+	}
+
+	taskClient, err := taskclient.NewTaskClientV1(c)
+	if err != nil {
+		return cli.Exit(err, 1)
+	}
+
+	return utils.WaitTaskAndShowResult(c, taskClient, results, true, func(task tasks.TaskID) (interface{}, error) {
+		return task, nil
+	})
+}
+
+func listBaremetalImagesAction(c *cli.Context) error {
+	return listImagesAction(c, client.NewGPUBaremetalClientV3)
 }
 
 func listVirtualImagesAction(c *cli.Context) error {
-	client, err := client.NewGPUVirtualClientV3(c)
-	if err != nil {
-		_ = cli.ShowAppHelp(c)
-		return cli.NewExitError(err, 1)
-	}
-
-	serviceClient := &images.ServiceClient{ServiceClient: client}
-	pages, err := serviceClient.ListVirtualImages().AllPages()
-	if err != nil {
-		return cli.NewExitError(err, 1)
-	}
-
-	images, err := images.ExtractImages(pages)
-	if err != nil {
-		return cli.NewExitError(err, 1)
-	}
-
-	utils.ShowResults(images, "")
-	return nil
+	return listImagesAction(c, client.NewGPUVirtualClientV3)
 }
 
 func deleteBaremetalImageAction(c *cli.Context) error {
-	imageID := c.Args().First()
-	if imageID == "" {
-		_ = cli.ShowCommandHelp(c, "delete")
-		return cli.NewExitError("image ID is required", 1)
-	}
-
-	client, err := client.NewGPUBaremetalClientV3(c)
-	if err != nil {
-		_ = cli.ShowAppHelp(c)
-		return cli.NewExitError(err, 1)
-	}
-
-	serviceClient := &images.ServiceClient{ServiceClient: client}
-	results, err := serviceClient.DeleteBaremetalImage(imageID)
-	if err != nil {
-		return cli.NewExitError(err, 1)
-	}
-
-	taskClient, err := taskclient.NewTaskClientV1(c)
-	if err != nil {
-		return cli.NewExitError(err, 1)
-	}
-
-	return utils.WaitTaskAndShowResult(c, taskClient, results, true, func(task tasks.TaskID) (interface{}, error) {
-		return task, nil
-	})
+	return deleteImageAction(c, client.NewGPUBaremetalClientV3)
 }
 
 func deleteVirtualImageAction(c *cli.Context) error {
-	imageID := c.Args().First()
-	if imageID == "" {
-		_ = cli.ShowCommandHelp(c, "delete")
-		return cli.NewExitError("image ID is required", 1)
-	}
-
-	client, err := client.NewGPUVirtualClientV3(c)
-	if err != nil {
-		_ = cli.ShowAppHelp(c)
-		return cli.NewExitError(err, 1)
-	}
-
-	serviceClient := &images.ServiceClient{ServiceClient: client}
-	results, err := serviceClient.DeleteVirtualImage(imageID)
-	if err != nil {
-		return cli.NewExitError(err, 1)
-	}
-
-	taskClient, err := taskclient.NewTaskClientV1(c)
-	if err != nil {
-		return cli.NewExitError(err, 1)
-	}
-
-	return utils.WaitTaskAndShowResult(c, taskClient, results, true, func(task tasks.TaskID) (interface{}, error) {
-		return task, nil
-	})
+	return deleteImageAction(c, client.NewGPUVirtualClientV3)
 }

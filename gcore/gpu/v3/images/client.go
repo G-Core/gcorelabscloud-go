@@ -70,36 +70,15 @@ func NewImageOpts() ImageOpts {
 	return ImageOpts{}
 }
 
-// ListBaremetalImages retrieves list of baremetal GPU images
-func (c *ServiceClient) ListBaremetalImages() pagination.Pager {
+// ListImages retrieves list of GPU images
+func (c *ServiceClient) ListImages() pagination.Pager {
 	return pagination.NewPager(c.ServiceClient, ImagesURL(c.ServiceClient), func(r pagination.PageResult) pagination.Page {
 		return ImagePage{pagination.LinkedPageBase{PageResult: r}}
 	})
 }
 
-// ListVirtualImages retrieves list of virtual GPU images
-func (c *ServiceClient) ListVirtualImages() pagination.Pager {
-	return pagination.NewPager(c.ServiceClient, ImagesURL(c.ServiceClient), func(r pagination.PageResult) pagination.Page {
-		return ImagePage{pagination.LinkedPageBase{PageResult: r}}
-	})
-}
-
-// DeleteBaremetalImage deletes a baremetal GPU image by ID
-func (c *ServiceClient) DeleteBaremetalImage(imageID string) (*tasks.TaskResults, error) {
-	url := ImageURL(c.ServiceClient, imageID)
-	var result tasks.TaskResults
-	_, err := c.Delete(url, &gcorecloud.RequestOpts{
-		OkCodes:      []int{200, 201, 202, 204},
-		JSONResponse: &result,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-// DeleteVirtualImage deletes a virtual GPU image by ID
-func (c *ServiceClient) DeleteVirtualImage(imageID string) (*tasks.TaskResults, error) {
+// DeleteImage deletes a GPU image by ID
+func (c *ServiceClient) DeleteImage(imageID string) (*tasks.TaskResults, error) {
 	url := ImageURL(c.ServiceClient, imageID)
 	var result tasks.TaskResults
 	_, err := c.Delete(url, &gcorecloud.RequestOpts{
