@@ -69,6 +69,9 @@ const (
 	TaskStateRunning  = TaskState("RUNNING")
 	TaskStateFinished = TaskState("FINISHED")
 	TaskStateError    = TaskState("ERROR")
+
+	TaskSortingOldFirst   = "asc"
+	TaskSortingToNewFirst = "desc"
 )
 
 type TaskResults struct {
