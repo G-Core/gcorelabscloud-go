@@ -235,45 +235,45 @@ func uploadVirtualImageAction(c *cli.Context) error {
 }
 
 func listBaremetalImagesAction(c *cli.Context) error {
-	client, err := client.NewGPUBaremetalClientV3(c)
+	gpuClient, err := client.NewGPUBaremetalClientV3(c)
 	if err != nil {
 		_ = cli.ShowAppHelp(c)
 		return cli.Exit(err, 1)
 	}
 
-	serviceClient := &images.ServiceClient{ServiceClient: client}
+	serviceClient := &images.ServiceClient{ServiceClient: gpuClient}
 	pages, err := serviceClient.ListBaremetalImages().AllPages()
 	if err != nil {
 		return cli.Exit(err, 1)
 	}
 
-	images, err := images.ExtractImages(pages)
+	imageList, err := images.ExtractImages(pages)
 	if err != nil {
 		return cli.Exit(err, 1)
 	}
 
-	utils.ShowResults(images, "json")
+	utils.ShowResults(imageList, "json")
 	return nil
 }
 
 func listVirtualImagesAction(c *cli.Context) error {
-	client, err := client.NewGPUVirtualClientV3(c)
+	gpuClient, err := client.NewGPUVirtualClientV3(c)
 	if err != nil {
 		_ = cli.ShowAppHelp(c)
 		return cli.Exit(err, 1)
 	}
 
-	serviceClient := &images.ServiceClient{ServiceClient: client}
+	serviceClient := &images.ServiceClient{ServiceClient: gpuClient}
 	pages, err := serviceClient.ListVirtualImages().AllPages()
 	if err != nil {
 		return cli.Exit(err, 1)
 	}
 
-	images, err := images.ExtractImages(pages)
+	imageList, err := images.ExtractImages(pages)
 	if err != nil {
 		return cli.Exit(err, 1)
 	}
 
-	utils.ShowResults(images, "json")
+	utils.ShowResults(imageList, "json")
 	return nil
 }
