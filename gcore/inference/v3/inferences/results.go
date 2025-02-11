@@ -76,10 +76,11 @@ type ContainerDeployStatus struct {
 }
 
 type ContainerScale struct {
-	Min            int                   `json:"min"`
-	Max            int                   `json:"max"`
-	CooldownPeriod *int                  `json:"cooldown_period"`
-	Triggers       ContainerScaleTrigger `json:"triggers"`
+	Min             int                   `json:"min"`
+	Max             int                   `json:"max"`
+	CooldownPeriod  *int                  `json:"cooldown_period"`
+	PollingInterval *int                  `json:"polling_interval"`
+	Triggers        ContainerScaleTrigger `json:"triggers"`
 }
 
 type ContainerScaleTrigger struct {
@@ -88,6 +89,18 @@ type ContainerScaleTrigger struct {
 	GpuUtilization *ScaleTriggerThreshold `json:"gpu_utilization,omitempty"`
 	Memory         *ScaleTriggerThreshold `json:"memory,omitempty"`
 	Http           *ScaleTriggerHttp      `json:"http,omitempty"`
+	Sqs            *ScaleTriggerSqs       `json:"sqs,omitempty"`
+}
+
+type ScaleTriggerSqs struct {
+	QueueURL              string  `json:"queue_url"`
+	QueueLength           int     `json:"queue_length"`
+	ActivationQueueLength int     `json:"activation_queue_length"`
+	ScaleOnFlight         bool    `json:"scale_on_flight"`
+	ScaleOnDelayed        bool    `json:"scale_on_delayed"`
+	AwsRegion             string  `json:"aws_region"`
+	AwsEndpoint           *string `json:"aws_endpoint"`
+	SecretName            string  `json:"secret_name"`
 }
 
 type ScaleTriggerThreshold struct {
