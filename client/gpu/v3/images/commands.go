@@ -79,7 +79,7 @@ var imageUploadFlags = []cli.Flag{
 	},
 }
 
-var uploadBaremetalCommand = cli.Command{
+var baremetalCommand = cli.Command{
 	Name:        "baremetal",
 	Usage:       "Manage baremetal GPU resources",
 	Description: "Commands for managing baremetal GPU resources",
@@ -128,7 +128,7 @@ var uploadBaremetalCommand = cli.Command{
 	},
 }
 
-var uploadVirtualCommand = cli.Command{
+var virtualCommand = cli.Command{
 	Name:        "virtual",
 	Usage:       "Manage virtual GPU resources",
 	Description: "Commands for managing virtual GPU resources",
@@ -191,8 +191,8 @@ var Commands = cli.Command{
 	Description: "Parent command for GPU-related operations",
 	Category:    "gpu",
 	Subcommands: []*cli.Command{
-		&uploadBaremetalCommand,
-		&uploadVirtualCommand,
+		&baremetalCommand,
+		&virtualCommand,
 	},
 }
 
