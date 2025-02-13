@@ -247,6 +247,15 @@ func GetFirstStringArg(c *cli.Context, errorText string) (string, error) {
 	return arg, nil
 }
 
+// GetNthStringArg returns the nth string argument, or an error if the arg is blank
+func GetNthStringArg(c *cli.Context, errorText string, n int) (string, error) {
+	arg := c.Args().Get(n)
+	if arg == "" {
+		return "", cli.Exit(fmt.Errorf(errorText), 1)
+	}
+	return arg, nil
+}
+
 func GetFirstIntArg(c *cli.Context, errorText string) (int, error) {
 	arg := c.Args().First()
 	if arg == "" {

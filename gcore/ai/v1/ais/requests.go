@@ -78,32 +78,23 @@ func (opts CreateOpts) ToAIClusterCreateMap() (map[string]interface{}, error) {
 	return mp, nil
 }
 
-// ResizeAIClusterOptsBuilder builds parameters or change flavor request.
-type ResizeAIClusterOptsBuilder interface {
-	ToResizeAIClusterActionMap() (map[string]interface{}, error)
+// ResizeGPUAIClusterOptsBuilder builds parameters or change flavor request.
+type ResizeGPUAIClusterOptsBuilder interface {
+	ToResizeGPUAIClusterActionMap() (map[string]interface{}, error)
 }
 
-// ResizeAIClusterOpts represents options used to resize AI Clsuter.
-type ResizeAIClusterOpts struct {
-	Flavor         string                                  `json:"flavor" validate:"omitempty,min=1"`
-	ImageID        string                                  `json:"image_id" validate:"omitempty,uuid4"`
-	Interfaces     []instances.InterfaceInstanceCreateOpts `json:"interfaces" validate:"required,dive"`
-	Volumes        []instances.CreateVolumeOpts            `json:"volumes,omitempty" validate:"omitempty,dive"`
-	SecurityGroups []gcorecloud.ItemID                     `json:"security_groups,omitempty" validate:"omitempty,dive,uuid4"`
-	Keypair        string                                  `json:"keypair_name,omitempty"`
-	Password       string                                  `json:"password" validate:"omitempty,required_with=Username"`
-	Username       string                                  `json:"username" validate:"omitempty,required_with=Password"`
-	UserData       string                                  `json:"user_data,omitempty" validate:"omitempty,base64"`
-	Metadata       map[string]string                       `json:"metadata,omitempty" validate:"omitempty,dive"`
+// ResizeGPUAIClusterOpts represents options used to resize GPU AI Cluster.
+type ResizeGPUAIClusterOpts struct {
+	InstancesCount int `json:"instances_count" validate:"required"`
 }
 
 // Validate
-func (opts ResizeAIClusterOpts) Validate() error {
+func (opts ResizeGPUAIClusterOpts) Validate() error {
 	return gcorecloud.ValidateStruct(opts)
 }
 
-// ToResizeAIClusterActionMap builds a request body from ResizeAIClusterOpts.
-func (opts ResizeAIClusterOpts) ToResizeAIClusterActionMap() (map[string]interface{}, error) {
+// ToResizeGPUAIClusterActionMap builds a request body from ResizeGPUAIClusterOpts.
+func (opts ResizeGPUAIClusterOpts) ToResizeGPUAIClusterActionMap() (map[string]interface{}, error) {
 	if err := opts.Validate(); err != nil {
 		return nil, err
 	}
@@ -352,8 +343,8 @@ func Resume(client *gcorecloud.ServiceClient, id string) (r tasks.Result) {
 }
 
 // Resize AI Cluster.
-func Resize(client *gcorecloud.ServiceClient, id string, opts ResizeAIClusterOptsBuilder) (r tasks.Result) {
-	b, err := opts.ToResizeAIClusterActionMap()
+func Resize(client *gcorecloud.ServiceClient, id string, opts ResizeGPUAIClusterOptsBuilder) (r tasks.Result) {
+	b, err := opts.ToResizeGPUAIClusterActionMap()
 	if err != nil {
 		r.Err = err
 		return
@@ -453,5 +444,46 @@ func RebuildGPUAICluster(client *gcorecloud.ServiceClient, clusterID string, opt
 		return
 	}
 	_, r.Err = client.Post(rebuildGPUAIURL(client, clusterID), b, &r.Body, nil) // nolint
+	return
+}
+
+// DeleteNodeOptsBuilder allows extensions to add additional parameters to the Delete request.
+type DeleteNodeOptsBuilder interface {
+	ToDeleteNodeFromGPUClusterQuery() (string, error)
+}
+
+// DeleteNodeOpts Set parameters for delete operation
+type DeleteNodeOpts struct {
+	DeleteFloatings bool `q:"delete_floatings" validate:"omitempty"`
+}
+
+// ToDeleteNodeFromGPUClusterQuery formats a DeleteNodeOpts into a query string.
+func (opts *DeleteNodeOpts) ToDeleteNodeFromGPUClusterQuery() (string, error) {
+	if err := opts.Validate(); err != nil {
+		return "", err
+	}
+	q, err := gcorecloud.BuildQueryString(opts)
+	if err != nil {
+		return "", err
+	}
+	return q.String(), err
+}
+
+func (opts *DeleteNodeOpts) Validate() error {
+	return gcorecloud.ValidateStruct(opts)
+}
+
+// DeleteNodeFromGPUCluster deletes a single node from a GPU cluster.
+func DeleteNodeFromGPUCluster(
+	client *gcorecloud.ServiceClient, clusterID, instanceID string, opts DeleteNodeOpts) (r tasks.Result) {
+
+	url := nodeFromGPUClusterURL(client, clusterID, instanceID)
+	query, err := opts.ToDeleteNodeFromGPUClusterQuery()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	url += query
+	_, r.Err = client.DeleteWithResponse(url, &r.Body, nil) // nolint
 	return
 }
