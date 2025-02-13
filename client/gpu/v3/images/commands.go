@@ -219,16 +219,17 @@ func uploadImageAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud
 	osType := images.ImageOsType(c.String("os-type"))
 	hwType := images.ImageHwFirmwareType(c.String("hw-firmware-type"))
 
-	opts := images.NewImageOpts()
-	opts.URL = c.String("url")
-	opts.Name = c.String("name")
-	opts.SshKey = &sshKey
-	opts.CowFormat = &cowFormat
-	opts.Architecture = stringPtr(c.String("architecture"))
-	opts.OsDistro = stringPtr(c.String("os-distro"))
-	opts.OsType = &osType
-	opts.OsVersion = stringPtr(c.String("os-version"))
-	opts.HwFirmwareType = &hwType
+	opts := images.ImageOpts{
+		URL:            c.String("url"),
+		Name:           c.String("name"),
+		SshKey:         &sshKey,
+		CowFormat:      &cowFormat,
+		Architecture:   stringPtr(c.String("architecture")),
+		OsDistro:       stringPtr(c.String("os-distro")),
+		OsType:         &osType,
+		OsVersion:      stringPtr(c.String("os-version")),
+		HwFirmwareType: &hwType,
+	}
 
 	if c.IsSet("metadata") {
 		metadata, err := stringToMap(c.StringSlice("metadata"))
@@ -242,8 +243,7 @@ func uploadImageAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud
 		opts.Metadata = metadataInterface
 	}
 
-	serviceClient := &images.ServiceClient{ServiceClient: gpuClient}
-	results, err := serviceClient.UploadImage(opts)
+	results, err := images.UploadImage(gpuClient, opts)
 	if err != nil {
 		return cli.Exit(err, 1)
 	}
@@ -274,8 +274,7 @@ func listImagesAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud.
 		return cli.Exit(err, 1)
 	}
 
-	serviceClient := &images.ServiceClient{ServiceClient: gpuClient}
-	pages, err := serviceClient.ListImages().AllPages()
+	pages, err := images.List(gpuClient).AllPages()
 	if err != nil {
 		return cli.Exit(err, 1)
 	}
@@ -303,8 +302,7 @@ func deleteImageAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud
 		return cli.Exit(err, 1)
 	}
 
-	serviceClient := &images.ServiceClient{ServiceClient: gpuClient}
-	results, err := serviceClient.DeleteImage(imageID)
+	results, err := images.Delete(gpuClient, imageID)
 	if err != nil {
 		return cli.Exit(err, 1)
 	}
@@ -348,8 +346,7 @@ func showImageAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud.S
 		return cli.Exit(err, 1)
 	}
 
-	serviceClient := &images.ServiceClient{ServiceClient: gpuClient}
-	imageDetails, err := serviceClient.GetImage(imageID)
+	imageDetails, err := images.Get(gpuClient, imageID)
 	if err != nil {
 		return cli.Exit(err, 1)
 	}

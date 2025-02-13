@@ -6,10 +6,6 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
-type ServiceClient struct {
-	*gcorecloud.ServiceClient
-}
-
 // ImageOpts represents common options for uploading GPU images.
 type ImageOpts struct {
 	// Image name
@@ -48,15 +44,16 @@ func (opts ImageOpts) ToImageCreateMap() (map[string]interface{}, error) {
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
-func (c *ServiceClient) UploadImage(opts ImageOpts) (*tasks.TaskResults, error) {
-	url := ImagesURL(c.ServiceClient)
+// UploadImage uploads a new GPU image
+func UploadImage(client *gcorecloud.ServiceClient, opts ImageOpts) (*tasks.TaskResults, error) {
+	url := ImagesURL(client)
 	b, err := opts.ToImageCreateMap()
 	if err != nil {
 		return nil, err
 	}
 
 	var result tasks.TaskResults
-	_, err = c.Post(url, b, &result, &gcorecloud.RequestOpts{
+	_, err = client.Post(url, b, &result, &gcorecloud.RequestOpts{
 		OkCodes: []int{200, 201, 202},
 	})
 	if err != nil {
@@ -65,23 +62,18 @@ func (c *ServiceClient) UploadImage(opts ImageOpts) (*tasks.TaskResults, error) 
 	return &result, nil
 }
 
-// NewImageOpts creates a new ImageOpts instance
-func NewImageOpts() ImageOpts {
-	return ImageOpts{}
-}
-
-// ListImages retrieves list of GPU images
-func (c *ServiceClient) ListImages() pagination.Pager {
-	return pagination.NewPager(c.ServiceClient, ImagesURL(c.ServiceClient), func(r pagination.PageResult) pagination.Page {
+// List retrieves list of GPU images
+func List(client *gcorecloud.ServiceClient) pagination.Pager {
+	return pagination.NewPager(client, ImagesURL(client), func(r pagination.PageResult) pagination.Page {
 		return ImagePage{pagination.LinkedPageBase{PageResult: r}}
 	})
 }
 
-// DeleteImage deletes a GPU image by ID
-func (c *ServiceClient) DeleteImage(imageID string) (*tasks.TaskResults, error) {
-	url := ImageURL(c.ServiceClient, imageID)
+// Delete deletes a GPU image by ID
+func Delete(client *gcorecloud.ServiceClient, imageID string) (*tasks.TaskResults, error) {
+	url := ImageURL(client, imageID)
 	var result tasks.TaskResults
-	_, err := c.Delete(url, &gcorecloud.RequestOpts{
+	_, err := client.Delete(url, &gcorecloud.RequestOpts{
 		OkCodes:      []int{200, 201, 202, 204},
 		JSONResponse: &result,
 	})
@@ -91,10 +83,11 @@ func (c *ServiceClient) DeleteImage(imageID string) (*tasks.TaskResults, error) 
 	return &result, nil
 }
 
-func (c *ServiceClient) GetImage(imageID string) (*Image, error) {
-	url := ImageURL(c.ServiceClient, imageID)
+// Get retrieves a specific GPU image by ID
+func Get(client *gcorecloud.ServiceClient, imageID string) (*Image, error) {
+	url := ImageURL(client, imageID)
 	var result GetResult
-	_, err := c.Get(url, &result.Body, nil)
+	_, err := client.Get(url, &result.Body, nil)
 	if err != nil {
 		return nil, err
 	}
