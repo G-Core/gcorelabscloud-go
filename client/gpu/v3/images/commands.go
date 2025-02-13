@@ -243,7 +243,12 @@ func uploadImageAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud
 		opts.Metadata = metadataInterface
 	}
 
-	results, err := images.UploadImage(gpuClient, opts)
+	results := images.UploadImage(gpuClient, opts)
+	if results.Err != nil {
+		return cli.Exit(results.Err, 1)
+	}
+
+	taskID, err := results.Extract()
 	if err != nil {
 		return cli.Exit(err, 1)
 	}
@@ -253,7 +258,7 @@ func uploadImageAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud
 		return cli.Exit(err, 1)
 	}
 
-	return utils.WaitTaskAndShowResult(c, taskClient, results, true, func(task tasks.TaskID) (interface{}, error) {
+	return utils.WaitTaskAndShowResult(c, taskClient, taskID, true, func(task tasks.TaskID) (interface{}, error) {
 		return task, nil
 	})
 }
@@ -302,7 +307,12 @@ func deleteImageAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud
 		return cli.Exit(err, 1)
 	}
 
-	results, err := images.Delete(gpuClient, imageID)
+	results := images.Delete(gpuClient, imageID)
+	if results.Err != nil {
+		return cli.Exit(results.Err, 1)
+	}
+
+	taskID, err := results.Extract()
 	if err != nil {
 		return cli.Exit(err, 1)
 	}
@@ -312,7 +322,7 @@ func deleteImageAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud
 		return cli.Exit(err, 1)
 	}
 
-	return utils.WaitTaskAndShowResult(c, taskClient, results, true, func(task tasks.TaskID) (interface{}, error) {
+	return utils.WaitTaskAndShowResult(c, taskClient, taskID, true, func(task tasks.TaskID) (interface{}, error) {
 		return task, nil
 	})
 }
@@ -346,12 +356,12 @@ func showImageAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud.S
 		return cli.Exit(err, 1)
 	}
 
-	imageDetails, err := images.Get(gpuClient, imageID)
-	if err != nil {
-		return cli.Exit(err, 1)
+	imageDetails := images.Get(gpuClient, imageID)
+	if imageDetails.Err != nil {
+		return cli.Exit(imageDetails.Err, 1)
 	}
 
-	utils.ShowResults(imageDetails, c.String("format"))
+	utils.ShowResults(imageDetails.Body, c.String("format"))
 	return nil
 }
 
