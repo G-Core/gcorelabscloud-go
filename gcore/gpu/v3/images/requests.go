@@ -45,21 +45,18 @@ func (opts ImageOpts) ToImageCreateMap() (map[string]interface{}, error) {
 }
 
 // UploadImage uploads a new GPU image
-func UploadImage(client *gcorecloud.ServiceClient, opts ImageOpts) (*tasks.TaskResults, error) {
+func UploadImage(client *gcorecloud.ServiceClient, opts ImageOpts) (r tasks.Result) {
 	url := ImagesURL(client)
 	b, err := opts.ToImageCreateMap()
 	if err != nil {
-		return nil, err
+		r.Err = err
+		return
 	}
 
-	var result tasks.TaskResults
-	_, err = client.Post(url, b, &result, &gcorecloud.RequestOpts{
+	_, r.Err = client.Post(url, b, &r.Body, &gcorecloud.RequestOpts{
 		OkCodes: []int{200, 201, 202},
 	})
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
+	return
 }
 
 // List retrieves list of GPU images
@@ -70,26 +67,18 @@ func List(client *gcorecloud.ServiceClient) pagination.Pager {
 }
 
 // Delete deletes a GPU image by ID
-func Delete(client *gcorecloud.ServiceClient, imageID string) (*tasks.TaskResults, error) {
+func Delete(client *gcorecloud.ServiceClient, imageID string) (r tasks.Result) {
 	url := ImageURL(client, imageID)
-	var result tasks.TaskResults
-	_, err := client.Delete(url, &gcorecloud.RequestOpts{
+	_, r.Err = client.Delete(url, &gcorecloud.RequestOpts{
 		OkCodes:      []int{200, 201, 202, 204},
-		JSONResponse: &result,
+		JSONResponse: &r.Body,
 	})
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
+	return
 }
 
 // Get retrieves a specific GPU image by ID
-func Get(client *gcorecloud.ServiceClient, imageID string) (*Image, error) {
+func Get(client *gcorecloud.ServiceClient, imageID string) (r GetResult) {
 	url := ImageURL(client, imageID)
-	var result GetResult
-	_, err := client.Get(url, &result.Body, nil)
-	if err != nil {
-		return nil, err
-	}
-	return result.Extract()
+	_, r.Err = client.Get(url, &r.Body, nil)
+	return
 }
