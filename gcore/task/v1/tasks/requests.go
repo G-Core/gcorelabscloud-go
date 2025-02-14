@@ -55,7 +55,7 @@ func (opts ListOpts) isValid() error {
 // ToTaskListQuery formats a ListOpts into a query string.
 func (opts ListOpts) ToTaskListQuery() (string, error) {
 	if err := gcorecloud.TranslateValidationError(opts.isValid()); err != nil {
-		return "", fmt.Errorf(`invalid task list filter params: "%s"`, opts)
+		return "", fmt.Errorf(`invalid task list filter params: %w`, err)
 	}
 
 	q, err := gcorecloud.BuildQueryString(opts)
