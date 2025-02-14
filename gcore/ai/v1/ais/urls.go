@@ -105,3 +105,7 @@ func metadataItemURL(c *gcorecloud.ServiceClient, id string, key string) string 
 func rebuildGPUAIURL(c *gcorecloud.ServiceClient, clusterID string) string {
 	return c.ServiceURL(clusterID, "rebuild")
 }
+
+func nodeFromGPUClusterURL(c *gcorecloud.ServiceClient, clusterID, instanceID string) string {
+	return c.ServiceURL(clusterID, "node", instanceID)
+}
