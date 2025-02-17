@@ -14,11 +14,11 @@ type ListOptsBuilder interface {
 
 // ListOpts allows the filtering and sorting List API response.
 type ListOpts struct {
-	ProjectID     *int        `q:"project_id"`
-	State         []TaskState `q:"state"`
-	TaskType      *string     `q:"task_type"`
-	Sorting       *string     `q:"sorting"`
-	FromTimestamp *string     `q:"from_timestamp"`
+	ProjectID     *int                `q:"project_id"`
+	State         []TaskState         `q:"state"`
+	TaskType      *string             `q:"task_type"`
+	Sorting       *TaskOrderByChoices `q:"sorting"`
+	FromTimestamp *string             `q:"from_timestamp"`
 }
 
 // isValid validation for Task options.
@@ -31,7 +31,6 @@ func (opts ListOpts) isValid() error {
 				return fmt.Errorf(`invalid task state: "%s"`, state)
 			}
 		}
-
 	}
 
 	if opts.Sorting != nil {
@@ -66,10 +65,17 @@ func (opts ListOpts) ToTaskListQuery() (string, error) {
 	return q.String(), err
 }
 
-// List returns a Pager which allows you to iterate over a collection of
-// cluster templates. It accepts a ListOpts struct, which allows you to filter and sort
+// List returns a Pager which allows you to iterate over a collection of active tasks.
+//
+// Deprecated: Use ListActive for getting the active tasks or ListWithOpts for greater filtering flexibility.
+func List(c *gcorecloud.ServiceClient) pagination.Pager {
+	return ListActive(c)
+}
+
+// ListWithOpts returns a Pager which allows you to iterate over a collection of
+// tasks. It accepts a ListOpts struct, which allows you to filter and sort
 // the returned collection for greater efficiency.
-func List(c *gcorecloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
+func ListWithOpts(c *gcorecloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
 	url := c.BaseServiceURL("tasks")
 	if opts != nil {
 		query, err := opts.ToTaskListQuery()
@@ -84,9 +90,10 @@ func List(c *gcorecloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
 	})
 }
 
-// ListAll returns all Tasks.
+// ListAll returns all Tasks. It accepts a ListOpts struct, which allows you to filter and sort
+// the returned slice for greater efficiency.
 func ListAll(c *gcorecloud.ServiceClient, opts ListOptsBuilder) ([]Task, error) {
-	page, err := List(c, opts).AllPages()
+	page, err := ListWithOpts(c, opts).AllPages()
 	if err != nil {
 		return nil, err
 	}
@@ -98,4 +105,12 @@ func Get(c *gcorecloud.ServiceClient, id string) (r GetResult) {
 	url := getURL(c, id)
 	_, r.Err = c.Get(url, &r.Body, nil)
 	return
+}
+
+// ListActive returns a Pager which allows you to iterate over a collection of active tasks.
+func ListActive(c *gcorecloud.ServiceClient) pagination.Pager {
+	url := listActiveURL(c)
+	return pagination.NewPager(c, url, func(r pagination.PageResult) pagination.Page {
+		return TaskPage{pagination.LinkedPageBase{PageResult: r}}
+	})
 }

@@ -9,3 +9,7 @@ func resourceURL(c *gcorecloud.ServiceClient, id string) string {
 func getURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceURL(c, id)
 }
+
+func listActiveURL(c *gcorecloud.ServiceClient) string {
+	return c.ServiceURL("active")
+}

@@ -63,6 +63,7 @@ type TaskPage struct {
 
 type TaskID string
 type TaskState string
+type TaskOrderByChoices string
 
 const (
 	TaskStateNew      = TaskState("NEW")
@@ -70,8 +71,8 @@ const (
 	TaskStateFinished = TaskState("FINISHED")
 	TaskStateError    = TaskState("ERROR")
 
-	TaskSortingOldFirst   = "asc"
-	TaskSortingToNewFirst = "desc"
+	TaskSortingOldFirst   = TaskOrderByChoices("asc")
+	TaskSortingToNewFirst = TaskOrderByChoices("desc")
 )
 
 type TaskResults struct {
