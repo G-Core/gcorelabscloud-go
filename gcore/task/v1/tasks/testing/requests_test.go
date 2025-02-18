@@ -51,7 +51,7 @@ func TestList(t *testing.T) {
 	client := fake.ServiceTokenClient("tasks", "v1")
 	count := 0
 
-	err := tasks.List(client).EachPage(func(page pagination.Page) (bool, error) {
+	err := tasks.ListActive(client).EachPage(func(page pagination.Page) (bool, error) {
 		count++
 		actual, err := tasks.ExtractTasks(page)
 		require.NoError(t, err)

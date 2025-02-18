@@ -21,15 +21,15 @@ var taskListCommand = cli.Command{
 		client, err := client.NewTaskClientV1(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
-		pages, err := tasks.List(client).AllPages()
+		pages, err := tasks.ListActive(client).AllPages()
 		if err != nil {
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		results, err := tasks.ExtractTasks(pages)
 		if len(results) == 0 {
-			return cli.NewExitError(err, 1)
+			return cli.Exit("No tasks found", 1)
 		}
 		utils.ShowResults(results, c.String("format"))
 		return nil
