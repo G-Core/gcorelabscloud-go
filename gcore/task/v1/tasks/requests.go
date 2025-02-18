@@ -44,7 +44,7 @@ func (opts ListOpts) isValid() error {
 	if opts.FromTimestamp != nil {
 		_, err := time.Parse(time.RFC3339, *opts.FromTimestamp)
 		if err != nil {
-			return fmt.Errorf(`timestamp "%s" should be ISO format string`, opts.FromTimestamp)
+			return fmt.Errorf(`timestamp "%s" should be RFC3339 format string`, opts.FromTimestamp)
 		}
 	}
 
