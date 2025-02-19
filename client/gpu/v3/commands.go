@@ -1,6 +1,7 @@
 package gpu
 
 import (
+	"github.com/G-Core/gcorelabscloud-go/client/gpu/v3/clusters"
 	"github.com/G-Core/gcorelabscloud-go/client/gpu/v3/flavors"
 	"github.com/G-Core/gcorelabscloud-go/client/gpu/v3/images"
 	"github.com/urfave/cli/v2"
@@ -13,6 +14,7 @@ var baremetalCommands = cli.Command{
 	Subcommands: []*cli.Command{
 		images.BaremetalCommands(),
 		flavors.BaremetalCommands(),
+		clusters.BaremetalCommands(),
 	},
 }
 
@@ -23,6 +25,7 @@ var virtualCommands = cli.Command{
 	Subcommands: []*cli.Command{
 		images.VirtualCommands(),
 		flavors.VirtualCommands(),
+		clusters.VirtualCommands(),
 	},
 }
 
