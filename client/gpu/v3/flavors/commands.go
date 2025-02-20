@@ -18,7 +18,7 @@ var listFlags = []cli.Flag{
 	&cli.BoolFlag{
 		Name:     "disabled",
 		Aliases:  []string{"dis"},
-		Usage:    "Include disabled flavors",
+		Usage:    "Show disabled flavors (by default disabled flavors are excluded)",
 		Required: false,
 	},
 }
@@ -32,7 +32,7 @@ func listFlavorsAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud
 	}
 
 	includePrices := c.Bool("include-prices")
-	disabled := c.Bool("disabled")
+	disabled := !c.Bool("disabled")
 	opts := flavors.ListOpts{
 		IncludePrices: &includePrices,
 		Disabled:      &disabled,
