@@ -184,18 +184,6 @@ func stringPtr(s string) *string {
 	return &s
 }
 
-// Commands returns the list of GPU image commands
-var Commands = cli.Command{
-	Name:        "gpu",
-	Usage:       "Manage GPU resources",
-	Description: "Parent command for GPU-related operations",
-	Category:    "gpu",
-	Subcommands: []*cli.Command{
-		&baremetalCommand,
-		&virtualCommand,
-	},
-}
-
 // uploadImageAction handles the common logic for both virtual and baremetal image uploads
 func uploadImageAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud.ServiceClient, error)) error {
 	if c.Args().Len() > 0 {

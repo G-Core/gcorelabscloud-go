@@ -14,13 +14,29 @@ type GetResult struct {
 	commonResult
 }
 
+// PriceDisplayStatus represents the status of price display
+type PriceDisplayStatus string
+
+const (
+	PriceStatusShow PriceDisplayStatus = "show"
+	PriceStatusHide PriceDisplayStatus = "hide"
+)
+
+// Price represents a flavor price structure
+type Price struct {
+	CurrencyCode  *string             `json:"currency_code"`
+	PricePerHour  any                 `json:"price_per_hour"`
+	PricePerMonth any                 `json:"price_per_month"`
+	PriceStatus   *PriceDisplayStatus `json:"price_status"`
+}
+
 // Flavor represents a GPU flavor
 type Flavor struct {
 	ID                  string            `json:"id"`
 	Name                string            `json:"name"`
 	VCPUs               int               `json:"vcpus"`
 	RAM                 int               `json:"ram"`
-	Price               map[string]any    `json:"price"`
+	Price               *Price            `json:"price"`
 	Architecture        *string           `json:"architecture"`
 	Disabled            bool              `json:"disabled"`
 	Capacity            int               `json:"capacity"`
