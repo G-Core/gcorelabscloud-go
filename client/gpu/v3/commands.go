@@ -1,4 +1,4 @@
-package v3
+package gpu
 
 import (
 	"github.com/G-Core/gcorelabscloud-go/client/gpu/v3/flavors"
