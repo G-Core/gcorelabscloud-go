@@ -13,7 +13,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/client/flavors/v1/flavors"
 	"github.com/G-Core/gcorelabscloud-go/client/floatingips/v1/floatingips"
-	gpuv3 "github.com/G-Core/gcorelabscloud-go/client/gpu/v3"
+	"github.com/G-Core/gcorelabscloud-go/client/gpu/v3"
 	"github.com/G-Core/gcorelabscloud-go/client/heat"
 	"github.com/G-Core/gcorelabscloud-go/client/images/v1/images"
 	"github.com/G-Core/gcorelabscloud-go/client/instances/v1/instances"
@@ -80,7 +80,7 @@ var commands = []*cli.Command{
 	&file_shares.Commands,
 	&ais.Commands,
 	&functions.Commands,
-	&gpuv3.Commands,
+	&gpu.Commands,
 }
 
 type clientCommands struct {
