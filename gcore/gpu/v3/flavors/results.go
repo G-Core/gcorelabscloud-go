@@ -3,6 +3,7 @@ package flavors
 import (
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
+	"github.com/shopspring/decimal"
 )
 
 type commonResult struct {
@@ -18,15 +19,16 @@ type GetResult struct {
 type PriceDisplayStatus string
 
 const (
-	PriceStatusShow PriceDisplayStatus = "show"
-	PriceStatusHide PriceDisplayStatus = "hide"
+	PriceStatusShow  PriceDisplayStatus = "show"
+	PriceStatusHide  PriceDisplayStatus = "hide"
+	PriceStatusError PriceDisplayStatus = "error"
 )
 
 // Price represents a flavor price structure
 type Price struct {
 	CurrencyCode  *string             `json:"currency_code"`
-	PricePerHour  any                 `json:"price_per_hour"`
-	PricePerMonth any                 `json:"price_per_month"`
+	PricePerHour  *decimal.Decimal    `json:"price_per_hour"`
+	PricePerMonth *decimal.Decimal    `json:"price_per_month"`
 	PriceStatus   *PriceDisplayStatus `json:"price_status"`
 }
 
