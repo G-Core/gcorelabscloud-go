@@ -10,8 +10,3 @@ const (
 func FlavorsURL(c *gcorecloud.ServiceClient) string {
 	return c.ServiceURL(flavorsPath)
 }
-
-// FlavorURL returns URL for specific GPU flavor operations
-func FlavorURL(c *gcorecloud.ServiceClient, flavorID string) string {
-	return c.ServiceURL(flavorsPath, flavorID)
-}
