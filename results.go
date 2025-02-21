@@ -714,6 +714,7 @@ type GcoreErrorType struct {
 	ExceptionClass string `json:"exception_class"`
 	Message        string `json:"message"`
 	Traceback      string `json:"traceback"`
+	RequestID      string `json:"request_id"`
 }
 
 type MAC struct {

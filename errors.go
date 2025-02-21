@@ -102,7 +102,7 @@ func (e *ErrUnexpectedResponseCode) ReadGcoreError() {
 	gcoreErr := GcoreErrorType{}
 	err := json.Unmarshal(e.Body, &gcoreErr)
 	if err == nil {
-		e.Info = gcoreErr.Message
+		e.Info = fmt.Sprintf("%s RequestID: %s", gcoreErr.Message, gcoreErr.RequestID)
 	}
 }
 
