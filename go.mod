@@ -7,7 +7,7 @@ require (
 	github.com/go-playground/locales v0.13.0
 	github.com/go-playground/universal-translator v0.17.0
 	github.com/go-playground/validator/v10 v10.2.0
-	github.com/golang/protobuf v1.4.2 // indirect
+	github.com/golang/protobuf v1.5.0 // indirect
 	github.com/imdario/mergo v0.3.9
 	github.com/json-iterator/go v1.1.9 // indirect
 	github.com/kr/pretty v0.2.0 // indirect
@@ -23,10 +23,10 @@ require (
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d // indirect
 	golang.org/x/time v0.0.0-20200416051211-89c76fbcd5d1 // indirect
 	google.golang.org/appengine v1.6.6 // indirect
-	google.golang.org/protobuf v1.24.0 // indirect
+	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/yaml.v2 v2.3.0
-	k8s.io/client-go v0.18.2
+	k8s.io/client-go v0.18.14
 )
 
 require github.com/AlekSi/pointer v1.2.0
@@ -45,12 +45,13 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
-	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9 // indirect
-	golang.org/x/net v0.0.0-20201021035429-f5854403a974 // indirect
-	golang.org/x/sys v0.0.0-20220808155132-1c4a2a72c664 // indirect
-	golang.org/x/text v0.3.3 // indirect
+	golang.org/x/crypto v0.31.0 // indirect
+	golang.org/x/net v0.21.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/term v0.27.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
-	k8s.io/apimachinery v0.18.2 // indirect
+	k8s.io/apimachinery v0.18.14 // indirect
 	k8s.io/klog v1.0.0 // indirect
 	k8s.io/utils v0.0.0-20200324210504-a9aa75ae1b89 // indirect
 	sigs.k8s.io/structured-merge-diff/v3 v3.0.0 // indirect
