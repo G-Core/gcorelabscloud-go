@@ -30,10 +30,6 @@ func deleteURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceURL(c, id)
 }
 
-func createCustomSecurityGroupURL(c *gcorecloud.ServiceClient, id string) string {
-	return c.ServiceURL(id, "securitygroup")
-}
-
 func resizeLoadBalancerUrl(c *gcorecloud.ServiceClient, id string) string {
 	return c.ServiceURL(id, "resize")
 }

@@ -18,10 +18,6 @@ type commonResult struct {
 	gcorecloud.Result
 }
 
-type customSecurityGroupResult struct {
-	gcorecloud.Result
-}
-
 // Extract is a function that accepts a result and extracts a loadbalancer resource.
 func (r commonResult) Extract() (*LoadBalancer, error) {
 	var s LoadBalancer
@@ -43,33 +39,6 @@ type GetResult struct {
 // method to interpret it as a LoadBalancer.
 type UpdateResult struct {
 	commonResult
-}
-
-// CustomSecurityGroupCreateResult represents the result of a creation of custom security group
-type CustomSecurityGroupCreateResult struct {
-	gcorecloud.ErrResult
-}
-
-// CustomSecurityGroupGetResult represents the result of a get operation of custom security group
-type CustomSecurityGroupGetResult struct {
-	customSecurityGroupResult
-}
-
-// Extract is a function that accepts a result and extracts a loadbalancer resource.
-func (r customSecurityGroupResult) Extract() ([]CustomSecurityGroup, error) {
-	var s []CustomSecurityGroup
-	err := r.ExtractInto(&s)
-	return s, err
-}
-
-func (r customSecurityGroupResult) ExtractInto(v interface{}) error {
-	return r.Result.ExtractIntoSlicePtr(v, "results")
-}
-
-// CustomSecurityGroup represents a loadbalancer's custom security group.
-type CustomSecurityGroup struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
 }
 
 // LoadBalancer represents a loadbalancer structure.

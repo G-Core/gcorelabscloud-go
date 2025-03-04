@@ -285,20 +285,6 @@ func ListAll(c *gcorecloud.ServiceClient, opts ListOptsBuilder) ([]LoadBalancer,
 	return ExtractLoadBalancers(page)
 }
 
-// CreateCustomSecurityGroup accepts a unique ID and create a custom security group for the load balancer's ingress port.
-func CreateCustomSecurityGroup(c *gcorecloud.ServiceClient, loadbalancerID string) (r CustomSecurityGroupCreateResult) {
-	_, r.Err = c.Post(createCustomSecurityGroupURL(c, loadbalancerID), nil, nil, &gcorecloud.RequestOpts{
-		OkCodes: []int{http.StatusNoContent},
-	})
-	return
-}
-
-// ListCustomSecurityGroup accepts a unique ID and returns a custom security group for the load balancer's ingress port.
-func ListCustomSecurityGroup(c *gcorecloud.ServiceClient, loadbalancerID string) (r CustomSecurityGroupGetResult) {
-	_, r.Err = c.Get(createCustomSecurityGroupURL(c, loadbalancerID), &r.Body, nil)
-	return
-}
-
 // ResizeOptsBuilder allows extensions to add additional parameters to the Resize request.
 type ResizeOptsBuilder interface {
 	ToLoadBalancerResizeMap() (map[string]interface{}, error)

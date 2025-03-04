@@ -70,18 +70,6 @@ var ListResponse = fmt.Sprintf(`
 }
 `, testing.MetadataResponse, VrrpIPsResponse)
 
-const ListCustomSecurityGroupResponse = `
-{
-  "count": 1,
-  "results": [
-    {
-      "id": "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c",
-      "name": "Test"
-    }
-  ]
-}
-`
-
 var GetResponse = fmt.Sprintf(`
 {
   "region": "RegionOne",
@@ -237,10 +225,5 @@ var (
 	}
 
 	ExpectedLoadBalancerSlice = []loadbalancers.LoadBalancer{LoadBalancer1}
-	LbSecurityGroup1          = loadbalancers.CustomSecurityGroup{
-		ID:   "2bf3a5d7-9072-40aa-8ac0-a64e39427a2c",
-		Name: "Test",
-	}
-	ExpectedLbSecurityGroupSlice = []loadbalancers.CustomSecurityGroup{LbSecurityGroup1}
-	Flavor                       = "lb1-4-8"
+	Flavor                    = "lb1-4-8"
 )
