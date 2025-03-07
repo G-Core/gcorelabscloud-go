@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"io"
 	"math"
-	"math/rand/v2"
+	"math/rand"
 	"net/http"
 	"net/http/httputil"
 	"os"
