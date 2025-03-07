@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
+	"math/rand"
 	"net/http"
 	"net/http/httputil"
 	"os"
@@ -103,6 +105,13 @@ type ProviderClient struct {
 	debug    bool
 	APIToken string
 	APIBase  string
+
+	// retryGetOn5XX enables GET retries on 5XX errors with the specified number of attempts and a base interval
+	// following an exponential backoff with jitter.
+	// See EnableGetRetriesOn5XX for enabling this feature.
+	retryGetOn5XX             bool
+	retryGetOn5XXAttempts     int
+	retryGetOn5XXBaseInterval int
 }
 
 // reauthlock represents a set of attributes used to help in the reauthentication process.
@@ -312,6 +321,14 @@ func (client *ProviderClient) SetDebug(debug bool) {
 	log.SetLevel(log.DebugLevel)
 }
 
+// EnableGetRetriesOn5XX enables GET retries on 5XX errors with the specified number of attempts and a base interval
+// (in seconds) following an exponential backoff with jitter strategy.
+func (client *ProviderClient) EnableGetRetriesOn5XX(attempts int, interval int) {
+	client.retryGetOn5XX = true
+	client.retryGetOn5XXAttempts = attempts
+	client.retryGetOn5XXBaseInterval = interval
+}
+
 func (client *ProviderClient) IsDebug() bool {
 	return client.debug
 }
@@ -380,7 +397,7 @@ type requestState struct {
 	hasReauthenticated bool
 	// This flag indicates if issued request has already been retried. It ensures that we don't
 	// end inside an infinite loop.
-	hasRetriedConflict bool
+	hasRetried bool
 }
 
 var applicationJSON = "application/json"
@@ -390,7 +407,7 @@ var applicationJSON = "application/json"
 func (client *ProviderClient) Request(method, url string, options *RequestOpts) (*http.Response, error) {
 	return client.doRequest(method, url, options, &requestState{
 		hasReauthenticated: false,
-		hasRetriedConflict: false,
+		hasRetried:         false,
 	})
 }
 
@@ -497,6 +514,33 @@ func (client *ProviderClient) doRequest(method, url string, options *RequestOpts
 		}
 
 		errType := options.ErrorContext
+
+		// Handling for all GET requests returning 5xx status codes
+		if method == http.MethodGet && resp.StatusCode >= 500 && resp.StatusCode < 600 {
+			// If retries on GET requests are enabled, retry requests according to client settings (attempts and interval)
+			if client.retryGetOn5XX && client.retryGetOn5XXAttempts > 0 && !state.hasRetried {
+				state.hasRetried = true
+				for attempt := 1; attempt <= client.retryGetOn5XXAttempts; attempt++ {
+					resp, err = client.doRequest(method, url, options, state)
+					if err != nil {
+						log.Warningf("Retried request failed.\nDetails: %v", err)
+					}
+					// Validate the HTTP response status.
+					for _, code := range okc {
+						if resp.StatusCode == code && err == nil {
+							return resp, err
+						}
+					}
+
+					// Exponential backoff with jitter
+					// E.g for 3 attempts and interval 2s: 1s, 3s, 7s
+					sleepDuration := time.Duration(float64(client.retryGetOn5XXBaseInterval) *
+						math.Pow(2, float64(attempt-1)) * (0.5 + rand.Float64()/2))
+					time.Sleep(sleepDuration * time.Second)
+				}
+			}
+		}
+
 		switch resp.StatusCode {
 		case http.StatusBadRequest:
 			err = ErrDefault400{respErr}
@@ -560,8 +604,8 @@ func (client *ProviderClient) doRequest(method, url string, options *RequestOpts
 				err = error408er.Error408(respErr)
 			}
 		case http.StatusConflict:
-			if options.ConflictRetryAmount > 0 && !state.hasRetriedConflict {
-				state.hasRetriedConflict = true
+			if options.ConflictRetryAmount > 0 && !state.hasRetried {
+				state.hasRetried = true
 				for attempt := 1; attempt <= options.ConflictRetryAmount; attempt++ {
 					resp, err := client.doRequest(method, url, options, state)
 
