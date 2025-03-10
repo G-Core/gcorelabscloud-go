@@ -184,18 +184,6 @@ func stringPtr(s string) *string {
 	return &s
 }
 
-// Commands returns the list of GPU image commands
-var Commands = cli.Command{
-	Name:        "gpu",
-	Usage:       "Manage GPU resources",
-	Description: "Parent command for GPU-related operations",
-	Category:    "gpu",
-	Subcommands: []*cli.Command{
-		&baremetalCommand,
-		&virtualCommand,
-	},
-}
-
 // uploadImageAction handles the common logic for both virtual and baremetal image uploads
 func uploadImageAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud.ServiceClient, error)) error {
 	if c.Args().Len() > 0 {
@@ -371,4 +359,94 @@ func showVirtualImageAction(c *cli.Context) error {
 
 func showBaremetalImageAction(c *cli.Context) error {
 	return showImageAction(c, client.NewGPUBaremetalClientV3)
+}
+
+// BaremetalCommands returns commands for managing baremetal GPU images
+func BaremetalCommands() *cli.Command {
+	return &cli.Command{
+		Name:        "images",
+		Usage:       "Manage baremetal GPU images",
+		Description: "Commands for managing baremetal GPU images",
+		Subcommands: []*cli.Command{
+			{
+				Name:        "upload",
+				Usage:       "Upload baremetal GPU image",
+				Description: "Upload a new baremetal GPU image with the specified URL and name",
+				Category:    "images",
+				ArgsUsage:   " ",
+				Flags:       append(imageUploadFlags, flags.WaitCommandFlags...),
+				Action:      uploadBaremetalImageAction,
+			},
+			{
+				Name:        "list",
+				Usage:       "List baremetal GPU images",
+				Description: "List all baremetal GPU images",
+				Category:    "images",
+				ArgsUsage:   " ",
+				Action:      listBaremetalImagesAction,
+			},
+			{
+				Name:        "show",
+				Usage:       "Show baremetal GPU image details",
+				Description: "Show details of a specific baremetal GPU image",
+				Category:    "images",
+				ArgsUsage:   "<image_id>",
+				Action:      showBaremetalImageAction,
+			},
+			{
+				Name:        "delete",
+				Usage:       "Delete baremetal GPU image",
+				Description: "Delete baremetal GPU image by ID",
+				Category:    "images",
+				ArgsUsage:   "<image_id>",
+				Flags:       flags.WaitCommandFlags,
+				Action:      deleteBaremetalImageAction,
+			},
+		},
+	}
+}
+
+// VirtualCommands returns commands for managing virtual GPU images
+func VirtualCommands() *cli.Command {
+	return &cli.Command{
+		Name:        "images",
+		Usage:       "Manage virtual GPU images",
+		Description: "Commands for managing virtual GPU images",
+		Subcommands: []*cli.Command{
+			{
+				Name:        "upload",
+				Usage:       "Upload virtual GPU image",
+				Description: "Upload a new virtual GPU image with the specified URL and name",
+				Category:    "images",
+				ArgsUsage:   " ",
+				Flags:       append(imageUploadFlags, flags.WaitCommandFlags...),
+				Action:      uploadVirtualImageAction,
+			},
+			{
+				Name:        "list",
+				Usage:       "List virtual GPU images",
+				Description: "List all virtual GPU images",
+				Category:    "images",
+				ArgsUsage:   " ",
+				Action:      listVirtualImagesAction,
+			},
+			{
+				Name:        "show",
+				Usage:       "Show virtual GPU image details",
+				Description: "Show details of a specific virtual GPU image",
+				Category:    "images",
+				ArgsUsage:   "<image_id>",
+				Action:      showVirtualImageAction,
+			},
+			{
+				Name:        "delete",
+				Usage:       "Delete virtual GPU image",
+				Description: "Delete virtual GPU image by ID",
+				Category:    "images",
+				ArgsUsage:   "<image_id>",
+				Flags:       flags.WaitCommandFlags,
+				Action:      deleteVirtualImageAction,
+			},
+		},
+	}
 }
