@@ -12,8 +12,10 @@ type ListOptsBuilder interface {
 
 // ListOpts allows the filtering and sorting of paginated collections through the API.
 type ListOpts struct {
+	// IncludePrices true to include prices in the response, defaults to false
 	IncludePrices *bool `q:"include_prices"`
-	Disabled      *bool `q:"disabled"`
+	// HideDisabled true to hide disabled flavors, defaults to false
+	HideDisabled *bool `q:"hide_disabled"`
 }
 
 // ToFlavorListQuery formats a ListOpts into a query string.
@@ -25,9 +27,28 @@ func (opts ListOpts) ToFlavorListQuery() (string, error) {
 	return q.String(), nil
 }
 
-// List retrieves list of GPU flavors
-func List(client *gcorecloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
-	url := FlavorsURL(client)
+// ListVirtual retrieves list of virtual GPU flavors
+func ListVirtual(client *gcorecloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
+	// Build complete URL for virtual flavors - client already has the path & project/region set
+	url := client.ServiceURL(flavorsPath)
+
+	if opts != nil {
+		query, err := opts.ToFlavorListQuery()
+		if err != nil {
+			return pagination.Pager{Err: err}
+		}
+		url += query
+	}
+	return pagination.NewPager(client, url, func(r pagination.PageResult) pagination.Page {
+		return FlavorPage{pagination.LinkedPageBase{PageResult: r}}
+	})
+}
+
+// ListBaremetal retrieves list of baremetal GPU flavors
+func ListBaremetal(client *gcorecloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
+	// Build complete URL for baremetal flavors - client already has the path & project/region set
+	url := client.ServiceURL(flavorsPath)
+
 	if opts != nil {
 		query, err := opts.ToFlavorListQuery()
 		if err != nil {

@@ -1,7 +1,8 @@
 package flavors
 
 import (
-	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	"fmt"
+
 	"github.com/G-Core/gcorelabscloud-go/client/gpu/v3/client"
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
 	"github.com/G-Core/gcorelabscloud-go/gcore/gpu/v3/flavors"
@@ -16,34 +17,56 @@ var listFlags = []cli.Flag{
 		Required: false,
 	},
 	&cli.BoolFlag{
-		Name:     "exclude-disabled",
-		Aliases:  []string{"ed"},
-		Usage:    "Exclude disabled flavors (by default shows all flavors)",
+		Name:     "hide-disabled",
+		Aliases:  []string{"hd"},
+		Usage:    "Hide disabled flavors (by default shows all flavors)",
 		Required: false,
 	},
 }
 
-// listFlavorsAction handles the common logic for listing both virtual and baremetal flavors
-func listFlavorsAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud.ServiceClient, error)) error {
-	cl, err := newClient(c)
+// listBaremetalFlavorsAction handles listing baremetal flavors
+func listBaremetalFlavorsAction(c *cli.Context) error {
+	cl, err := client.NewGPUBaremetalClientV3(c)
 	if err != nil {
 		_ = cli.ShowAppHelp(c)
 		return cli.Exit(err, 1)
 	}
 
-	includePrices := c.Bool("include-prices")
-	disabled := !c.Bool("exclude-disabled")
-	opts := flavors.ListOpts{
-		IncludePrices: &includePrices,
-		Disabled:      &disabled,
+	// Get project ID from CLI context or service client
+	projectID := c.Int("project")
+	if projectID == 0 {
+		projectID = cl.ProjectID
+		if projectID == 0 {
+			return cli.Exit(fmt.Errorf("project ID must be provided with --project flag or GCLOUD_PROJECT environment variable"), 1)
+		}
 	}
 
-	results, err := flavors.List(cl, opts).AllPages()
+	// Get region ID from CLI context or service client
+	regionID := c.Int("region")
+	if regionID == 0 {
+		regionID = cl.RegionID
+		if regionID == 0 {
+			return cli.Exit(fmt.Errorf("region ID must be provided with --region flag or GCLOUD_REGION environment variable"), 1)
+		}
+	}
+
+	includePrices := c.Bool("include-prices")
+	hideDisabled := c.Bool("hide-disabled")
+	opts := flavors.ListOpts{
+		IncludePrices: &includePrices,
+		HideDisabled:  &hideDisabled,
+	}
+
+	// Set project and region in the client
+	cl.ProjectID = projectID
+	cl.RegionID = regionID
+
+	results, err := flavors.ListBaremetal(cl, opts).AllPages()
 	if err != nil {
 		return cli.Exit(err, 1)
 	}
 
-	flavorList, err := flavors.ExtractFlavors(results)
+	flavorList, err := flavors.ExtractBMFlavors(results)
 	if err != nil {
 		return cli.Exit(err, 1)
 	}
@@ -51,12 +74,54 @@ func listFlavorsAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud
 	return nil
 }
 
-func listBaremetalFlavorsAction(c *cli.Context) error {
-	return listFlavorsAction(c, client.NewGPUBaremetalClientV3)
-}
-
+// listVirtualFlavorsAction handles listing virtual flavors
 func listVirtualFlavorsAction(c *cli.Context) error {
-	return listFlavorsAction(c, client.NewGPUVirtualClientV3)
+	cl, err := client.NewGPUVirtualClientV3(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.Exit(err, 1)
+	}
+
+	// Get project ID from CLI context or service client
+	projectID := c.Int("project")
+	if projectID == 0 {
+		projectID = cl.ProjectID
+		if projectID == 0 {
+			return cli.Exit(fmt.Errorf("project ID must be provided with --project flag or GCLOUD_PROJECT environment variable"), 1)
+		}
+	}
+
+	// Get region ID from CLI context or service client
+	regionID := c.Int("region")
+	if regionID == 0 {
+		regionID = cl.RegionID
+		if regionID == 0 {
+			return cli.Exit(fmt.Errorf("region ID must be provided with --region flag or GCLOUD_REGION environment variable"), 1)
+		}
+	}
+
+	includePrices := c.Bool("include-prices")
+	hideDisabled := c.Bool("hide-disabled")
+	opts := flavors.ListOpts{
+		IncludePrices: &includePrices,
+		HideDisabled:  &hideDisabled,
+	}
+
+	// Set project and region in the client
+	cl.ProjectID = projectID
+	cl.RegionID = regionID
+
+	results, err := flavors.ListVirtual(cl, opts).AllPages()
+	if err != nil {
+		return cli.Exit(err, 1)
+	}
+
+	flavorList, err := flavors.ExtractVMFlavors(results)
+	if err != nil {
+		return cli.Exit(err, 1)
+	}
+	utils.ShowResults(flavorList, c.String("format"))
+	return nil
 }
 
 // BaremetalCommands returns commands for managing baremetal GPU flavors

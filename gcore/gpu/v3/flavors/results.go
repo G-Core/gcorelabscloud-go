@@ -1,6 +1,8 @@
 package flavors
 
 import (
+	"fmt"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 	"github.com/shopspring/decimal"
@@ -32,17 +34,44 @@ type Price struct {
 	PriceStatus   *PriceDisplayStatus `json:"price_status"`
 }
 
-// Flavor represents a GPU flavor
-type Flavor struct {
-	ID                  string            `json:"id"`
-	Name                string            `json:"name"`
-	VCPUs               int               `json:"vcpus"`
-	RAM                 int               `json:"ram"`
-	Price               *Price            `json:"price"`
-	Architecture        *string           `json:"architecture"`
-	Disabled            bool              `json:"disabled"`
-	Capacity            int               `json:"capacity"`
-	HardwareDescription map[string]string `json:"hardware_description"`
+// GPUInfo represents GPU related information
+type GPUInfo struct {
+	Model  string `json:"model"`
+	Count  int    `json:"count"`
+	Memory int    `json:"memory"`
+}
+
+// FormatGPU formats GPU information according to the formula
+func FormatGPU(model string, count int, memory int) string {
+	return fmt.Sprintf("NVIDIA %s-%dGPU (%dGB)", model, count, memory)
+}
+
+// VMFlavor represents a virtual GPU flavor
+type VMFlavor struct {
+	ID           string  `json:"id"`
+	Name         string  `json:"name"`
+	VCPUs        int     `json:"vcpus"`
+	RAM          int     `json:"ram"`
+	Price        *Price  `json:"price"`
+	Architecture *string `json:"architecture"`
+	Disabled     bool    `json:"disabled"`
+	Capacity     int     `json:"capacity"`
+	GPU          string  `json:"gpu"`
+}
+
+// BMFlavor represents a baremetal GPU flavor
+type BMFlavor struct {
+	ID           string  `json:"id"`
+	Name         string  `json:"name"`
+	CPU          string  `json:"cpu"`
+	RAM          int     `json:"ram"`
+	Disk         string  `json:"disk"`
+	Network      string  `json:"network"`
+	GPU          string  `json:"gpu"`
+	Price        *Price  `json:"price"`
+	Architecture *string `json:"architecture"`
+	Disabled     bool    `json:"disabled"`
+	Capacity     int     `json:"capacity"`
 }
 
 // FlavorPage is the page returned by a pager when traversing over a collection of flavors.
@@ -52,26 +81,39 @@ type FlavorPage struct {
 
 // IsEmpty checks whether a FlavorPage struct is empty.
 func (r FlavorPage) IsEmpty() (bool, error) {
-	flavors, err := ExtractFlavors(r)
-	return len(flavors) == 0, err
+	if r.Result.Err != nil {
+		return true, r.Result.Err
+	}
+
+	var vmFlavors []VMFlavor
+	vmErr := r.Result.ExtractIntoSlicePtr(&vmFlavors, "results")
+	if vmErr == nil && len(vmFlavors) > 0 {
+		return false, nil
+	}
+
+	var bmFlavors []BMFlavor
+	bmErr := r.Result.ExtractIntoSlicePtr(&bmFlavors, "results")
+	if bmErr == nil && len(bmFlavors) > 0 {
+		return false, nil
+	}
+
+	if vmErr != nil && bmErr != nil {
+		return true, vmErr
+	}
+
+	return true, nil
 }
 
-// ExtractFlavors accepts a Page struct, specifically a FlavorPage struct,
-// and extracts the elements into a slice of Flavor structs.
-func ExtractFlavors(r pagination.Page) ([]Flavor, error) {
-	var s []Flavor
-	err := ExtractFlavorsInto(r, &s)
+// ExtractVMFlavors extracts virtual machine flavors
+func ExtractVMFlavors(r pagination.Page) ([]VMFlavor, error) {
+	var s []VMFlavor
+	err := r.(FlavorPage).Result.ExtractIntoSlicePtr(&s, "results")
 	return s, err
 }
 
-// ExtractFlavorsInto similar to ExtractInto but operates on a List of Flavors
-func ExtractFlavorsInto(r pagination.Page, v interface{}) error {
-	return r.(FlavorPage).Result.ExtractIntoSlicePtr(v, "results")
-}
-
-// Extract will get the Flavor object from the commonResult
-func (r commonResult) Extract() (*Flavor, error) {
-	var s Flavor
-	err := r.ExtractInto(&s)
-	return &s, err
+// ExtractBMFlavors extracts baremetal flavors
+func ExtractBMFlavors(r pagination.Page) ([]BMFlavor, error) {
+	var s []BMFlavor
+	err := r.(FlavorPage).Result.ExtractIntoSlicePtr(&s, "results")
+	return s, err
 }
