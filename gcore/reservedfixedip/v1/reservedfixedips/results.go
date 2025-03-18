@@ -71,6 +71,7 @@ type ReservedFixedIP struct {
 	FixedIPAddress      net.IP                  `json:"fixed_ip_address"`
 	FixedIPv6Address    net.IP                  `json:"fixed_ipv6_address"`
 	SubnetID            string                  `json:"subnet_id"`
+	Subnetv6ID          string                  `json:"subnet_v6_id"`
 	CreatorTaskID       string                  `json:"creator_task_id"`
 	TaskID              *string                 `json:"task_id"`
 	IsExternal          bool                    `json:"is_external"`
