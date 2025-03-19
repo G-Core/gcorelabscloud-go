@@ -3,17 +3,22 @@ package reservedfixedips
 import (
 	"fmt"
 	"net"
+	"strings"
 
 	"github.com/urfave/cli/v2"
 
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/client/reservedfixedips/v1/client"
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
+	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/reservedfixedip/v1/reservedfixedips"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 )
 
-var portIDText = "port_id is mandatory argument"
+var (
+	portIDText   = "port_id is mandatory argument"
+	ipFamilyType = types.IPFamilyType("").StringList()
+)
 
 var Commands = cli.Command{
 	Name:  "fixed_ip",
@@ -167,6 +172,13 @@ var reservedFixedIPCreateSubCommand = cli.Command{
 			Name:  "ip-address",
 			Usage: "Reserved fixed IP will be allocated the given IP address. Required if type is 'ip_address'.",
 		},
+		&cli.GenericFlag{
+			Name: "ip-family",
+			Value: &utils.EnumValue{
+				Enum: ipFamilyType,
+			},
+			Usage: fmt.Sprintf("Reserved fixed IP family types. Available options: %s", strings.Join(ipFamilyType, ", ")),
+		},
 	}, flags.WaitCommandFlags...),
 	Action: func(c *cli.Context) error {
 		client, err := client.NewReservedFixedIPClientV1(c)
@@ -180,6 +192,7 @@ var reservedFixedIPCreateSubCommand = cli.Command{
 			NetworkID: c.String("network-id"),
 			SubnetID:  c.String("subnet-id"),
 			IsVip:     c.Bool("is-vip"),
+			IPFamily:  reservedfixedips.IPFamilyType(c.String("ip-family")),
 		}
 
 		if opts.Type == reservedfixedips.IPAddress {
