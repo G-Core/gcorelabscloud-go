@@ -24,6 +24,28 @@ var listFlags = []cli.Flag{
 	},
 }
 
+// BMFlavorOutput represents the output structure for baremetal flavors
+type BMFlavorOutput struct {
+	Name                string                      `json:"name"`
+	Architecture        *string                     `json:"architecture"`
+	Disabled            bool                        `json:"disabled"`
+	Capacity            int                         `json:"capacity"`
+	HardwareDescription map[string]interface{}      `json:"hardware_description"`
+	HardwareProperties  *flavors.HardwareProperties `json:"hardware_properties"`
+	Price               *flavors.Price              `json:"price,omitempty"`
+}
+
+// VMFlavorOutput represents the output structure for virtual flavors
+type VMFlavorOutput struct {
+	Name                string                      `json:"name"`
+	Architecture        *string                     `json:"architecture"`
+	Disabled            bool                        `json:"disabled"`
+	Capacity            int                         `json:"capacity"`
+	HardwareDescription map[string]interface{}      `json:"hardware_description"`
+	HardwareProperties  *flavors.HardwareProperties `json:"hardware_properties"`
+	Price               *flavors.Price              `json:"price,omitempty"`
+}
+
 // listBaremetalFlavorsAction handles listing baremetal flavors
 func listBaremetalFlavorsAction(c *cli.Context) error {
 	cl, err := client.NewGPUBaremetalClientV3(c)
@@ -70,7 +92,28 @@ func listBaremetalFlavorsAction(c *cli.Context) error {
 	if err != nil {
 		return cli.Exit(err, 1)
 	}
-	utils.ShowResults(flavorList, c.String("format"))
+
+	// Convert to our output format
+	outputList := make([]BMFlavorOutput, 0, len(flavorList))
+	for _, flavor := range flavorList {
+		output := BMFlavorOutput{
+			Name:                flavor.Name,
+			Architecture:        flavor.Architecture,
+			Disabled:            flavor.Disabled,
+			Capacity:            flavor.Capacity,
+			HardwareDescription: flavor.HardwareDescription,
+			HardwareProperties:  flavor.HardwareProperties,
+		}
+
+		// Include price if available
+		if includePrices && flavor.Price != nil {
+			output.Price = flavor.Price
+		}
+
+		outputList = append(outputList, output)
+	}
+
+	utils.ShowResults(outputList, c.String("format"))
 	return nil
 }
 
@@ -120,7 +163,28 @@ func listVirtualFlavorsAction(c *cli.Context) error {
 	if err != nil {
 		return cli.Exit(err, 1)
 	}
-	utils.ShowResults(flavorList, c.String("format"))
+
+	// Convert to our output format
+	outputList := make([]VMFlavorOutput, 0, len(flavorList))
+	for _, flavor := range flavorList {
+		output := VMFlavorOutput{
+			Name:                flavor.Name,
+			Architecture:        flavor.Architecture,
+			Disabled:            flavor.Disabled,
+			Capacity:            flavor.Capacity,
+			HardwareDescription: flavor.HardwareDescription,
+			HardwareProperties:  flavor.HardwareProperties,
+		}
+
+		// Include price if available
+		if includePrices && flavor.Price != nil {
+			output.Price = flavor.Price
+		}
+
+		outputList = append(outputList, output)
+	}
+
+	utils.ShowResults(outputList, c.String("format"))
 	return nil
 }
 
