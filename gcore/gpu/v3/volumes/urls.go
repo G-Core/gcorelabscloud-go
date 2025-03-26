@@ -5,9 +5,8 @@ import (
 )
 
 const (
-	gpuVirtualPath = "gpu/virtual"
-	clustersPath   = "clusters"
-	volumesPath    = "volumes"
+	clustersPath = "clusters"
+	volumesPath  = "volumes"
 )
 
 // listURL returns URL for listing GPU virtual cluster volumes
