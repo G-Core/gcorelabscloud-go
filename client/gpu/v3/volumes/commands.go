@@ -10,19 +10,6 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/gpu/v3/volumes"
 )
 
-var listFlags = []cli.Flag{
-	&cli.IntFlag{
-		Name:     "project",
-		Usage:    "Project ID",
-		Required: false,
-	},
-	&cli.IntFlag{
-		Name:     "region",
-		Usage:    "Region ID",
-		Required: false,
-	},
-}
-
 func listVirtualVolumesAction(c *cli.Context) error {
 	clusterID := c.Args().First()
 	if clusterID == "" {
@@ -84,7 +71,6 @@ func VirtualCommands() *cli.Command {
 				Name:     "list",
 				Usage:    "List virtual GPU cluster volumes",
 				Category: "volumes",
-				Flags:    listFlags,
 				Action:   listVirtualVolumesAction,
 			},
 		},
