@@ -38,6 +38,36 @@ func showBaremetalClusterAction(c *cli.Context) error {
 	return showClusterAction(c, client.NewGPUBaremetalClientV3)
 }
 
+// listClustersAction handles the common logic for listing both virtual and baremetal clusters
+func listClustersAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud.ServiceClient, error)) error {
+	gpuClient, err := newClient(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.Exit(err, 1)
+	}
+	opts := &clusters.ListOpts{}
+	pages, err := clusters.List(gpuClient, opts).AllPages()
+	if err != nil {
+		return cli.Exit(err, 1)
+	}
+
+	clusterList, err := clusters.ExtractClusters(pages)
+	if err != nil {
+		return cli.Exit(err, 1)
+	}
+
+	utils.ShowResults(clusterList, c.String("format"))
+	return nil
+}
+
+func listVirtualClustersAction(c *cli.Context) error {
+	return listClustersAction(c, client.NewGPUVirtualClientV3)
+}
+
+func listBaremetalClustersAction(c *cli.Context) error {
+	return listClustersAction(c, client.NewGPUBaremetalClientV3)
+}
+
 // BaremetalCommands returns commands for managing baremetal GPU clusters
 func BaremetalCommands() *cli.Command {
 	return &cli.Command{
@@ -52,6 +82,14 @@ func BaremetalCommands() *cli.Command {
 				Category:    "clusters",
 				ArgsUsage:   "<cluster_id>",
 				Action:      showBaremetalClusterAction,
+			},
+			{
+				Name:        "list",
+				Usage:       "List baremetal GPU clusters",
+				Description: "List all baremetal GPU clusters",
+				Category:    "clusters",
+				ArgsUsage:   " ",
+				Action:      listBaremetalClustersAction,
 			},
 		},
 	}
@@ -71,6 +109,14 @@ func VirtualCommands() *cli.Command {
 				Category:    "clusters",
 				ArgsUsage:   "<cluster_id>",
 				Action:      showVirtualClusterAction,
+			},
+			{
+				Name:        "list",
+				Usage:       "List virtual GPU clusters",
+				Description: "List all virtual GPU clusters",
+				Category:    "clusters",
+				ArgsUsage:   " ",
+				Action:      listVirtualClustersAction,
 			},
 		},
 	}
