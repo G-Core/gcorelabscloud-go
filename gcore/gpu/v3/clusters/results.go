@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
 type commonResult struct {
@@ -170,4 +171,25 @@ type Cluster struct {
 	UpdatedAt       *gcorecloud.JSONRFC3339Z `json:"updated_at"`
 	ServersIDs      *[]string                `json:"servers_ids"`
 	ServersSettings ClusterServerSettings    `json:"servers_settings"`
+}
+
+// ClusterPage is the page returned by a pager when traversing over a
+// collection of clusters.
+type ClusterPage struct {
+	pagination.LinkedPageBase
+}
+
+// IsEmpty checks whether a ClusterPage struct is empty.
+func (r ClusterPage) IsEmpty() (bool, error) {
+	s, err := ExtractClusters(r)
+	return len(s) == 0, err
+}
+
+// ExtractClusters accepts a Page struct, specifically a ClusterPage struct,
+// and extracts the elements into a slice of cluster structs. In other words,
+// a generic collection is mapped into a relevant slice.
+func ExtractClusters(r pagination.Page) ([]Cluster, error) {
+	var s []Cluster
+	err := r.(ClusterPage).Result.ExtractIntoSlicePtr(&s, "results")
+	return s, err
 }
