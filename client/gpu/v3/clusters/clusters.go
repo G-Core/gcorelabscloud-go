@@ -27,12 +27,12 @@ func showClusterAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud
 		return cli.Exit(err, 1)
 	}
 
-	imageDetails := clusters.Get(gpuClient, clusterID)
-	if imageDetails.Err != nil {
-		return cli.Exit(imageDetails.Err, 1)
+	clusterDetails := clusters.Get(gpuClient, clusterID)
+	if clusterDetails.Err != nil {
+		return cli.Exit(clusterDetails.Err, 1)
 	}
 
-	utils.ShowResults(imageDetails.Body, c.String("format"))
+	utils.ShowResults(clusterDetails.Body, c.String("format"))
 	return nil
 }
 
@@ -414,7 +414,7 @@ func listBaremetalClustersAction(c *cli.Context) error {
 func BaremetalCommands() *cli.Command {
 	return &cli.Command{
 		Name:        "clusters",
-		Usage:       "Manage baremetal GPU images",
+		Usage:       "Manage baremetal GPU clusters",
 		Description: "Commands for managing baremetal GPU clusters",
 		Subcommands: []*cli.Command{
 			{
@@ -449,7 +449,7 @@ func BaremetalCommands() *cli.Command {
 func VirtualCommands() *cli.Command {
 	return &cli.Command{
 		Name:        "clusters",
-		Usage:       "Manage virtual GPU images",
+		Usage:       "Manage virtual GPU clusters",
 		Description: "Commands for managing virtual GPU clusters",
 		Subcommands: []*cli.Command{
 			{
