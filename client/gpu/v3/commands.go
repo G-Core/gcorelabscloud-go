@@ -4,6 +4,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/client/gpu/v3/clusters"
 	"github.com/G-Core/gcorelabscloud-go/client/gpu/v3/flavors"
 	"github.com/G-Core/gcorelabscloud-go/client/gpu/v3/images"
+	"github.com/G-Core/gcorelabscloud-go/client/gpu/v3/volumes"
 	"github.com/urfave/cli/v2"
 )
 
@@ -25,6 +26,7 @@ var virtualCommands = cli.Command{
 	Subcommands: []*cli.Command{
 		images.VirtualCommands(),
 		flavors.VirtualCommands(),
+		volumes.VirtualCommands(),
 		clusters.VirtualCommands(),
 	},
 }
