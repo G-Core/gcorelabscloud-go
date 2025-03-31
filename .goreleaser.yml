@@ -25,7 +25,7 @@ builds:
         goarch: '386'
       - goos: windows
         goarch: arm64
-    binary: '{{ .ProjectName }}_v{{ .Version }}'
+    binary: gcoreclient
 archives:
   - format: zip
     name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
