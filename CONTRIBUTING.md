@@ -56,9 +56,9 @@ We use GitHub to host code, to track issues and feature requests, as well as acc
 2. Update any relevant documentation
 3. The PR will be merged once you have the sign-off of at least one maintainer
 
-## Any contributions you make will be under the MIT Software License
+## Any contributions you make will be under the Mozilla Public License Version 2.0
 
-In short, when you submit code changes, your submissions are understood to be under the same [MIT License](LICENSE) that covers the project. Feel free to contact the maintainers if that's a concern.
+In short, when you submit code changes, your submissions are understood to be under the same [Mozilla Public License Version 2.0](LICENSE) that covers the project. Feel free to contact the maintainers if that's a concern.
 
 ## Report bugs using GitHub's [issue tracker](https://github.com/G-Core/gcorelabscloud-go/issues)
 
@@ -78,4 +78,4 @@ We use GitHub issues to track public bugs. Report a bug by [opening a new issue]
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under its MIT License. 
+By contributing, you agree that your contributions will be licensed under its Mozilla Public License Version 2.0. 
