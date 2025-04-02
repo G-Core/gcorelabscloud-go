@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: GCore Cloud Documentation
+    url: https://gcore.com/docs/cloud
+    about: Check out our documentation for guides and API references
+  - name: GCore Support
+    url: https://gcore.com/support
+    about: Contact GCore support for account or service related issues 
