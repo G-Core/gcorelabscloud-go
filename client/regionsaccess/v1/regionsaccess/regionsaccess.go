@@ -124,7 +124,7 @@ var regionAccessCreateCommand = cli.Command{
 }
 
 var Commands = cli.Command{
-	Name:  "region",
+	Name:  "regionaccess",
 	Usage: "GCloud regions access API",
 	Subcommands: []*cli.Command{
 		&regionAccessListCommand,
