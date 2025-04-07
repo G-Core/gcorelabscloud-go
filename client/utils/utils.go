@@ -409,3 +409,18 @@ func StructToString(item interface{}) string {
 	result := strings.Join(fields, ";")
 	return result
 }
+
+func StringSliceToTags(slice []string) (map[string]string, error) {
+	if len(slice) == 0 {
+		return nil, nil
+	}
+	m := make(map[string]string, len(slice))
+	for _, s := range slice {
+		parts := strings.SplitN(s, "=", 2)
+		if len(parts) != 2 {
+			return m, fmt.Errorf("wrong label format: %s", s)
+		}
+		m[parts[0]] = parts[1]
+	}
+	return m, nil
+}
