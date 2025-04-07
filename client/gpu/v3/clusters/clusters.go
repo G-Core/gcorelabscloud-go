@@ -177,7 +177,7 @@ func getInterfaceOpts(c *cli.Context) (clusters.InterfaceOpts, error) {
 			ipFamily = clusters.IPFamilyType(ipFamilySlice[0])
 		}
 		return clusters.ExternalInterfaceOpts{
-			Name:     pointer.StringPtr(c.String("volume-name")),
+			Name:     pointer.StringPtr(c.String("interface-name")),
 			Type:     interfaceType,
 			IPFamily: ipFamily,
 		}, nil
