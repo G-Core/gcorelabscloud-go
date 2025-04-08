@@ -101,6 +101,11 @@ func createClusterAction(c *cli.Context, newClient func(*cli.Context) (*gcoreclo
 		return cli.Exit(err, 1)
 	}
 
+	// Validate mutually exclusive flags
+	if c.IsSet("user-data") && (c.IsSet("server-username") || c.IsSet("server-password")) {
+		return cli.Exit("`user-data` cannot be used together with `server-username` or `server-password`", 1)
+	}
+
 	// build create cluster options from CLI flags
 	serverSettings, err := getServerSettings(c)
 	if err != nil {
@@ -143,8 +148,8 @@ func getServerSettings(c *cli.Context) (clusters.ServerSettingsOpts, error) {
 		return clusters.ServerSettingsOpts{}, err
 	}
 	credentialOpts := clusters.ServerCredentialsOpts{
-		Username:    c.String("username"),
-		Password:    c.String("password"),
+		Username:    c.String("server-username"),
+		Password:    c.String("server-password"),
 		KeypairName: c.String("keypair"),
 	}
 
@@ -162,11 +167,15 @@ func getServerSettings(c *cli.Context) (clusters.ServerSettingsOpts, error) {
 
 func getInterfaceOpts(c *cli.Context) (clusters.InterfaceOpts, error) {
 	interfaceType := utils.GetEnumStringSliceValue(c, "interface-type")[0]
+	var name *string
+	if c.IsSet("interface-name") {
+		name = pointer.StringPtr(c.String("interface-name"))
+	}
 
-	source := c.String("interface-floating-source")
+	sourceSlice := utils.GetEnumStringSliceValue(c, "interface-floating-source")
 	var floatingIP *clusters.FloatingIPOpts
-	if source != "" {
-		floatingIP = &clusters.FloatingIPOpts{Source: source}
+	if len(sourceSlice) > 0 {
+		floatingIP = &clusters.FloatingIPOpts{Source: sourceSlice[0]}
 	}
 
 	switch clusters.InterfaceType(interfaceType) {
@@ -176,49 +185,50 @@ func getInterfaceOpts(c *cli.Context) (clusters.InterfaceOpts, error) {
 		if len(ipFamilySlice) > 0 {
 			ipFamily = clusters.IPFamilyType(ipFamilySlice[0])
 		}
-		return clusters.ExternalInterfaceOpts{
-			Name:     pointer.StringPtr(c.String("interface-name")),
+		interfaceOpts := clusters.ExternalInterfaceOpts{
+			Name:     name,
 			Type:     interfaceType,
 			IPFamily: ipFamily,
-		}, nil
+		}
+		return interfaceOpts, nil
 	case clusters.Subnet:
-		return clusters.SubnetInterfaceOpts{
+		interfaceOpts := clusters.SubnetInterfaceOpts{
+			Name:       name,
 			NetworkID:  c.String("interface-network-id"),
-			Name:       pointer.StringPtr(c.String("interface-name")),
 			Type:       interfaceType,
 			SubnetID:   c.String("interface-subnet-id"),
 			FloatingIP: floatingIP,
-		}, nil
+		}
+		return interfaceOpts, nil
 	case clusters.AnySubnet:
 		ipFamilySlice := utils.GetEnumStringSliceValue(c, "interface-ip-family")
 		var ipFamily clusters.IPFamilyType
 		if len(ipFamilySlice) > 0 {
 			ipFamily = clusters.IPFamilyType(ipFamilySlice[0])
 		}
-		return clusters.AnySubnetInterfaceOpts{
+		interfaceOpts := clusters.AnySubnetInterfaceOpts{
+			Name:       name,
 			NetworkID:  c.String("interface-network-id"),
-			Name:       pointer.StringPtr(c.String("interface-name")),
 			Type:       interfaceType,
 			FloatingIP: floatingIP,
 			IPAddress:  pointer.StringPtr(c.String("interface-ip-address")),
 			IPFamily:   ipFamily,
-		}, nil
+		}
+		return interfaceOpts, nil
 	}
 	return nil, fmt.Errorf("unexpected interface-type: %v", interfaceType)
 }
 
 func getVolumeOpts(c *cli.Context) (clusters.VolumeOpts, error) {
-	volumeSource := utils.GetEnumStringSliceValue(c, "volume-source")[0]
 	volumeType := utils.GetEnumStringSliceValue(c, "volume-type")[0]
 	volume := clusters.VolumeOpts{
-		Source:              clusters.VolumeSource(volumeSource),
+		Source:              clusters.Image,
 		Name:                c.String("volume-name"),
-		BootIndex:           c.Int("volume-boot-index"),
+		BootIndex:           0,
 		DeleteOnTermination: c.Bool("volume-delete-on-termination"),
 		Size:                c.Int("volume-size"),
 		Type:                clusters.VolumeType(volumeType),
 		ImageID:             c.String("volume-image-id"),
-		SnapshotID:          c.String("volume-snapshot-id"),
 	}
 	if c.IsSet("volume-tags") {
 		tags, err := utils.StringSliceToTags(c.StringSlice("volume-tags"))
@@ -268,13 +278,13 @@ func createClusterFlags() []cli.Flag {
 			Required: false,
 		},
 		&cli.StringFlag{
-			Name:     "username",
+			Name:     "server-username",
 			Aliases:  []string{"u"},
 			Usage:    "username for the servers in the cluster",
 			Required: false,
 		},
 		&cli.StringFlag{
-			Name:     "password",
+			Name:     "server-password",
 			Aliases:  []string{"p"},
 			Usage:    "password for the servers in the cluster",
 			Required: false,
@@ -284,20 +294,6 @@ func createClusterFlags() []cli.Flag {
 			Aliases:  []string{"k"},
 			Usage:    "(ssh) keypair name for the servers in the cluster",
 			Required: false,
-		},
-		&cli.GenericFlag{
-			Name:    "volume-source",
-			Aliases: []string{"vs"},
-			Value: &utils.EnumStringSliceValue{
-				Enum: clusters.VolumeSourcesStringList(),
-			},
-			Usage:    fmt.Sprintf("volume source. One of %s", strings.Join(clusters.VolumeSourcesStringList(), ", ")),
-			Required: false,
-		},
-		&cli.IntFlag{
-			Name:     "volume-boot-index",
-			Usage:    "boot index of the volume",
-			Required: true,
 		},
 		&cli.BoolFlag{
 			Name:  "volume-delete-on-termination",
@@ -315,12 +311,9 @@ func createClusterFlags() []cli.Flag {
 			Required: true,
 		},
 		&cli.StringFlag{
-			Name:  "volume-image-id",
-			Usage: "image ID of the volume",
-		},
-		&cli.StringFlag{
-			Name:  "volume-snapshot-id",
-			Usage: "snapshot ID of the volume",
+			Name:     "volume-image-id",
+			Usage:    "image ID of the volume",
+			Required: true,
 		},
 		&cli.StringSliceFlag{
 			Name:  "volume-tags",
@@ -334,7 +327,7 @@ func createClusterFlags() []cli.Flag {
 			},
 			Usage: fmt.Sprintf("volume types. One of %s",
 				strings.Join(clusters.VolumeTypesStringList(), ", ")),
-			Required: false,
+			Required: true,
 		},
 		&cli.GenericFlag{
 			Name:    "interface-type",
