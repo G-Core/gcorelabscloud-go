@@ -6,8 +6,12 @@ import (
 )
 
 type IPFamilyType string
+type VolumeSource string
 type VolumeType string
 type ClusterStatusType string
+type FloatingIPSource string
+
+type InterfaceType string
 
 const (
 	IPv4IPFamilyType      IPFamilyType = "ipv4"
@@ -25,6 +29,17 @@ const (
 	Active    ClusterStatusType = "active"
 	Suspended ClusterStatusType = "suspended"
 	Error     ClusterStatusType = "error"
+
+	NewVolume VolumeSource = "new"
+	Image     VolumeSource = "image"
+	Snapshot  VolumeSource = "snapshot"
+
+	External  InterfaceType = "external"
+	Subnet    InterfaceType = "subnet"
+	AnySubnet InterfaceType = "any_subnet"
+
+	NewFloatingIP      FloatingIPSource = "new"
+	ExistingFloatingIP FloatingIPSource = "existing"
 )
 
 func (it *IPFamilyType) IsValid() error {
@@ -46,11 +61,70 @@ func (it *IPFamilyType) ValidOrNil() (*IPFamilyType, error) {
 	return it, nil
 }
 
+func InterfaceTypeList() []InterfaceType {
+	return []InterfaceType{
+		External,
+		Subnet,
+		AnySubnet,
+	}
+}
+
+func InterfaceTypeStringList() []string {
+	var s []string
+	for _, v := range InterfaceTypeList() {
+		s = append(s, v.String())
+	}
+	return s
+}
+
+func (it *InterfaceType) String() string {
+	return string(*it)
+}
+
+func (fis *FloatingIPSource) String() string {
+	return string(*fis)
+}
+
+func FloatingIPSourceList() []FloatingIPSource {
+	return []FloatingIPSource{
+		NewFloatingIP,
+		ExistingFloatingIP,
+	}
+}
+
+func FloatingIPSourceStringList() []string {
+	var s []string
+	for _, v := range FloatingIPSourceList() {
+		s = append(s, v.String())
+	}
+	return s
+}
+
+func (vs *VolumeSource) String() string {
+	return string(*vs)
+}
+
+func VolumeSourcesList() []VolumeSource {
+	return []VolumeSource{
+		NewVolume,
+		Image,
+		Snapshot,
+	}
+}
+
+func VolumeSourcesStringList() []string {
+	var s []string
+	for _, v := range VolumeSourcesList() {
+		s = append(s, v.String())
+	}
+	return s
+}
+
 func (it *IPFamilyType) String() string {
 	return string(*it)
 }
 
-func (it *IPFamilyType) List() []IPFamilyType {
+func IPFamilyTypeList() []IPFamilyType {
 	return []IPFamilyType{
 		IPv6IPFamilyType,
 		IPv4IPFamilyType,
@@ -58,9 +132,9 @@ func (it *IPFamilyType) List() []IPFamilyType {
 	}
 }
 
-func (it *IPFamilyType) StringList() []string {
+func IPFamilyTypeListStringList() []string {
 	var s []string
-	for _, v := range it.List() {
+	for _, v := range IPFamilyTypeList() {
 		s = append(s, v.String())
 	}
 	return s
@@ -109,7 +183,7 @@ func (vt *VolumeType) String() string {
 	return string(*vt)
 }
 
-func (vt *VolumeType) List() []VolumeType {
+func VolumeTypesList() []VolumeType {
 	return []VolumeType{
 		Standard,
 		SsdHiIops,
@@ -120,9 +194,9 @@ func (vt *VolumeType) List() []VolumeType {
 	}
 }
 
-func (vt *VolumeType) StringList() []string {
+func VolumeTypesStringList() []string {
 	var s []string
-	for _, v := range vt.List() {
+	for _, v := range VolumeTypesList() {
 		s = append(s, v.String())
 	}
 	return s

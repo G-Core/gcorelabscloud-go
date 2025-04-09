@@ -4,11 +4,14 @@ import (
 	"fmt"
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/client/gpu/v3/client"
-	task_client "github.com/G-Core/gcorelabscloud-go/client/tasks/v1/client"
+	taskclient "github.com/G-Core/gcorelabscloud-go/client/tasks/v1/client"
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
 	"github.com/G-Core/gcorelabscloud-go/gcore/gpu/v3/clusters"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/urfave/cli/v2"
+	"k8s.io/utils/pointer"
+
+	"strings"
 )
 
 func showClusterAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud.ServiceClient, error)) error {
@@ -59,7 +62,7 @@ func deleteClusterAction(c *cli.Context, newClient func(*cli.Context) (*gcoreclo
 		return cli.Exit(err, 1)
 	}
 
-	taskClient, err := task_client.NewTaskClientV1(c)
+	taskClient, err := taskclient.NewTaskClientV1(c)
 	if err != nil {
 		_ = cli.ShowAppHelp(c)
 		return cli.Exit(err, 1)
@@ -85,6 +88,296 @@ func deleteVirtualClusterAction(c *cli.Context) error {
 
 func deleteBaremetalClusterAction(c *cli.Context) error {
 	return deleteClusterAction(c, client.NewGPUBaremetalClientV3)
+}
+
+func createVirtualClusterAction(c *cli.Context) error {
+	return createClusterAction(c, client.NewGPUVirtualClientV3)
+}
+
+func createClusterAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud.ServiceClient, error)) error {
+	gpuClient, err := newClient(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.Exit(err, 1)
+	}
+
+	// Validate mutually exclusive flags
+	if c.IsSet("user-data") && (c.IsSet("server-username") || c.IsSet("server-password")) {
+		return cli.Exit("`user-data` cannot be used together with `server-username` or `server-password`", 1)
+	}
+
+	// build create cluster options from CLI flags
+	serverSettings, err := getServerSettings(c)
+	if err != nil {
+		_ = cli.ShowCommandHelp(c, "create")
+		return cli.Exit(err, 1)
+	}
+	tags, err := utils.StringSliceToTags(c.StringSlice("tags"))
+	if err != nil {
+		_ = cli.ShowCommandHelp(c, "create")
+		return cli.Exit(err, 1)
+	}
+	opts := clusters.CreateClusterOpts{
+		Name:            c.String("name"),
+		Flavor:          c.String("flavor"),
+		ServersCount:    c.Int("servers-count"),
+		Tags:            tags,
+		ServersSettings: serverSettings,
+	}
+
+	// create the cluster and extract the task result
+	result := clusters.Create(gpuClient, opts)
+	if result.Err != nil {
+		return cli.Exit(result.Err, 1)
+	}
+	taskResults, err := result.Extract()
+	if err != nil {
+		return cli.Exit(err, 1)
+	}
+	utils.ShowResults(taskResults, c.String("format"))
+	return nil
+}
+
+func getServerSettings(c *cli.Context) (clusters.ServerSettingsOpts, error) {
+	interfaceOpts, err := getInterfaceOpts(c)
+	if err != nil {
+		return clusters.ServerSettingsOpts{}, err
+	}
+	volumeOpts, err := getVolumeOpts(c)
+	if err != nil {
+		return clusters.ServerSettingsOpts{}, err
+	}
+	credentialOpts := clusters.ServerCredentialsOpts{
+		Username:    c.String("server-username"),
+		Password:    c.String("server-password"),
+		KeypairName: c.String("keypair"),
+	}
+
+	serverSettings := clusters.ServerSettingsOpts{
+		Interfaces:     []clusters.InterfaceOpts{interfaceOpts},
+		Volumes:        []clusters.VolumeOpts{volumeOpts},
+		Credentials:    &credentialOpts,
+		SecurityGroups: c.StringSlice("security-groups"),
+		UserData:       StringPtrExcludeEmpty(c, "user-data"),
+	}
+	return serverSettings, nil
+}
+
+func StringPtrExcludeEmpty(c *cli.Context, name string) *string {
+	if c.IsSet(name) && c.String(name) != "" {
+		return pointer.StringPtr(c.String(name))
+	}
+	return nil
+}
+
+func getInterfaceOpts(c *cli.Context) (clusters.InterfaceOpts, error) {
+	interfaceType := utils.GetEnumStringSliceValue(c, "interface-type")[0]
+	interfaceName := StringPtrExcludeEmpty(c, "interface-name")
+
+	sourceSlice := utils.GetEnumStringSliceValue(c, "interface-floating-source")
+	var floatingIP *clusters.FloatingIPOpts
+	if len(sourceSlice) > 0 {
+		floatingIP = &clusters.FloatingIPOpts{Source: sourceSlice[0]}
+	}
+
+	switch clusters.InterfaceType(interfaceType) {
+	case clusters.External:
+		ipFamilySlice := utils.GetEnumStringSliceValue(c, "interface-ip-family")
+		var ipFamily clusters.IPFamilyType
+		if len(ipFamilySlice) > 0 {
+			ipFamily = clusters.IPFamilyType(ipFamilySlice[0])
+		}
+		interfaceOpts := clusters.ExternalInterfaceOpts{
+			Name:     interfaceName,
+			Type:     interfaceType,
+			IPFamily: ipFamily,
+		}
+		return interfaceOpts, nil
+	case clusters.Subnet:
+		interfaceOpts := clusters.SubnetInterfaceOpts{
+			Name:       interfaceName,
+			NetworkID:  c.String("interface-network-id"),
+			Type:       interfaceType,
+			SubnetID:   c.String("interface-subnet-id"),
+			FloatingIP: floatingIP,
+		}
+		return interfaceOpts, nil
+	case clusters.AnySubnet:
+		ipFamilySlice := utils.GetEnumStringSliceValue(c, "interface-ip-family")
+		var ipFamily clusters.IPFamilyType
+		if len(ipFamilySlice) > 0 {
+			ipFamily = clusters.IPFamilyType(ipFamilySlice[0])
+		}
+		interfaceOpts := clusters.AnySubnetInterfaceOpts{
+			Name:       interfaceName,
+			NetworkID:  c.String("interface-network-id"),
+			Type:       interfaceType,
+			FloatingIP: floatingIP,
+			IPAddress:  StringPtrExcludeEmpty(c, "interface-ip-address"),
+			IPFamily:   ipFamily,
+		}
+		return interfaceOpts, nil
+	}
+	return nil, fmt.Errorf("unexpected interface-type: %v", interfaceType)
+}
+
+func getVolumeOpts(c *cli.Context) (clusters.VolumeOpts, error) {
+	volumeType := utils.GetEnumStringSliceValue(c, "volume-type")[0]
+	volume := clusters.VolumeOpts{
+		Source:              clusters.Image,
+		Name:                c.String("volume-name"),
+		BootIndex:           0,
+		DeleteOnTermination: c.Bool("volume-delete-on-termination"),
+		Size:                c.Int("volume-size"),
+		Type:                clusters.VolumeType(volumeType),
+		ImageID:             c.String("volume-image-id"),
+	}
+	if c.IsSet("volume-tags") {
+		tags, err := utils.StringSliceToTags(c.StringSlice("volume-tags"))
+		if err != nil {
+			return clusters.VolumeOpts{}, err
+		}
+		volume.Tags = tags
+	}
+	return volume, nil
+}
+
+func createClusterFlags() []cli.Flag {
+	return []cli.Flag{
+		&cli.StringFlag{
+			Name:     "name",
+			Aliases:  []string{"n"},
+			Usage:    "name of the cluster",
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:     "flavor",
+			Usage:    "flavor ID of the cluster",
+			Required: true,
+		},
+		&cli.StringSliceFlag{
+			Name:     "tags",
+			Aliases:  []string{"t"},
+			Usage:    "cluster key-value tags. Example: --tags key1=value1 --tags key2=value2",
+			Required: false,
+		},
+		&cli.IntFlag{
+			Name:     "servers-count",
+			Aliases:  []string{"sc"},
+			Usage:    "number of servers of the cluster",
+			Required: true,
+		},
+		&cli.StringSliceFlag{
+			Name:     "security-groups",
+			Aliases:  []string{"sg"},
+			Usage:    "security groups IDs of the cluster. Example: --security-groups b4849ffa-89f2-45a1-951f-0ae5b7809d98 --security-groups d478ae29-dedc-4869-82f0-96104425f565",
+			Required: false,
+		},
+		&cli.StringFlag{
+			Name:     "user-data",
+			Aliases:  []string{"ud"},
+			Usage:    "user data for the cluster (Base64 encoded string)",
+			Required: false,
+		},
+		&cli.StringFlag{
+			Name:     "server-username",
+			Aliases:  []string{"u"},
+			Usage:    "username for the servers in the cluster",
+			Required: false,
+		},
+		&cli.StringFlag{
+			Name:     "server-password",
+			Aliases:  []string{"p"},
+			Usage:    "password for the servers in the cluster",
+			Required: false,
+		},
+		&cli.StringFlag{
+			Name:     "keypair",
+			Aliases:  []string{"k"},
+			Usage:    "(ssh) keypair name for the servers in the cluster",
+			Required: false,
+		},
+		&cli.BoolFlag{
+			Name:  "volume-delete-on-termination",
+			Usage: "delete volume on termination",
+		},
+		&cli.StringFlag{
+			Name:     "volume-name",
+			Aliases:  []string{"vn"},
+			Usage:    "name of the volume",
+			Required: true,
+		},
+		&cli.IntFlag{
+			Name:     "volume-size",
+			Usage:    "size of the volume",
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:     "volume-image-id",
+			Usage:    "image ID of the volume",
+			Required: true,
+		},
+		&cli.StringSliceFlag{
+			Name:  "volume-tags",
+			Usage: "tags for the volume",
+		},
+		&cli.GenericFlag{
+			Name:    "volume-type",
+			Aliases: []string{"vt"},
+			Value: &utils.EnumStringSliceValue{
+				Enum: clusters.VolumeTypesStringList(),
+			},
+			Usage: fmt.Sprintf("volume types. One of %s",
+				strings.Join(clusters.VolumeTypesStringList(), ", ")),
+			Required: true,
+		},
+		&cli.GenericFlag{
+			Name:    "interface-type",
+			Aliases: []string{"it"},
+			Value: &utils.EnumStringSliceValue{
+				Enum: clusters.InterfaceTypeStringList(),
+			},
+			Usage: fmt.Sprintf("interface type. One of %s",
+				strings.Join(clusters.InterfaceTypeStringList(), ", ")),
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:     "interface-name",
+			Usage:    "name of the interface",
+			Required: false,
+		},
+		&cli.GenericFlag{
+			Name: "interface-ip-family",
+			Value: &utils.EnumStringSliceValue{
+				Enum: clusters.IPFamilyTypeListStringList(),
+			},
+			Usage: fmt.Sprintf("IP family of the interface. One of %s",
+				strings.Join(clusters.IPFamilyTypeListStringList(), ", ")),
+			Required: false,
+		},
+		&cli.StringFlag{
+			Name:  "interface-network-id",
+			Usage: "network ID of the interface",
+		},
+		&cli.StringFlag{
+			Name:  "interface-subnet-id",
+			Usage: "subnet ID of the interface",
+		},
+		&cli.StringFlag{
+			Name:  "interface-ip-address",
+			Usage: "IP address of the interface",
+		},
+		&cli.GenericFlag{
+			Name:    "interface-floating-source",
+			Aliases: []string{"ifs"},
+			Value: &utils.EnumStringSliceValue{
+				Enum: clusters.FloatingIPSourceStringList(),
+			},
+			Usage: fmt.Sprintf("floating ip source. One of %s",
+				strings.Join(clusters.FloatingIPSourceStringList(), ", ")),
+			Required: false,
+		},
+	}
 }
 
 // BaremetalCommands returns commands for managing baremetal GPU clusters
@@ -136,6 +429,14 @@ func VirtualCommands() *cli.Command {
 				Category:    "clusters",
 				ArgsUsage:   "<cluster_id>",
 				Action:      deleteVirtualClusterAction,
+			},
+			{
+				Name:        "create",
+				Usage:       "Create a new virtual GPU cluster",
+				Description: "Create a new virtual GPU cluster with the specified options",
+				Category:    "clusters",
+				Flags:       createClusterFlags(),
+				Action:      createVirtualClusterAction,
 			},
 		},
 	}
