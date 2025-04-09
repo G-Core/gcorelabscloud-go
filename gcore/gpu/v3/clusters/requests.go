@@ -30,8 +30,8 @@ func (opts RenameClusterOpts) ToRenameClusterActionMap() (map[string]interface{}
 }
 
 type ServerCredentialsOpts struct {
-	Username    string `json:"username"`
-	Password    string `json:"password"`
+	Username    string `json:"username,omitempty"`
+	Password    string `json:"password,omitempty"`
 	KeypairName string `json:"keypair_name,omitempty"`
 }
 
@@ -65,7 +65,7 @@ func (SubnetInterfaceOpts) implInterfaceOpts()    {}
 func (AnySubnetInterfaceOpts) implInterfaceOpts() {}
 
 type ExternalInterfaceOpts struct {
-	Name     *string      `json:"name"`
+	Name     *string      `json:"name,omitempty"`
 	Type     string       `json:"type" validate:"required"`
 	IPFamily IPFamilyType `json:"ip_family,omitempty"`
 }

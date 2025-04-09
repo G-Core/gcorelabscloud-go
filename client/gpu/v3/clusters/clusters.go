@@ -158,19 +158,21 @@ func getServerSettings(c *cli.Context) (clusters.ServerSettingsOpts, error) {
 		Volumes:        []clusters.VolumeOpts{volumeOpts},
 		Credentials:    &credentialOpts,
 		SecurityGroups: c.StringSlice("security-groups"),
-	}
-	if c.IsSet("user-data") {
-		serverSettings.UserData = pointer.StringPtr(c.String("user-data"))
+		UserData:       StringPtrExcludeEmpty(c, "user-data"),
 	}
 	return serverSettings, nil
 }
 
+func StringPtrExcludeEmpty(c *cli.Context, name string) *string {
+	if c.IsSet(name) && c.String(name) != "" {
+		return pointer.StringPtr(c.String(name))
+	}
+	return nil
+}
+
 func getInterfaceOpts(c *cli.Context) (clusters.InterfaceOpts, error) {
 	interfaceType := utils.GetEnumStringSliceValue(c, "interface-type")[0]
-	var name *string
-	if c.IsSet("interface-name") {
-		name = pointer.StringPtr(c.String("interface-name"))
-	}
+	interfaceName := StringPtrExcludeEmpty(c, "interface-name")
 
 	sourceSlice := utils.GetEnumStringSliceValue(c, "interface-floating-source")
 	var floatingIP *clusters.FloatingIPOpts
@@ -186,14 +188,14 @@ func getInterfaceOpts(c *cli.Context) (clusters.InterfaceOpts, error) {
 			ipFamily = clusters.IPFamilyType(ipFamilySlice[0])
 		}
 		interfaceOpts := clusters.ExternalInterfaceOpts{
-			Name:     name,
+			Name:     interfaceName,
 			Type:     interfaceType,
 			IPFamily: ipFamily,
 		}
 		return interfaceOpts, nil
 	case clusters.Subnet:
 		interfaceOpts := clusters.SubnetInterfaceOpts{
-			Name:       name,
+			Name:       interfaceName,
 			NetworkID:  c.String("interface-network-id"),
 			Type:       interfaceType,
 			SubnetID:   c.String("interface-subnet-id"),
@@ -207,11 +209,11 @@ func getInterfaceOpts(c *cli.Context) (clusters.InterfaceOpts, error) {
 			ipFamily = clusters.IPFamilyType(ipFamilySlice[0])
 		}
 		interfaceOpts := clusters.AnySubnetInterfaceOpts{
-			Name:       name,
+			Name:       interfaceName,
 			NetworkID:  c.String("interface-network-id"),
 			Type:       interfaceType,
 			FloatingIP: floatingIP,
-			IPAddress:  pointer.StringPtr(c.String("interface-ip-address")),
+			IPAddress:  StringPtrExcludeEmpty(c, "interface-ip-address"),
 			IPFamily:   ipFamily,
 		}
 		return interfaceOpts, nil
