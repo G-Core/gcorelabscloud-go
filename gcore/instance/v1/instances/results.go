@@ -154,6 +154,7 @@ type Instance struct {
 	TaskState        *string                      `json:"task_state"`
 	Flavor           flavors.Flavor               `json:"flavor"`
 	Metadata         map[string]interface{}       `json:"metadata"`
+	MetadataDetailed []metadata.Metadata          `json:"metadata_detailed"`
 	Volumes          []InstanceVolume             `json:"volumes"`
 	Addresses        map[string][]InstanceAddress `json:"addresses"`
 	SecurityGroups   []gcorecloud.ItemName        `json:"security_groups"`
