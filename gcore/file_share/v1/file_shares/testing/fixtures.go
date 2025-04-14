@@ -246,7 +246,9 @@ var createdTime = gcorecloud.JSONRFC3339MilliNoZ{Time: createdTimeParsed}
 var creatorTaskID = "79dc7c30-44d2-4c5c-b5c1-e9a46f6bbf54"
 
 var (
-	FileShare1 = file_shares.FileShare{
+	networkName = "usernet"
+	subnetName  = "usersnet"
+	FileShare1  = file_shares.FileShare{
 		Name:             "myshare",
 		ID:               "8fba32f8-dc70-4ac2-be9c-ed6b02927c0e",
 		Protocol:         "NFS",
@@ -255,8 +257,8 @@ var (
 		VolumeType:       "default_share_type",
 		CreatedAt:        &createdTime,
 		ShareNetworkName: "File_share_ivandshare2_network",
-		NetworkName:      "usernet",
-		SubnetName:       "usersnet",
+		NetworkName:      &networkName,
+		SubnetName:       &subnetName,
 		ConnectionPoint:  "10.33.20.241:/shares/share-e1dca5e4-257d-47c2-82ac-980fa43e0da9",
 		TaskID:           nil,
 		CreatorTaskID:    &creatorTaskID,
@@ -278,8 +280,6 @@ var (
 		VolumeType:       "default_share_type",
 		CreatedAt:        &createdTime,
 		ShareNetworkName: "",
-		NetworkName:      "",
-		SubnetName:       "",
 		ConnectionPoint:  "10.33.20.241:/shares/share-e1dca5e4-257d-47c2-82ac-980fa43e0da9",
 		TaskID:           nil,
 		CreatorTaskID:    &creatorTaskID,
