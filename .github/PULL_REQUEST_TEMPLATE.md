@@ -22,8 +22,6 @@ Fixes # (issue)
 - [ ] I have read the [CONTRIBUTING](../CONTRIBUTING.md) doc
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] I have added necessary documentation (if appropriate)
-- [ ] I have run `make test` locally and all tests pass
-- [ ] I have run `make lint` locally and there are no linting errors
 - [ ] I have followed the style guidelines of this project
 - [ ] I have tested my changes with the latest version of Go
 

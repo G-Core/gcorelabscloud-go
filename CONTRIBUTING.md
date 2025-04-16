@@ -31,10 +31,6 @@ We use GitHub to host code, to track issues and feature requests, as well as acc
    ```bash
    go mod download
    ```
-4. Run tests:
-   ```bash
-   make test
-   ```
 
 ## Code Style
 
@@ -47,7 +43,6 @@ We use GitHub to host code, to track issues and feature requests, as well as acc
 
 - Add tests for any new code you write
 - Tests should be clear and maintainable
-- Run the full test suite with `make test`
 - Run integration tests with `make integration` (requires Gcore Cloud credentials)
 
 ## Pull Request Process
