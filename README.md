@@ -82,4 +82,21 @@ COMMANDS:
    fixed_ip       GCloud reserved fixed ip API
    help, h        Shows a list of commands or help for one command
 
-```
+Contributing
+------------------------------------
+
+We welcome contributions to the gcorelabscloud-go project! Whether it's bug fixes, feature additions, or documentation improvements, your help is appreciated.
+
+Please read our [Contributing Guidelines](CONTRIBUTING.md) for details on:
+- How to submit bug reports
+- How to submit feature requests
+- How to submit pull requests
+- Development setup and guidelines
+- Code style and testing requirements
+
+For any questions or support, please check our [documentation](https://gcore.com/docs/cloud) or contact [GCore Support](https://gcore.com/support).
+
+License
+------------------------------------
+
+This project is licensed under the Mozilla Public License Version 2.0 - see the [LICENSE](LICENSE) file for details.

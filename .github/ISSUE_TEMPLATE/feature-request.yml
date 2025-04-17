@@ -1,0 +1,52 @@
+name: Feature Request
+description: Suggest a new feature for the gcorelabscloud-go SDK
+title: "[FEATURE] ..."
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to suggest a new feature!
+        Please fill out this form as completely as possible.
+
+  - type: checkboxes
+    attributes:
+      label: Prerequisites
+      description: Please check these boxes before submitting the feature request
+      options:
+      - label: I have searched existing issues and feature requests
+        required: true
+      - label: This feature would be useful for other users too
+        required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Description
+      description: What problem are you trying to solve? What becomes easier or possible with this feature?
+      placeholder: |
+        Example: When working with [specific GCore service], I often need to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like to see. Include example API usage if possible.
+      placeholder: |
+        Example API usage:
+        ```go
+        client.SomeNewFeature(ctx, params)
+        ```
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative Solutions
+      description: What alternatives have you considered? How are you solving this problem currently?
+      placeholder: |
+        - Current workaround...
+        - Alternative approach... 
