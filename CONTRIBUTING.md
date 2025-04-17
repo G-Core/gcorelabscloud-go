@@ -12,12 +12,11 @@ We love your input! We want to make contributing to gcorelabscloud-go as easy an
 
 We use GitHub to host code, to track issues and feature requests, as well as accept pull requests.
 
-1. Fork the repo and create your branch from `main`
+1. Fork the repo and create your branch from `master`
 2. If you've added code that should be tested, add tests
 3. If you've changed APIs, update the documentation
-4. Ensure the test suite passes
-5. Make sure your code follows the existing style
-6. Issue that pull request!
+4. Make sure your code follows the existing style
+5. Issue that pull request!
 
 ## Development Setup
 
@@ -35,15 +34,12 @@ We use GitHub to host code, to track issues and feature requests, as well as acc
 ## Code Style
 
 - Follow standard Go conventions and [Effective Go](https://golang.org/doc/effective_go)
-- Run `make lint` to check your code style
-- Write descriptive commit messages in the [conventional commits](https://www.conventionalcommits.org/) style
 - Include comments on exported functions and types
 
 ## Testing
 
 - Add tests for any new code you write
 - Tests should be clear and maintainable
-- Run integration tests with `make integration` (requires Gcore Cloud credentials)
 
 ## Pull Request Process
 
