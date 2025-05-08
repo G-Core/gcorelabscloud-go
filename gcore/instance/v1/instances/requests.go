@@ -22,6 +22,7 @@ type ListOptsBuilder interface {
 type ListOpts struct {
 	ExcludeSecGroup   string            `q:"exclude_secgroup"`
 	AvailableFloating bool              `q:"available_floating"`
+	IncludeAI         bool              `q:"include_ai"`
 	IncludeBaremetal  bool              `q:"include_baremetal"`
 	Name              string            `q:"name"`
 	FlavorID          string            `q:"flavor_id"`
