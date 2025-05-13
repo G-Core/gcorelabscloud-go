@@ -77,9 +77,9 @@ type CNICreateOpts struct {
 	Cilium   *CiliumCreateOpts `json:"cilium,omitempty"`
 }
 
-type DDosProfileCreateOpts struct {
+type DDoSProfileCreateOpts struct {
 	Enabled             bool               `json:"enabled,omitempty"`
-	Fields              []DDosProfileField `json:"fields,omitempty"`
+	Fields              []DDoSProfileField `json:"fields,omitempty"`
 	ProfileTemplate     *int               `json:"profile_template,omitempty"`
 	ProfileTemplateName *string            `json:"profile_template_name,omitempty"`
 }
@@ -90,7 +90,7 @@ type CreateOpts struct {
 	Authentication   *AuthenticationCreateOpts `json:"authentication,omitempty" validate:"omitempty"`
 	AutoscalerConfig map[string]string         `json:"autoscaler_config,omitempty" validate:"omitempty"`
 	CNI              *CNICreateOpts            `json:"cni,omitempty" validate:"omitempty"`
-	DDosProfile      *DDosProfileCreateOpts    `json:"ddos_profile,omitempty" validate:"omitempty"`
+	DDoSProfile      *DDoSProfileCreateOpts    `json:"d_do_s_profile,omitempty" validate:"omitempty"`
 	FixedNetwork     string                    `json:"fixed_network" validate:"omitempty,uuid4"`
 	FixedSubnet      string                    `json:"fixed_subnet" validate:"omitempty,uuid4"`
 	PodsIPPool       *gcorecloud.CIDR          `json:"pods_ip_pool,omitempty" validate:"omitempty,cidr"`
@@ -113,7 +113,7 @@ func (opts CreateOpts) ToClusterCreateMap() (map[string]interface{}, error) {
 
 type AuthenticationUpdateOpts = AuthenticationCreateOpts
 
-type DDosProfileUpdateOpts = DDosProfileCreateOpts
+type DDoSProfileUpdateOpts = DDoSProfileCreateOpts
 
 // UpdateOptsBuilder allows extensions to add additional parameters to the Update request.
 type UpdateOptsBuilder interface {
@@ -125,7 +125,7 @@ type UpdateOpts struct {
 	Authentication   *AuthenticationUpdateOpts `json:"authentication,omitempty" validate:"omitempty"`
 	AutoscalerConfig map[string]string         `json:"autoscaler_config,omitempty" validate:"omitempty"`
 	CNI              *CNICreateOpts            `json:"cni,omitempty" validate:"omitempty"`
-	DDosProfile      *DDosProfileUpdateOpts    `json:"ddos_profile,omitempty" validate:"omitempty"`
+	DDoSProfile      *DDoSProfileUpdateOpts    `json:"d_do_s_profile,omitempty" validate:"omitempty"`
 }
 
 // ToClusterUpdateMap builds a request body from UpdateOpts.

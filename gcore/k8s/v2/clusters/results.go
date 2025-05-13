@@ -87,9 +87,9 @@ type CNI struct {
 	Cilium   *Cilium     `json:"cilium,omitempty"`
 }
 
-type DDosProfile struct {
+type DDoSProfile struct {
 	Enabled             bool               `json:"enabled,omitempty"`
-	Fields              []DDosProfileField `json:"fields,omitempty"`
+	Fields              []DDoSProfileField `json:"fields,omitempty"`
 	ProfileTemplate     *int               `json:"profile_template,omitempty"`
 	ProfileTemplateName *string            `json:"profile_template_name,omitempty"`
 }
@@ -117,7 +117,7 @@ type Cluster struct {
 	IsIPV6           bool                `json:"is_ipv6,omitempty"`
 	CreatedAt        time.Time           `json:"created_at"`
 	CreatorTaskID    string              `json:"creator_task_id"`
-	DDosProfile      *DDosProfile        `json:"ddos_profile,omitempty"`
+	DDoSProfile      *DDoSProfile        `json:"d_do_s_profile,omitempty"`
 	TaskID           string              `json:"task_id"`
 	ProjectID        int                 `json:"project_id"`
 	RegionID         int                 `json:"region_id"`
