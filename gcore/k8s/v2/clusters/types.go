@@ -256,3 +256,17 @@ func (t *RoutingModeType) UnmarshalJSON(data []byte) error {
 func (t *RoutingModeType) MarshalJSON() ([]byte, error) {
 	return json.Marshal(t.String())
 }
+
+type DDosProfileField struct {
+	BaseField  int     `json:"base_field" required:"true" validate:"required"`
+	FieldValue any     `json:"field_value,omitempty"`
+	Value      *string `json:"value,omitempty" validate:"omitempty"`
+}
+
+// Validate ensures that only one of FieldValue or Value is specified.
+func (f DDosProfileField) Validate() error {
+	if (f.FieldValue != nil && f.Value != nil) || (f.FieldValue == nil && f.Value == nil) {
+		return fmt.Errorf("exactly one of 'FieldValue' or 'Value' must be specified")
+	}
+	return nil
+}
