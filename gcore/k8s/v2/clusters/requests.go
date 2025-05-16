@@ -90,7 +90,7 @@ type CreateOpts struct {
 	Authentication   *AuthenticationCreateOpts `json:"authentication,omitempty" validate:"omitempty"`
 	AutoscalerConfig map[string]string         `json:"autoscaler_config,omitempty" validate:"omitempty"`
 	CNI              *CNICreateOpts            `json:"cni,omitempty" validate:"omitempty"`
-	DDoSProfile      *DDoSProfileCreateOpts    `json:"d_do_s_profile,omitempty" validate:"omitempty"`
+	DDoSProfile      *DDoSProfileCreateOpts    `json:"ddos_profile,omitempty" validate:"omitempty"`
 	FixedNetwork     string                    `json:"fixed_network" validate:"omitempty,uuid4"`
 	FixedSubnet      string                    `json:"fixed_subnet" validate:"omitempty,uuid4"`
 	PodsIPPool       *gcorecloud.CIDR          `json:"pods_ip_pool,omitempty" validate:"omitempty,cidr"`
@@ -125,7 +125,7 @@ type UpdateOpts struct {
 	Authentication   *AuthenticationUpdateOpts `json:"authentication,omitempty" validate:"omitempty"`
 	AutoscalerConfig map[string]string         `json:"autoscaler_config,omitempty" validate:"omitempty"`
 	CNI              *CNICreateOpts            `json:"cni,omitempty" validate:"omitempty"`
-	DDoSProfile      *DDoSProfileUpdateOpts    `json:"d_do_s_profile,omitempty" validate:"omitempty"`
+	DDoSProfile      *DDoSProfileUpdateOpts    `json:"ddos_profile,omitempty" validate:"omitempty"`
 }
 
 // ToClusterUpdateMap builds a request body from UpdateOpts.
