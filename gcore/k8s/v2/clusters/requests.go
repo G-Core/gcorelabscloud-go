@@ -78,7 +78,7 @@ type CNICreateOpts struct {
 }
 
 type DDoSProfileCreateOpts struct {
-	Enabled             bool               `json:"enabled,omitempty"`
+	Enabled             bool               `json:"enabled"`
 	Fields              []DDoSProfileField `json:"fields,omitempty"`
 	ProfileTemplate     *int               `json:"profile_template,omitempty"`
 	ProfileTemplateName *string            `json:"profile_template_name,omitempty"`
