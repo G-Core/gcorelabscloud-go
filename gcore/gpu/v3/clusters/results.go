@@ -164,8 +164,8 @@ type Cluster struct {
 	ID              string                   `json:"id"`
 	Name            string                   `json:"name"`
 	Status          ClusterStatusType        `json:"status"`
-	FlavorID        string                   `json:"flavor_id"`
-	Metadata        []map[string]interface{} `json:"metadata"`
+	Flavor          string                   `json:"flavor"`
+	Tags            []map[string]interface{} `json:"tags"`
 	ServersCount    int                      `json:"servers_count"`
 	CreatedAt       gcorecloud.JSONRFC3339Z  `json:"created_at"`
 	UpdatedAt       *gcorecloud.JSONRFC3339Z `json:"updated_at"`
