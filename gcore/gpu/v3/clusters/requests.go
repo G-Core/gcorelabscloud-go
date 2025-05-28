@@ -169,6 +169,35 @@ type CreateClusterOptsBuilder interface {
 	ToCreateClusterMap() (map[string]interface{}, error)
 }
 
+// ClusterActionsOpts allows extensions to add parameters to cluster actions.
+type ClusterActionsOpts struct {
+	Action       ClusterAction     `json:"action" required:"true" validate:"required,enum"`
+	ServersCount int               `json:"servers_count,omitempty" validate:"rfe=Action:resize,gt=-1"`
+	UpdateTags   map[string]string `json:"tags,omitempty" validate:"rfe=Action:update_tags"`
+}
+
+// Validate checks if the provided options are valid.
+func (opts ClusterActionsOpts) Validate() error {
+	return gcorecloud.ValidateStruct(opts)
+}
+
+// ToClusterActionsMap builds a request body from ClusterActionsOpts.
+func (opts ClusterActionsOpts) ToClusterActionsMap() (map[string]interface{}, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, err
+	}
+	mp, err := gcorecloud.BuildRequestBody(opts, "")
+	if err != nil {
+		return nil, err
+	}
+	return mp, nil
+}
+
+// ClusterActionsOptsBuilder allows extensions to add additional parameters to cluster actions.
+type ClusterActionsOptsBuilder interface {
+	ToClusterActionsMap() (map[string]interface{}, error)
+}
+
 // Get retrieves a specific GPU cluster by its ID.
 func Get(client *gcorecloud.ServiceClient, clusterID string) (r GetResult) {
 	url := ClusterURL(client, clusterID)
@@ -210,4 +239,62 @@ func Create(client *gcorecloud.ServiceClient, opts CreateClusterOptsBuilder) (r 
 		OkCodes: []int{http.StatusOK, http.StatusCreated},
 	})
 	return
+}
+
+func ApplyAction(client *gcorecloud.ServiceClient, clusterID string, opts ClusterActionsOptsBuilder) (r tasks.Result) {
+	b, err := opts.ToClusterActionsMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+
+	url := ClusterActionURL(client, clusterID)
+	_, r.Err = client.Post(url, b, &r.Body, &gcorecloud.RequestOpts{
+		OkCodes: []int{http.StatusOK},
+	})
+	return
+}
+
+func Resize(client *gcorecloud.ServiceClient, clusterID string, serversCount int) (r tasks.Result) {
+	opts := ClusterActionsOpts{
+		Action:       ResizeClusterAction,
+		ServersCount: serversCount,
+	}
+	return ApplyAction(client, clusterID, opts)
+}
+
+func UpdateTags(client *gcorecloud.ServiceClient, clusterID string, tags map[string]string) (r tasks.Result) {
+	opts := ClusterActionsOpts{
+		Action:     UpdateTagsClusterAction,
+		UpdateTags: tags,
+	}
+	return ApplyAction(client, clusterID, opts)
+}
+
+func SoftReboot(client *gcorecloud.ServiceClient, clusterID string) (r tasks.Result) {
+	opts := ClusterActionsOpts{
+		Action: SoftRebootClusterAction,
+	}
+	return ApplyAction(client, clusterID, opts)
+}
+
+func HardReboot(client *gcorecloud.ServiceClient, clusterID string) (r tasks.Result) {
+	opts := ClusterActionsOpts{
+		Action: HardRebootClusterAction,
+	}
+	return ApplyAction(client, clusterID, opts)
+}
+
+func Start(client *gcorecloud.ServiceClient, clusterID string) (r tasks.Result) {
+	opts := ClusterActionsOpts{
+		Action: StartClusterAction,
+	}
+	return ApplyAction(client, clusterID, opts)
+}
+
+func Stop(client *gcorecloud.ServiceClient, clusterID string) (r tasks.Result) {
+	opts := ClusterActionsOpts{
+		Action: StopClusterAction,
+	}
+	return ApplyAction(client, clusterID, opts)
 }

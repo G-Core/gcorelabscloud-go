@@ -3,6 +3,7 @@ package clusters
 import (
 	"fmt"
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/client/gpu/v3/client"
 	taskclient "github.com/G-Core/gcorelabscloud-go/client/tasks/v1/client"
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
@@ -88,6 +89,214 @@ func deleteVirtualClusterAction(c *cli.Context) error {
 
 func deleteBaremetalClusterAction(c *cli.Context) error {
 	return deleteClusterAction(c, client.NewGPUBaremetalClientV3)
+}
+
+func resizeVirtualClusterAction(c *cli.Context) error {
+	return resizeClusterAction(c, client.NewGPUVirtualClientV3)
+}
+
+func softRebootVirtualClusterAction(c *cli.Context) error {
+	return softRebootClusterAction(c, client.NewGPUVirtualClientV3)
+}
+
+func hardRebootVirtualClusterAction(c *cli.Context) error {
+	return hardRebootClusterAction(c, client.NewGPUVirtualClientV3)
+}
+
+func startVirtualClusterAction(c *cli.Context) error {
+	return startClusterAction(c, client.NewGPUVirtualClientV3)
+}
+
+func stopVirtualClusterAction(c *cli.Context) error {
+	return stopClusterAction(c, client.NewGPUVirtualClientV3)
+}
+
+func updateTagsVirtualClusterAction(c *cli.Context) error {
+	return updateTagsClusterAction(c, client.NewGPUVirtualClientV3)
+}
+
+func softRebootClusterAction(c *cli.Context, newClient func(ctx *cli.Context) (*gcorecloud.ServiceClient, error)) error {
+	clusterID := c.Args().First()
+	if clusterID == "" {
+		_ = cli.ShowCommandHelp(c, "softreboot")
+		return cli.Exit("cluster ID is required", 1)
+	}
+
+	gpuClient, err := newClient(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.Exit(err, 1)
+	}
+
+	results, err := clusters.SoftReboot(gpuClient, clusterID).Extract()
+	if err != nil {
+		return cli.Exit(err, 1)
+	}
+
+	taskClient, err := taskclient.NewTaskClientV1(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.Exit(err, 1)
+	}
+
+	return utils.WaitTaskAndShowResult(c, taskClient, results, false,
+		waitForClusterOperation(gpuClient, clusterID))
+}
+
+func hardRebootClusterAction(c *cli.Context, newClient func(ctx *cli.Context) (*gcorecloud.ServiceClient, error)) error {
+	clusterID := c.Args().First()
+	if clusterID == "" {
+		_ = cli.ShowCommandHelp(c, "hardreboot")
+		return cli.Exit("cluster ID is required", 1)
+	}
+
+	gpuClient, err := newClient(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.Exit(err, 1)
+	}
+
+	results, err := clusters.HardReboot(gpuClient, clusterID).Extract()
+	if err != nil {
+		return cli.Exit(err, 1)
+	}
+
+	taskClient, err := taskclient.NewTaskClientV1(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.Exit(err, 1)
+	}
+
+	return utils.WaitTaskAndShowResult(c, taskClient, results, false,
+		waitForClusterOperation(gpuClient, clusterID))
+}
+
+func startClusterAction(c *cli.Context, newClient func(ctx *cli.Context) (*gcorecloud.ServiceClient, error)) error {
+	clusterID := c.Args().First()
+	if clusterID == "" {
+		_ = cli.ShowCommandHelp(c, "start")
+		return cli.Exit("cluster ID is required", 1)
+	}
+
+	gpuClient, err := newClient(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.Exit(err, 1)
+	}
+
+	results, err := clusters.Start(gpuClient, clusterID).Extract()
+	if err != nil {
+		return cli.Exit(err, 1)
+	}
+
+	taskClient, err := taskclient.NewTaskClientV1(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.Exit(err, 1)
+	}
+
+	return utils.WaitTaskAndShowResult(c, taskClient, results, false,
+		waitForClusterOperation(gpuClient, clusterID))
+}
+
+func stopClusterAction(c *cli.Context, newClient func(ctx *cli.Context) (*gcorecloud.ServiceClient, error)) error {
+	clusterID := c.Args().First()
+	if clusterID == "" {
+		_ = cli.ShowCommandHelp(c, "stop")
+		return cli.Exit("cluster ID is required", 1)
+	}
+
+	gpuClient, err := newClient(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.Exit(err, 1)
+	}
+
+	results, err := clusters.Stop(gpuClient, clusterID).Extract()
+	if err != nil {
+		return cli.Exit(err, 1)
+	}
+
+	taskClient, err := taskclient.NewTaskClientV1(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.Exit(err, 1)
+	}
+
+	return utils.WaitTaskAndShowResult(c, taskClient, results, false,
+		waitForClusterOperation(gpuClient, clusterID))
+}
+
+func updateTagsClusterAction(c *cli.Context, newClient func(ctx *cli.Context) (*gcorecloud.ServiceClient, error)) error {
+	clusterID := c.Args().First()
+	if clusterID == "" {
+		_ = cli.ShowCommandHelp(c, "updatetags")
+		return cli.Exit("cluster ID is required", 1)
+	}
+
+	gpuClient, err := newClient(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.Exit(err, 1)
+	}
+
+	tags, err := utils.StringSliceToTags(c.StringSlice("tags"))
+	results, err := clusters.UpdateTags(gpuClient, clusterID, tags).Extract()
+	if err != nil {
+		return cli.Exit(err, 1)
+	}
+
+	taskClient, err := taskclient.NewTaskClientV1(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.Exit(err, 1)
+	}
+
+	return utils.WaitTaskAndShowResult(c, taskClient, results, false,
+		waitForClusterOperation(gpuClient, clusterID))
+}
+
+func waitForClusterOperation(gpuClient *gcorecloud.ServiceClient, clusterID string) func(task tasks.TaskID) (interface{}, error) {
+	return func(task tasks.TaskID) (interface{}, error) {
+		cluster, err := clusters.Get(gpuClient, clusterID).Extract()
+		if err != nil {
+			return nil, fmt.Errorf("cannot perform GPU cluster operation with ID: %s. Error: %w", clusterID, err)
+		}
+		return cluster, nil
+	}
+}
+
+func resizeClusterAction(c *cli.Context, newClient func(ctx *cli.Context) (*gcorecloud.ServiceClient, error)) error {
+	clusterID := c.Args().First()
+	if clusterID == "" {
+		_ = cli.ShowCommandHelp(c, "resize")
+		return cli.Exit("cluster ID is required", 1)
+	}
+
+	gpuClient, err := newClient(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.Exit(err, 1)
+	}
+
+	// Validate servers count
+	if c.Int("servers-count") <= 0 {
+		return cli.Exit("`servers-count` must be greater than 0", 1)
+	}
+
+	results, err := clusters.Resize(gpuClient, clusterID, c.Int("servers-count")).Extract()
+	if err != nil {
+		return cli.Exit(err, 1)
+	}
+
+	taskClient, err := taskclient.NewTaskClientV1(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.Exit(err, 1)
+	}
+
+	return utils.WaitTaskAndShowResult(c, taskClient, results, false,
+		waitForClusterOperation(gpuClient, clusterID))
 }
 
 func createVirtualClusterAction(c *cli.Context) error {
@@ -427,6 +636,7 @@ func BaremetalCommands() *cli.Command {
 				Category:    "clusters",
 				ArgsUsage:   "<cluster_id>",
 				Action:      deleteBaremetalClusterAction,
+				Flags:       flags.WaitCommandFlags,
 			},
 			{
 				Name:        "list",
@@ -462,13 +672,14 @@ func VirtualCommands() *cli.Command {
 				Category:    "clusters",
 				ArgsUsage:   "<cluster_id>",
 				Action:      deleteVirtualClusterAction,
+				Flags:       flags.WaitCommandFlags,
 			},
 			{
 				Name:        "create",
 				Usage:       "Create a new virtual GPU cluster",
 				Description: "Create a new virtual GPU cluster with the specified options",
 				Category:    "clusters",
-				Flags:       createClusterFlags(),
+				Flags:       append(createClusterFlags(), flags.WaitCommandFlags...),
 				Action:      createVirtualClusterAction,
 			},
 			{
@@ -478,6 +689,75 @@ func VirtualCommands() *cli.Command {
 				Category:    "clusters",
 				ArgsUsage:   " ",
 				Action:      listVirtualClustersAction,
+			},
+			{
+				Name:        "resize",
+				Usage:       "Resize virtual GPU cluster",
+				Description: "Resize a specific virtual GPU cluster",
+				Category:    "clusters",
+				ArgsUsage:   "<cluster_id>",
+				Action:      resizeVirtualClusterAction,
+				Flags: append([]cli.Flag{
+					&cli.IntFlag{
+						Name:     "servers-count",
+						Aliases:  []string{"sc"},
+						Usage:    "number of servers of the cluster",
+						Required: true,
+					},
+				},
+					flags.WaitCommandFlags...),
+			},
+			{
+				Name:        "softreboot",
+				Usage:       "Soft reboot virtual GPU cluster",
+				Description: "Soft reboot of specific virtual GPU cluster",
+				Category:    "clusters",
+				ArgsUsage:   "<cluster_id>",
+				Action:      softRebootVirtualClusterAction,
+				Flags:       flags.WaitCommandFlags,
+			},
+			{
+				Name:        "hardreboot",
+				Usage:       "Hard reboot virtual GPU cluster",
+				Description: "Hard reboot of specific virtual GPU cluster",
+				Category:    "clusters",
+				ArgsUsage:   "<cluster_id>",
+				Action:      hardRebootVirtualClusterAction,
+				Flags:       flags.WaitCommandFlags,
+			},
+			{
+				Name:        "start",
+				Usage:       "Start (power on) virtual GPU cluster",
+				Description: "Power on a specific virtual GPU cluster",
+				Category:    "clusters",
+				ArgsUsage:   "<cluster_id>",
+				Action:      startVirtualClusterAction,
+				Flags:       flags.WaitCommandFlags,
+			},
+			{
+				Name:        "stop",
+				Usage:       "Stop (power off) virtual GPU cluster",
+				Description: "Power off a specific virtual GPU cluster",
+				Category:    "clusters",
+				ArgsUsage:   "<cluster_id>",
+				Action:      stopVirtualClusterAction,
+				Flags:       flags.WaitCommandFlags,
+			},
+			{
+				Name:        "updatetags",
+				Usage:       "Update tags of virtual GPU cluster",
+				Description: "Updates the tags of specific virtual GPU cluster",
+				Category:    "clusters",
+				ArgsUsage:   "<cluster_id>",
+				Action:      updateTagsVirtualClusterAction,
+				Flags: append([]cli.Flag{
+					&cli.StringSliceFlag{
+						Name:     "tags",
+						Aliases:  []string{"t"},
+						Usage:    "cluster key-value tags. Example: --tags key1=value1 --tags key2=value2",
+						Required: false,
+					},
+				}, flags.WaitCommandFlags...),
 			},
 		},
 	}
