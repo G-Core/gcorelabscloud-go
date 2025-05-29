@@ -144,7 +144,7 @@ type CreateClusterOpts struct {
 	Name            string             `json:"name" validate:"required"`
 	Flavor          string             `json:"flavor" validate:"required"`
 	Tags            map[string]string  `json:"tags,omitempty"`
-	ServersCount    int                `json:"servers_count,omitempty"`
+	ServersCount    int                `json:"servers_count" validate:"required"`
 	ServersSettings ServerSettingsOpts `json:"servers_settings,omitempty"`
 }
 

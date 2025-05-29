@@ -326,6 +326,10 @@ func createClusterAction(c *cli.Context, newClient func(*cli.Context) (*gcoreclo
 		_ = cli.ShowCommandHelp(c, "create")
 		return cli.Exit(err, 1)
 	}
+	// Validate servers count
+	if c.Int("servers-count") <= 0 {
+		return cli.Exit("`servers-count` must be greater than 0", 1)
+	}
 	opts := clusters.CreateClusterOpts{
 		Name:            c.String("name"),
 		Flavor:          c.String("flavor"),
