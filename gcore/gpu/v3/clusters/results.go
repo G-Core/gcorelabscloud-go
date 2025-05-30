@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
 type commonResult struct {
@@ -141,14 +142,14 @@ func (i *InterfaceUnion) UnmarshalJSON(data []byte) error {
 
 // Volume represents a volume structure.
 type Volume struct {
-	Size                 int                      `json:"size"`
-	Type                 VolumeType               `json:"type"`
-	DeletedOnTermination bool                     `json:"deleted_on_termination"`
-	Metadata             []map[string]interface{} `json:"metadata"`
-	Name                 *string                  `json:"name"`
-	BootIndex            *int                     `json:"boot_index"`
-	ImageID              *string                  `json:"image_id"`
-	SnapshotID           *string                  `json:"snapshot_id"`
+	Size                int        `json:"size"`
+	Type                VolumeType `json:"type"`
+	DeleteOnTermination bool       `json:"delete_on_termination"`
+	Tags                []Tag      `json:"tags"`
+	Name                *string    `json:"name"`
+	BootIndex           *int       `json:"boot_index"`
+	ImageID             *string    `json:"image_id"`
+	SnapshotID          *string    `json:"snapshot_id"`
 }
 
 type ClusterServerSettings struct {
@@ -156,18 +157,47 @@ type ClusterServerSettings struct {
 	SecurityGroups []string         `json:"security_groups"`
 	Volumes        []Volume         `json:"volumes"`
 	UserData       string           `json:"user_data"`
-	KeypairName    *string          `json:"keypair_name"`
+	SSHKeyName     *string          `json:"ssh_key_name"`
 }
 
 type Cluster struct {
 	ID              string                   `json:"id"`
 	Name            string                   `json:"name"`
 	Status          ClusterStatusType        `json:"status"`
-	FlavorID        string                   `json:"flavor_id"`
-	Metadata        []map[string]interface{} `json:"metadata"`
+	Flavor          string                   `json:"flavor"`
+	Tags            []Tag                    `json:"tags"`
 	ServersCount    int                      `json:"servers_count"`
 	CreatedAt       gcorecloud.JSONRFC3339Z  `json:"created_at"`
 	UpdatedAt       *gcorecloud.JSONRFC3339Z `json:"updated_at"`
 	ServersIDs      *[]string                `json:"servers_ids"`
 	ServersSettings ClusterServerSettings    `json:"servers_settings"`
+}
+
+// Tag represents a key-value pair used to tag resources like clusters, servers, volumes, etc.
+// Some tags are read-only and cannot be modified by the user.
+type Tag struct {
+	Key      string `json:"key"`
+	Value    string `json:"value"`
+	ReadOnly bool   `json:"read_only"`
+}
+
+// ClusterPage is the page returned by a pager when traversing over a
+// collection of clusters.
+type ClusterPage struct {
+	pagination.LinkedPageBase
+}
+
+// IsEmpty checks whether a ClusterPage struct is empty.
+func (r ClusterPage) IsEmpty() (bool, error) {
+	s, err := ExtractClusters(r)
+	return len(s) == 0, err
+}
+
+// ExtractClusters accepts a Page struct, specifically a ClusterPage struct,
+// and extracts the elements into a slice of cluster structs. In other words,
+// a generic collection is mapped into a relevant slice.
+func ExtractClusters(r pagination.Page) ([]Cluster, error) {
+	var s []Cluster
+	err := r.(ClusterPage).Result.ExtractIntoSlicePtr(&s, "results")
+	return s, err
 }
