@@ -69,9 +69,9 @@ func List(client *gcorecloud.ServiceClient, opts ListClustersOptsBuilder) pagina
 }
 
 type ServerCredentialsOpts struct {
-	Username    string `json:"username,omitempty"`
-	Password    string `json:"password,omitempty"`
-	KeypairName string `json:"keypair_name,omitempty"`
+	Username   string `json:"username,omitempty"`
+	Password   string `json:"password,omitempty"`
+	SSHKeyName string `json:"ssh_key_name,omitempty"`
 }
 
 type ServerSettingsOpts struct {

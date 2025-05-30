@@ -148,9 +148,9 @@ func getServerSettings(c *cli.Context) (clusters.ServerSettingsOpts, error) {
 		return clusters.ServerSettingsOpts{}, err
 	}
 	credentialOpts := clusters.ServerCredentialsOpts{
-		Username:    c.String("server-username"),
-		Password:    c.String("server-password"),
-		KeypairName: c.String("keypair"),
+		Username:   c.String("server-username"),
+		Password:   c.String("server-password"),
+		SSHKeyName: c.String("ssh-key-name"),
 	}
 
 	serverSettings := clusters.ServerSettingsOpts{
@@ -292,7 +292,7 @@ func createClusterFlags() []cli.Flag {
 			Required: false,
 		},
 		&cli.StringFlag{
-			Name:     "keypair",
+			Name:     "ssh-key-name",
 			Aliases:  []string{"k"},
 			Usage:    "(ssh) keypair name for the servers in the cluster",
 			Required: false,

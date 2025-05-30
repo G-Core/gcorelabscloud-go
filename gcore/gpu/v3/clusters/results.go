@@ -142,14 +142,14 @@ func (i *InterfaceUnion) UnmarshalJSON(data []byte) error {
 
 // Volume represents a volume structure.
 type Volume struct {
-	Size                 int                      `json:"size"`
-	Type                 VolumeType               `json:"type"`
-	DeletedOnTermination bool                     `json:"deleted_on_termination"`
-	Metadata             []map[string]interface{} `json:"metadata"`
-	Name                 *string                  `json:"name"`
-	BootIndex            *int                     `json:"boot_index"`
-	ImageID              *string                  `json:"image_id"`
-	SnapshotID           *string                  `json:"snapshot_id"`
+	Size                int                      `json:"size"`
+	Type                VolumeType               `json:"type"`
+	DeleteOnTermination bool                     `json:"delete_on_termination"`
+	Tags                []map[string]interface{} `json:"tags"`
+	Name                *string                  `json:"name"`
+	BootIndex           *int                     `json:"boot_index"`
+	ImageID             *string                  `json:"image_id"`
+	SnapshotID          *string                  `json:"snapshot_id"`
 }
 
 type ClusterServerSettings struct {
@@ -157,7 +157,7 @@ type ClusterServerSettings struct {
 	SecurityGroups []string         `json:"security_groups"`
 	Volumes        []Volume         `json:"volumes"`
 	UserData       string           `json:"user_data"`
-	KeypairName    *string          `json:"keypair_name"`
+	SSHKeyName     *string          `json:"ssh_key_name"`
 }
 
 type Cluster struct {
