@@ -142,14 +142,14 @@ func (i *InterfaceUnion) UnmarshalJSON(data []byte) error {
 
 // Volume represents a volume structure.
 type Volume struct {
-	Size                int                      `json:"size"`
-	Type                VolumeType               `json:"type"`
-	DeleteOnTermination bool                     `json:"delete_on_termination"`
-	Tags                []map[string]interface{} `json:"tags"`
-	Name                *string                  `json:"name"`
-	BootIndex           *int                     `json:"boot_index"`
-	ImageID             *string                  `json:"image_id"`
-	SnapshotID          *string                  `json:"snapshot_id"`
+	Size                int        `json:"size"`
+	Type                VolumeType `json:"type"`
+	DeleteOnTermination bool       `json:"delete_on_termination"`
+	Tags                []Tag      `json:"tags"`
+	Name                *string    `json:"name"`
+	BootIndex           *int       `json:"boot_index"`
+	ImageID             *string    `json:"image_id"`
+	SnapshotID          *string    `json:"snapshot_id"`
 }
 
 type ClusterServerSettings struct {
@@ -165,12 +165,20 @@ type Cluster struct {
 	Name            string                   `json:"name"`
 	Status          ClusterStatusType        `json:"status"`
 	Flavor          string                   `json:"flavor"`
-	Tags            []map[string]interface{} `json:"tags"`
+	Tags            []Tag                    `json:"tags"`
 	ServersCount    int                      `json:"servers_count"`
 	CreatedAt       gcorecloud.JSONRFC3339Z  `json:"created_at"`
 	UpdatedAt       *gcorecloud.JSONRFC3339Z `json:"updated_at"`
 	ServersIDs      *[]string                `json:"servers_ids"`
 	ServersSettings ClusterServerSettings    `json:"servers_settings"`
+}
+
+// Tag represents a key-value pair used to tag resources like clusters, servers, volumes, etc.
+// Some tags are read-only and cannot be modified by the user.
+type Tag struct {
+	Key      string `json:"key"`
+	Value    string `json:"value"`
+	ReadOnly bool   `json:"read_only"`
 }
 
 // ClusterPage is the page returned by a pager when traversing over a

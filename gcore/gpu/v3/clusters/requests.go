@@ -68,6 +68,15 @@ func List(client *gcorecloud.ServiceClient, opts ListClustersOptsBuilder) pagina
 	})
 }
 
+// ListAll retrieves all GPU clusters, using the provided ListClustersOptsBuilder to filter results.
+func ListAll(client *gcorecloud.ServiceClient, opts ListClustersOptsBuilder) ([]Cluster, error) {
+	allPages, err := List(client, opts).AllPages()
+	if err != nil {
+		return nil, err
+	}
+	return ExtractClusters(allPages)
+}
+
 type ServerCredentialsOpts struct {
 	Username   string `json:"username,omitempty"`
 	Password   string `json:"password,omitempty"`
