@@ -363,6 +363,9 @@ func TestCreate(t *testing.T) {
 				},
 			},
 		},
+		Metadata: map[string]string{
+			"foo": "bar",
+		},
 		Password: "secret",
 		Username: "useruser",
 	}

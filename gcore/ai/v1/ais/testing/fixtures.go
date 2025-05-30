@@ -532,6 +532,9 @@ const CreateRequest = `
   ],
   "username": "useruser",
   "password": "secret",
+  "metadata": {
+      "foo": "bar"
+  },
   "name": "ivandts",
   "volumes": [
       {
