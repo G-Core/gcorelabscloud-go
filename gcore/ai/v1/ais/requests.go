@@ -57,7 +57,7 @@ type CreateOpts struct {
 	Password       string                                  `json:"password" validate:"omitempty,required_with=Username"`
 	Username       string                                  `json:"username" validate:"omitempty,required_with=Password"`
 	UserData       string                                  `json:"user_data,omitempty" validate:"omitempty,base64"`
-	Metadata       map[string]string                       `json:"metadata,omitempty" validate:"omitempty,dive"`
+	Metadata       map[string]string                       `json:"metadata,omitempty" validate:"omitempty"`
 	InstancesCount int                                     `json:"instances_count,omitempty" validate:"omitempty,min=1"`
 }
 
@@ -458,7 +458,7 @@ type DeleteNodeOpts struct {
 }
 
 // ToDeleteNodeFromGPUClusterQuery formats a DeleteNodeOpts into a query string.
-func (opts *DeleteNodeOpts) ToDeleteNodeFromGPUClusterQuery() (string, error) {
+func (opts DeleteNodeOpts) ToDeleteNodeFromGPUClusterQuery() (string, error) {
 	if err := opts.Validate(); err != nil {
 		return "", err
 	}
@@ -475,7 +475,7 @@ func (opts *DeleteNodeOpts) Validate() error {
 
 // DeleteNodeFromGPUCluster deletes a single node from a GPU cluster.
 func DeleteNodeFromGPUCluster(
-	client *gcorecloud.ServiceClient, clusterID, instanceID string, opts DeleteNodeOpts) (r tasks.Result) {
+	client *gcorecloud.ServiceClient, clusterID, instanceID string, opts DeleteNodeOptsBuilder) (r tasks.Result) {
 
 	url := nodeFromGPUClusterURL(client, clusterID, instanceID)
 	query, err := opts.ToDeleteNodeFromGPUClusterQuery()
