@@ -2,9 +2,12 @@ package servers
 
 import (
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/client/gpu/v3/client"
+	tasksclient "github.com/G-Core/gcorelabscloud-go/client/tasks/v1/client"
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
 	"github.com/G-Core/gcorelabscloud-go/gcore/gpu/v3/servers"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/urfave/cli/v2"
 )
 
@@ -21,22 +24,65 @@ func listServersAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud
 		return cli.Exit(err, 1)
 	}
 
-	serversList := servers.List(gpuClient, clusterID)
-	if serversList.Err != nil {
-		return cli.Exit(serversList.Err, 1)
-	}
-
-	results, err := servers.ExtractServers(serversList)
+	servers, err := servers.ListAll(gpuClient, clusterID)
 	if err != nil {
 		return cli.Exit(err, 1)
 	}
 
-	utils.ShowResults(results, c.String("format"))
+	utils.ShowResults(servers, c.String("format"))
 	return nil
 }
 
 func listVirtualServersAction(c *cli.Context) error {
 	return listServersAction(c, client.NewGPUVirtualClientV3)
+}
+
+func deleteServerAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud.ServiceClient, error)) error {
+	clusterID := c.Args().First()
+	if clusterID == "" {
+		_ = cli.ShowCommandHelp(c, "list")
+		return cli.Exit("cluster ID is required", 1)
+	}
+
+	serverID := c.Args().Get(1)
+	if serverID == "" {
+		_ = cli.ShowCommandHelp(c, "list")
+		return cli.Exit("server ID is required", 1)
+	}
+
+	gpuClient, err := newClient(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.Exit(err, 1)
+	}
+
+	opts := servers.DeleteServerOpts{
+		AllFloatingIPs:      c.Bool("delete-all-floating-ips"),
+		AllReservedFixedIPs: c.Bool("delete-all-reserved-fixed-ips"),
+		AllVolumes:          c.Bool("delete-all-volumes"),
+	}
+	results, err := servers.Delete(gpuClient, clusterID, serverID, opts).Extract()
+	if err != nil {
+		return cli.Exit(err, 1)
+	}
+
+	tc, err := tasksclient.NewTaskClientV1(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.Exit(err, 1)
+	}
+
+	return utils.WaitTaskAndShowResult(c, tc, results, c.Bool("d"), func(task tasks.TaskID) (interface{}, error) {
+		servers, err := servers.ListAll(gpuClient, clusterID)
+		if err != nil {
+			return nil, err
+		}
+		return servers, nil
+	})
+}
+
+func deleteVirtualServerAction(c *cli.Context) error {
+	return deleteServerAction(c, client.NewGPUVirtualClientV3)
 }
 
 // VirtualCommands returns commands for virtual GPU servers
@@ -53,6 +99,31 @@ func VirtualCommands() *cli.Command {
 				Category:    "servers",
 				ArgsUsage:   "<cluster_id>",
 				Action:      listVirtualServersAction,
+			},
+			{
+				Name:        "delete",
+				Usage:       "Delete server from a virtual GPU cluster",
+				Description: "Delete a specific server from a virtual GPU cluster",
+				Category:    "servers",
+				ArgsUsage:   "<cluster_id> <server_id>",
+				Flags: append([]cli.Flag{
+					&cli.BoolFlag{
+						Name:     "delete-all-floating-ips",
+						Usage:    "delete all server floating ips",
+						Required: false,
+					},
+					&cli.BoolFlag{
+						Name:     "delete-all-reserved-fixed-ips",
+						Usage:    "delete all server reserved fixed ips",
+						Required: false,
+					},
+					&cli.BoolFlag{
+						Name:     "delete-all-volumes",
+						Usage:    "delete all server volumes",
+						Required: false,
+					},
+				}, flags.WaitCommandFlags...),
+				Action: deleteVirtualServerAction,
 			},
 		},
 	}
