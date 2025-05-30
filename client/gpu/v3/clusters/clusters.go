@@ -388,12 +388,7 @@ func listClustersAction(c *cli.Context, newClient func(*cli.Context) (*gcoreclou
 		return cli.Exit(err, 1)
 	}
 	opts := &clusters.ListOpts{}
-	pages, err := clusters.List(gpuClient, opts).AllPages()
-	if err != nil {
-		return cli.Exit(err, 1)
-	}
-
-	clusterList, err := clusters.ExtractClusters(pages)
+	clusterList, err := clusters.ListAll(gpuClient, opts)
 	if err != nil {
 		return cli.Exit(err, 1)
 	}
