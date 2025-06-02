@@ -13,6 +13,8 @@ type FloatingIPSource string
 
 type InterfaceType string
 
+type ClusterAction string
+
 const (
 	IPv4IPFamilyType      IPFamilyType = "ipv4"
 	IPv6IPFamilyType      IPFamilyType = "ipv6"
@@ -40,6 +42,13 @@ const (
 
 	NewFloatingIP      FloatingIPSource = "new"
 	ExistingFloatingIP FloatingIPSource = "existing"
+
+	StartClusterAction      ClusterAction = "start"
+	StopClusterAction       ClusterAction = "stop"
+	HardRebootClusterAction ClusterAction = "hard_reboot"
+	SoftRebootClusterAction ClusterAction = "soft_reboot"
+	ResizeClusterAction     ClusterAction = "resize"
+	UpdateTagsClusterAction ClusterAction = "update_tags"
 )
 
 func (it *IPFamilyType) IsValid() error {
@@ -280,4 +289,71 @@ func (ct *ClusterStatusType) UnmarshalJSON(data []byte) error {
 // MarshalJSON - implements Marshaller interface
 func (ct *ClusterStatusType) MarshalJSON() ([]byte, error) {
 	return json.Marshal(ct.String())
+}
+
+func (ca ClusterAction) IsValid() error {
+	switch ca {
+	case StartClusterAction,
+		StopClusterAction,
+		SoftRebootClusterAction,
+		HardRebootClusterAction,
+		ResizeClusterAction,
+		UpdateTagsClusterAction:
+		return nil
+	}
+	return fmt.Errorf("invalid ClusterAction: %v", ca)
+}
+
+func (ca ClusterAction) ValidOrNil() (*ClusterAction, error) {
+	if ca.String() == "" {
+		return nil, nil
+	}
+	err := ca.IsValid()
+	if err != nil {
+		return &ca, err
+	}
+	return &ca, nil
+}
+
+func (ca ClusterAction) String() string {
+	return string(ca)
+}
+
+func (ca ClusterAction) List() []ClusterAction {
+	return []ClusterAction{
+		StartClusterAction,
+		StopClusterAction,
+		SoftRebootClusterAction,
+		HardRebootClusterAction,
+		ResizeClusterAction,
+		UpdateTagsClusterAction,
+	}
+}
+
+func (ca ClusterAction) StringList() []string {
+	var s []string
+	for _, v := range ca.List() {
+		s = append(s, v.String())
+	}
+	return s
+}
+
+// UnmarshalJSON - implements Unmarshaler interface
+func (ca *ClusterAction) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	v := ClusterAction(s)
+	err := v.IsValid()
+	if err != nil {
+		return err
+	}
+	*ca = v
+	return nil
+}
+
+// MarshalJSON - implements Marshaler interface
+func (ca *ClusterAction) MarshalJSON() ([]byte, error) {
+	return json.Marshal(ca.String())
 }

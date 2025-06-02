@@ -15,3 +15,8 @@ func ClustersURL(c *gcorecloud.ServiceClient) string {
 func ClusterURL(c *gcorecloud.ServiceClient, clusterID string) string {
 	return c.ServiceURL(clustersPath, clusterID)
 }
+
+// ClusterActionURL returns URL for specific GPU cluster action operations
+func ClusterActionURL(c *gcorecloud.ServiceClient, clusterID string) string {
+	return c.ServiceURL(clustersPath, clusterID, "action")
+}
