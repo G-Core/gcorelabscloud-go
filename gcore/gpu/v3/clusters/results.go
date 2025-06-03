@@ -157,7 +157,7 @@ type ClusterServerSettings struct {
 	Interfaces     []InterfaceUnion `json:"interfaces"`
 	SecurityGroups []string         `json:"security_groups"`
 	Volumes        []Volume         `json:"volumes"`
-	UserData       string           `json:"user_data"`
+	UserData       *string          `json:"user_data"`
 	SSHKeyName     *string          `json:"ssh_key_name"`
 }
 
