@@ -204,17 +204,14 @@ func ExtractClusters(r pagination.Page) ([]Cluster, error) {
 }
 
 type ClusterTaskResult struct {
-	Clusters []string `mapstructure:"instances"`
+	ClusterID string `mapstructure:"cluster_id"`
 }
 
 func ExtractGPUClusterIDFromTask(task *tasks.Task) (string, error) {
 	var result ClusterTaskResult
-	err := gcorecloud.NativeMapToStruct(task.CreatedResources, &result)
+	err := gcorecloud.NativeMapToStruct(task.Data, &result)
 	if err != nil {
 		return "", fmt.Errorf("cannot decode AI cluster information in task structure: %w", err)
 	}
-	if len(result.Clusters) == 0 {
-		return "", fmt.Errorf("cannot decode ai cluster information in task structure: %w", err)
-	}
-	return result.Clusters[0], nil
+	return result.ClusterID, nil
 }
