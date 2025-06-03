@@ -204,7 +204,7 @@ func ExtractClusters(r pagination.Page) ([]Cluster, error) {
 }
 
 type ClusterTaskResult struct {
-	Clusters []string `mapstructure:"ai_clusters"`
+	Clusters []string `mapstructure:"instances"`
 }
 
 func ExtractGPUClusterIDFromTask(task *tasks.Task) (string, error) {
