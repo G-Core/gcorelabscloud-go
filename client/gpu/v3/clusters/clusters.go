@@ -2,6 +2,7 @@ package clusters
 
 import (
 	"fmt"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/client/gpu/v3/client"
@@ -58,7 +59,12 @@ func deleteClusterAction(c *cli.Context, newClient func(*cli.Context) (*gcoreclo
 		return cli.Exit(err, 1)
 	}
 
-	results, err := clusters.Delete(gpuClient, clusterID).Extract()
+	opts := clusters.DeleteClusterOpts{
+		AllFloatingIPs:      c.Bool("delete-all-floating-ips"),
+		AllReservedFixedIPs: c.Bool("delete-all-reserved-fixed-ips"),
+		AllVolumes:          c.Bool("delete-all-volumes"),
+	}
+	results, err := clusters.Delete(gpuClient, clusterID, opts).Extract()
 	if err != nil {
 		return cli.Exit(err, 1)
 	}
@@ -639,8 +645,19 @@ func BaremetalCommands() *cli.Command {
 				Description: "Delete a specific baremetal GPU cluster",
 				Category:    "clusters",
 				ArgsUsage:   "<cluster_id>",
-				Action:      deleteBaremetalClusterAction,
-				Flags:       flags.WaitCommandFlags,
+				Flags: append([]cli.Flag{
+					&cli.BoolFlag{
+						Name:     "delete-all-floating-ips",
+						Usage:    "delete all server floating ips",
+						Required: false,
+					},
+					&cli.BoolFlag{
+						Name:     "delete-all-reserved-fixed-ips",
+						Usage:    "delete all server reserved fixed ips",
+						Required: false,
+					},
+				}, flags.WaitCommandFlags...),
+				Action: deleteBaremetalClusterAction,
 			},
 			{
 				Name:        "list",
@@ -675,8 +692,24 @@ func VirtualCommands() *cli.Command {
 				Description: "Delete a specific virtual GPU cluster",
 				Category:    "clusters",
 				ArgsUsage:   "<cluster_id>",
-				Action:      deleteVirtualClusterAction,
-				Flags:       flags.WaitCommandFlags,
+				Flags: append([]cli.Flag{
+					&cli.BoolFlag{
+						Name:     "delete-all-floating-ips",
+						Usage:    "delete all server floating ips",
+						Required: false,
+					},
+					&cli.BoolFlag{
+						Name:     "delete-all-reserved-fixed-ips",
+						Usage:    "delete all server reserved fixed ips",
+						Required: false,
+					},
+					&cli.BoolFlag{
+						Name:     "delete-all-volumes",
+						Usage:    "delete all server volumes",
+						Required: false,
+					},
+				}, flags.WaitCommandFlags...),
+				Action: deleteVirtualClusterAction,
 			},
 			{
 				Name:        "create",
