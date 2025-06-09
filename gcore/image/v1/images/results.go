@@ -51,7 +51,7 @@ type Image struct {
 	DisplayOrder  int                      `json:"display_order"`
 	CreatedAt     gcorecloud.JSONRFC3339Z  `json:"created_at"`
 	UpdatedAt     *gcorecloud.JSONRFC3339Z `json:"updated_at"`
-	Size          int                      `json:"size"`
+	Size          int64                    `json:"size"`
 	CreatorTaskID *string                  `json:"creator_task_id"`
 	TaskID        *string                  `json:"task_id"`
 	Region        string                   `json:"region"`
