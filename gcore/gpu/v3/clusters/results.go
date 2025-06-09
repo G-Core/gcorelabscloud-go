@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
@@ -156,7 +157,7 @@ type ClusterServerSettings struct {
 	Interfaces     []InterfaceUnion `json:"interfaces"`
 	SecurityGroups []string         `json:"security_groups"`
 	Volumes        []Volume         `json:"volumes"`
-	UserData       string           `json:"user_data"`
+	UserData       *string          `json:"user_data"`
 	SSHKeyName     *string          `json:"ssh_key_name"`
 }
 
@@ -200,4 +201,17 @@ func ExtractClusters(r pagination.Page) ([]Cluster, error) {
 	var s []Cluster
 	err := r.(ClusterPage).Result.ExtractIntoSlicePtr(&s, "results")
 	return s, err
+}
+
+type ClusterTaskResult struct {
+	ClusterID string `mapstructure:"cluster_id"`
+}
+
+func ExtractGPUClusterIDFromTask(task *tasks.Task) (string, error) {
+	var result ClusterTaskResult
+	err := gcorecloud.NativeMapToStruct(task.Data, &result)
+	if err != nil {
+		return "", fmt.Errorf("cannot decode AI cluster information in task structure: %w", err)
+	}
+	return result.ClusterID, nil
 }
