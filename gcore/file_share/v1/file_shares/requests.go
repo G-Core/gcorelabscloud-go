@@ -1,6 +1,7 @@
 package file_shares
 
 import (
+	"errors"
 	"net/http"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
@@ -43,12 +44,13 @@ type CreateAccessRuleOpts struct {
 
 // CreateOpts represents options used to create a file share.
 type CreateOpts struct {
-	Name     string                 `json:"name" required:"true" validate:"required"`
-	Protocol string                 `json:"protocol" required:"true" validate:"required,oneof=NFS"`
-	Size     int                    `json:"size" required:"true" validate:"required,gt=1"`
-	Network  FileShareNetworkOpts   `json:"network" required:"true" validate:"required,dive"`
-	Access   []CreateAccessRuleOpts `json:"access,omitempty" validate:"dive"`
-	Metadata map[string]string      `json:"metadata,omitempty"`
+	Name       string                 `json:"name" required:"true" validate:"required"`
+	VolumeType string                 `json:"volume_type,omitempty" validate:"omitempty,oneof=default_share_type vast_share_type"`
+	Protocol   string                 `json:"protocol" required:"true" validate:"required,oneof=NFS"`
+	Size       int                    `json:"size" required:"true" validate:"required,gt=1"`
+	Network    *FileShareNetworkOpts  `json:"network,omitempty" validate:"omitempty,dive"`
+	Access     []CreateAccessRuleOpts `json:"access,omitempty" validate:"dive"`
+	Tags       map[string]string      `json:"tags,omitempty"`
 }
 
 // ToFileShareCreateMap builds a request body from CreateOpts.
@@ -61,7 +63,13 @@ func (opts CreateOpts) ToFileShareCreateMap() (map[string]interface{}, error) {
 
 // Validate
 func (opts CreateOpts) Validate() error {
-	return gcorecloud.TranslateValidationError(gcorecloud.Validate.Struct(opts))
+	if err := gcorecloud.Validate.Struct(opts); err != nil {
+		return gcorecloud.TranslateValidationError(err)
+	}
+	if (opts.VolumeType == "" || opts.VolumeType == "default_share_type") && opts.Network == nil {
+		return errors.New("field Network is required for volume_type default_share_type")
+	}
+	return nil
 }
 
 // Create accepts a CreateOpts struct and creates a new file share using the values provided.

@@ -2,6 +2,7 @@ package file_shares
 
 import (
 	"fmt"
+	"strings"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/client/file_shares/v1/client"
@@ -30,6 +31,12 @@ var fileShareCreateCommand = cli.Command{
 			Required: true,
 		},
 		&cli.StringFlag{
+			Name:     "volume-type",
+			Usage:    "File share volume type (default_share_type or vast_share_type)",
+			Value:    "default_share_type",
+			Required: false,
+		},
+		&cli.StringFlag{
 			Name:     "protocol",
 			Aliases:  []string{"p"},
 			Usage:    "File share protocol",
@@ -43,13 +50,13 @@ var fileShareCreateCommand = cli.Command{
 		},
 		&cli.StringFlag{
 			Name:     "network",
-			Usage:    "File share network id",
-			Required: true,
+			Usage:    "File share network id (required for default_share_type)",
+			Required: false,
 		},
 		&cli.StringFlag{
 			Name:     "subnet",
 			Usage:    "File share subnet id",
-			Required: true,
+			Required: false,
 		},
 		&cli.StringSliceFlag{
 			Name:     "acl-source-address",
@@ -63,7 +70,7 @@ var fileShareCreateCommand = cli.Command{
 		},
 		&cli.StringSliceFlag{
 			Name:     "metadata",
-			Usage:    "instance metadata. Example: --metadata one=two --metadata three=four",
+			Usage:    "File share tags. Example: --metadata one=two --metadata three=four",
 			Required: false,
 		},
 	}, flags.WaitCommandFlags...,
@@ -75,16 +82,31 @@ var fileShareCreateCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
+		tags := make(map[string]string)
+		for _, v := range c.StringSlice("metadata") {
+			parts := strings.SplitN(v, "=", 2)
+			if len(parts) == 2 {
+				tags[parts[0]] = parts[1]
+			}
+		}
+
 		opts := file_shares.CreateOpts{
-			Name:     c.String("name"),
-			Protocol: c.String("protocol"),
-			Size:     c.Int("size"),
-			Network: file_shares.FileShareNetworkOpts{
+			Name:       c.String("name"),
+			VolumeType: c.String("volume-type"),
+			Protocol:   c.String("protocol"),
+			Size:       c.Int("size"),
+			Access:     getAccessRules(c),
+			Tags:       tags,
+		}
+
+		if opts.VolumeType == "default_share_type" || opts.VolumeType == "" {
+			if c.String("network") == "" {
+				return cli.NewExitError("--network is required for default_share_type", 1)
+			}
+			opts.Network = &file_shares.FileShareNetworkOpts{
 				NetworkID: c.String("network"),
 				SubnetID:  c.String("subnet"),
-			},
-			Access:   getAccessRules(c),
-			Metadata: map[string]string{},
+			}
 		}
 
 		results, err := file_shares.Create(client, opts).Extract()
