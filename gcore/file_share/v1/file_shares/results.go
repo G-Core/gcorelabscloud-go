@@ -86,7 +86,7 @@ type FileShare struct {
 	Protocol         string                          `json:"protocol"`
 	Status           FileShareStatus                 `json:"status"`
 	Size             int                             `json:"size"`
-	VolumeType       string                          `json:"volume_type"`
+	TypeName         string                          `json:"type_name"`
 	CreatedAt        *gcorecloud.JSONRFC3339MilliNoZ `json:"created_at"`
 	ShareNetworkName string                          `json:"share_network_name"`
 	NetworkID        *string                         `json:"network_id"`

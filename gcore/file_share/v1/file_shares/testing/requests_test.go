@@ -6,15 +6,18 @@ import (
 	"testing"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/file_share/v1/file_shares"
-	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata"
-	"github.com/G-Core/gcorelabscloud-go/pagination"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	th "github.com/G-Core/gcorelabscloud-go/testhelper"
-	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
-	log "github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/require"
+	fakeclient "github.com/G-Core/gcorelabscloud-go/testhelper/client"
+	"github.comcom/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 )
 
-const fileSharePath = "file_shares"
+const fileSharePath = "/fileshares/v1/shares"
+const fileShareListPath = "/fileshares/v1/shares"
+
+var (
+	client = client.NewClient()
+)
 
 func prepareListTestURLParams(projectID int, regionID int) string {
 	return fmt.Sprintf("/v1/file_shares/%d/%d", projectID, regionID)
@@ -25,11 +28,11 @@ func prepareGetTestURLParams(projectID int, regionID int, id string) string {
 }
 
 func prepareListTestURL() string {
-	return prepareListTestURLParams(fake.ProjectID, fake.RegionID)
+	return prepareListTestURLParams(client.ProjectID, client.RegionID)
 }
 
 func prepareGetTestURL(id string) string {
-	return prepareGetTestURLParams(fake.ProjectID, fake.RegionID, id)
+	return prepareGetTestURLParams(client.ProjectID, client.RegionID, id)
 }
 
 func prepareActionTestURLParams(projectID, regionID int, id, action string) string {
@@ -37,7 +40,7 @@ func prepareActionTestURLParams(projectID, regionID int, id, action string) stri
 }
 
 func prepareExtendActionTestURL(id string) string { // nolint
-	return prepareActionTestURLParams(fake.ProjectID, fake.RegionID, id, "extend")
+	return prepareActionTestURLParams(client.ProjectID, client.RegionID, id, "extend")
 }
 
 func prepareListAccessRuleTestURLParams(projectID int, regionID int, shareID string) string {
@@ -49,429 +52,389 @@ func prepareGetAccessRuleTestURLParams(projectID int, regionID int, shareID stri
 }
 
 func prepareListAccessRuleTestURL(shareID string) string {
-	return prepareListAccessRuleTestURLParams(fake.ProjectID, fake.RegionID, shareID)
+	return prepareListAccessRuleTestURLParams(client.ProjectID, client.RegionID, shareID)
 }
 
 func prepareGetAccessRuleTestURL(shareID string, ruleID string) string {
-	return prepareGetAccessRuleTestURLParams(fake.ProjectID, fake.RegionID, shareID, ruleID)
+	return prepareGetAccessRuleTestURLParams(client.ProjectID, client.RegionID, shareID, ruleID)
 }
 
 func prepareMetadataTestURL(id string) string {
-	return prepareActionTestURLParams(fake.ProjectID, fake.RegionID, id, "metadata")
+	return prepareActionTestURLParams(client.ProjectID, client.RegionID, id, "metadata")
 }
 
 func prepareMetadataItemTestURL(id string) string {
-	return fmt.Sprintf("/%s/file_shares/%d/%d/%s/%s", "v1", fake.ProjectID, fake.RegionID, id, "metadata_item")
+	return fmt.Sprintf("/%s/file_shares/%d/%d/%s/%s", "v1", client.ProjectID, client.RegionID, id, "metadata_item")
 }
 
 func TestList(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
+	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
 
-	th.Mux.HandleFunc(prepareListTestURL(), func(w http.ResponseWriter, r *http.Request) {
+	th.Mux.HandleFunc(fileShareListPath, func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "GET")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		_, err := fmt.Fprint(w, ListResponse)
-		if err != nil {
-			log.Error(err)
-		}
+
+		fmt.Fprintf(w, ListResponse)
 	})
 
-	client := fake.ServiceTokenClient(fileSharePath, "v1")
-	count := 0
-
-	err := file_shares.List(client).EachPage(func(page pagination.Page) (bool, error) {
-		count++
-		actual, err := file_shares.ExtractFileShares(page)
-		require.NoError(t, err)
-		ct := actual[0]
-		require.Equal(t, ListFileShare1, ct)
-		require.Equal(t, ExpectedFileShareSlice, actual)
-		return true, nil
-	})
-
+	pages, err := file_shares.List(client).AllPages()
 	th.AssertNoErr(t, err)
 
-	if count != 1 {
-		t.Errorf("Expected 1 page, got %d", count)
-	}
+	actual, err := file_shares.ExtractFileShares(pages)
+	th.AssertNoErr(t, err)
+
+	expected := []file_shares.FileShare{FirstFileShare}
+
+	th.CheckDeepEquals(t, expected, actual)
 }
 
 func TestListAll(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
+	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
 
-	th.Mux.HandleFunc(prepareListTestURL(), func(w http.ResponseWriter, r *http.Request) {
+	th.Mux.HandleFunc(fileShareListPath, func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "GET")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		_, err := fmt.Fprint(w, ListResponse)
-		if err != nil {
-			log.Error(err)
-		}
+
+		fmt.Fprintf(w, ListResponse)
 	})
 
-	client := fake.ServiceTokenClient(fileSharePath, "v1")
+	all, err := file_shares.ListAll(client)
+	th.AssertNoErr(t, err)
 
-	actual, err := file_shares.ListAll(client)
-	require.NoError(t, err)
-	ct := actual[0]
-	require.Equal(t, ListFileShare1, ct)
-	require.Equal(t, ExpectedFileShareSlice, actual)
-
+	expected := []file_shares.FileShare{FirstFileShare}
+	th.CheckDeepEquals(t, expected, all)
 }
 
 func TestGet(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
+	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
 
-	testURL := prepareGetTestURL(FileShare1.ID)
-
-	th.Mux.HandleFunc(testURL, func(w http.ResponseWriter, r *http.Request) {
+	th.Mux.HandleFunc(fmt.Sprintf("%s/%s", fileSharePath, FirstFileShare.ID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "GET")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 
-		_, err := fmt.Fprint(w, GetResponse)
-		if err != nil {
-			log.Error(err)
-		}
+		fmt.Fprint(w, GetResponse)
 	})
 
-	client := fake.ServiceTokenClient(fileSharePath, "v1")
+	actual, err := file_shares.Get(client, FirstFileShare.ID).Extract()
+	th.AssertNoErr(t, err)
 
-	ct, err := file_shares.Get(client, FileShare1.ID).Extract()
-
-	require.NoError(t, err)
-	require.Equal(t, FileShare1, *ct)
-	require.Equal(t, &createdTime, ct.CreatedAt)
+	th.CheckDeepEquals(t, &SecondFileShare, actual)
 }
 
 func TestCreate(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
+	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
 
-	th.Mux.HandleFunc(prepareListTestURL(), func(w http.ResponseWriter, r *http.Request) {
+	th.Mux.HandleFunc(fileSharePath, func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "POST")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
-		th.TestHeader(t, r, "Content-Type", "application/json")
-		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
 		th.TestJSONRequest(t, r, CreateRequest)
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
 
-		_, err := fmt.Fprint(w, CreateResponse)
-		if err != nil {
-			log.Error(err)
-		}
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusAccepted)
+
+		fmt.Fprint(w, CreateResponse)
 	})
 
-	options := file_shares.CreateOpts{
-		Name:     FileShare1.Name,
+	createOpts := file_shares.CreateOpts{
+		Name:     "myshare",
 		Protocol: "NFS",
 		Size:     13,
-		Network: file_shares.FileShareNetworkOpts{
+		Network: &file_shares.FileShareNetworkOpts{
 			NetworkID: "9b17dd07-1281-4fe0-8c13-d80c5725e297",
 			SubnetID:  "221f8318-cf2d-47a7-90f7-97acfa4ef165",
 		},
-		Metadata: map[string]string{"qqq": "that"},
+		Tags: map[string]string{
+			"qqq": "that",
+		},
 	}
+	res := file_shares.Create(client, createOpts)
+	th.AssertNoErr(t, res.Err)
 
-	client := fake.ServiceTokenClient(fileSharePath, "v1")
-	tasks, err := file_shares.Create(client, options).Extract()
-	require.NoError(t, err)
-	require.Equal(t, Tasks1, *tasks)
+	task, err := res.Extract()
+	th.AssertNoErr(t, err)
+
+	var expectedTasks = tasks.TaskResults{
+		Tasks: []tasks.TaskID{
+			"79dc7c30-44d2-4c5c-b5c1-e9a46f6bbf54",
+		},
+	}
+	th.CheckDeepEquals(t, &expectedTasks, task)
 }
 
 func TestDelete(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
+	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
 
-	th.Mux.HandleFunc(prepareGetTestURL(FileShare1.ID), func(w http.ResponseWriter, r *http.Request) {
+	th.Mux.HandleFunc(fmt.Sprintf("%s/%s", fileSharePath, FirstFileShare.ID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "DELETE")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
 		w.WriteHeader(http.StatusOK)
-		_, err := fmt.Fprint(w, DeleteResponse)
-		if err != nil {
-			log.Error(err)
-		}
+		fmt.Fprint(w, DeleteResponse)
 	})
 
-	client := fake.ServiceTokenClient(fileSharePath, "v1")
-	tasks, err := file_shares.Delete(client, FileShare1.ID).Extract()
-	require.NoError(t, err)
-	require.Equal(t, Tasks1, *tasks)
+	res := file_shares.Delete(client, FirstFileShare.ID)
+	th.AssertNoErr(t, res.Err)
 
+	task, err := res.Extract()
+	th.AssertNoErr(t, err)
+
+	var expectedTasks = tasks.TaskResults{
+		Tasks: []tasks.TaskID{
+			"79dc7c30-44d2-4c5c-b5c1-e9a46f6bbf54",
+		},
+	}
+	th.CheckDeepEquals(t, &expectedTasks, task)
 }
 
 func TestUpdate(t *testing.T) {
-
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
+	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
 
-	testURL := prepareGetTestURL(FileShare1.ID)
-
-	th.Mux.HandleFunc(testURL, func(w http.ResponseWriter, r *http.Request) {
+	th.Mux.HandleFunc(fmt.Sprintf("%s/%s", fileSharePath, FirstFileShare.ID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "PATCH")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
-		th.TestHeader(t, r, "Content-Type", "application/json")
-		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
 		th.TestJSONRequest(t, r, UpdateRequest)
+
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 
-		_, err := fmt.Fprint(w, UpdateResponse)
-		if err != nil {
-			log.Error(err)
-		}
+		fmt.Fprint(w, UpdateResponse)
 	})
 
-	client := fake.ServiceTokenClient(fileSharePath, "v1")
-
-	opts := file_shares.UpdateOpts{
+	updateOpts := file_shares.UpdateOpts{
 		Name: "myshareqqq",
 	}
-	ct, err := file_shares.Update(client, FileShare1.ID, opts).Extract()
 
-	FileShare1.Name = opts.Name
-	require.NoError(t, err)
-	require.Equal(t, FileShare1, *ct)
-	require.Equal(t, FileShare1.Name, ct.Name)
-	require.Equal(t, &createdTime, ct.CreatedAt)
+	actual, err := file_shares.Update(client, FirstFileShare.ID, updateOpts).Extract()
+	th.AssertNoErr(t, err)
+
+	th.CheckDeepEquals(t, &UpdatedFileShare, actual)
 }
 
 func TestExtend(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
+	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
 
-	testURL := prepareExtendActionTestURL(FileShare1.ID)
-
-	th.Mux.HandleFunc(testURL, func(w http.ResponseWriter, r *http.Request) {
+	th.Mux.HandleFunc(fmt.Sprintf("%s/%s/action", fileSharePath, FirstFileShare.ID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "POST")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
-		th.TestHeader(t, r, "Content-Type", "application/json")
-		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
 		th.TestJSONRequest(t, r, ExtendRequest)
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
 
-		_, err := fmt.Fprint(w, ExtendResponse)
-		if err != nil {
-			log.Error(err)
-		}
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusAccepted)
+
+		fmt.Fprint(w, ExtendResponse)
 	})
 
-	client := fake.ServiceTokenClient(fileSharePath, "v1")
-
-	opts := file_shares.ExtendOpts{
+	extendOpts := file_shares.ExtendOpts{
 		Size: 15,
 	}
-	ct, err := file_shares.Extend(client, FileShare1.ID, opts).Extract()
 
-	FileShare1.Size = opts.Size
-	require.NoError(t, err)
-	require.Equal(t, Tasks1, *ct)
+	res := file_shares.Extend(client, FirstFileShare.ID, extendOpts)
+	th.AssertNoErr(t, res.Err)
+
+	task, err := res.Extract()
+	th.AssertNoErr(t, err)
+
+	var expectedTasks = tasks.TaskResults{
+		Tasks: []tasks.TaskID{
+			"79dc7c30-44d2-4c5c-b5c1-e9a46f6bbf54",
+		},
+	}
+	th.CheckDeepEquals(t, &expectedTasks, task)
 }
 
 // Test file share access rules
 
-func TestListAccessRule(t *testing.T) {
+func TestListAccessRules(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
+	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
 
-	th.Mux.HandleFunc(prepareListAccessRuleTestURL(FileShare1.ID), func(w http.ResponseWriter, r *http.Request) {
+	th.Mux.HandleFunc(fmt.Sprintf("%s/%s/access-rules", fileSharePath, FirstFileShare.ID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "GET")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		_, err := fmt.Fprint(w, ListAccessRuleResponse)
-		if err != nil {
-			log.Error(err)
-		}
+
+		fmt.Fprint(w, ListAccessRuleResponse)
 	})
 
-	client := fake.ServiceTokenClient(fileSharePath, "v1")
-	count := 0
-
-	err := file_shares.ListAccessRules(client, FileShare1.ID).EachPage(func(page pagination.Page) (bool, error) {
-		count++
-		actual, err := file_shares.ExtractAccessRule(page)
-		require.NoError(t, err)
-		ct := actual[0]
-		require.Equal(t, AccessRule1, ct)
-		require.Equal(t, ExpectedAccessRuleSlice, actual)
-		return true, nil
-	})
-
+	pages, err := file_shares.ListAccessRules(client, FirstFileShare.ID).AllPages()
 	th.AssertNoErr(t, err)
 
-	if count != 1 {
-		t.Errorf("Expected 1 page, got %d", count)
-	}
+	actual, err := file_shares.ExtractAccessRule(pages)
+	th.AssertNoErr(t, err)
+
+	th.CheckDeepEquals(t, []file_shares.AccessRule{FirstAccessRule}, actual)
 }
 
 func TestCreateAccessRule(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
+	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
 
-	th.Mux.HandleFunc(prepareListAccessRuleTestURL(FileShare1.ID), func(w http.ResponseWriter, r *http.Request) {
+	th.Mux.HandleFunc(fmt.Sprintf("%s/%s/access-rules", fileSharePath, FirstFileShare.ID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "POST")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
-		th.TestHeader(t, r, "Content-Type", "application/json")
-		th.TestHeader(t, r, "Accept", "application/json")
-		th.TestJSONRequest(t, r, CreateAccessRuleRequest)
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
+
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 
-		_, err := fmt.Fprint(w, CreateAccessRuleResponse)
-		if err != nil {
-			log.Error(err)
-		}
+		fmt.Fprint(w, CreateAccessRuleResponse)
 	})
 
-	options := file_shares.CreateAccessRuleOpts{
+	createOpts := file_shares.CreateAccessRuleOpts{
 		IPAddress:  "10.100.100.0/24",
 		AccessMode: "rw",
 	}
 
-	client := fake.ServiceTokenClient(fileSharePath, "v1")
-	result, err := file_shares.CreateAccessRule(client, FileShare1.ID, options).Extract()
-	require.NoError(t, err)
-	require.Equal(t, &CreatedAccessRule, result)
+	actual, err := file_shares.CreateAccessRule(client, FirstFileShare.ID, createOpts).Extract()
+	th.AssertNoErr(t, err)
+
+	th.CheckDeepEquals(t, &SecondAccessRule, actual)
 }
 
 func TestDeleteAccessRule(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
+	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
 
-	th.Mux.HandleFunc(prepareGetAccessRuleTestURL(FileShare1.ID, AccessRule1.ID), func(w http.ResponseWriter, r *http.Request) {
+	th.Mux.HandleFunc(fmt.Sprintf("%s/%s/access-rules/%s", fileSharePath, FirstFileShare.ID, FirstAccessRule.ID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "DELETE")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
+
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	client := fake.ServiceTokenClient(fileSharePath, "v1")
-	err := file_shares.DeleteAccessRule(client, FileShare1.ID, AccessRule1.ID).ExtractErr()
-	require.NoError(t, err)
+	res := file_shares.DeleteAccessRule(client, FirstFileShare.ID, FirstAccessRule.ID)
+	th.AssertNoErr(t, res.Err)
 }
 
 // Metadata tests
 
-func TestMetadataListAll(t *testing.T) {
+func TestMetadataList(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
+	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
 
-	th.Mux.HandleFunc(prepareMetadataTestURL(FileShare1.ID), func(w http.ResponseWriter, r *http.Request) {
+	th.Mux.HandleFunc(fmt.Sprintf("%s/%s/metadata", fileSharePath, FirstFileShare.ID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "GET")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		_, err := fmt.Fprint(w, MetadataListResponse)
-		if err != nil {
-			log.Error(err)
-		}
+
+		fmt.Fprint(w, MetadataListResponse)
 	})
 
-	client := fake.ServiceTokenClient(fileSharePath, "v1")
+	pages, err := file_shares.MetadataList(client, FirstFileShare.ID).AllPages()
+	th.AssertNoErr(t, err)
 
-	actual, err := metadata.MetadataListAll(client, FileShare1.ID)
-	require.NoError(t, err)
-	ct := actual[0]
-	require.Equal(t, Metadata1, ct)
-	require.Equal(t, ExpectedMetadataList, actual)
+	actual, err := file_shares.ExtractMetadata(pages)
+	th.AssertNoErr(t, err)
+
+	th.CheckDeepEquals(t, []metadata.Metadata{FirstMetadata, SecondMetadata}, actual)
 }
 
 func TestMetadataGet(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
+	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
 
-	th.Mux.HandleFunc(prepareMetadataItemTestURL(FileShare1.ID), func(w http.ResponseWriter, r *http.Request) {
+	th.Mux.HandleFunc(fmt.Sprintf("%s/%s/metadata/%s", fileSharePath, FirstFileShare.ID, SecondMetadata.Key), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "GET")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		_, err := fmt.Fprint(w, MetadataResponse)
-		if err != nil {
-			log.Error(err)
-		}
+
+		fmt.Fprint(w, MetadataResponse)
 	})
 
-	client := fake.ServiceTokenClient(fileSharePath, "v1")
+	actual, err := file_shares.MetadataGet(client, FirstFileShare.ID, SecondMetadata.Key).Extract()
+	th.AssertNoErr(t, err)
 
-	actual, err := metadata.MetadataGet(client, FileShare1.ID, Metadata2.Key).Extract()
-	require.NoError(t, err)
-	require.Equal(t, &Metadata2, actual)
+	th.CheckDeepEquals(t, &SecondMetadata, actual)
 }
 
 func TestMetadataCreate(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
+	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
 
-	th.Mux.HandleFunc(prepareMetadataTestURL(FileShare1.ID), func(w http.ResponseWriter, r *http.Request) {
+	th.Mux.HandleFunc(fmt.Sprintf("%s/%s/metadata", fileSharePath, FirstFileShare.ID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "POST")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
 
-		th.TestHeader(t, r, "Content-Type", "application/json")
-		th.TestHeader(t, r, "Accept", "application/json")
-		th.TestJSONRequest(t, r, MetadataCreateRequest)
 		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNoContent)
+		w.WriteHeader(http.StatusOK)
+
+		fmt.Fprint(w, MetadataListResponse)
 	})
 
-	client := fake.ServiceTokenClient(fileSharePath, "v1")
-	err := metadata.MetadataCreateOrUpdate(client, FileShare1.ID, map[string]string{
+	res := file_shares.MetadataCreateOrUpdate(client, FirstFileShare.ID, map[string]interface{}{
 		"test1": "test1",
 		"test2": "test2",
-	}).ExtractErr()
-	require.NoError(t, err)
+	})
+	th.AssertNoErr(t, res.Err)
 }
 
 func TestMetadataUpdate(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
+	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
 
-	th.Mux.HandleFunc(prepareMetadataTestURL(FileShare1.ID), func(w http.ResponseWriter, r *http.Request) {
-		th.TestMethod(t, r, "PUT")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+	th.Mux.HandleFunc(fmt.Sprintf("%s/%s/metadata", fileSharePath, FirstFileShare.ID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
 
-		th.TestHeader(t, r, "Content-Type", "application/json")
-		th.TestHeader(t, r, "Accept", "application/json")
-		th.TestJSONRequest(t, r, MetadataCreateRequest)
 		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNoContent)
+		w.WriteHeader(http.StatusOK)
+
+		fmt.Fprint(w, MetadataListResponse)
 	})
 
-	client := fake.ServiceTokenClient(fileSharePath, "v1")
-	err := metadata.MetadataReplace(client, FileShare1.ID, map[string]string{
+	res := file_shares.MetadataCreateOrUpdate(client, FirstFileShare.ID, map[string]interface{}{
 		"test1": "test1",
 		"test2": "test2",
-	}).ExtractErr()
-	require.NoError(t, err)
+	})
+	th.AssertNoErr(t, res.Err)
 }
 
 func TestMetadataDelete(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
+	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
 
-	th.Mux.HandleFunc(prepareMetadataItemTestURL(FileShare1.ID), func(w http.ResponseWriter, r *http.Request) {
+	th.Mux.HandleFunc(fmt.Sprintf("%s/%s/metadata/%s", fileSharePath, FirstFileShare.ID, "test"), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "DELETE")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
-		th.TestHeader(t, r, "Accept", "application/json")
-		w.Header().Add("Content-Type", "application/json")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
+
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	client := fake.ServiceTokenClient(fileSharePath, "v1")
-	err := metadata.MetadataDelete(client, FileShare1.ID, Metadata1.Key).ExtractErr()
-	require.NoError(t, err)
+	res := file_shares.MetadataDelete(client, FirstFileShare.ID, "test")
+	th.AssertNoErr(t, res.Err)
 }
