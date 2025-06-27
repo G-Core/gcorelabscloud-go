@@ -17,7 +17,7 @@ var ListResponse = `
 		"task_id": null,
 		"connection_point": "10.33.20.241:/shares/share-e1dca5e4-257d-47c2-82ac-980fa43e0da9",
 		"status": "available",
-		"volume_type": "default_share_type",
+		"type_name": "default_share_type",
 		"creator_task_id": "79dc7c30-44d2-4c5c-b5c1-e9a46f6bbf54",
 		"created_at": "2023-08-01T14:32:41.465031",
 		"name": "myshare",
@@ -53,7 +53,7 @@ var GetResponse = `
     "task_id": null,
     "connection_point": "10.33.20.241:/shares/share-e1dca5e4-257d-47c2-82ac-980fa43e0da9",
     "status": "available",
-    "volume_type": "default_share_type",
+    "type_name": "default_share_type",
     "creator_task_id": "79dc7c30-44d2-4c5c-b5c1-e9a46f6bbf54",
     "created_at": "2023-08-01T14:32:41.465031",
     "network_name": "usernet",
@@ -90,7 +90,7 @@ var UpdateResponse = `
     "task_id": null,
     "connection_point": "10.33.20.241:/shares/share-e1dca5e4-257d-47c2-82ac-980fa43e0da9",
     "status": "available",
-    "volume_type": "default_share_type",
+    "type_name": "default_share_type",
     "creator_task_id": "79dc7c30-44d2-4c5c-b5c1-e9a46f6bbf54",
     "created_at": "2023-08-01T14:32:41.465031",
     "network_name": "usernet",
@@ -131,7 +131,7 @@ const CreateRequest = `
     },
     "protocol": "NFS",
     "size": 13,
-    "metadata": {
+    "tags": {
         "qqq": "that"
     }
 }
@@ -254,7 +254,7 @@ var (
 		Protocol:         "NFS",
 		Status:           file_shares.StatusAvailable,
 		Size:             13,
-		VolumeType:       "default_share_type",
+		TypeName:         "cephfs",
 		CreatedAt:        &createdTime,
 		ShareNetworkName: "File_share_ivandshare2_network",
 		NetworkName:      &networkName,
@@ -277,7 +277,7 @@ var (
 		Protocol:         "NFS",
 		Status:           file_shares.StatusAvailable,
 		Size:             13,
-		VolumeType:       "default_share_type",
+		TypeName:         "cephfs",
 		CreatedAt:        &createdTime,
 		ShareNetworkName: "",
 		ConnectionPoint:  "10.33.20.241:/shares/share-e1dca5e4-257d-47c2-82ac-980fa43e0da9",
@@ -329,4 +329,99 @@ var (
 		ReadOnly: true,
 	}
 	ExpectedMetadataList = []metadata.Metadata{Metadata1, Metadata2}
+
+	FirstFileShare = file_shares.FileShare{
+		TaskID:          nil,
+		ConnectionPoint: "10.33.20.241:/shares/share-e1dca5e4-257d-47c2-82ac-980fa43e0da9",
+		Status:          "available",
+		TypeName:        "default_share_type",
+		CreatorTaskID:   &creatorTaskID,
+		CreatedAt:       &createdTime,
+		Name:            "myshare",
+		Size:            13,
+		Protocol:        "NFS",
+		ID:              "8fba32f8-dc70-4ac2-be9c-ed6b02927c0e",
+		Region:          "ED-10",
+		RegionID:        2,
+		ProjectID:       5,
+		Metadata:        map[string]interface{}{"task_id": "79dc7c30-44d2-4c5c-b5c1-e9a46f6bbf54", "qqq": "that"},
+	}
+
+	SecondFileShare = file_shares.FileShare{
+		TaskID:           nil,
+		ConnectionPoint:  "10.33.20.241:/shares/share-e1dca5e4-257d-47c2-82ac-980fa43e0da9",
+		Status:           "available",
+		TypeName:         "default_share_type",
+		CreatorTaskID:    &creatorTaskID,
+		CreatedAt:        &createdTime,
+		NetworkName:      &networkName,
+		Name:             "myshare",
+		Size:             13,
+		ShareNetworkName: "File_share_ivandshare2_network",
+		Protocol:         "NFS",
+		ID:               "8fba32f8-dc70-4ac2-be9c-ed6b02927c0e",
+		SubnetName:       &subnetName,
+		Metadata:         map[string]interface{}{"task_id": "79dc7c30-44d2-4c5c-b5c1-e9a46f6bbf54", "qqq": "that"},
+		Region:           "ED-10",
+		RegionID:         2,
+		ProjectID:        5,
+	}
+
+	UpdatedFileShare = file_shares.FileShare{
+		TaskID:           nil,
+		ConnectionPoint:  "10.33.20.241:/shares/share-e1dca5e4-257d-47c2-82ac-980fa43e0da9",
+		Status:           "available",
+		TypeName:         "default_share_type",
+		CreatorTaskID:    &creatorTaskID,
+		CreatedAt:        &createdTime,
+		NetworkName:      &networkName,
+		Name:             "myshareqqq",
+		Size:             13,
+		ShareNetworkName: "File_share_ivandshare2_network",
+		Protocol:         "NFS",
+		ID:               "8fba32f8-dc70-4ac2-be9c-ed6b02927c0e",
+		SubnetName:       &subnetName,
+		Metadata:         map[string]interface{}{"task_id": "79dc7c30-44d2-4c5c-b5c1-e9a46f6bbf54", "qqq": "that"},
+		Region:           "ED-10",
+		RegionID:         2,
+		ProjectID:        5,
+	}
+
+	FirstAccessRule = file_shares.AccessRule{
+		ID:          "6a0a0be1-5875-4a0a-82dd-bab2eef8cb3f",
+		State:       "active",
+		AccessTo:    "10.17.18.10",
+		AccessLevel: "ro",
+	}
+
+	SecondAccessRule = file_shares.AccessRule{
+		ID:          "6a0a0be1-5875-4a0a-82dd-bab2eef8cbaa",
+		State:       "active",
+		AccessTo:    "10.100.100.0/24",
+		AccessLevel: "rw",
+	}
+
+	FirstMetadata = metadata.Metadata{
+		Key:      "qqq",
+		Value:    "that",
+		ReadOnly: false,
+	}
+
+	SecondMetadata = metadata.Metadata{
+		Key:      "task_id",
+		Value:    "47e8d97b-0318-4d3e-91c6-53a0e0016f81",
+		ReadOnly: true,
+	}
+	Task = tasks.Task{
+		ID:        "79dc7c30-44d2-4c5c-b5c1-e9a46f6bbf54",
+		State:     "RUNNING",
+		TaskType:  "SFS_CREATE_SHARE",
+		CreatedOn: gcorecloud.JSONRFC3339NoZ{Time: createdTime.Time},
+		UpdatedOn: &gcorecloud.JSONRFC3339NoZ{Time: createdTime.Time},
+		CreatedResources: &map[string]interface{}{
+			"file_shares": []interface{}{
+				"8fba32f8-dc70-4ac2-be9c-ed6b02927c0e",
+			},
+		},
+	}
 )
