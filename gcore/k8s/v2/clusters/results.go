@@ -87,11 +87,19 @@ type CNI struct {
 	Cilium   *Cilium     `json:"cilium,omitempty"`
 }
 
+type CSI struct {
+	NFS *NFS `json:"nfs,omitempty"`
+}
+
 type DDoSProfile struct {
 	Enabled             bool               `json:"enabled,omitempty"`
 	Fields              []DDoSProfileField `json:"fields,omitempty"`
 	ProfileTemplate     *int               `json:"profile_template,omitempty"`
 	ProfileTemplateName *string            `json:"profile_template_name,omitempty"`
+}
+
+type NFS struct {
+	VASTEnabled bool `json:"vast_enabled"`
 }
 
 // Cluster represents a cluster structure.
@@ -108,6 +116,7 @@ type Cluster struct {
 	Authentication   *Authentication     `json:"authentication,omitempty"`
 	AutoscalerConfig map[string]string   `json:"autoscaler_config,omitempty"`
 	CNI              *CNI                `json:"cni,omitempty"`
+	CSI              *CSI                `json:"csi,omitempty"`
 	FixedNetwork     string              `json:"fixed_network"`
 	FixedSubnet      string              `json:"fixed_subnet"`
 	PodsIPPool       *gcorecloud.CIDR    `json:"pods_ip_pool,omitempty" validate:"omitempty,cidr"`
