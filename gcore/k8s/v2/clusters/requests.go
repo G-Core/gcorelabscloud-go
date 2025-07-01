@@ -77,6 +77,10 @@ type CNICreateOpts struct {
 	Cilium   *CiliumCreateOpts `json:"cilium,omitempty"`
 }
 
+type CSICreateOpts struct {
+	NFS *NFSCreateOpts `json:"nfs,omitempty" validate:"omitempty,dive"`
+}
+
 type DDoSProfileCreateOpts struct {
 	Enabled             bool               `json:"enabled"`
 	Fields              []DDoSProfileField `json:"fields,omitempty"`
@@ -84,12 +88,17 @@ type DDoSProfileCreateOpts struct {
 	ProfileTemplateName *string            `json:"profile_template_name,omitempty"`
 }
 
+type NFSCreateOpts struct {
+	VASTEnabled bool `json:"vast_enabled"`
+}
+
 // CreateOpts represents options used to create a cluster.
 type CreateOpts struct {
 	Name             string                    `json:"name" required:"true" validate:"required,gt=0,lte=20"`
 	Authentication   *AuthenticationCreateOpts `json:"authentication,omitempty" validate:"omitempty"`
 	AutoscalerConfig map[string]string         `json:"autoscaler_config,omitempty" validate:"omitempty"`
-	CNI              *CNICreateOpts            `json:"cni,omitempty" validate:"omitempty"`
+	CNI              *CNICreateOpts            `json:"cni,omitempty" validate:"omitempty,dive"`
+	CSI              *CSICreateOpts            `json:"csi,omitempty" validate:"omitempty,dive"`
 	DDoSProfile      *DDoSProfileCreateOpts    `json:"ddos_profile,omitempty" validate:"omitempty"`
 	FixedNetwork     string                    `json:"fixed_network" validate:"omitempty,uuid4"`
 	FixedSubnet      string                    `json:"fixed_subnet" validate:"omitempty,uuid4"`
