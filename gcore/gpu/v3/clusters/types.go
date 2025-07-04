@@ -29,7 +29,9 @@ const (
 
 	New       ClusterStatusType = "new"
 	Active    ClusterStatusType = "active"
+	Resizing  ClusterStatusType = "resizing"
 	Suspended ClusterStatusType = "suspended"
+	Deleting  ClusterStatusType = "deleting"
 	Error     ClusterStatusType = "error"
 
 	NewVolume VolumeSource = "new"
@@ -156,10 +158,6 @@ func (it *IPFamilyType) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	v := IPFamilyType(s)
-	err := v.IsValid()
-	if err != nil {
-		return err
-	}
 	*it = v
 	return nil
 }
@@ -218,10 +216,6 @@ func (vt *VolumeType) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	v := VolumeType(s)
-	err := v.IsValid()
-	if err != nil {
-		return err
-	}
 	*vt = v
 	return nil
 }
@@ -278,10 +272,6 @@ func (ct *ClusterStatusType) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	v := ClusterStatusType(s)
-	err := v.IsValid()
-	if err != nil {
-		return err
-	}
 	*ct = v
 	return nil
 }
@@ -345,10 +335,6 @@ func (ca *ClusterAction) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	v := ClusterAction(s)
-	err := v.IsValid()
-	if err != nil {
-		return err
-	}
 	*ca = v
 	return nil
 }
