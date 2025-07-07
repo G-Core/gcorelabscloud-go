@@ -2,8 +2,6 @@ package file_shares
 
 import (
 	"fmt"
-	"strings"
-
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/client/file_shares/v1/client"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
@@ -70,7 +68,12 @@ var fileShareCreateCommand = cli.Command{
 		},
 		&cli.StringSliceFlag{
 			Name:     "metadata",
-			Usage:    "File share tags. Example: --metadata one=two --metadata three=four",
+			Usage:    "File share tags (deprecated, use --tags). Example: --metadata one=two --metadata three=four",
+			Required: false,
+		},
+		&cli.StringSliceFlag{
+			Name:     "tags",
+			Usage:    "File share tags. Example: --tags one=two --tags three=four",
 			Required: false,
 		},
 	}, flags.WaitCommandFlags...,
@@ -82,11 +85,16 @@ var fileShareCreateCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
-		tags := make(map[string]string)
-		for _, v := range c.StringSlice("metadata") {
-			parts := strings.SplitN(v, "=", 2)
-			if len(parts) == 2 {
-				tags[parts[0]] = parts[1]
+		var tags map[string]string
+		if len(c.StringSlice("tags")) > 0 {
+			tags, err = utils.StringSliceToTags(c.StringSlice("tags"))
+			if err != nil {
+				return cli.Exit(err, 1)
+			}
+		} else if len(c.StringSlice("metadata")) > 0 {
+			tags, err = utils.StringSliceToTags(c.StringSlice("metadata"))
+			if err != nil {
+				return cli.Exit(err, 1)
 			}
 		}
 
