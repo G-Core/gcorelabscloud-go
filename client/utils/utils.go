@@ -412,7 +412,7 @@ func StructToString(item interface{}) string {
 
 func StringSliceToTags(slice []string) (map[string]string, error) {
 	if len(slice) == 0 {
-		return nil, nil
+		return nil, fmt.Errorf("no tags provided")
 	}
 	m := make(map[string]string, len(slice))
 	for _, s := range slice {

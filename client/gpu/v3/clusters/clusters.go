@@ -2,7 +2,6 @@ package clusters
 
 import (
 	"fmt"
-
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/client/gpu/v3/client"
@@ -246,8 +245,21 @@ func updateTagsClusterAction(c *cli.Context, newClient func(ctx *cli.Context) (*
 		return cli.Exit(err, 1)
 	}
 
-	tags, err := utils.StringSliceToTags(c.StringSlice("tags"))
-	results, err := clusters.UpdateTags(gpuClient, clusterID, tags).Extract()
+	tagsToAddOrReplace, err := utils.StringSliceToTags(c.StringSlice("tags"))
+	tagsToRemove := c.StringSlice("remove-tags")
+	if len(tagsToAddOrReplace) == 0 && len(tagsToRemove) == 0 {
+		_ = cli.ShowCommandHelp(c, "updatetags")
+		return cli.Exit("at least one of `tags` or `remove-tags` must be specified", 1)
+	}
+	tags := map[string]*string{}
+	for tagKey, tagValue := range tagsToAddOrReplace {
+		tags[tagKey] = utils.StringToPointer(tagValue)
+	}
+	for _, tagKey := range tagsToRemove {
+		tags[tagKey] = nil // nil value indicates removal of the tag
+	}
+	results, err := clusters.UpdateAndRemoveTags(gpuClient, clusterID, tags).Extract()
+
 	if err != nil {
 		return cli.Exit(err, 1)
 	}
@@ -792,6 +804,12 @@ func VirtualCommands() *cli.Command {
 						Name:     "tags",
 						Aliases:  []string{"t"},
 						Usage:    "cluster key-value tags. Example: --tags key1=value1 --tags key2=value2",
+						Required: false,
+					},
+					&cli.StringSliceFlag{
+						Name:     "remove-tags",
+						Aliases:  []string{"rt"},
+						Usage:    "cluster tag names. Example: --remove-tags key1 --remove-tags key2",
 						Required: false,
 					},
 				}, flags.WaitCommandFlags...),

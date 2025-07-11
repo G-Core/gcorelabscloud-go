@@ -204,9 +204,9 @@ type CreateClusterOptsBuilder interface {
 
 // ClusterActionsOpts allows extensions to add parameters to cluster actions.
 type ClusterActionsOpts struct {
-	Action       ClusterAction     `json:"action" required:"true" validate:"required,enum"`
-	ServersCount int               `json:"servers_count,omitempty" validate:"rfe=Action:resize,gt=-1"`
-	UpdateTags   map[string]string `json:"tags,omitempty" validate:"rfe=Action:update_tags"`
+	Action       ClusterAction      `json:"action" required:"true" validate:"required,enum"`
+	ServersCount int                `json:"servers_count,omitempty" validate:"rfe=Action:resize,gt=-1"`
+	UpdateTags   map[string]*string `json:"tags"`
 }
 
 // Validate checks if the provided options are valid.
@@ -305,6 +305,37 @@ func Resize(client *gcorecloud.ServiceClient, clusterID string, serversCount int
 }
 
 func UpdateTags(client *gcorecloud.ServiceClient, clusterID string, tags map[string]string) (r tasks.Result) {
+	convertedTags := make(map[string]*string, len(tags))
+	for k, v := range tags {
+		val := v
+		convertedTags[k] = &val
+	}
+	opts := ClusterActionsOpts{
+		Action:     UpdateTagsClusterAction,
+		UpdateTags: convertedTags,
+	}
+	return ApplyAction(client, clusterID, opts)
+}
+
+func RemoveTags(client *gcorecloud.ServiceClient, clusterID string, tags []string) (r tasks.Result) {
+	opts := ClusterActionsOpts{
+		Action:     UpdateTagsClusterAction,
+		UpdateTags: make(map[string]*string, len(tags)),
+	}
+	for _, tag := range tags {
+		opts.UpdateTags[tag] = nil // nil value indicates removal of the tag
+	}
+	return ApplyAction(client, clusterID, opts)
+}
+
+func RemoveAllTags(client *gcorecloud.ServiceClient, clusterID string) (r tasks.Result) {
+	opts := ClusterActionsOpts{
+		Action: UpdateTagsClusterAction,
+	}
+	return ApplyAction(client, clusterID, opts)
+}
+
+func UpdateAndRemoveTags(client *gcorecloud.ServiceClient, clusterID string, tags map[string]*string) (r tasks.Result) {
 	opts := ClusterActionsOpts{
 		Action:     UpdateTagsClusterAction,
 		UpdateTags: tags,
