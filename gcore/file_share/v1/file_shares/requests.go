@@ -273,3 +273,37 @@ func MetadataGet(client *gcorecloud.ServiceClient, id string, key string) (r Met
 	_, r.Err = client.Get(url, &r.Body, nil) // nolint
 	return
 }
+
+// CheckLimitOpts represents options used to check file share limits.
+type CheckLimitOpts struct {
+	Size int `json:"size" required:"true" validate:"required,gt=1"`
+}
+
+// ToCheckLimitsMap builds a request body from ResizeOpts.
+func (opts CheckLimitOpts) ToCheckLimitsMap() (map[string]interface{}, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, err
+	}
+	return gcorecloud.BuildRequestBody(opts, "")
+}
+
+// Validate validates the CheckLimitOpts structure.
+func (opts CheckLimitOpts) Validate() error {
+	return gcorecloud.TranslateValidationError(gcorecloud.Validate.Struct(opts))
+}
+
+// CheckLimitsOptsBuilder allows extensions to add additional parameters to the CheckLimits request.
+type CheckLimitsOptsBuilder interface {
+	ToCheckLimitsMap() (map[string]interface{}, error)
+}
+
+// CheckLimits checks the limits for creating a file share with the specified size.
+func CheckLimits(c *gcorecloud.ServiceClient, opts CheckLimitsOptsBuilder) (r CheckLimitsResult) {
+	b, err := opts.ToCheckLimitsMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = c.Post(checkLimitsURL(c), b, &r.Body, nil)
+	return
+}

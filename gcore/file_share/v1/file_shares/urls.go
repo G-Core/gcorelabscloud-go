@@ -55,3 +55,7 @@ func metadataURL(c *gcorecloud.ServiceClient, id string) string {
 func metadataItemURL(c *gcorecloud.ServiceClient, id string, key string) string {
 	return resourceActionURL(c, id, fmt.Sprintf("metadata_item?key=%s", key))
 }
+
+func checkLimitsURL(c *gcorecloud.ServiceClient) string {
+	return c.ServiceURL("check_limits")
+}

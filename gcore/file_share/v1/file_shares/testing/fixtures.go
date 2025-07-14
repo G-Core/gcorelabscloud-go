@@ -425,3 +425,29 @@ var (
 		},
 	}
 )
+
+const CheckLimitsRequest = `
+{
+    "size": 1001
+}
+`
+
+const CheckLimitsResponse = `
+{
+    "sfs_count_limit": 10,
+    "sfs_count_requested": 1,
+    "sfs_count_usage": 2,
+    "sfs_size_limit": 1000,
+    "sfs_size_requested": 1001,
+    "sfs_size_usage": 900
+}
+`
+
+var ExpectedCheckLimitsQuota = file_shares.FileShareQuota{
+	CountLimit:     10,
+	CountRequested: 1,
+	CountUsage:     2,
+	SizeLimit:      1000,
+	SizeRequested:  1001,
+	SizeUsage:      900,
+}
