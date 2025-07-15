@@ -47,7 +47,7 @@ type CreateOpts struct {
 	Name       string                 `json:"name" required:"true" validate:"required"`
 	VolumeType string                 `json:"volume_type,omitempty" validate:"omitempty,oneof=default_share_type vast_share_type"`
 	Protocol   string                 `json:"protocol" required:"true" validate:"required,oneof=NFS"`
-	Size       int                    `json:"size" required:"true" validate:"required,gt=1"`
+	Size       int                    `json:"size" required:"true" validate:"required,gt=0"`
 	Network    *FileShareNetworkOpts  `json:"network,omitempty" validate:"omitempty,dive"`
 	Access     []CreateAccessRuleOpts `json:"access,omitempty" validate:"dive"`
 	Tags       map[string]string      `json:"tags,omitempty"`
@@ -133,7 +133,7 @@ func Delete(c *gcorecloud.ServiceClient, fileShareID string) (r tasks.Result) {
 
 // ExtendOpts represents options used to resize a file share.
 type ExtendOpts struct {
-	Size int `json:"size" required:"true" validate:"required,gt=1"`
+	Size int `json:"size" required:"true" validate:"required,gt=0"`
 }
 
 // ToFileShareResizeMap builds a request body from ResizeOpts.
