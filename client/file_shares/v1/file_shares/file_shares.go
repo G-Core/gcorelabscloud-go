@@ -104,7 +104,7 @@ var fileShareCreateCommand = cli.Command{
 			return cli.Exit("--volume-type must be either 'default_share_type' or 'vast_share_type'", 1)
 		}
 
-		// Validate if user provider network and subnet for vast_share_type, which are automatically set
+		// Validate if user provided network and subnet for vast_share_type, which are automatically set
 		// for vast_share_type, so they should not be provided by user.
 		if volumeType == "vast_share_type" && (c.String("network") != "" || c.String("subnet") != "") {
 			return cli.Exit("--network and/or --subnet should not be provided for vast_share_type", 1)
@@ -121,8 +121,8 @@ var fileShareCreateCommand = cli.Command{
 
 		// Validate if user provided network and subnet for default_share_type, which are required.
 		if opts.VolumeType == "default_share_type" {
-			if c.String("network") == "" || c.String("subnet") == "" {
-				return cli.Exit("--network and --subnet are required for volume-type=default_share_type (default)", 1)
+			if c.String("network") == "" {
+				return cli.Exit("--network is required for volume-type=default_share_type (default)", 1)
 			}
 			opts.Network = &file_shares.FileShareNetworkOpts{
 				NetworkID: c.String("network"),
