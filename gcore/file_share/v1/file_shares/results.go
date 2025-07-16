@@ -292,3 +292,23 @@ func ExtractMetadata(r pagination.Page) ([]Metadata, error) {
 type MetadataActionResult struct {
 	gcorecloud.ErrResult
 }
+
+type CheckLimitsResult struct {
+	gcorecloud.Result
+}
+
+// Extract is a function that accepts a result and extracts a file share quota.
+func (r CheckLimitsResult) Extract() (*FileShareQuota, error) {
+	var s FileShareQuota
+	err := r.ExtractInto(&s)
+	return &s, err
+}
+
+type FileShareQuota struct {
+	CountLimit     int `json:"sfs_count_limit"`
+	CountRequested int `json:"sfs_count_requested"`
+	CountUsage     int `json:"sfs_count_usage"`
+	SizeLimit      int `json:"sfs_size_limit"`
+	SizeRequested  int `json:"sfs_size_requested"`
+	SizeUsage      int `json:"sfs_size_usage"`
+}

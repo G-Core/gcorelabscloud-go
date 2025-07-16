@@ -67,6 +67,10 @@ func prepareMetadataItemTestURL(id string) string {
 	return fmt.Sprintf("/%s/file_shares/%d/%d/%s/%s", "v1", client.ProjectID, client.RegionID, id, "metadata_item")
 }
 
+func prepareCheckLimitsTestURL() string {
+	return fmt.Sprintf("/v1/file_shares/%d/%d/check_limits", fake.ProjectID, fake.RegionID)
+}
+
 func TestList(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
@@ -437,4 +441,56 @@ func TestMetadataDelete(t *testing.T) {
 
 	res := file_shares.MetadataDelete(client, FirstFileShare.ID, "test")
 	th.AssertNoErr(t, res.Err)
+}
+
+func TestCheckLimitsSizeNotExceeded(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareCheckLimitsTestURL(), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestJSONRequest(t, r, CheckLimitsRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, `{}`)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient(fileSharePath, "v1")
+	opts := file_shares.CheckLimitOpts{
+		Size: 1001,
+	}
+	result, err := file_shares.CheckLimits(client, opts).Extract()
+	require.NoError(t, err)
+	require.Equal(t, &file_shares.FileShareQuota{}, result)
+}
+
+func TestCheckLimitsSizeExceeded(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareCheckLimitsTestURL(), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "POST")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestJSONRequest(t, r, CheckLimitsRequest)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, CheckLimitsResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient(fileSharePath, "v1")
+	opts := file_shares.CheckLimitOpts{
+		Size: 1001,
+	}
+	result, err := file_shares.CheckLimits(client, opts).Extract()
+	require.NoError(t, err)
+	require.Equal(t, &ExpectedCheckLimitsQuota, result)
 }
