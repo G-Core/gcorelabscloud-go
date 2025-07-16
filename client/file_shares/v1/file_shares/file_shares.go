@@ -2,7 +2,6 @@ package file_shares
 
 import (
 	"fmt"
-
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/client/file_shares/v1/client"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
@@ -30,6 +29,12 @@ var fileShareCreateCommand = cli.Command{
 			Required: true,
 		},
 		&cli.StringFlag{
+			Name:     "volume-type",
+			Usage:    "File share volume type (default_share_type or vast_share_type)",
+			Value:    "default_share_type",
+			Required: false,
+		},
+		&cli.StringFlag{
 			Name:     "protocol",
 			Aliases:  []string{"p"},
 			Usage:    "File share protocol",
@@ -43,13 +48,13 @@ var fileShareCreateCommand = cli.Command{
 		},
 		&cli.StringFlag{
 			Name:     "network",
-			Usage:    "File share network id",
-			Required: true,
+			Usage:    "File share network id (required for default_share_type)",
+			Required: false,
 		},
 		&cli.StringFlag{
 			Name:     "subnet",
 			Usage:    "File share subnet id",
-			Required: true,
+			Required: false,
 		},
 		&cli.StringSliceFlag{
 			Name:     "acl-source-address",
@@ -63,7 +68,12 @@ var fileShareCreateCommand = cli.Command{
 		},
 		&cli.StringSliceFlag{
 			Name:     "metadata",
-			Usage:    "instance metadata. Example: --metadata one=two --metadata three=four",
+			Usage:    "File share tags (deprecated, use --tags). Example: --metadata one=two --metadata three=four",
+			Required: false,
+		},
+		&cli.StringSliceFlag{
+			Name:     "tags",
+			Usage:    "File share tags. Example: --tags one=two --tags three=four",
 			Required: false,
 		},
 	}, flags.WaitCommandFlags...,
@@ -72,27 +82,60 @@ var fileShareCreateCommand = cli.Command{
 		client, err := client.NewFileShareClientV1(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
+		}
+
+		var tags map[string]string
+		if len(c.StringSlice("tags")) > 0 {
+			tags, err = utils.StringSliceToTags(c.StringSlice("tags"))
+			if err != nil {
+				return cli.Exit(err, 1)
+			}
+		} else if len(c.StringSlice("metadata")) > 0 {
+			tags, err = utils.StringSliceToTags(c.StringSlice("metadata"))
+			if err != nil {
+				return cli.Exit(err, 1)
+			}
+		}
+
+		// Validate volume-type
+		volumeType := c.String("volume-type")
+		if volumeType != "default_share_type" && volumeType != "vast_share_type" {
+			return cli.Exit("--volume-type must be either 'default_share_type' or 'vast_share_type'", 1)
+		}
+
+		// Validate if user provided network and subnet for vast_share_type, which are automatically set
+		// for vast_share_type, so they should not be provided by user.
+		if volumeType == "vast_share_type" && (c.String("network") != "" || c.String("subnet") != "") {
+			return cli.Exit("--network and/or --subnet should not be provided for vast_share_type", 1)
 		}
 
 		opts := file_shares.CreateOpts{
-			Name:     c.String("name"),
-			Protocol: c.String("protocol"),
-			Size:     c.Int("size"),
-			Network: file_shares.FileShareNetworkOpts{
+			Name:       c.String("name"),
+			VolumeType: c.String("volume-type"),
+			Protocol:   c.String("protocol"),
+			Size:       c.Int("size"),
+			Access:     getAccessRules(c),
+			Tags:       tags,
+		}
+
+		// Validate if user provided network and subnet for default_share_type, which are required.
+		if opts.VolumeType == "default_share_type" {
+			if c.String("network") == "" {
+				return cli.Exit("--network is required for volume-type=default_share_type (default)", 1)
+			}
+			opts.Network = &file_shares.FileShareNetworkOpts{
 				NetworkID: c.String("network"),
 				SubnetID:  c.String("subnet"),
-			},
-			Access:   getAccessRules(c),
-			Metadata: map[string]string{},
+			}
 		}
 
 		results, err := file_shares.Create(client, opts).Extract()
 		if err != nil {
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		if results == nil {
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		return utils.WaitTaskAndShowResult(c, client, results, true, func(task tasks.TaskID) (interface{}, error) {
 			taskInfo, err := tasks.Get(client, string(task)).Extract()
@@ -143,14 +186,14 @@ var fileShareGetCommand = cli.Command{
 		client, err := client.NewFileShareClientV1(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		fileShare, err := file_shares.Get(client, fileShareID).Extract()
 		if err != nil {
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		if fileShare == nil {
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		utils.ShowResults(fileShare, c.String("format"))
 		return nil
@@ -174,22 +217,22 @@ var fileShareUpdateCommand = cli.Command{
 		fileShareID, err := flags.GetFirstStringArg(c, fileShareIDText)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		client, err := client.NewFileShareClientV1(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		opts := file_shares.UpdateOpts{
 			Name: c.String("name"),
 		}
 		fileShare, err := file_shares.Update(client, fileShareID, opts).Extract()
 		if err != nil {
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		if fileShare == nil {
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		utils.ShowResults(fileShare, c.String("format"))
 		return nil
@@ -214,22 +257,22 @@ var fileShareResizeCommand = cli.Command{
 		fileShareID, err := flags.GetFirstStringArg(c, fileShareIDText)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		client, err := client.NewFileShareClientV1(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		opts := file_shares.ExtendOpts{
 			Size: c.Int("size"),
 		}
 		results, err := file_shares.Extend(client, fileShareID, opts).Extract()
 		if err != nil {
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		if results == nil {
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		return utils.WaitTaskAndShowResult(c, client, results, true, func(task tasks.TaskID) (interface{}, error) {
 			fileShare, err := file_shares.Get(client, fileShareID).Extract()
@@ -255,14 +298,14 @@ var fileShareDeleteCommand = cli.Command{
 		client, err := client.NewFileShareClientV1(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		results, err := file_shares.Delete(client, fileShareID).Extract()
 		if err != nil {
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		if results == nil {
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 
 		return utils.WaitTaskAndShowResult(c, client, results, false, func(task tasks.TaskID) (interface{}, error) {
@@ -288,15 +331,15 @@ var fileShareListCommand = cli.Command{
 		client, err := client.NewFileShareClientV1(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		pages, err := file_shares.List(client).AllPages()
 		if err != nil {
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		results, err := file_shares.ExtractFileShares(pages)
 		if err != nil {
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		utils.ShowResults(results, c.String("format"))
 		return nil
@@ -317,15 +360,15 @@ var fileShareAccessRuleListCommand = cli.Command{
 		client, err := client.NewFileShareClientV1(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		pages, err := file_shares.ListAccessRules(client, fileShareID).AllPages()
 		if err != nil {
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		results, err := file_shares.ExtractAccessRule(pages)
 		if err != nil {
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		utils.ShowResults(results, c.String("format"))
 		return nil
@@ -358,7 +401,7 @@ var fileShareAccessRuleCreateCommand = cli.Command{
 		client, err := client.NewFileShareClientV1(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		opts := file_shares.CreateAccessRuleOpts{
 			IPAddress:  c.String("acl-source-address"),
@@ -366,10 +409,10 @@ var fileShareAccessRuleCreateCommand = cli.Command{
 		}
 		accessRule, err := file_shares.CreateAccessRule(client, fileShareID, opts).Extract()
 		if err != nil {
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		if accessRule == nil {
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		utils.ShowResults(accessRule, c.String("format"))
 		return nil
@@ -379,7 +422,7 @@ var fileShareAccessRuleCreateCommand = cli.Command{
 func GetSecondStringArg(c *cli.Context, errorText string) (string, error) {
 	arg := c.Args().Get(1)
 	if arg == "" {
-		return "", cli.NewExitError(fmt.Errorf(errorText), 1)
+		return "", cli.Exit(fmt.Errorf(errorText), 1)
 	}
 	return arg, nil
 }
@@ -403,11 +446,11 @@ var fileShareAccessRuleDeleteCommand = cli.Command{
 		client, err := client.NewFileShareClientV1(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		err = file_shares.DeleteAccessRule(client, fileShareID, accessRuleID).ExtractErr()
 		if err != nil {
-			return cli.NewExitError(err, 1)
+			return cli.Exit(err, 1)
 		}
 		return nil
 	},

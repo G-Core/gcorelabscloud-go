@@ -34,7 +34,8 @@ var validStatuses = map[FileShareStatus]struct{}{
 // Validate checks if the status is valid.
 func (s FileShareStatus) Validate() error {
 	if _, ok := validStatuses[s]; !ok {
-		return fmt.Errorf("invalid status: %s", s)
+		fmt.Printf("unknown file share status: %s", s)
+		return nil
 	}
 	return nil
 }
@@ -79,6 +80,14 @@ type UpdateResult struct {
 	commonResult
 }
 
+// Tag represents a key-value pair used to tag resources like file shares, servers, volumes, etc.
+// Some tags are read-only and cannot be modified by the user.
+type Tag struct {
+	Key      string `json:"key"`
+	Value    string `json:"value"`
+	ReadOnly bool   `json:"read_only"`
+}
+
 // FileShare represents a file share structure.
 type FileShare struct {
 	Name             string                          `json:"name"`
@@ -86,20 +95,22 @@ type FileShare struct {
 	Protocol         string                          `json:"protocol"`
 	Status           FileShareStatus                 `json:"status"`
 	Size             int                             `json:"size"`
-	VolumeType       string                          `json:"volume_type"`
+	TypeName         string                          `json:"type_name"`
 	CreatedAt        *gcorecloud.JSONRFC3339MilliNoZ `json:"created_at"`
-	ShareNetworkName string                          `json:"share_network_name"`
-	NetworkID        *string                         `json:"network_id"`
-	NetworkName      *string                         `json:"network_name"`
-	SubnetID         *string                         `json:"subnet_id"`
-	SubnetName       *string                         `json:"subnet_name"`
-	ConnectionPoint  string                          `json:"connection_point"`
+	ShareNetworkName *string                         `json:"share_network_name"`
+	NetworkID        string                          `json:"network_id"`
+	NetworkName      string                          `json:"network_name"`
+	SubnetID         string                          `json:"subnet_id"`
+	SubnetName       string                          `json:"subnet_name"`
+	ConnectionPoint  *string                         `json:"connection_point"`
 	TaskID           *string                         `json:"task_id"`
-	CreatorTaskID    *string                         `json:"creator_task_id"`
+	CreatorTaskID    string                          `json:"creator_task_id"`
 	ProjectID        int                             `json:"project_id"`
 	RegionID         int                             `json:"region_id"`
 	Region           string                          `json:"region"`
 	Metadata         map[string]interface{}          `json:"metadata"`
+	Tags             []Tag                           `json:"tags"`
+	VolumeType       string                          `json:"volume_type"`
 }
 
 // Validate validates the FileShare structure.
