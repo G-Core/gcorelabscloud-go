@@ -97,6 +97,11 @@ var fileShareCreateCommand = cli.Command{
 				return cli.Exit(err, 1)
 			}
 		}
+		convertedTags := make(map[string]*string, len(tags))
+		for k, v := range tags {
+			val := v
+			convertedTags[k] = &val
+		}
 
 		// Validate volume-type
 		volumeType := c.String("volume-type")
@@ -116,7 +121,7 @@ var fileShareCreateCommand = cli.Command{
 			Protocol:   c.String("protocol"),
 			Size:       c.Int("size"),
 			Access:     getAccessRules(c),
-			Tags:       tags,
+			Tags:       convertedTags,
 		}
 
 		// Validate if user provided network and subnet for default_share_type, which are required.
@@ -210,7 +215,19 @@ var fileShareUpdateCommand = cli.Command{
 			Name:     "name",
 			Aliases:  []string{"n"},
 			Usage:    "File share name",
-			Required: true,
+			Required: false,
+		},
+		&cli.StringSliceFlag{
+			Name:     "tags",
+			Aliases:  []string{"t"},
+			Usage:    "File share key-value tags. Example: --tags key1=value1 --tags key2=value2",
+			Required: false,
+		},
+		&cli.StringSliceFlag{
+			Name:     "remove-tags",
+			Aliases:  []string{"rt"},
+			Usage:    "File share tag names. Example: --remove-tags key1 --remove-tags key2",
+			Required: false,
 		},
 	},
 	Action: func(c *cli.Context) error {
@@ -224,9 +241,26 @@ var fileShareUpdateCommand = cli.Command{
 			_ = cli.ShowAppHelp(c)
 			return cli.Exit(err, 1)
 		}
-		opts := file_shares.UpdateOpts{
-			Name: c.String("name"),
+
+		tagsToAddOrReplace, err := utils.StringSliceToTags(c.StringSlice("tags"))
+		tagsToRemove := c.StringSlice("remove-tags")
+		if c.String("name") == "" && len(tagsToAddOrReplace) == 0 && len(tagsToRemove) == 0 {
+			_ = cli.ShowCommandHelp(c, "update")
+			return cli.Exit("At least one of the flags --name, --tags or --remove-tags must be provided", 1)
 		}
+
+		opts := file_shares.UpdateOpts{}
+		if c.String("name") != "" {
+			opts.Name = c.String("name")
+		}
+		tags := map[string]*string{}
+		for tagKey, tagValue := range tagsToAddOrReplace {
+			tags[tagKey] = utils.StringToPointer(tagValue)
+		}
+		for _, tagKey := range tagsToRemove {
+			tags[tagKey] = nil // nil value indicates removal of the tag
+		}
+		opts.Tags = tags
 		fileShare, err := file_shares.Update(client, fileShareID, opts).Extract()
 		if err != nil {
 			return cli.Exit(err, 1)
