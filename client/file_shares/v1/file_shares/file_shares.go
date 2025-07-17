@@ -97,11 +97,6 @@ var fileShareCreateCommand = cli.Command{
 				return cli.Exit(err, 1)
 			}
 		}
-		convertedTags := make(map[string]*string, len(tags))
-		for k, v := range tags {
-			val := v
-			convertedTags[k] = &val
-		}
 
 		// Validate volume-type
 		volumeType := c.String("volume-type")
@@ -121,7 +116,7 @@ var fileShareCreateCommand = cli.Command{
 			Protocol:   c.String("protocol"),
 			Size:       c.Int("size"),
 			Access:     getAccessRules(c),
-			Tags:       convertedTags,
+			Tags:       tags,
 		}
 
 		// Validate if user provided network and subnet for default_share_type, which are required.
