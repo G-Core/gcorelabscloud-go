@@ -50,7 +50,7 @@ type CreateOpts struct {
 	Size       int                    `json:"size" required:"true" validate:"required,gt=0"`
 	Network    *FileShareNetworkOpts  `json:"network,omitempty" validate:"omitempty,dive"`
 	Access     []CreateAccessRuleOpts `json:"access,omitempty" validate:"dive"`
-	Tags       map[string]string      `json:"tags,omitempty"`
+	Tags       map[string]*string     `json:"tags"`
 }
 
 // ToFileShareCreateMap builds a request body from CreateOpts.
@@ -90,7 +90,8 @@ type UpdateOptsBuilder interface {
 
 // UpdateOpts represents options used to update a file share.
 type UpdateOpts struct {
-	Name string `json:"name" required:"true" validate:"required"`
+	Name string             `json:"name,omitempty"`
+	Tags map[string]*string `json:"tags"`
 }
 
 // ResizeOptsBuilder has parameters for resize request.
@@ -306,4 +307,47 @@ func CheckLimits(c *gcorecloud.ServiceClient, opts CheckLimitsOptsBuilder) (r Ch
 	}
 	_, r.Err = c.Post(checkLimitsURL(c), b, &r.Body, nil)
 	return
+}
+
+// Rename updates the name of an existing file share.
+func Rename(client *gcorecloud.ServiceClient, fileShareID string, newName string) (r UpdateResult) {
+	opts := UpdateOpts{Name: newName, Tags: make(map[string]*string)}
+	r = Update(client, fileShareID, opts)
+	return
+}
+
+// UpdateTags updates the tags (adds or replaces) of an existing file share.
+func UpdateTags(client *gcorecloud.ServiceClient, fileShareID string, tags map[string]string) (r UpdateResult) {
+	convertedTags := make(map[string]*string, len(tags))
+	for k, v := range tags {
+		val := v
+		convertedTags[k] = &val
+	}
+	opts := UpdateOpts{Tags: convertedTags}
+	r = Update(client, fileShareID, opts)
+	return r
+}
+
+// RemoveTags removes specified tags from an existing file share.
+func RemoveTags(client *gcorecloud.ServiceClient, fileShareID string, tags []string) (r UpdateResult) {
+	opts := UpdateOpts{Tags: make(map[string]*string, len(tags))}
+	for _, tag := range tags {
+		opts.Tags[tag] = nil // Setting the value to nil indicates removal of the tag
+	}
+	r = Update(client, fileShareID, opts)
+	return r
+}
+
+// RemoveAllTags removes all (custom) tags from an existing file share.
+func RemoveAllTags(client *gcorecloud.ServiceClient, fileShareID string) (r UpdateResult) {
+	opts := UpdateOpts{Tags: nil}
+	r = Update(client, fileShareID, opts)
+	return r
+}
+
+// UpdateAndRemoveTags updates existing, adds new, and removes specified tags in a single operation.
+func UpdateAndRemoveTags(client *gcorecloud.ServiceClient, fileShareID string, tags map[string]*string) (r UpdateResult) {
+	opts := UpdateOpts{Tags: tags}
+	r = Update(client, fileShareID, opts)
+	return r
 }
