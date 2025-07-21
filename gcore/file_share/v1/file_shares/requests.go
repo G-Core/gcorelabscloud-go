@@ -84,14 +84,27 @@ func Create(c *gcorecloud.ServiceClient, opts CreateOptsBuilder) (r tasks.Result
 }
 
 // UpdateOptsBuilder allows extensions to add additional parameters to the Update request.
+//
+// Deprecated: Use UpdateWithTagsOptsBuilder instead for more flexible tag management.
 type UpdateOptsBuilder interface {
 	ToFileShareUpdateMap() (map[string]interface{}, error)
 }
 
 // UpdateOpts represents options used to update a file share.
+//
+// Deprecated: Use UpdateWithTagsOpts instead for more flexible tag management.
 type UpdateOpts struct {
+	Name string `json:"name" required:"true" validate:"required"`
+}
+
+type UpdateWithTagsOpts struct {
 	Name string             `json:"name,omitempty"`
 	Tags map[string]*string `json:"tags"`
+}
+
+// UpdateWithTagsOptsBuilder allows extensions to add additional parameters to the UpdateWithTags request.
+type UpdateWithTagsOptsBuilder interface {
+	ToFileShareUpdateWithTagsMap() (map[string]interface{}, error)
 }
 
 // ResizeOptsBuilder has parameters for resize request.
@@ -100,6 +113,8 @@ type ResizeOptsBuilder interface {
 }
 
 // ToFileShareUpdateMap builds a request body from UpdateOpts.
+//
+// Deprecated: Use ToFileShareUpdateWithTagsMap instead for more flexible tag management.
 func (opts UpdateOpts) ToFileShareUpdateMap() (map[string]interface{}, error) {
 	if err := opts.Validate(); err != nil {
 		return nil, err
@@ -107,13 +122,30 @@ func (opts UpdateOpts) ToFileShareUpdateMap() (map[string]interface{}, error) {
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
-// Validate
+// Validate validates the UpdateWithTagsOpts structure.
+func (opts UpdateWithTagsOpts) Validate() error {
+	return gcorecloud.TranslateValidationError(gcorecloud.Validate.Struct(opts))
+}
+
+// ToFileShareUpdateWithTagsMap builds a request body from UpdateWithTagsOpts.
+func (opts UpdateWithTagsOpts) ToFileShareUpdateWithTagsMap() (map[string]interface{}, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, err
+	}
+	return gcorecloud.BuildRequestBody(opts, "")
+}
+
+// Validate validates the UpdateOpts structure.
+//
+// Deprecated: Use UpdateWithOpts instead for more flexible tag management.
 func (opts UpdateOpts) Validate() error {
 	return gcorecloud.TranslateValidationError(gcorecloud.Validate.Struct(opts))
 }
 
 // Update accepts a UpdateOpts struct and updates an existing file share using the
 // values provided. For more information, see the Create function.
+//
+// Deprecated: Use UpdateWithTags instead for more flexible tag management.
 func Update(c *gcorecloud.ServiceClient, fileShareID string, opts UpdateOptsBuilder) (r UpdateResult) {
 	b, err := opts.ToFileShareUpdateMap()
 	if err != nil {
@@ -309,10 +341,25 @@ func CheckLimits(c *gcorecloud.ServiceClient, opts CheckLimitsOptsBuilder) (r Ch
 	return
 }
 
+// UpdateWithTags accepts a UpdateWithTagsOpts struct and updates an existing file share using the
+// values provided. For more information, see the Create function.
+// Use this method to update many properties of a file share in a single request.
+func UpdateWithTags(c *gcorecloud.ServiceClient, fileShareID string, opts UpdateWithTagsOpts) (r UpdateResult) {
+	b, err := opts.ToFileShareUpdateWithTagsMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = c.Patch(updateURL(c, fileShareID), b, &r.Body, &gcorecloud.RequestOpts{
+		OkCodes: []int{200, 201},
+	})
+	return
+}
+
 // Rename updates the name of an existing file share.
 func Rename(client *gcorecloud.ServiceClient, fileShareID string, newName string) (r UpdateResult) {
-	opts := UpdateOpts{Name: newName, Tags: make(map[string]*string)}
-	r = Update(client, fileShareID, opts)
+	opts := UpdateWithTagsOpts{Name: newName, Tags: make(map[string]*string)}
+	r = UpdateWithTags(client, fileShareID, opts)
 	return
 }
 
@@ -323,31 +370,31 @@ func UpdateTags(client *gcorecloud.ServiceClient, fileShareID string, tags map[s
 		val := v
 		convertedTags[k] = &val
 	}
-	opts := UpdateOpts{Tags: convertedTags}
-	r = Update(client, fileShareID, opts)
+	opts := UpdateWithTagsOpts{Tags: convertedTags}
+	r = UpdateWithTags(client, fileShareID, opts)
 	return r
 }
 
 // RemoveTags removes specified tags from an existing file share.
 func RemoveTags(client *gcorecloud.ServiceClient, fileShareID string, tags []string) (r UpdateResult) {
-	opts := UpdateOpts{Tags: make(map[string]*string, len(tags))}
+	opts := UpdateWithTagsOpts{Tags: make(map[string]*string, len(tags))}
 	for _, tag := range tags {
 		opts.Tags[tag] = nil // Setting the value to nil indicates removal of the tag
 	}
-	r = Update(client, fileShareID, opts)
+	r = UpdateWithTags(client, fileShareID, opts)
 	return r
 }
 
 // RemoveAllTags removes all (custom) tags from an existing file share.
 func RemoveAllTags(client *gcorecloud.ServiceClient, fileShareID string) (r UpdateResult) {
-	opts := UpdateOpts{Tags: nil}
-	r = Update(client, fileShareID, opts)
+	opts := UpdateWithTagsOpts{Tags: nil}
+	r = UpdateWithTags(client, fileShareID, opts)
 	return r
 }
 
 // UpdateAndRemoveTags updates existing, adds new, and removes specified tags in a single operation.
 func UpdateAndRemoveTags(client *gcorecloud.ServiceClient, fileShareID string, tags map[string]*string) (r UpdateResult) {
-	opts := UpdateOpts{Tags: tags}
-	r = Update(client, fileShareID, opts)
+	opts := UpdateWithTagsOpts{Tags: tags}
+	r = UpdateWithTags(client, fileShareID, opts)
 	return r
 }

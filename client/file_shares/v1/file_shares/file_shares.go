@@ -244,7 +244,7 @@ var fileShareUpdateCommand = cli.Command{
 			return cli.Exit("At least one of the flags --name, --tags or --remove-tags must be provided", 1)
 		}
 
-		opts := file_shares.UpdateOpts{}
+		opts := file_shares.UpdateWithTagsOpts{}
 		if c.String("name") != "" {
 			opts.Name = c.String("name")
 		}
@@ -256,7 +256,7 @@ var fileShareUpdateCommand = cli.Command{
 			tags[tagKey] = nil // nil value indicates removal of the tag
 		}
 		opts.Tags = tags
-		fileShare, err := file_shares.Update(client, fileShareID, opts).Extract()
+		fileShare, err := file_shares.UpdateWithTags(client, fileShareID, opts).Extract()
 		if err != nil {
 			return cli.Exit(err, 1)
 		}
