@@ -33,6 +33,10 @@ func listServersAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud
 	return nil
 }
 
+func listBaremetalServersAction(c *cli.Context) error {
+	return listServersAction(c, client.NewGPUBaremetalClientV3)
+}
+
 func listVirtualServersAction(c *cli.Context) error {
 	return listServersAction(c, client.NewGPUVirtualClientV3)
 }
@@ -81,8 +85,56 @@ func deleteServerAction(c *cli.Context, newClient func(*cli.Context) (*gcoreclou
 	})
 }
 
+func deleteBaremetalServerAction(c *cli.Context) error {
+	return deleteServerAction(c, client.NewGPUBaremetalClientV3)
+}
+
 func deleteVirtualServerAction(c *cli.Context) error {
 	return deleteServerAction(c, client.NewGPUVirtualClientV3)
+}
+
+// BaremetalCommands returns commands for baremetal GPU servers
+func BaremetalCommands() *cli.Command {
+	return &cli.Command{
+		Name:        "servers",
+		Usage:       "Manage baremetal GPU cluster servers",
+		Description: "Commands for managing servers in baremetal GPU clusters",
+		Subcommands: []*cli.Command{
+			{
+				Name:        "list",
+				Usage:       "List servers in a baremetal GPU cluster",
+				Description: "List all servers in a specific baremetal GPU cluster",
+				Category:    "servers",
+				ArgsUsage:   "<cluster_id>",
+				Action:      listBaremetalServersAction,
+			},
+			{
+				Name:        "delete",
+				Usage:       "Delete server from a baremetal GPU cluster",
+				Description: "Delete a specific server from a baremetal GPU cluster",
+				Category:    "servers",
+				ArgsUsage:   "<cluster_id> <server_id>",
+				Flags: append([]cli.Flag{
+					&cli.BoolFlag{
+						Name:     "delete-all-floating-ips",
+						Usage:    "delete all server floating ips",
+						Required: false,
+					},
+					&cli.BoolFlag{
+						Name:     "delete-all-reserved-fixed-ips",
+						Usage:    "delete all server reserved fixed ips",
+						Required: false,
+					},
+					&cli.BoolFlag{
+						Name:     "delete-all-volumes",
+						Usage:    "delete all server volumes",
+						Required: false,
+					},
+				}, flags.WaitCommandFlags...),
+				Action: deleteBaremetalServerAction,
+			},
+		},
+	}
 }
 
 // VirtualCommands returns commands for virtual GPU servers
