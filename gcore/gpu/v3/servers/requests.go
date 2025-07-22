@@ -42,7 +42,7 @@ func (opts DeleteServerOpts) ToServerDeleteQuery() (string, error) {
 func List(client *gcorecloud.ServiceClient, clusterID string) pagination.Pager {
 	url := ClusterServersURL(client, clusterID)
 	return pagination.NewPager(client, url, func(r pagination.PageResult) pagination.Page {
-		return ServerPage{pagination.LinkedPageBase{PageResult: r}}
+		return ServerPage{pagination.OffsetPageBase{PageResult: r}}
 	})
 }
 

@@ -17,6 +17,7 @@ var baremetalCommands = cli.Command{
 		images.BaremetalCommands(),
 		flavors.BaremetalCommands(),
 		clusters.BaremetalCommands(),
+		servers.BaremetalCommands(),
 	},
 }
 
