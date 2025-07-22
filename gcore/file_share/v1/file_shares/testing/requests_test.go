@@ -2,21 +2,23 @@ package testing
 
 import (
 	"fmt"
+	log "github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/require"
 	"net/http"
 	"testing"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/file_share/v1/file_shares"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	th "github.com/G-Core/gcorelabscloud-go/testhelper"
-	fakeclient "github.com/G-Core/gcorelabscloud-go/testhelper/client"
-	"github.comcom/G-Core/gcorelabscloud-go/gcore/utils/metadata"
+	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
 )
 
 const fileSharePath = "/fileshares/v1/shares"
 const fileShareListPath = "/fileshares/v1/shares"
 
 var (
-	client = client.NewClient()
+	client = fake.ServiceClient()
 )
 
 func prepareListTestURLParams(projectID int, regionID int) string {
@@ -74,11 +76,11 @@ func prepareCheckLimitsTestURL() string {
 func TestList(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
-	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
+	client := fake.ServiceTokenClient(fileSharePath, "v1")
 
 	th.Mux.HandleFunc(fileShareListPath, func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "GET")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -100,11 +102,11 @@ func TestList(t *testing.T) {
 func TestListAll(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
-	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
+	client := fake.ServiceTokenClient(fileSharePath, "v1")
 
 	th.Mux.HandleFunc(fileShareListPath, func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "GET")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -122,11 +124,11 @@ func TestListAll(t *testing.T) {
 func TestGet(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
-	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
+	client := fake.ServiceTokenClient(fileSharePath, "v1")
 
 	th.Mux.HandleFunc(fmt.Sprintf("%s/%s", fileSharePath, FirstFileShare.ID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "GET")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -143,11 +145,11 @@ func TestGet(t *testing.T) {
 func TestCreate(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
-	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
+	client := fake.ServiceTokenClient(fileSharePath, "v1")
 
 	th.Mux.HandleFunc(fileSharePath, func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "POST")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 		th.TestJSONRequest(t, r, CreateRequest)
 
 		w.Header().Add("Content-Type", "application/json")
@@ -185,11 +187,11 @@ func TestCreate(t *testing.T) {
 func TestDelete(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
-	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
+	client := fake.ServiceTokenClient(fileSharePath, "v1")
 
 	th.Mux.HandleFunc(fmt.Sprintf("%s/%s", fileSharePath, FirstFileShare.ID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "DELETE")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprint(w, DeleteResponse)
 	})
@@ -211,11 +213,11 @@ func TestDelete(t *testing.T) {
 func TestUpdate(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
-	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
+	client := fake.ServiceTokenClient(fileSharePath, "v1")
 
 	th.Mux.HandleFunc(fmt.Sprintf("%s/%s", fileSharePath, FirstFileShare.ID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "PATCH")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 		th.TestJSONRequest(t, r, UpdateRequest)
 
 		w.Header().Add("Content-Type", "application/json")
@@ -237,11 +239,11 @@ func TestUpdate(t *testing.T) {
 func TestExtend(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
-	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
+	client := fake.ServiceTokenClient(fileSharePath, "v1")
 
 	th.Mux.HandleFunc(fmt.Sprintf("%s/%s/action", fileSharePath, FirstFileShare.ID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "POST")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 		th.TestJSONRequest(t, r, ExtendRequest)
 
 		w.Header().Add("Content-Type", "application/json")
@@ -273,11 +275,11 @@ func TestExtend(t *testing.T) {
 func TestListAccessRules(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
-	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
+	client := fake.ServiceTokenClient(fileSharePath, "v1")
 
 	th.Mux.HandleFunc(fmt.Sprintf("%s/%s/access-rules", fileSharePath, FirstFileShare.ID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "GET")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -297,11 +299,11 @@ func TestListAccessRules(t *testing.T) {
 func TestCreateAccessRule(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
-	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
+	client := fake.ServiceTokenClient(fileSharePath, "v1")
 
 	th.Mux.HandleFunc(fmt.Sprintf("%s/%s/access-rules", fileSharePath, FirstFileShare.ID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "POST")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -323,11 +325,11 @@ func TestCreateAccessRule(t *testing.T) {
 func TestDeleteAccessRule(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
-	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
+	client := fake.ServiceTokenClient(fileSharePath, "v1")
 
 	th.Mux.HandleFunc(fmt.Sprintf("%s/%s/access-rules/%s", fileSharePath, FirstFileShare.ID, FirstAccessRule.ID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "DELETE")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 
 		w.WriteHeader(http.StatusNoContent)
 	})
@@ -341,11 +343,11 @@ func TestDeleteAccessRule(t *testing.T) {
 func TestMetadataList(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
-	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
+	client := fake.ServiceTokenClient(fileSharePath, "v1")
 
 	th.Mux.HandleFunc(fmt.Sprintf("%s/%s/metadata", fileSharePath, FirstFileShare.ID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "GET")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -365,11 +367,11 @@ func TestMetadataList(t *testing.T) {
 func TestMetadataGet(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
-	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
+	client := fake.ServiceTokenClient(fileSharePath, "v1")
 
 	th.Mux.HandleFunc(fmt.Sprintf("%s/%s/metadata/%s", fileSharePath, FirstFileShare.ID, SecondMetadata.Key), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "GET")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -386,11 +388,11 @@ func TestMetadataGet(t *testing.T) {
 func TestMetadataCreate(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
-	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
+	client := fake.ServiceTokenClient(fileSharePath, "v1")
 
 	th.Mux.HandleFunc(fmt.Sprintf("%s/%s/metadata", fileSharePath, FirstFileShare.ID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "POST")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -408,11 +410,11 @@ func TestMetadataCreate(t *testing.T) {
 func TestMetadataUpdate(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
-	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
+	client := fake.ServiceTokenClient(fileSharePath, "v1")
 
 	th.Mux.HandleFunc(fmt.Sprintf("%s/%s/metadata", fileSharePath, FirstFileShare.ID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "POST")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -430,11 +432,11 @@ func TestMetadataUpdate(t *testing.T) {
 func TestMetadataDelete(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
-	client := fakeclient.ServiceTokenClient(fileSharePath, "v1")
+	client := fake.ServiceTokenClient(fileSharePath, "v1")
 
 	th.Mux.HandleFunc(fmt.Sprintf("%s/%s/metadata/%s", fileSharePath, FirstFileShare.ID, "test"), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "DELETE")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fakeclient.AccessToken))
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 
 		w.WriteHeader(http.StatusNoContent)
 	})
