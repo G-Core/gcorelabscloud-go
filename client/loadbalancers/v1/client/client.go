@@ -23,6 +23,10 @@ func NewLBPoolClientV1(c *cli.Context) (*gcorecloud.ServiceClient, error) {
 	return common.BuildClient(c, "lbpools", "v1")
 }
 
+func NewLBPoolClientV2(c *cli.Context) (*gcorecloud.ServiceClient, error) {
+	return common.BuildClient(c, "lbpools", "v2")
+}
+
 func NewLBFlavorClientV1(c *cli.Context) (*gcorecloud.ServiceClient, error) {
 	return common.BuildClient(c, "lbflavors", "v1")
 }

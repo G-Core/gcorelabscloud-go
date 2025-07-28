@@ -822,7 +822,7 @@ var lbpoolUpdateSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "update")
 			return err
 		}
-		client, err := client.NewLBPoolClientV1(c)
+		client, err := client.NewLBPoolClientV2(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
@@ -914,7 +914,7 @@ var lbpoolUnsetSubCommand = cli.Command{
 			_ = cli.ShowCommandHelp(c, "unset")
 			return err
 		}
-		client, err := client.NewLBPoolClientV1(c)
+		client, err := client.NewLBPoolClientV2(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.NewExitError(err, 1)
