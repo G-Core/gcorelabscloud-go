@@ -118,7 +118,7 @@ type ServerCredentialsOpts struct {
 
 type ServerSettingsOpts struct {
 	Interfaces     []InterfaceOpts        `json:"interfaces"`
-	SecurityGroups []string               `json:"security_groups,omitempty"`
+	SecurityGroups []gcorecloud.ItemID    `json:"security_groups" validate:"omitempty,dive,uuid4"`
 	Volumes        []VolumeOpts           `json:"volumes"`
 	UserData       *string                `json:"user_data,omitempty"`
 	Credentials    *ServerCredentialsOpts `json:"credentials,omitempty"`
