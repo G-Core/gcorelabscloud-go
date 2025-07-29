@@ -2,6 +2,7 @@ package clusters
 
 import (
 	"fmt"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/client/gpu/v3/client"
@@ -388,10 +389,19 @@ func getServerSettings(c *cli.Context) (clusters.ServerSettingsOpts, error) {
 		Interfaces:     []clusters.InterfaceOpts{interfaceOpts},
 		Volumes:        []clusters.VolumeOpts{volumeOpts},
 		Credentials:    &credentialOpts,
-		SecurityGroups: c.StringSlice("security-groups"),
+		SecurityGroups: getItemIDs(c, "security-groups"),
 		UserData:       StringPtrExcludeEmpty(c, "user-data"),
 	}
 	return serverSettings, nil
+}
+
+func getItemIDs(c *cli.Context, name string) []gcorecloud.ItemID {
+	ids := c.StringSlice(name)
+	res := make([]gcorecloud.ItemID, len(ids))
+	for i, id := range ids {
+		res[i] = gcorecloud.ItemID{ID: id}
+	}
+	return res
 }
 
 func StringPtrExcludeEmpty(c *cli.Context, name string) *string {
