@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"os"
+	"runtime/debug"
 	"strings"
 	"sync"
 	"time"
@@ -19,10 +20,31 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+func init() {
+	loadAppVersion()
+}
+
+func loadAppVersion() {
+	info, ok := debug.ReadBuildInfo()
+	if !ok {
+		return
+	}
+	for _, dep := range info.Deps {
+		if dep.Path == "github.com/G-Core/gcorelabscloud-go" {
+			if dep.Replace != nil {
+				AppVersion = strings.TrimPrefix(dep.Replace.Version, "v")
+			} else {
+				AppVersion = strings.TrimPrefix(dep.Version, "v")
+			}
+			break
+		}
+	}
+}
+
 // DefaultUserAgent is the default User-Agent string set in the request header.
 const DefaultUserAgent = "cloud-api-go-sdk/%s"
 
-var AppVersion = "0.23.0"
+var AppVersion = "0"
 
 // UserAgent represents a User-Agent header.
 type UserAgent struct {

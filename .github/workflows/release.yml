@@ -30,15 +30,6 @@ jobs:
         with:
           go-version: 1.21
       -
-        name: Check tag version against AppVersion
-        run: |
-          TAG_VERSION=${GITHUB_REF#refs/tags/}
-          APP_VERSION=$(grep -oP 'var AppVersion = "\K[0-9]+\.[0-9]+\.[0-9]+' provider_client.go)
-          if [ "$TAG_VERSION" != "v$APP_VERSION" ]; then
-            echo "Tag version ($TAG_VERSION) does not match AppVersion ($APP_VERSION)"
-            exit 1
-          fi
-      -
         name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
