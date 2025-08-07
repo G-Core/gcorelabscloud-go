@@ -8,6 +8,7 @@ type RegistryCredentials struct {
 	ProjectID   int    `json:"project_id"`
 	Name        string `json:"name"`
 	Username    string `json:"username"`
+	Password    string `json:"password"`
 	RegistryURL string `json:"registry_url"`
 }
 

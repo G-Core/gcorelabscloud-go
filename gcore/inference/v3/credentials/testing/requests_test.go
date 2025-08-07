@@ -106,7 +106,7 @@ func TestCreate(t *testing.T) {
 	options := credentials.CreateRegistryCredentialOpts{
 		Name:        Creds1.Name,
 		Username:    Creds1.Username,
-		Password:    Creds1Password,
+		Password:    Creds1.Password,
 		RegistryURL: Creds1.RegistryURL,
 	}
 
@@ -157,7 +157,7 @@ func TestUpdate(t *testing.T) {
 	client := fake.ServiceTokenClient("inferences", "v3")
 	opts := credentials.UpdateRegistryCredentialOpts{
 		Username:    Creds1.Username,
-		Password:    Creds1Password,
+		Password:    Creds1.Password,
 		RegistryURL: Creds1.RegistryURL,
 	}
 

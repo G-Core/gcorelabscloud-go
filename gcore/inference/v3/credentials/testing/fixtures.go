@@ -52,8 +52,8 @@ var (
 		ProjectID:   fake.ProjectID,
 		Name:        "docker-io",
 		Username:    "username",
+		Password:    "password",
 		RegistryURL: "registry.example.com",
 	}
-	Creds1Password = "password"
-	CredsSlice     = []credentials.RegistryCredentials{Creds1}
+	CredsSlice = []credentials.RegistryCredentials{Creds1}
 )
