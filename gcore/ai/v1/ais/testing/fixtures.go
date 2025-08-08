@@ -219,14 +219,18 @@ const ListResponse = `
           "security_groups": [
               {
                   "security_groups": [
-                      "4c74142d-9374-4aa6-b11b-43469b66f746"
+                      {
+                          "name": "security-group-1"
+                      }
                   ],
                   "network_id": "bf572176-2d95-4fe0-9de0-f54a5307fbe6",
                   "port_id": "d7136b4d-c5f3-4d3b-bd86-aeb01942cfc8"
               },
               {
                   "security_groups": [
-                      "77ae0765-f262-493a-ba32-d9892436ddd0"
+                      {
+                          "name": "security-group-2"
+                      }
                   ],
                   "network_id": "518ba531-496b-4676-8ea4-68e2ed3b2e4b",
                   "port_id": "f3dcadf8-a4a5-4e5a-af7e-4c5902cd4142"
@@ -442,14 +446,18 @@ const GetResponse = `
   "security_groups": [
       {
           "security_groups": [
-              "4c74142d-9374-4aa6-b11b-43469b66f746"
+              {
+                  "name": "security-group-1"
+              }
           ],
           "network_id": "bf572176-2d95-4fe0-9de0-f54a5307fbe6",
           "port_id": "d7136b4d-c5f3-4d3b-bd86-aeb01942cfc8"
       },
       {
           "security_groups": [
-              "77ae0765-f262-493a-ba32-d9892436ddd0"
+              {
+                  "name": "security-group-2"
+              }
           ],
           "network_id": "518ba531-496b-4676-8ea4-68e2ed3b2e4b",
           "port_id": "f3dcadf8-a4a5-4e5a-af7e-4c5902cd4142"
@@ -1207,12 +1215,12 @@ var (
 			{
 				PortID:         "d7136b4d-c5f3-4d3b-bd86-aeb01942cfc8",
 				NetworkID:      "bf572176-2d95-4fe0-9de0-f54a5307fbe6",
-				SecurityGroups: []string{"4c74142d-9374-4aa6-b11b-43469b66f746"},
+				SecurityGroups: []gcorecloud.ItemName{{Name: "security-group-1"}},
 			},
 			{
 				PortID:         "f3dcadf8-a4a5-4e5a-af7e-4c5902cd4142",
 				NetworkID:      "518ba531-496b-4676-8ea4-68e2ed3b2e4b",
-				SecurityGroups: []string{"77ae0765-f262-493a-ba32-d9892436ddd0"},
+				SecurityGroups: []gcorecloud.ItemName{{Name: "security-group-2"}},
 			},
 		},
 		Interfaces: []ai.AIClusterInterface{
