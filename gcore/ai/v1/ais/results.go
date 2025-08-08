@@ -3,7 +3,7 @@ package ai
 import (
 	"encoding/json"
 	"fmt"
-		
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
@@ -75,7 +75,6 @@ func (r aiInstanceResult) ExtractInto(v interface{}) error {
 	return r.Result.ExtractIntoStructPtr(v, "")
 }
 
-
 // AIInstanceActionResult represents the result of an cluster instance operation. Call its Extract
 // method to interpret it as a AI Cluster instance actions.
 type AIInstanceActionResult struct {
@@ -131,9 +130,9 @@ type SecurityGroupActionResult struct {
 }
 
 type PoplarInterfaceSecGrop struct {
-	PortID         string   `json:"port_id"`
-	NetworkID      string   `json:"network_id"`
-	SecurityGroups []string `json:"security_groups"`
+	PortID         string                `json:"port_id"`
+	NetworkID      string                `json:"network_id"`
+	SecurityGroups []gcorecloud.ItemName `json:"security_groups"`
 }
 
 type AIClusterInterface struct {
@@ -243,6 +242,7 @@ func (r AIClusterInterfacePage) IsEmpty() (bool, error) {
 type AIClusterPortsPage struct {
 	pagination.LinkedPageBase
 }
+
 // NextPageURL is invoked when a paginated collection of ai cluster ports has reached
 // the end of a page and the pager seeks to traverse over a new one. In order
 // to do this, it needs to construct the next page's URL.
