@@ -2,6 +2,7 @@ package file_shares
 
 import (
 	"fmt"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/client/file_shares/v1/client"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
@@ -111,16 +112,16 @@ var fileShareCreateCommand = cli.Command{
 		}
 
 		opts := file_shares.CreateOpts{
-			Name:       c.String("name"),
-			VolumeType: c.String("volume-type"),
-			Protocol:   c.String("protocol"),
-			Size:       c.Int("size"),
-			Access:     getAccessRules(c),
-			Tags:       tags,
+			Name:     c.String("name"),
+			TypeName: c.String("volume-type"), // Using TypeName field
+			Protocol: c.String("protocol"),
+			Size:     c.Int("size"),
+			Access:   getAccessRules(c),
+			Tags:     tags,
 		}
 
 		// Validate if user provided network and subnet for default_share_type, which are required.
-		if opts.VolumeType == "default_share_type" {
+		if opts.TypeName == "default_share_type" {
 			if c.String("network") == "" {
 				return cli.Exit("--network is required for volume-type=default_share_type (default)", 1)
 			}

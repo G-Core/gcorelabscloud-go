@@ -44,13 +44,13 @@ type CreateAccessRuleOpts struct {
 
 // CreateOpts represents options used to create a file share.
 type CreateOpts struct {
-	Name       string                 `json:"name" required:"true" validate:"required"`
-	VolumeType string                 `json:"volume_type,omitempty" validate:"omitempty,oneof=default_share_type vast_share_type"`
-	Protocol   string                 `json:"protocol" required:"true" validate:"required,oneof=NFS"`
-	Size       int                    `json:"size" required:"true" validate:"required,gt=0"`
-	Network    *FileShareNetworkOpts  `json:"network,omitempty" validate:"omitempty,dive"`
-	Access     []CreateAccessRuleOpts `json:"access,omitempty" validate:"dive"`
-	Tags       map[string]string      `json:"tags"`
+	Name     string                 `json:"name" required:"true" validate:"required"`
+	TypeName string                 `json:"type_name,omitempty" validate:"omitempty,oneof=default_share_type vast_share_type"`
+	Protocol string                 `json:"protocol" required:"true" validate:"required,oneof=NFS"`
+	Size     int                    `json:"size" required:"true" validate:"required,gt=0"`
+	Network  *FileShareNetworkOpts  `json:"network,omitempty" validate:"omitempty,dive"`
+	Access   []CreateAccessRuleOpts `json:"access,omitempty" validate:"dive"`
+	Tags     map[string]string      `json:"tags"`
 }
 
 // ToFileShareCreateMap builds a request body from CreateOpts.
@@ -61,13 +61,13 @@ func (opts CreateOpts) ToFileShareCreateMap() (map[string]interface{}, error) {
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
-// Validate
+// Validate validates the CreateOpts structure.
 func (opts CreateOpts) Validate() error {
 	if err := gcorecloud.Validate.Struct(opts); err != nil {
 		return gcorecloud.TranslateValidationError(err)
 	}
-	if (opts.VolumeType == "" || opts.VolumeType == "default_share_type") && opts.Network == nil {
-		return errors.New("field Network is required for volume_type default_share_type")
+	if (opts.TypeName == "" || opts.TypeName == "default_share_type") && opts.Network == nil {
+		return errors.New("field Network is required for type_name default_share_type")
 	}
 	return nil
 }

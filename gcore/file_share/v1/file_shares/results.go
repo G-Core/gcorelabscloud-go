@@ -110,7 +110,6 @@ type FileShare struct {
 	Region           string                          `json:"region"`
 	Metadata         map[string]interface{}          `json:"metadata"`
 	Tags             []Tag                           `json:"tags"`
-	VolumeType       string                          `json:"volume_type"`
 }
 
 // Validate validates the FileShare structure.
