@@ -45,7 +45,7 @@ type CreateAccessRuleOpts struct {
 // CreateOpts represents options used to create a file share.
 type CreateOpts struct {
 	Name     string                 `json:"name" required:"true" validate:"required"`
-	TypeName string                 `json:"type_name,omitempty" validate:"omitempty,oneof=default_share_type vast_share_type"`
+	TypeName string                 `json:"type_name,omitempty" validate:"omitempty,oneof=standard vast"`
 	Protocol string                 `json:"protocol" required:"true" validate:"required,oneof=NFS"`
 	Size     int                    `json:"size" required:"true" validate:"required,gt=0"`
 	Network  *FileShareNetworkOpts  `json:"network,omitempty" validate:"omitempty,dive"`
@@ -66,8 +66,8 @@ func (opts CreateOpts) Validate() error {
 	if err := gcorecloud.Validate.Struct(opts); err != nil {
 		return gcorecloud.TranslateValidationError(err)
 	}
-	if (opts.TypeName == "" || opts.TypeName == "default_share_type") && opts.Network == nil {
-		return errors.New("field Network is required for type_name default_share_type")
+	if (opts.TypeName == "" || opts.TypeName == "standard") && opts.Network == nil {
+		return errors.New("field Network is required for type_name standard")
 	}
 	return nil
 }

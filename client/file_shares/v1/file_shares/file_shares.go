@@ -30,9 +30,9 @@ var fileShareCreateCommand = cli.Command{
 			Required: true,
 		},
 		&cli.StringFlag{
-			Name:     "volume-type",
-			Usage:    "File share volume type (default_share_type or vast_share_type)",
-			Value:    "default_share_type",
+			Name:     "type-name",
+			Usage:    "File share type name (standard or vast)",
+			Value:    "standard",
 			Required: false,
 		},
 		&cli.StringFlag{
@@ -49,7 +49,7 @@ var fileShareCreateCommand = cli.Command{
 		},
 		&cli.StringFlag{
 			Name:     "network",
-			Usage:    "File share network id (required for default_share_type)",
+			Usage:    "File share network id (required for standard type)",
 			Required: false,
 		},
 		&cli.StringFlag{
@@ -99,31 +99,31 @@ var fileShareCreateCommand = cli.Command{
 			}
 		}
 
-		// Validate volume-type
-		volumeType := c.String("volume-type")
-		if volumeType != "default_share_type" && volumeType != "vast_share_type" {
-			return cli.Exit("--volume-type must be either 'default_share_type' or 'vast_share_type'", 1)
+		// Validate type-name
+		typeName := c.String("type-name")
+		if typeName != "standard" && typeName != "vast" {
+			return cli.Exit("--type-name must be either 'standard' or 'vast'", 1)
 		}
 
-		// Validate if user provided network and subnet for vast_share_type, which are automatically set
-		// for vast_share_type, so they should not be provided by user.
-		if volumeType == "vast_share_type" && (c.String("network") != "" || c.String("subnet") != "") {
-			return cli.Exit("--network and/or --subnet should not be provided for vast_share_type", 1)
+		// Validate if user provided network and subnet for vast, which are automatically set
+		// for vast, so they should not be provided by user.
+		if typeName == "vast" && (c.String("network") != "" || c.String("subnet") != "") {
+			return cli.Exit("--network and/or --subnet should not be provided for vast type", 1)
 		}
 
 		opts := file_shares.CreateOpts{
 			Name:     c.String("name"),
-			TypeName: c.String("volume-type"), // Using TypeName field
+			TypeName: typeName,
 			Protocol: c.String("protocol"),
 			Size:     c.Int("size"),
 			Access:   getAccessRules(c),
 			Tags:     tags,
 		}
 
-		// Validate if user provided network and subnet for default_share_type, which are required.
-		if opts.TypeName == "default_share_type" {
+		// Validate if user provided network and subnet for standard, which are required.
+		if typeName == "standard" {
 			if c.String("network") == "" {
-				return cli.Exit("--network is required for volume-type=default_share_type (default)", 1)
+				return cli.Exit("--network is required for type-name=standard (default)", 1)
 			}
 			opts.Network = &file_shares.FileShareNetworkOpts{
 				NetworkID: c.String("network"),
