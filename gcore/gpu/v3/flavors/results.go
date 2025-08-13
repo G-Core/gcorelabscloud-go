@@ -53,6 +53,11 @@ type HardwareProperties struct {
 	GPUCount        *int    `json:"gpu_count"`
 }
 
+// SupportedFeatures represents the set of enabled features based on the flavor's type and configuration
+type SupportedFeatures struct {
+	SecurityGroups bool `json:"security_groups"`
+}
+
 // VMFlavor represents a virtual GPU flavor
 type VMFlavor struct {
 	ID                  string                 `json:"id"`
@@ -66,6 +71,7 @@ type VMFlavor struct {
 	GPU                 string                 `json:"gpu"`
 	HardwareDescription map[string]interface{} `json:"hardware_description"`
 	HardwareProperties  *HardwareProperties    `json:"hardware_properties"`
+	SupportedFeatures   *SupportedFeatures     `json:"supported_features"`
 }
 
 // BMFlavor represents a baremetal GPU flavor
@@ -83,6 +89,7 @@ type BMFlavor struct {
 	Capacity            int                    `json:"capacity"`
 	HardwareDescription map[string]interface{} `json:"hardware_description"`
 	HardwareProperties  *HardwareProperties    `json:"hardware_properties"`
+	SupportedFeatures   *SupportedFeatures     `json:"supported_features"`
 }
 
 // FlavorPage is the page returned by a pager when traversing over a collection of flavors.
