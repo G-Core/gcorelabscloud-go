@@ -50,7 +50,7 @@ type CreateOpts struct {
 	Size     int                    `json:"size" required:"true" validate:"required,gt=0"`
 	Network  *FileShareNetworkOpts  `json:"network,omitempty" validate:"omitempty,dive"`
 	Access   []CreateAccessRuleOpts `json:"access,omitempty" validate:"dive"`
-	Tags     map[string]string      `json:"tags"`
+	Tags     map[string]string      `json:"tags,omitempty"`
 }
 
 // ToFileShareCreateMap builds a request body from CreateOpts.
