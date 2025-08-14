@@ -32,6 +32,7 @@ type BMFlavorOutput struct {
 	Capacity            int                         `json:"capacity"`
 	HardwareDescription map[string]interface{}      `json:"hardware_description"`
 	HardwareProperties  *flavors.HardwareProperties `json:"hardware_properties"`
+	SupportedFeatures   *flavors.SupportedFeatures  `json:"supported_features"`
 	Price               *flavors.Price              `json:"price,omitempty"`
 }
 
@@ -43,6 +44,7 @@ type VMFlavorOutput struct {
 	Capacity            int                         `json:"capacity"`
 	HardwareDescription map[string]interface{}      `json:"hardware_description"`
 	HardwareProperties  *flavors.HardwareProperties `json:"hardware_properties"`
+	SupportedFeatures   *flavors.SupportedFeatures  `json:"supported_features"`
 	Price               *flavors.Price              `json:"price,omitempty"`
 }
 
@@ -103,6 +105,7 @@ func listBaremetalFlavorsAction(c *cli.Context) error {
 			Capacity:            flavor.Capacity,
 			HardwareDescription: flavor.HardwareDescription,
 			HardwareProperties:  flavor.HardwareProperties,
+			SupportedFeatures:   flavor.SupportedFeatures,
 		}
 
 		// Include price if available
@@ -174,6 +177,7 @@ func listVirtualFlavorsAction(c *cli.Context) error {
 			Capacity:            flavor.Capacity,
 			HardwareDescription: flavor.HardwareDescription,
 			HardwareProperties:  flavor.HardwareProperties,
+			SupportedFeatures:   flavor.SupportedFeatures,
 		}
 
 		// Include price if available
