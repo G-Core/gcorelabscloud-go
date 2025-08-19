@@ -106,9 +106,9 @@ var fileShareCreateCommand = cli.Command{
 		}
 
 		// Validate if user provided network and subnet for vast, which are automatically set
-		// for vast, so they should not be provided by user.
+		// Validate if user provided network and subnet for 'vast' type, which are automatically set for 'vast', so they should not be provided by the user.
 		if typeName == "vast" && (c.String("network") != "" || c.String("subnet") != "") {
-			return cli.Exit("--network and/or --subnet should not be provided for vast type", 1)
+			return cli.Exit("--network and/or --subnet should not be provided for type-name=vast", 1)
 		}
 
 		opts := file_shares.CreateOpts{
@@ -120,7 +120,7 @@ var fileShareCreateCommand = cli.Command{
 			Tags:     tags,
 		}
 
-		// Validate if user provided network and subnet for standard, which are required.
+		// Validate if user provided network for 'standard' type, which is required.
 		if typeName == "standard" {
 			if c.String("network") == "" {
 				return cli.Exit("--network is required for type-name=standard (default)", 1)

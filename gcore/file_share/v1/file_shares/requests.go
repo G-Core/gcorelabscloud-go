@@ -61,13 +61,13 @@ func (opts CreateOpts) ToFileShareCreateMap() (map[string]interface{}, error) {
 	return gcorecloud.BuildRequestBody(opts, "")
 }
 
-// Validate validates the CreateOpts structure.
+// Validate validates the CreateOpts structure and ensures required fields are present based on the type.
 func (opts CreateOpts) Validate() error {
 	if err := gcorecloud.Validate.Struct(opts); err != nil {
 		return gcorecloud.TranslateValidationError(err)
 	}
 	if (opts.TypeName == "" || opts.TypeName == "standard") && opts.Network == nil {
-		return errors.New("field Network is required for type_name standard")
+		return errors.New("field Network is required for TypeName 'standard'")
 	}
 	return nil
 }
