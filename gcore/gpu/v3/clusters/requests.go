@@ -72,7 +72,7 @@ type ListClustersOptsBuilder interface {
 type ListOpts struct {
 	Limit     int          `q:"limit" validate:"omitempty,gt=0"`
 	Offset    int          `q:"offset" validate:"omitempty,gte=0"`
-	ManagedBy ManagedByOpt `q:"managed_by" validate:"omitempty"`
+	ManagedBy ManagedByOpt `q:"managed_by" validate:"omitempty,oneof=k8s user"`
 }
 
 // ToListClustersQuery formats a ListOpts into a query string.
