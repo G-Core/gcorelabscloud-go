@@ -483,6 +483,15 @@ func getVolumeOpts(c *cli.Context) (clusters.VolumeOpts, error) {
 	return volume, nil
 }
 
+func listClustersFlags() []cli.Flag {
+	return []cli.Flag{
+		&cli.StringFlag{
+			Name:  "managed-by",
+			Usage: "the entity responsible for managing the cluster",
+		},
+	}
+}
+
 func createClusterFlags() []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
@@ -628,7 +637,9 @@ func listClustersAction(c *cli.Context, newClient func(*cli.Context) (*gcoreclou
 		_ = cli.ShowAppHelp(c)
 		return cli.Exit(err, 1)
 	}
-	opts := &clusters.ListOpts{}
+	opts := &clusters.ListOpts{
+		ManagedBy: clusters.ManagedByOpt(c.String("managed-by")),
+	}
 	clusterList, err := clusters.ListAll(gpuClient, opts)
 	if err != nil {
 		return cli.Exit(err, 1)
@@ -687,6 +698,7 @@ func BaremetalCommands() *cli.Command {
 				Description: "List all baremetal GPU clusters",
 				Category:    "clusters",
 				ArgsUsage:   " ",
+				Flags:       listClustersFlags(),
 				Action:      listBaremetalClustersAction,
 			},
 		},

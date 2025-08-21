@@ -10,10 +10,9 @@ type VolumeSource string
 type VolumeType string
 type ClusterStatusType string
 type FloatingIPSource string
-
 type InterfaceType string
-
 type ClusterAction string
+type ManagedByOpt string
 
 const (
 	IPv4IPFamilyType      IPFamilyType = "ipv4"
@@ -51,6 +50,9 @@ const (
 	SoftRebootClusterAction ClusterAction = "soft_reboot"
 	ResizeClusterAction     ClusterAction = "resize"
 	UpdateTagsClusterAction ClusterAction = "update_tags"
+
+	ManagedByK8s  ManagedByOpt = "k8s"
+	ManagedByUser ManagedByOpt = "user"
 )
 
 func (it *IPFamilyType) IsValid() error {
