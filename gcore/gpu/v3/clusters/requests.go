@@ -209,6 +209,7 @@ func (opts CreateClusterOpts) ToCreateClusterMap() (map[string]interface{}, erro
 type CreateBaremetalClusterOpts struct {
 	Name            string                      `json:"name" validate:"required"`
 	Flavor          string                      `json:"flavor" validate:"required"`
+	ImageID         string                      `json:"image_id" validate:"required"`
 	Tags            map[string]string           `json:"tags,omitempty"`
 	ServersCount    int                         `json:"servers_count" validate:"required"`
 	ServersSettings BaremetalServerSettingsOpts `json:"servers_settings,omitempty"`

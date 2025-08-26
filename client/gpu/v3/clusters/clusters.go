@@ -364,6 +364,7 @@ func createClusterAction(c *cli.Context, newClient func(*cli.Context) (*gcoreclo
 			Name:            c.String("name"),
 			Flavor:          c.String("flavor"),
 			ServersCount:    c.Int("servers-count"),
+			ImageID:         c.String("image-id"),
 			Tags:            tags,
 			ServersSettings: serverSettings,
 		}
@@ -573,12 +574,7 @@ func createClusterVolumeFlags() []cli.Flag {
 	}
 }
 
-func createVirtualClusterFlags() []cli.Flag {
-	// Virtual cluster flags include both baremetal cluster flags and volume flags
-	return append(createBaremetalClusterFlags(), createClusterVolumeFlags()...)
-}
-
-func createBaremetalClusterFlags() []cli.Flag {
+func createCommonClusterFlags() []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:     "name",
@@ -684,6 +680,22 @@ func createBaremetalClusterFlags() []cli.Flag {
 			Required: false,
 		},
 	}
+}
+
+func createVirtualClusterFlags() []cli.Flag {
+	// Virtual cluster flags include volume flags besides common flags
+	return append(createCommonClusterFlags(), createClusterVolumeFlags()...)
+}
+
+func createBaremetalClusterFlags() []cli.Flag {
+	// Baremetal cluster flags include the image-id flag besides common flags
+	return append(createCommonClusterFlags(),
+		&cli.StringFlag{
+			Name:     "image-id",
+			Aliases:  []string{"i"},
+			Usage:    "image ID for the servers in the cluster",
+			Required: true,
+		})
 }
 
 // listClustersAction handles the common logic for listing both virtual and baremetal clusters
