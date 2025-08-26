@@ -762,8 +762,8 @@ func BaremetalCommands() *cli.Command {
 			},
 			{
 				Name:        "create",
-				Usage:       "Create a new virtual GPU cluster",
-				Description: "Create a new virtual GPU cluster with the specified options",
+				Usage:       "Create a new baremetal GPU cluster",
+				Description: "Create a new baremetal GPU cluster with the specified options",
 				Category:    "clusters",
 				Flags:       append(createBaremetalClusterFlags(), flags.WaitCommandFlags...),
 				Action:      createBaremetalClusterAction,
