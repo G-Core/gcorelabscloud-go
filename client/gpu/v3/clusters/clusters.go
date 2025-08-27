@@ -46,7 +46,7 @@ func showBaremetalClusterAction(c *cli.Context) error {
 	return showClusterAction(c, client.NewGPUBaremetalClientV3)
 }
 
-func deleteClusterAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud.ServiceClient, error)) error {
+func deleteClusterAction(c *cli.Context, gpuType string, newClient func(*cli.Context) (*gcorecloud.ServiceClient, error)) error {
 	clusterID := c.Args().First()
 	if clusterID == "" {
 		_ = cli.ShowCommandHelp(c, "delete")
@@ -64,7 +64,7 @@ func deleteClusterAction(c *cli.Context, newClient func(*cli.Context) (*gcoreclo
 		AllReservedFixedIPs: c.Bool("delete-all-reserved-fixed-ips"),
 	}
 	// this flag is only applicable for virtual clusters
-	if c.IsSet("delete-all-volumes") {
+	if gpuType == "virtual" {
 		opts.AllVolumes = c.Bool("delete-all-volumes")
 	}
 	results, err := clusters.Delete(gpuClient, clusterID, opts).Extract()
@@ -93,11 +93,11 @@ func deleteClusterAction(c *cli.Context, newClient func(*cli.Context) (*gcoreclo
 }
 
 func deleteVirtualClusterAction(c *cli.Context) error {
-	return deleteClusterAction(c, client.NewGPUVirtualClientV3)
+	return deleteClusterAction(c, "virtual", client.NewGPUVirtualClientV3)
 }
 
 func deleteBaremetalClusterAction(c *cli.Context) error {
-	return deleteClusterAction(c, client.NewGPUBaremetalClientV3)
+	return deleteClusterAction(c, "baremetal", client.NewGPUBaremetalClientV3)
 }
 
 func resizeVirtualClusterAction(c *cli.Context) error {
@@ -326,14 +326,14 @@ func resizeClusterAction(c *cli.Context, newClient func(ctx *cli.Context) (*gcor
 }
 
 func createVirtualClusterAction(c *cli.Context) error {
-	return createClusterAction(c, client.NewGPUVirtualClientV3)
+	return createClusterAction(c, "virtual", client.NewGPUVirtualClientV3)
 }
 
 func createBaremetalClusterAction(c *cli.Context) error {
-	return createClusterAction(c, client.NewGPUBaremetalClientV3)
+	return createClusterAction(c, "baremetal", client.NewGPUBaremetalClientV3)
 }
 
-func createClusterAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud.ServiceClient, error)) error {
+func createClusterAction(c *cli.Context, gpuType string, newClient func(*cli.Context) (*gcorecloud.ServiceClient, error)) error {
 	gpuClient, err := newClient(c)
 	if err != nil {
 		_ = cli.ShowAppHelp(c)
@@ -344,8 +344,6 @@ func createClusterAction(c *cli.Context, newClient func(*cli.Context) (*gcoreclo
 	if c.IsSet("user-data") && (c.IsSet("server-username") || c.IsSet("server-password")) {
 		return cli.Exit("`user-data` cannot be used together with `server-username` or `server-password`", 1)
 	}
-	// Check if the client is for baremetal or virtual clusters
-	isBaremetal := strings.Contains(gpuClient.ResourceBaseURL(), "baremetal")
 
 	tags, err := utils.StringSliceToTags(c.StringSlice("tags"))
 	if err != nil {
@@ -358,7 +356,7 @@ func createClusterAction(c *cli.Context, newClient func(*cli.Context) (*gcoreclo
 	}
 
 	var opts clusters.CreateClusterOptsBuilder
-	if isBaremetal {
+	if gpuType == "baremetal" {
 		serverSettings, err := getBaremetalServerSettings(c)
 		if err != nil {
 			_ = cli.ShowCommandHelp(c, "create")
