@@ -124,6 +124,10 @@ func updateTagsVirtualClusterAction(c *cli.Context) error {
 	return updateTagsClusterAction(c, client.NewGPUVirtualClientV3)
 }
 
+func updateTagsBaremetalClusterAction(c *cli.Context) error {
+	return updateTagsClusterAction(c, client.NewGPUBaremetalClientV3)
+}
+
 func softRebootClusterAction(c *cli.Context, newClient func(ctx *cli.Context) (*gcorecloud.ServiceClient, error)) error {
 	clusterID := c.Args().First()
 	if clusterID == "" {
@@ -776,6 +780,28 @@ func BaremetalCommands() *cli.Command {
 				ArgsUsage:   " ",
 				Flags:       listClustersFlags(),
 				Action:      listBaremetalClustersAction,
+			},
+			{
+				Name:        "updatetags",
+				Usage:       "Update tags of baremetal GPU cluster",
+				Description: "Updates the tags of specific baremetal GPU cluster",
+				Category:    "clusters",
+				ArgsUsage:   "<cluster_id>",
+				Action:      updateTagsBaremetalClusterAction,
+				Flags: append([]cli.Flag{
+					&cli.StringSliceFlag{
+						Name:     "tags",
+						Aliases:  []string{"t"},
+						Usage:    "cluster key-value tags. Example: --tags key1=value1 --tags key2=value2",
+						Required: false,
+					},
+					&cli.StringSliceFlag{
+						Name:     "remove-tags",
+						Aliases:  []string{"rt"},
+						Usage:    "cluster tag names. Example: --remove-tags key1 --remove-tags key2",
+						Required: false,
+					},
+				}, flags.WaitCommandFlags...),
 			},
 		},
 	}
