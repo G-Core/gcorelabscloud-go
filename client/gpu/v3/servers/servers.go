@@ -41,7 +41,7 @@ func listVirtualServersAction(c *cli.Context) error {
 	return listServersAction(c, client.NewGPUVirtualClientV3)
 }
 
-func deleteServerAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud.ServiceClient, error)) error {
+func deleteServerAction(c *cli.Context, gpuType string, newClient func(*cli.Context) (*gcorecloud.ServiceClient, error)) error {
 	clusterID := c.Args().First()
 	if clusterID == "" {
 		_ = cli.ShowCommandHelp(c, "list")
@@ -63,7 +63,10 @@ func deleteServerAction(c *cli.Context, newClient func(*cli.Context) (*gcoreclou
 	opts := servers.DeleteServerOpts{
 		AllFloatingIPs:      c.Bool("delete-all-floating-ips"),
 		AllReservedFixedIPs: c.Bool("delete-all-reserved-fixed-ips"),
-		AllVolumes:          c.Bool("delete-all-volumes"),
+	}
+	// this flag is only applicable for virtual clusters
+	if gpuType == "virtual" {
+		opts.AllVolumes = c.Bool("delete-all-volumes")
 	}
 	results, err := servers.Delete(gpuClient, clusterID, serverID, opts).Extract()
 	if err != nil {
@@ -86,11 +89,11 @@ func deleteServerAction(c *cli.Context, newClient func(*cli.Context) (*gcoreclou
 }
 
 func deleteBaremetalServerAction(c *cli.Context) error {
-	return deleteServerAction(c, client.NewGPUBaremetalClientV3)
+	return deleteServerAction(c, "baremetal", client.NewGPUBaremetalClientV3)
 }
 
 func deleteVirtualServerAction(c *cli.Context) error {
-	return deleteServerAction(c, client.NewGPUVirtualClientV3)
+	return deleteServerAction(c, "virtual", client.NewGPUVirtualClientV3)
 }
 
 // BaremetalCommands returns commands for baremetal GPU servers
@@ -123,11 +126,6 @@ func BaremetalCommands() *cli.Command {
 					&cli.BoolFlag{
 						Name:     "delete-all-reserved-fixed-ips",
 						Usage:    "delete all server reserved fixed ips",
-						Required: false,
-					},
-					&cli.BoolFlag{
-						Name:     "delete-all-volumes",
-						Usage:    "delete all server volumes",
 						Required: false,
 					},
 				}, flags.WaitCommandFlags...),

@@ -46,7 +46,7 @@ func showBaremetalClusterAction(c *cli.Context) error {
 	return showClusterAction(c, client.NewGPUBaremetalClientV3)
 }
 
-func deleteClusterAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud.ServiceClient, error)) error {
+func deleteClusterAction(c *cli.Context, gpuType string, newClient func(*cli.Context) (*gcorecloud.ServiceClient, error)) error {
 	clusterID := c.Args().First()
 	if clusterID == "" {
 		_ = cli.ShowCommandHelp(c, "delete")
@@ -62,7 +62,10 @@ func deleteClusterAction(c *cli.Context, newClient func(*cli.Context) (*gcoreclo
 	opts := clusters.DeleteClusterOpts{
 		AllFloatingIPs:      c.Bool("delete-all-floating-ips"),
 		AllReservedFixedIPs: c.Bool("delete-all-reserved-fixed-ips"),
-		AllVolumes:          c.Bool("delete-all-volumes"),
+	}
+	// this flag is only applicable for virtual clusters
+	if gpuType == "virtual" {
+		opts.AllVolumes = c.Bool("delete-all-volumes")
 	}
 	results, err := clusters.Delete(gpuClient, clusterID, opts).Extract()
 	if err != nil {
@@ -90,11 +93,11 @@ func deleteClusterAction(c *cli.Context, newClient func(*cli.Context) (*gcoreclo
 }
 
 func deleteVirtualClusterAction(c *cli.Context) error {
-	return deleteClusterAction(c, client.NewGPUVirtualClientV3)
+	return deleteClusterAction(c, "virtual", client.NewGPUVirtualClientV3)
 }
 
 func deleteBaremetalClusterAction(c *cli.Context) error {
-	return deleteClusterAction(c, client.NewGPUBaremetalClientV3)
+	return deleteClusterAction(c, "baremetal", client.NewGPUBaremetalClientV3)
 }
 
 func resizeVirtualClusterAction(c *cli.Context) error {
@@ -119,6 +122,10 @@ func stopVirtualClusterAction(c *cli.Context) error {
 
 func updateTagsVirtualClusterAction(c *cli.Context) error {
 	return updateTagsClusterAction(c, client.NewGPUVirtualClientV3)
+}
+
+func updateTagsBaremetalClusterAction(c *cli.Context) error {
+	return updateTagsClusterAction(c, client.NewGPUBaremetalClientV3)
 }
 
 func softRebootClusterAction(c *cli.Context, newClient func(ctx *cli.Context) (*gcorecloud.ServiceClient, error)) error {
@@ -319,10 +326,14 @@ func resizeClusterAction(c *cli.Context, newClient func(ctx *cli.Context) (*gcor
 }
 
 func createVirtualClusterAction(c *cli.Context) error {
-	return createClusterAction(c, client.NewGPUVirtualClientV3)
+	return createClusterAction(c, "virtual", client.NewGPUVirtualClientV3)
 }
 
-func createClusterAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud.ServiceClient, error)) error {
+func createBaremetalClusterAction(c *cli.Context) error {
+	return createClusterAction(c, "baremetal", client.NewGPUBaremetalClientV3)
+}
+
+func createClusterAction(c *cli.Context, gpuType string, newClient func(*cli.Context) (*gcorecloud.ServiceClient, error)) error {
 	gpuClient, err := newClient(c)
 	if err != nil {
 		_ = cli.ShowAppHelp(c)
@@ -334,27 +345,48 @@ func createClusterAction(c *cli.Context, newClient func(*cli.Context) (*gcoreclo
 		return cli.Exit("`user-data` cannot be used together with `server-username` or `server-password`", 1)
 	}
 
-	// build create cluster options from CLI flags
-	serverSettings, err := getServerSettings(c)
-	if err != nil {
-		_ = cli.ShowCommandHelp(c, "create")
-		return cli.Exit(err, 1)
-	}
-	tags, err := utils.StringSliceToTags(c.StringSlice("tags"))
-	if err != nil {
-		_ = cli.ShowCommandHelp(c, "create")
-		return cli.Exit(err, 1)
+	var tags map[string]string
+	if c.IsSet("tags") {
+		tags, err = utils.StringSliceToTags(c.StringSlice("tags"))
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "create")
+			return cli.Exit(err, 1)
+		}
 	}
 	// Validate servers count
 	if c.Int("servers-count") <= 0 {
 		return cli.Exit("`servers-count` must be greater than 0", 1)
 	}
-	opts := clusters.CreateClusterOpts{
-		Name:            c.String("name"),
-		Flavor:          c.String("flavor"),
-		ServersCount:    c.Int("servers-count"),
-		Tags:            tags,
-		ServersSettings: serverSettings,
+
+	var opts clusters.CreateClusterOptsBuilder
+	if gpuType == "baremetal" {
+		serverSettings, err := getBaremetalServerSettings(c)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "create")
+			return cli.Exit(err, 1)
+		}
+		opts = clusters.CreateBaremetalClusterOpts{
+			Name:            c.String("name"),
+			Flavor:          c.String("flavor"),
+			ServersCount:    c.Int("servers-count"),
+			ImageID:         c.String("image-id"),
+			Tags:            tags,
+			ServersSettings: serverSettings,
+		}
+	} else {
+		// build create cluster options from CLI flags
+		serverSettings, err := getServerSettings(c)
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "create")
+			return cli.Exit(err, 1)
+		}
+		opts = clusters.CreateClusterOpts{
+			Name:            c.String("name"),
+			Flavor:          c.String("flavor"),
+			ServersCount:    c.Int("servers-count"),
+			Tags:            tags,
+			ServersSettings: serverSettings,
+		}
 	}
 
 	// create the cluster and extract the task result
@@ -388,6 +420,26 @@ func getServerSettings(c *cli.Context) (clusters.ServerSettingsOpts, error) {
 	serverSettings := clusters.ServerSettingsOpts{
 		Interfaces:     []clusters.InterfaceOpts{interfaceOpts},
 		Volumes:        []clusters.VolumeOpts{volumeOpts},
+		Credentials:    &credentialOpts,
+		SecurityGroups: getItemIDs(c, "security-groups"),
+		UserData:       StringPtrExcludeEmpty(c, "user-data"),
+	}
+	return serverSettings, nil
+}
+
+func getBaremetalServerSettings(c *cli.Context) (clusters.BaremetalServerSettingsOpts, error) {
+	interfaceOpts, err := getInterfaceOpts(c)
+	if err != nil {
+		return clusters.BaremetalServerSettingsOpts{}, err
+	}
+	credentialOpts := clusters.ServerCredentialsOpts{
+		Username:   c.String("server-username"),
+		Password:   c.String("server-password"),
+		SSHKeyName: c.String("ssh-key-name"),
+	}
+
+	serverSettings := clusters.BaremetalServerSettingsOpts{
+		Interfaces:     []clusters.InterfaceOpts{interfaceOpts},
 		Credentials:    &credentialOpts,
 		SecurityGroups: getItemIDs(c, "security-groups"),
 		UserData:       StringPtrExcludeEmpty(c, "user-data"),
@@ -492,7 +544,46 @@ func listClustersFlags() []cli.Flag {
 	}
 }
 
-func createClusterFlags() []cli.Flag {
+func createClusterVolumeFlags() []cli.Flag {
+	return []cli.Flag{
+		&cli.StringFlag{
+			Name:     "volume-name",
+			Aliases:  []string{"vn"},
+			Usage:    "name of the volume",
+			Required: true,
+		},
+		&cli.IntFlag{
+			Name:     "volume-size",
+			Usage:    "size of the volume in GB",
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:     "volume-image-id",
+			Usage:    "image ID of the volume",
+			Required: true,
+		},
+		&cli.StringSliceFlag{
+			Name:  "volume-tags",
+			Usage: "tags for the volume",
+		},
+		&cli.BoolFlag{
+			Name:  "volume-delete-on-termination",
+			Usage: "delete volume on termination",
+		},
+		&cli.GenericFlag{
+			Name:    "volume-type",
+			Aliases: []string{"vt"},
+			Value: &utils.EnumStringSliceValue{
+				Enum: clusters.VolumeTypesStringList(),
+			},
+			Usage: fmt.Sprintf("volume types. One of %s",
+				strings.Join(clusters.VolumeTypesStringList(), ", ")),
+			Required: true,
+		},
+	}
+}
+
+func createCommonClusterFlags() []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:     "name",
@@ -547,40 +638,6 @@ func createClusterFlags() []cli.Flag {
 			Usage:    "(ssh) keypair name for the servers in the cluster",
 			Required: false,
 		},
-		&cli.BoolFlag{
-			Name:  "volume-delete-on-termination",
-			Usage: "delete volume on termination",
-		},
-		&cli.StringFlag{
-			Name:     "volume-name",
-			Aliases:  []string{"vn"},
-			Usage:    "name of the volume",
-			Required: true,
-		},
-		&cli.IntFlag{
-			Name:     "volume-size",
-			Usage:    "size of the volume",
-			Required: true,
-		},
-		&cli.StringFlag{
-			Name:     "volume-image-id",
-			Usage:    "image ID of the volume",
-			Required: true,
-		},
-		&cli.StringSliceFlag{
-			Name:  "volume-tags",
-			Usage: "tags for the volume",
-		},
-		&cli.GenericFlag{
-			Name:    "volume-type",
-			Aliases: []string{"vt"},
-			Value: &utils.EnumStringSliceValue{
-				Enum: clusters.VolumeTypesStringList(),
-			},
-			Usage: fmt.Sprintf("volume types. One of %s",
-				strings.Join(clusters.VolumeTypesStringList(), ", ")),
-			Required: true,
-		},
 		&cli.GenericFlag{
 			Name:    "interface-type",
 			Aliases: []string{"it"},
@@ -628,6 +685,22 @@ func createClusterFlags() []cli.Flag {
 			Required: false,
 		},
 	}
+}
+
+func createVirtualClusterFlags() []cli.Flag {
+	// Virtual cluster flags include volume flags besides common flags
+	return append(createCommonClusterFlags(), createClusterVolumeFlags()...)
+}
+
+func createBaremetalClusterFlags() []cli.Flag {
+	// Baremetal cluster flags include the image-id flag besides common flags
+	return append(createCommonClusterFlags(),
+		&cli.StringFlag{
+			Name:     "image-id",
+			Aliases:  []string{"i"},
+			Usage:    "image ID for the servers in the cluster",
+			Required: true,
+		})
 }
 
 // listClustersAction handles the common logic for listing both virtual and baremetal clusters
@@ -693,6 +766,14 @@ func BaremetalCommands() *cli.Command {
 				Action: deleteBaremetalClusterAction,
 			},
 			{
+				Name:        "create",
+				Usage:       "Create a new baremetal GPU cluster",
+				Description: "Create a new baremetal GPU cluster with the specified options",
+				Category:    "clusters",
+				Flags:       append(createBaremetalClusterFlags(), flags.WaitCommandFlags...),
+				Action:      createBaremetalClusterAction,
+			},
+			{
 				Name:        "list",
 				Usage:       "List baremetal GPU clusters",
 				Description: "List all baremetal GPU clusters",
@@ -700,6 +781,28 @@ func BaremetalCommands() *cli.Command {
 				ArgsUsage:   " ",
 				Flags:       listClustersFlags(),
 				Action:      listBaremetalClustersAction,
+			},
+			{
+				Name:        "updatetags",
+				Usage:       "Update tags of baremetal GPU cluster",
+				Description: "Updates the tags of specific baremetal GPU cluster",
+				Category:    "clusters",
+				ArgsUsage:   "<cluster_id>",
+				Action:      updateTagsBaremetalClusterAction,
+				Flags: append([]cli.Flag{
+					&cli.StringSliceFlag{
+						Name:     "tags",
+						Aliases:  []string{"t"},
+						Usage:    "cluster key-value tags. Example: --tags key1=value1 --tags key2=value2",
+						Required: false,
+					},
+					&cli.StringSliceFlag{
+						Name:     "remove-tags",
+						Aliases:  []string{"rt"},
+						Usage:    "cluster tag names. Example: --remove-tags key1 --remove-tags key2",
+						Required: false,
+					},
+				}, flags.WaitCommandFlags...),
 			},
 		},
 	}
@@ -750,7 +853,7 @@ func VirtualCommands() *cli.Command {
 				Usage:       "Create a new virtual GPU cluster",
 				Description: "Create a new virtual GPU cluster with the specified options",
 				Category:    "clusters",
-				Flags:       append(createClusterFlags(), flags.WaitCommandFlags...),
+				Flags:       append(createVirtualClusterFlags(), flags.WaitCommandFlags...),
 				Action:      createVirtualClusterAction,
 			},
 			{

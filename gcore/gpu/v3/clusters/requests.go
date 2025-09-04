@@ -125,6 +125,13 @@ type ServerSettingsOpts struct {
 	Credentials    *ServerCredentialsOpts `json:"credentials,omitempty"`
 }
 
+type BaremetalServerSettingsOpts struct {
+	Interfaces     []InterfaceOpts        `json:"interfaces"`
+	SecurityGroups []gcorecloud.ItemID    `json:"security_groups" validate:"omitempty,dive,uuid4"`
+	UserData       *string                `json:"user_data,omitempty"`
+	Credentials    *ServerCredentialsOpts `json:"credentials,omitempty"`
+}
+
 // VolumeOpts represents options used to create a volume.
 type VolumeOpts struct {
 	Source              VolumeSource      `json:"source" validate:"required,enum"`
@@ -188,6 +195,33 @@ func (opts CreateClusterOpts) Validate() error {
 }
 
 func (opts CreateClusterOpts) ToCreateClusterMap() (map[string]interface{}, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, err
+	}
+	mp, err := gcorecloud.BuildRequestBody(opts, "")
+	if err != nil {
+		return nil, err
+	}
+	return mp, nil
+}
+
+// CreateBaremetalClusterOpts allows extensions to add parameters to create baremetal cluster options.
+type CreateBaremetalClusterOpts struct {
+	Name            string                      `json:"name" validate:"required"`
+	Flavor          string                      `json:"flavor" validate:"required"`
+	ImageID         string                      `json:"image_id" validate:"required"`
+	Tags            map[string]string           `json:"tags,omitempty"`
+	ServersCount    int                         `json:"servers_count" validate:"required"`
+	ServersSettings BaremetalServerSettingsOpts `json:"servers_settings,omitempty"`
+}
+
+// Validate checks if the provided options are valid.
+func (opts CreateBaremetalClusterOpts) Validate() error {
+	return gcorecloud.ValidateStruct(opts)
+}
+
+// ToCreateClusterMap builds a request body from CreateBaremetalClusterOpts.
+func (opts CreateBaremetalClusterOpts) ToCreateClusterMap() (map[string]interface{}, error) {
 	if err := opts.Validate(); err != nil {
 		return nil, err
 	}
