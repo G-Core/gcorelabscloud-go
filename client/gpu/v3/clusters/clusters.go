@@ -345,10 +345,13 @@ func createClusterAction(c *cli.Context, gpuType string, newClient func(*cli.Con
 		return cli.Exit("`user-data` cannot be used together with `server-username` or `server-password`", 1)
 	}
 
-	tags, err := utils.StringSliceToTags(c.StringSlice("tags"))
-	if err != nil {
-		_ = cli.ShowCommandHelp(c, "create")
-		return cli.Exit(err, 1)
+	var tags map[string]string
+	if c.IsSet("tags") {
+		tags, err = utils.StringSliceToTags(c.StringSlice("tags"))
+		if err != nil {
+			_ = cli.ShowCommandHelp(c, "create")
+			return cli.Exit(err, 1)
+		}
 	}
 	// Validate servers count
 	if c.Int("servers-count") <= 0 {
@@ -551,7 +554,7 @@ func createClusterVolumeFlags() []cli.Flag {
 		},
 		&cli.IntFlag{
 			Name:     "volume-size",
-			Usage:    "size of the volume",
+			Usage:    "size of the volume in GB",
 			Required: true,
 		},
 		&cli.StringFlag{
@@ -562,6 +565,10 @@ func createClusterVolumeFlags() []cli.Flag {
 		&cli.StringSliceFlag{
 			Name:  "volume-tags",
 			Usage: "tags for the volume",
+		},
+		&cli.BoolFlag{
+			Name:  "volume-delete-on-termination",
+			Usage: "delete volume on termination",
 		},
 		&cli.GenericFlag{
 			Name:    "volume-type",
@@ -630,10 +637,6 @@ func createCommonClusterFlags() []cli.Flag {
 			Aliases:  []string{"k"},
 			Usage:    "(ssh) keypair name for the servers in the cluster",
 			Required: false,
-		},
-		&cli.BoolFlag{
-			Name:  "volume-delete-on-termination",
-			Usage: "delete volume on termination",
 		},
 		&cli.GenericFlag{
 			Name:    "interface-type",
