@@ -6,6 +6,29 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
+// ListOptsBuilder allows extensions to add additional parameters to the List request.
+type ListOptsBuilder interface {
+	ToListClustersQuery() (string, error)
+}
+
+// ListOpts allows the filtering and sorting of paginated collections through the API.
+type ListOpts struct {
+	Limit  int `q:"limit" validate:"omitempty,gt=0,lte=30"`
+	Offset int `q:"offset" validate:"omitempty,gte=0"`
+}
+
+// ToListClustersQuery formats a ListOpts into a query string.
+func (opts ListOpts) ToListClustersQuery() (string, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return "", err
+	}
+	q, err := gcorecloud.BuildQueryString(opts)
+	if err != nil {
+		return "", err
+	}
+	return q.String(), err
+}
+
 // DeleteServerOptsBuilder allows extensions to add parameters to delete server options.
 type DeleteServerOptsBuilder interface {
 	ToServerDeleteQuery() (string, error)
@@ -39,16 +62,23 @@ func (opts DeleteServerOpts) ToServerDeleteQuery() (string, error) {
 }
 
 // List retrieves servers of a specific GPU cluster.
-func List(client *gcorecloud.ServiceClient, clusterID string) pagination.Pager {
+func List(client *gcorecloud.ServiceClient, clusterID string, opts ListOptsBuilder) pagination.Pager {
 	url := ClusterServersURL(client, clusterID)
+	if opts != nil {
+		query, err := opts.ToListClustersQuery()
+		if err != nil {
+			return pagination.Pager{Err: err}
+		}
+		url += query
+	}
 	return pagination.NewPager(client, url, func(r pagination.PageResult) pagination.Page {
 		return ServerPage{pagination.OffsetPageBase{PageResult: r}}
 	})
 }
 
 // ListAll is a convenience function that returns all servers of a specific GPU cluster.
-func ListAll(client *gcorecloud.ServiceClient, clusterID string) ([]Server, error) {
-	pages, err := List(client, clusterID).AllPages()
+func ListAll(client *gcorecloud.ServiceClient, clusterID string, opts ListOptsBuilder) ([]Server, error) {
+	pages, err := List(client, clusterID, opts).AllPages()
 	if err != nil {
 		return nil, err
 	}
