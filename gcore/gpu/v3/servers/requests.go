@@ -13,7 +13,7 @@ type ListOptsBuilder interface {
 
 // ListOpts allows the filtering and sorting of paginated collections through the API.
 type ListOpts struct {
-	Limit  int `q:"limit" validate:"omitempty,gt=0,lte=30"`
+	Limit  int `q:"limit" validate:"omitempty,gt=0"`
 	Offset int `q:"offset" validate:"omitempty,gte=0"`
 }
 

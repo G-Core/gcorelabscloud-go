@@ -24,7 +24,7 @@ func listServersAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud
 		return cli.Exit(err, 1)
 	}
 
-	servers, err := servers.ListAll(gpuClient, clusterID, servers.ListOpts{})
+	servers, err := servers.ListAll(gpuClient, clusterID, nil)
 	if err != nil {
 		return cli.Exit(err, 1)
 	}
@@ -80,7 +80,7 @@ func deleteServerAction(c *cli.Context, gpuType string, newClient func(*cli.Cont
 	}
 
 	return utils.WaitTaskAndShowResult(c, tc, results, c.Bool("d"), func(task tasks.TaskID) (interface{}, error) {
-		servers, err := servers.ListAll(gpuClient, clusterID, servers.ListOpts{})
+		servers, err := servers.ListAll(gpuClient, clusterID, nil)
 		if err != nil {
 			return nil, err
 		}
