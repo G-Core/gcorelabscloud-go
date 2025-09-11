@@ -98,7 +98,7 @@ func List(client *gcorecloud.ServiceClient, opts ListClustersOptsBuilder) pagina
 		url += query
 	}
 	return pagination.NewPager(client, url, func(r pagination.PageResult) pagination.Page {
-		return ClusterPage{pagination.LinkedPageBase{PageResult: r}}
+		return ClusterPage{pagination.OffsetPageBase{PageResult: r}}
 	})
 }
 

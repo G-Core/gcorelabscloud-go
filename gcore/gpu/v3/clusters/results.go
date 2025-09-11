@@ -186,7 +186,7 @@ type Tag struct {
 // ClusterPage is the page returned by a pager when traversing over a
 // collection of clusters.
 type ClusterPage struct {
-	pagination.LinkedPageBase
+	pagination.OffsetPageBase
 }
 
 // IsEmpty checks whether a ClusterPage struct is empty.
