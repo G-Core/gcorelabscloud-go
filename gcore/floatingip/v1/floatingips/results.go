@@ -64,6 +64,7 @@ type FloatingIPDetail struct {
 	Region            string                   `json:"region"`
 	Instance          instances.Instance       `json:"instance,omitempty"`
 	Metadata          []metadata.Metadata      `json:"metadata"`
+	Tags              []metadata.Metadata      `json:"tags"`
 }
 
 // FloatingIPPage is the page returned by a pager when traversing over a

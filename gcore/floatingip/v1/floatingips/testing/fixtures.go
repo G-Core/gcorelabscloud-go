@@ -75,8 +75,9 @@ var GetResponse = fmt.Sprintf(`
   "project_id": 1,
   "region": "ED-8",
   "region_id": 1,
- "metadata": [%s]
-}`, MetadataResponse)
+ "metadata": [%s],
+ "tags": [%s]
+}`, MetadataResponse, MetadataResponse)
 
 const CreateRequest = `
 {
@@ -148,6 +149,7 @@ const MetadataListResponse = `
 
 var AssignResponse = GetResponse
 var UnassignResponse = GetResponse
+var UpdateResponse = GetResponse
 
 var (
 	floatingIPUpdatedAtParsed, _ = time.Parse(gcorecloud.RFC3339Z, "2019-06-13T13:58:12+0000")
@@ -176,6 +178,7 @@ var (
 		RegionID:          1,
 		Region:            "ED-8",
 		Metadata:          []metadata.Metadata{ResourceMetadataReadOnly},
+		Tags:              []metadata.Metadata{ResourceMetadataReadOnly},
 	}
 
 	instance = instances.Instance{

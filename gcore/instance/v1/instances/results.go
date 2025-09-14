@@ -217,6 +217,7 @@ type FloatingIP struct {
 	RegionID          int                      `json:"region_id"`
 	Region            string                   `json:"region"`
 	Metadata          []metadata.Metadata      `json:"metadata"`
+	Tags              []metadata.Metadata      `json:"tags"`
 }
 
 // Subnet port subnet

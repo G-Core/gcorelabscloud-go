@@ -85,6 +85,16 @@ type UpdateOptsBuilder interface {
 	ToFloatingIPUpdateMap() (map[string]interface{}, error)
 }
 
+// UpdateOpts represents options used to update a floating ip.
+type UpdateOpts struct {
+	Tags map[string]*string `json:"tags"`
+}
+
+// ToFloatingIPUpdateMap builds a request body from UpdateOpts.
+func (opts UpdateOpts) ToFloatingIPUpdateMap() (map[string]interface{}, error) {
+	return gcorecloud.BuildRequestBody(opts, "")
+}
+
 // Delete accepts a unique ID and deletes the floating ip associated with it.
 func Delete(c *gcorecloud.ServiceClient, floatingID string) (r tasks.Result) {
 	_, r.Err = c.DeleteWithResponse(deleteURL(c, floatingID), &r.Body, nil)
@@ -120,5 +130,17 @@ func Assign(c *gcorecloud.ServiceClient, floatingIPID string, opts CreateOptsBui
 
 func UnAssign(c *gcorecloud.ServiceClient, floatingIPID string) (r UpdateResult) {
 	_, r.Err = c.Post(unAssignURL(c, floatingIPID), nil, &r.Body, nil)
+	return
+}
+
+// Update accepts a UpdateOpts struct and updates an existing floating ip using the
+// values provided.
+func Update(c *gcorecloud.ServiceClient, floatingIPID string, opts UpdateOptsBuilder) (r UpdateResult) {
+	b, err := opts.ToFloatingIPUpdateMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = c.Patch(updateURL(c, floatingIPID), b, &r.Body, nil)
 	return
 }
