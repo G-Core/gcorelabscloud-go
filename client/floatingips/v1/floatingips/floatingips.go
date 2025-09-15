@@ -241,66 +241,6 @@ var floatingIPUnAssignSubCommand = cli.Command{
 	},
 }
 
-var floatingIPUpdateSubCommand = cli.Command{
-	Name:      "update",
-	Usage:     "Update floating ip",
-	ArgsUsage: "<floatingip_id>",
-	Category:  "floatingip",
-	Flags: []cli.Flag{
-		&cli.StringSliceFlag{
-			Name:     "tags",
-			Aliases:  []string{"t"},
-			Usage:    "Floating ip tags. Example: --tags key1=value1 --tags key2=value2",
-			Required: false,
-		},
-		&cli.StringSliceFlag{
-			Name:     "remove-tags",
-			Aliases:  []string{"rt"},
-			Usage:    "Floating ip tag names. Example: --remove-tags key1 --remove-tags key2",
-			Required: false,
-		},
-	},
-	Action: func(c *cli.Context) error {
-		floatingIPID, err := flags.GetFirstStringArg(c, floatingIPIDText)
-		if err != nil {
-			_ = cli.ShowCommandHelp(c, "update")
-			return err
-		}
-		client, err := client.NewFloatingIPClientV1(c)
-		if err != nil {
-			_ = cli.ShowAppHelp(c)
-			return cli.Exit(err, 1)
-		}
-		tagsToAddOrReplace := map[string]string{}
-		if c.IsSet("tags") {
-			tagsToAddOrReplace, err = utils.StringSliceToTags(c.StringSlice("tags"))
-			if err != nil {
-				return cli.Exit(err, 1)
-			}
-		}
-		tagsToRemove := c.StringSlice("remove-tags")
-		if len(tagsToAddOrReplace) == 0 && len(tagsToRemove) == 0 {
-			_ = cli.ShowCommandHelp(c, "update")
-			return cli.Exit("At least one of the flags --tags or --remove-tags must be provided", 1)
-		}
-		opts := floatingips.UpdateOpts{}
-		tags := map[string]*string{}
-		for tagKey, tagValue := range tagsToAddOrReplace {
-			tags[tagKey] = utils.StringToPointer(tagValue)
-		}
-		for _, tagKey := range tagsToRemove {
-			tags[tagKey] = nil
-		}
-		opts.Tags = tags
-		floatingIP, err := floatingips.Update(client, floatingIPID, opts).Extract()
-		if err != nil {
-			return cli.Exit(err, 1)
-		}
-		utils.ShowResults(floatingIP, c.String("format"))
-		return nil
-	},
-}
-
 var Commands = cli.Command{
 	Name:  "floatingip",
 	Usage: "GCloud floating ips API",
@@ -311,7 +251,6 @@ var Commands = cli.Command{
 		&floatingIPUnAssignSubCommand,
 		&floatingIPDeleteSubCommand,
 		&floatingIPCreateSubCommand,
-		&floatingIPUpdateSubCommand,
 		&availablefloatingips.AvailableFloatingIPCommands,
 		{
 			Name:  "metadata",
