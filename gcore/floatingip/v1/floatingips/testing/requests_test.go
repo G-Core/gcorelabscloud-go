@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/G-Core/gcorelabscloud-go/client/utils"
 	"github.com/G-Core/gcorelabscloud-go/gcore/floatingip/v1/floatingips"
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
@@ -45,9 +46,11 @@ func prepareAssignTestURL(id string) string {
 func prepareUnAssignTestURL(id string) string {
 	return prepareActionTestURLParams(fake.ProjectID, fake.RegionID, id, "unassign")
 }
+
 func prepareGetActionTestURLParams(version string, id string, action string) string { // nolint
 	return fmt.Sprintf("/%s/floatingips/%d/%d/%s/%s", version, fake.ProjectID, fake.RegionID, id, action)
 }
+
 func prepareMetadataTestURL(id string) string {
 	return prepareGetActionTestURLParams("v1", id, "metadata")
 }
@@ -255,6 +258,38 @@ func TestUnAssign(t *testing.T) {
 
 	client := fake.ServiceTokenClient("floatingips", "v1")
 	ip, err := floatingips.UnAssign(client, floatingIP.ID).Extract()
+	require.NoError(t, err)
+	require.Equal(t, floatingIP, *ip)
+	require.Equal(t, floatingIPCreatedAt, ip.CreatedAt)
+	require.Equal(t, floatingIPUpdatedAt, *ip.UpdatedAt)
+}
+
+func TestUpdate(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	testURL := prepareGetTestURL(floatingIP.ID)
+
+	th.Mux.HandleFunc(testURL, func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "PATCH")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Accept", "application/json")
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, UpdateResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("floatingips", "v1")
+	ip, err := floatingips.Update(client, floatingIP.ID, floatingips.UpdateOpts{
+		Tags: map[string]*string{
+			"test1": utils.StringToPointer("test1"),
+			"test2": utils.StringToPointer("test2"),
+		},
+	}).Extract()
 	require.NoError(t, err)
 	require.Equal(t, floatingIP, *ip)
 	require.Equal(t, floatingIPCreatedAt, ip.CreatedAt)

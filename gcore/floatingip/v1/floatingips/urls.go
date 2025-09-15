@@ -39,3 +39,7 @@ func assignURL(c *gcorecloud.ServiceClient, id string) string {
 func unAssignURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceActionURL(c, id, "unassign")
 }
+
+func updateURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceURL(c, id)
+}
