@@ -2,6 +2,7 @@ package file_shares
 
 import (
 	"fmt"
+	"strings"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/client/file_shares/v1/client"
@@ -17,6 +18,9 @@ import (
 var fileShareIDText = "share_id is mandatory argument"
 
 var accessRuleIDText = "rule_id is mandatory argument"
+
+var allowedCharacters = file_shares.FileShareAllowedCharacters("").StringList()
+var pathLengths = file_shares.FileSharePathLength("").StringList()
 
 var fileShareCreateCommand = cli.Command{
 	Name:     "create",
@@ -77,6 +81,29 @@ var fileShareCreateCommand = cli.Command{
 			Usage:    "File share tags. Example: --tags one=two --tags three=four",
 			Required: false,
 		},
+		&cli.GenericFlag{
+			Name: "allowed-characters",
+			Value: &utils.EnumValue{
+				Enum: allowedCharacters,
+			},
+			Usage: fmt.Sprintf("Determines which characters are allowed in file names (%s). "+
+				"Only for 'vast' type. Example: --allowed-characters LCD", strings.Join(allowedCharacters, ", ")),
+			Required: false,
+		},
+		&cli.GenericFlag{
+			Name: "path-length",
+			Value: &utils.EnumValue{
+				Enum: allowedCharacters,
+			},
+			Usage: fmt.Sprintf("Affects the maximum limit of file path component name length (%s). "+
+				"Only for 'vast' type. Example: --path-length LCD", strings.Join(pathLengths, ", ")),
+			Required: false,
+		},
+		&cli.BoolFlag{
+			Name:     "root-squash",
+			Usage:    "Enables or disables root squash for NFS clients (true/false). Only for 'vast' type. Example: --root-squash (enables root squash).",
+			Required: false,
+		},
 	}, flags.WaitCommandFlags...,
 	),
 	Action: func(c *cli.Context) error {
@@ -105,10 +132,16 @@ var fileShareCreateCommand = cli.Command{
 			return cli.Exit("--type-name must be either 'standard' or 'vast'", 1)
 		}
 
-		// Validate if user provided network and subnet for vast, which are automatically set
-		// Validate if user provided network and subnet for 'vast' type, which are automatically set for 'vast', so they should not be provided by the user.
+		// Validate if user provided network and subnet for 'vast' type, which are automatically set for 'vast',
+		// so they should not be provided by the user.
 		if typeName == "vast" && (c.String("network") != "" || c.String("subnet") != "") {
 			return cli.Exit("--network and/or --subnet should not be provided for type-name=vast", 1)
+		}
+		// Validate if user provided vast-specific options for 'standard' type, which are only available for 'vast'.
+		if typeName == "standard" && (c.String("allowed-characters") != "" ||
+			c.String("path-length") != "" || c.IsSet("root-squash")) {
+			return cli.Exit("--allowed-characters, --path-length and --root-squash are only available for "+
+				"type-name=vast", 1)
 		}
 
 		opts := file_shares.CreateOpts{
@@ -128,6 +161,22 @@ var fileShareCreateCommand = cli.Command{
 			opts.Network = &file_shares.FileShareNetworkOpts{
 				NetworkID: c.String("network"),
 				SubnetID:  c.String("subnet"),
+			}
+		}
+
+		if typeName == "vast" {
+			if c.IsSet("allowed-characters") || c.IsSet("path-length") || c.IsSet("root-squash") {
+				opts.ShareSettings = &file_shares.ShareSettingsOpts{}
+				if c.IsSet("allowed-characters") {
+					opts.ShareSettings.AllowedCharacters = file_shares.FileShareAllowedCharacters(
+						c.String("allowed-characters"))
+				}
+				if c.IsSet("path-length") {
+					opts.ShareSettings.PathLength = file_shares.FileSharePathLength(c.String("path-length"))
+				}
+				if c.IsSet("root-squash") {
+					opts.ShareSettings.RootSquash = c.Bool("root-squash")
+				}
 			}
 		}
 
@@ -225,6 +274,29 @@ var fileShareUpdateCommand = cli.Command{
 			Usage:    "File share tag names. Example: --remove-tags key1 --remove-tags key2",
 			Required: false,
 		},
+		&cli.GenericFlag{
+			Name: "allowed-characters",
+			Value: &utils.EnumValue{
+				Enum: allowedCharacters,
+			},
+			Usage: fmt.Sprintf("Determines which characters are allowed in file names (%s). "+
+				"Only for 'vast' type. Example: --allowed-characters LCD", strings.Join(allowedCharacters, ", ")),
+			Required: false,
+		},
+		&cli.GenericFlag{
+			Name: "path-length",
+			Value: &utils.EnumValue{
+				Enum: allowedCharacters,
+			},
+			Usage: fmt.Sprintf("Affects the maximum limit of file path component name length (%s). "+
+				"Only for 'vast' type. Example: --path-length LCD", strings.Join(pathLengths, ", ")),
+			Required: false,
+		},
+		&cli.BoolFlag{
+			Name:     "root-squash",
+			Usage:    "Enables or disables root squash for NFS clients (true/false). Only for 'vast' type. Example: --root-squash (enables root squash).",
+			Required: false,
+		},
 	},
 	Action: func(c *cli.Context) error {
 		fileShareID, err := flags.GetFirstStringArg(c, fileShareIDText)
@@ -240,9 +312,12 @@ var fileShareUpdateCommand = cli.Command{
 
 		tagsToAddOrReplace, err := utils.StringSliceToTags(c.StringSlice("tags"))
 		tagsToRemove := c.StringSlice("remove-tags")
-		if c.String("name") == "" && len(tagsToAddOrReplace) == 0 && len(tagsToRemove) == 0 {
+		if !c.IsSet("name") && len(tagsToAddOrReplace) == 0 && len(tagsToRemove) == 0 &&
+			!c.IsSet("allowed-characters") && !c.IsSet("path-length") &&
+			!c.IsSet("root-squash") {
 			_ = cli.ShowCommandHelp(c, "update")
-			return cli.Exit("At least one of the flags --name, --tags or --remove-tags must be provided", 1)
+			return cli.Exit("At least one of the flags --name, --tags, --remove-tags, --allowed-characters, "+
+				"--path-length or --root-squash must be provided", 1)
 		}
 
 		opts := file_shares.UpdateWithTagsOpts{}
@@ -257,6 +332,22 @@ var fileShareUpdateCommand = cli.Command{
 			tags[tagKey] = nil // nil value indicates removal of the tag
 		}
 		opts.Tags = tags
+		// if any of these flags are set, we create a share settings opts
+		var shareSettingsOpts file_shares.ShareSettingsOpts
+		if c.IsSet("allowed-characters") || c.IsSet("path-length") || c.IsSet("root-squash") {
+			shareSettingsOpts = file_shares.ShareSettingsOpts{}
+			if c.IsSet("allowed-characters") {
+				shareSettingsOpts.AllowedCharacters = file_shares.FileShareAllowedCharacters(c.String("allowed-characters"))
+			}
+			if c.IsSet("path-length") {
+				shareSettingsOpts.PathLength = file_shares.FileSharePathLength(c.String("path-length"))
+			}
+			if c.IsSet("root-squash") {
+				shareSettingsOpts.RootSquash = c.Bool("root-squash")
+			}
+			opts.ShareSettings = &shareSettingsOpts
+		}
+
 		fileShare, err := file_shares.UpdateWithTags(client, fileShareID, opts).Extract()
 		if err != nil {
 			return cli.Exit(err, 1)

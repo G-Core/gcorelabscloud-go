@@ -42,15 +42,26 @@ type CreateAccessRuleOpts struct {
 	AccessMode string `json:"access_mode" validate:"required,oneof=ro rw"`
 }
 
+type ShareSettingsOpts struct {
+	AllowedCharacters FileShareAllowedCharacters `json:"allowed_characters,omitempty" validate:"omitempty,oneof=LCD NPL"`
+	PathLength        FileSharePathLength        `json:"path_length,omitempty" validate:"omitempty,oneof=LCD NPL"`
+	RootSquash        bool                       `json:"root_squash,omitempty" validate:"omitempty"`
+}
+
 // CreateOpts represents options used to create a file share.
 type CreateOpts struct {
-	Name     string                 `json:"name" required:"true" validate:"required"`
-	TypeName string                 `json:"type_name,omitempty" validate:"omitempty,oneof=standard vast"`
-	Protocol string                 `json:"protocol" required:"true" validate:"required,oneof=NFS"`
-	Size     int                    `json:"size" required:"true" validate:"required,gt=0"`
-	Network  *FileShareNetworkOpts  `json:"network,omitempty" validate:"omitempty,dive"`
-	Access   []CreateAccessRuleOpts `json:"access,omitempty" validate:"dive"`
-	Tags     map[string]string      `json:"tags,omitempty"`
+	Name     string            `json:"name" required:"true" validate:"required"`
+	TypeName string            `json:"type_name,omitempty" validate:"omitempty,oneof=standard vast"`
+	Protocol string            `json:"protocol" required:"true" validate:"required,oneof=NFS"`
+	Size     int               `json:"size" required:"true" validate:"required,gt=0"`
+	Tags     map[string]string `json:"tags,omitempty"`
+
+	// Only applicable for 'Standard' type
+	Network *FileShareNetworkOpts  `json:"network,omitempty" validate:"omitempty,dive"`
+	Access  []CreateAccessRuleOpts `json:"access,omitempty" validate:"dive"`
+
+	// Only applicable for 'Vast' type
+	ShareSettings *ShareSettingsOpts `json:"share_settings,omitempty" validate:"omitempty,dive"`
 }
 
 // ToFileShareCreateMap builds a request body from CreateOpts.
@@ -100,6 +111,9 @@ type UpdateOpts struct {
 type UpdateWithTagsOpts struct {
 	Name string             `json:"name,omitempty"`
 	Tags map[string]*string `json:"tags"`
+
+	// Only applicable for 'Vast' type
+	ShareSettings *ShareSettingsOpts `json:"share_settings,omitempty" validate:"omitempty,dive"`
 }
 
 // UpdateWithTagsOptsBuilder allows extensions to add additional parameters to the UpdateWithTags request.

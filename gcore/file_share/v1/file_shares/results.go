@@ -11,6 +11,10 @@ import (
 // FileShareStatus defines valid statuses for FileShare.
 type FileShareStatus string
 
+type FileShareAllowedCharacters string
+
+type FileSharePathLength string
+
 const (
 	StatusAvailable      FileShareStatus = "available"
 	StatusCreating       FileShareStatus = "creating"
@@ -19,6 +23,12 @@ const (
 	StatusErrorDeleting  FileShareStatus = "error_deleting"
 	StatusExtending      FileShareStatus = "extending"
 	StatusExtendingError FileShareStatus = "extending_error"
+
+	AllowedCharactersLCD FileShareAllowedCharacters = "LCD"
+	AllowedCharactersNPL FileShareAllowedCharacters = "NPL"
+
+	PathLengthLCD FileSharePathLength = "LCD"
+	PathLengthNPL FileSharePathLength = "NPL"
 )
 
 var validStatuses = map[FileShareStatus]struct{}{
@@ -38,6 +48,44 @@ func (s FileShareStatus) Validate() error {
 		return nil
 	}
 	return nil
+}
+
+func (o FileShareAllowedCharacters) List() []FileShareAllowedCharacters {
+	return []FileShareAllowedCharacters{
+		AllowedCharactersLCD,
+		AllowedCharactersNPL,
+	}
+}
+
+func (o FileShareAllowedCharacters) String() string {
+	return string(o)
+}
+
+func (o FileShareAllowedCharacters) StringList() []string {
+	var s []string
+	for _, v := range o.List() {
+		s = append(s, v.String())
+	}
+	return s
+}
+
+func (o FileSharePathLength) List() []FileSharePathLength {
+	return []FileSharePathLength{
+		PathLengthNPL,
+		PathLengthLCD,
+	}
+}
+
+func (o FileSharePathLength) String() string {
+	return string(o)
+}
+
+func (o FileSharePathLength) StringList() []string {
+	var s []string
+	for _, v := range o.List() {
+		s = append(s, v.String())
+	}
+	return s
 }
 
 type commonResult struct {
@@ -88,6 +136,13 @@ type Tag struct {
 	ReadOnly bool   `json:"read_only"`
 }
 
+type FileShareSettings struct {
+	AllowedCharacters *FileShareAllowedCharacters `json:"allowed_characters"`
+	PathLength        *FileSharePathLength        `json:"path_length"`
+	RootSquash        *bool                       `json:"root_squash"`
+	TypeName          string                      `json:"type_name"`
+}
+
 // FileShare represents a file share structure.
 type FileShare struct {
 	Name             string                          `json:"name"`
@@ -110,6 +165,7 @@ type FileShare struct {
 	Region           string                          `json:"region"`
 	Metadata         map[string]interface{}          `json:"metadata"`
 	Tags             []Tag                           `json:"tags"`
+	ShareSettings    FileShareSettings               `json:"share_settings"`
 }
 
 // Validate validates the FileShare structure.
