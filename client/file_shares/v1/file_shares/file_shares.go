@@ -103,6 +103,7 @@ var fileShareCreateCommand = cli.Command{
 			Name:     "root-squash",
 			Usage:    "Enables or disables root squash for NFS clients (true/false). Only for 'vast' type. Example: --root-squash (enables root squash).",
 			Required: false,
+			Value:    true,
 		},
 	}, flags.WaitCommandFlags...,
 	),
@@ -296,6 +297,7 @@ var fileShareUpdateCommand = cli.Command{
 			Name:     "root-squash",
 			Usage:    "Enables or disables root squash for NFS clients (true/false). Only for 'vast' type. Example: --root-squash (enables root squash).",
 			Required: false,
+			Value:    true,
 		},
 	},
 	Action: func(c *cli.Context) error {
