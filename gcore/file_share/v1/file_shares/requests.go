@@ -45,7 +45,7 @@ type CreateAccessRuleOpts struct {
 type ShareSettingsOpts struct {
 	AllowedCharacters FileShareAllowedCharacters `json:"allowed_characters,omitempty" validate:"omitempty,oneof=LCD NPL"`
 	PathLength        FileSharePathLength        `json:"path_length,omitempty" validate:"omitempty,oneof=LCD NPL"`
-	RootSquash        bool                       `json:"root_squash,omitempty" validate:"omitempty"`
+	RootSquash        *bool                      `json:"root_squash,omitempty" validate:"omitempty"`
 }
 
 // CreateOpts represents options used to create a file share.

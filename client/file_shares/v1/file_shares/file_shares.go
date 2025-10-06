@@ -176,7 +176,8 @@ var fileShareCreateCommand = cli.Command{
 					opts.ShareSettings.PathLength = file_shares.FileSharePathLength(c.String("path-length"))
 				}
 				if c.IsSet("root-squash") {
-					opts.ShareSettings.RootSquash = c.Bool("root-squash")
+					rootSquash := c.Bool("root-squash")
+					opts.ShareSettings.RootSquash = &rootSquash
 				}
 			}
 		}
@@ -345,11 +346,11 @@ var fileShareUpdateCommand = cli.Command{
 				shareSettingsOpts.PathLength = file_shares.FileSharePathLength(c.String("path-length"))
 			}
 			if c.IsSet("root-squash") {
-				shareSettingsOpts.RootSquash = c.Bool("root-squash")
+				rootSquash := c.Bool("root-squash")
+				shareSettingsOpts.RootSquash = &rootSquash
 			}
 			opts.ShareSettings = &shareSettingsOpts
 		}
-
 		fileShare, err := file_shares.UpdateWithTags(client, fileShareID, opts).Extract()
 		if err != nil {
 			return cli.Exit(err, 1)
