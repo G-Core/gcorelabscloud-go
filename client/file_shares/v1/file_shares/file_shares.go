@@ -101,7 +101,7 @@ var fileShareCreateCommand = cli.Command{
 		},
 		&cli.BoolFlag{
 			Name:     "root-squash",
-			Usage:    "Enables or disables root squash for NFS clients (true/false). Only for 'vast' type. Example: --root-squash (enables root squash).",
+			Usage:    "Enables or disables root squash for NFS clients (true/false). Only for 'vast' type. Example: Use '--root-squash to enable and '--root-squash=false' to disable.",
 			Required: false,
 			Value:    true,
 		},
@@ -296,7 +296,7 @@ var fileShareUpdateCommand = cli.Command{
 		},
 		&cli.BoolFlag{
 			Name:     "root-squash",
-			Usage:    "Enables or disables root squash for NFS clients (true/false). Only for 'vast' type. Example: --root-squash (enables root squash).",
+			Usage:    "Enables or disables root squash for NFS clients (true/false). Only for 'vast' type. Example: Use '--root-squash to enable and '--root-squash=false' to disable.",
 			Required: false,
 			Value:    true,
 		},
