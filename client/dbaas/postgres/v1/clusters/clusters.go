@@ -192,7 +192,7 @@ func deleteClusterAction(c *cli.Context) error {
 	return utils.WaitTaskAndShowResult(c, pgClient, taskResults, false, func(task tasks.TaskID) (interface{}, error) {
 		_, err := clusters.Get(pgClient, clusterName).Extract()
 		if err == nil {
-			return nil, fmt.Errorf("cannot delete posgres cluster with name: %s", clusterName)
+			return nil, fmt.Errorf("cannot delete postgres cluster with name: %s", clusterName)
 		}
 		switch err.(type) {
 		case gcorecloud.ErrDefault404:
