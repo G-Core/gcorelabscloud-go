@@ -1,7 +1,10 @@
 package clusters
 
 import (
+	"fmt"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
@@ -42,6 +45,22 @@ func ExtractClusters(r pagination.Page) ([]PostgresSQLClusterShort, error) {
 
 func ExtractClustersInto(r pagination.Page, v interface{}) error {
 	return r.(ClusterPage).Result.ExtractIntoSlicePtr(v, "results")
+}
+
+type ClusterTaskResult struct {
+	PostgresClusters []string `mapstructure:"postgresql_clusters"`
+}
+
+func ExtractClusterNameFromTask(task *tasks.Task) (string, error) {
+	var result ClusterTaskResult
+	err := gcorecloud.NativeMapToStruct(task.CreatedResources, &result)
+	if err != nil {
+		return "", fmt.Errorf("cannot decode postgres cluster information in task structure: %w", err)
+	}
+	if len(result.PostgresClusters) == 0 {
+		return "", fmt.Errorf("cannot decode postgres cluster information in task structure: %w", err)
+	}
+	return result.PostgresClusters[0], nil
 }
 
 type DatabaseOverview struct {
