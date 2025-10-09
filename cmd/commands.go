@@ -8,6 +8,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/client/ais/v1/ais"
 	"github.com/G-Core/gcorelabscloud-go/client/apitokens/v1/apitokens"
 	"github.com/G-Core/gcorelabscloud-go/client/apptemplates/v1/apptemplates"
+	"github.com/G-Core/gcorelabscloud-go/client/dbaas/postgres/v1"
 	"github.com/G-Core/gcorelabscloud-go/client/faas/v1/functions"
 	"github.com/G-Core/gcorelabscloud-go/client/file_shares/v1/file_shares"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
@@ -81,6 +82,7 @@ var commands = []*cli.Command{
 	&ais.Commands,
 	&functions.Commands,
 	&gpu.Commands,
+	&postgres.Commands,
 }
 
 type clientCommands struct {
