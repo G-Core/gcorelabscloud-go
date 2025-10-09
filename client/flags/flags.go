@@ -152,6 +152,21 @@ var retryFlags = []cli.Flag{
 	},
 }
 
+var OffsetLimitFlags = []cli.Flag{
+	&cli.IntFlag{
+		Name:     "offset",
+		Usage:    "offset of the first item to return from the list",
+		Value:    0,
+		Required: false,
+	},
+	&cli.IntFlag{
+		Name:     "limit",
+		Usage:    "maximum number of items to return from the list",
+		Value:    10,
+		Required: false,
+	},
+}
+
 func buildTokenClientFlags() []cli.Flag {
 	var flags []cli.Flag
 	flags = append(flags, commonFlags...)
