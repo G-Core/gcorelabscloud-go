@@ -40,6 +40,10 @@ type DeleteOptsBuilder interface {
 // DeleteOpts specifies the parameters for the Delete method.
 type DeleteOpts struct{}
 
+func (d DeleteOpts) ToClusterDeleteQuery() (string, error) {
+	return "", nil
+}
+
 type DatabaseOpts struct {
 	Name  string `json:"name" validate:"required"`
 	Owner string `json:"owner" validate:"required"`

@@ -181,7 +181,7 @@ func deleteClusterAction(c *cli.Context) error {
 		return cli.Exit(err, 1)
 	}
 
-	result := clusters.Delete(pgClient, clusterName, nil)
+	result := clusters.Delete(pgClient, clusterName, clusters.DeleteOpts{})
 	if result.Err != nil {
 		return cli.Exit(result.Err, 1)
 	}
