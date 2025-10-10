@@ -65,5 +65,10 @@ func WaitTaskAndReturnResult(
 	return result, nil
 }
 
+// WaitForFinishedTask is a convenience function for waiting for a task to finish and stopping on error
+func WaitForFinishedTask(client *gcorecloud.ServiceClient, task TaskID, secs int) error {
+	return WaitForStatus(client, string(task), TaskStateFinished, secs, true)
+}
+
 type RetrieveTaskResult func(task TaskID) (interface{}, error)
 type CheckTaskResult func(task TaskID) error
