@@ -373,7 +373,22 @@ func updateClusterAction(c *cli.Context) error {
 		}
 		opts.Users = newUsers
 	}
+
+	if c.IsSet("pg-config-conf") || c.IsSet("pg-config-version") {
+		if opts.PGServerConfiguration == nil {
+			opts.PGServerConfiguration = &clusters.PGServerConfigurationOpts{}
+		}
+		if c.IsSet("pg-config-conf") {
+			opts.PGServerConfiguration.PGConf = c.String("pg-config-conf")
+		}
+		if c.IsSet("pg-config-version") {
+			opts.PGServerConfiguration.Version = c.String("pg-config-version")
+		}
+	}
 	if c.IsSet("pg-config-pooler-mode") {
+		if opts.PGServerConfiguration == nil {
+			opts.PGServerConfiguration = &clusters.PGServerConfigurationOpts{}
+		}
 		opts.PGServerConfiguration.Pooler = &clusters.PoolerOpts{
 			Mode: clusters.PoolerMode(c.String("pg-config-pooler-mode")),
 			Type: "pgbouncer",
@@ -738,6 +753,16 @@ func updateClusterFlags() []cli.Flag {
 		&cli.StringFlag{
 			Name:     "pg-config-pooler-mode",
 			Usage:    "mode of the connection pooler (e.g. session, statement, transaction)",
+			Required: false,
+		},
+		&cli.StringFlag{
+			Name:     "pg-config-conf",
+			Usage:    `pg.conf settings (e.g. "\nlisten_addresses = 'localhost'\nport = 5432")`,
+			Required: false,
+		},
+		&cli.StringFlag{
+			Name:     "pg-config-version",
+			Usage:    "version of PostgreSQL (e.g. 13, 14, 15)",
 			Required: false,
 		},
 		&cli.StringSliceFlag{
