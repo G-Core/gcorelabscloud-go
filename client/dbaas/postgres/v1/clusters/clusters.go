@@ -374,24 +374,19 @@ func updateClusterAction(c *cli.Context) error {
 		opts.Users = newUsers
 	}
 
-	if c.IsSet("pg-config-conf") || c.IsSet("pg-config-version") {
-		if opts.PGServerConfiguration == nil {
-			opts.PGServerConfiguration = &clusters.PGServerConfigurationOpts{}
-		}
+	if c.IsSet("pg-config-conf") || c.IsSet("pg-config-version") || c.IsSet("pg-config-pooler-mode") {
+		opts.PGServerConfiguration = &clusters.PGServerConfigurationUpdateOpts{}
 		if c.IsSet("pg-config-conf") {
 			opts.PGServerConfiguration.PGConf = c.String("pg-config-conf")
 		}
 		if c.IsSet("pg-config-version") {
 			opts.PGServerConfiguration.Version = c.String("pg-config-version")
 		}
-	}
-	if c.IsSet("pg-config-pooler-mode") {
-		if opts.PGServerConfiguration == nil {
-			opts.PGServerConfiguration = &clusters.PGServerConfigurationOpts{}
-		}
-		opts.PGServerConfiguration.Pooler = &clusters.PoolerOpts{
-			Mode: clusters.PoolerMode(c.String("pg-config-pooler-mode")),
-			Type: "pgbouncer",
+		if c.IsSet("pg-config-pooler-mode") {
+			opts.PGServerConfiguration.Pooler = &clusters.PoolerOpts{
+				Mode: clusters.PoolerMode(c.String("pg-config-pooler-mode")),
+				Type: "pgbouncer",
+			}
 		}
 	}
 	if c.IsSet("ha-replication-mode") {

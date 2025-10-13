@@ -74,6 +74,12 @@ type PGServerConfigurationOpts struct {
 	Pooler  *PoolerOpts `json:"pooler,omitempty" validate:"omitempty"`
 }
 
+type PGServerConfigurationUpdateOpts struct {
+	PGConf  string      `json:"pg_conf,omitempty" validate:"omitempty"`
+	Version string      `json:"version,omitempty" validate:"omitempty"`
+	Pooler  *PoolerOpts `json:"pooler,omitempty" validate:"omitempty"`
+}
+
 type PGStorageConfigurationOpts struct {
 	SizeGiB int    `json:"size_gib" validate:"required,gte=1,lte=100"`
 	Type    string `json:"type" validate:"required"`
@@ -127,7 +133,7 @@ type UpdateOpts struct {
 	Flavor                *FlavorOpts                       `json:"flavor,omitempty" validate:"omitempty"`
 	HighAvailability      *HighAvailabilityOpts             `json:"high_availability,omitempty" validate:"omitempty"`
 	Network               *NetworkOpts                      `json:"network,omitempty" validate:"omitempty"`
-	PGServerConfiguration *PGServerConfigurationOpts        `json:"pg_server_configuration,omitempty" validate:"omitempty"`
+	PGServerConfiguration *PGServerConfigurationUpdateOpts  `json:"pg_server_configuration,omitempty" validate:"omitempty"`
 	Storage               *PGStorageConfigurationUpdateOpts `json:"storage,omitempty" validate:"omitempty"`
 	Users                 []PgUserOpts                      `json:"users,omitempty" validate:"omitempty,dive"`
 }
