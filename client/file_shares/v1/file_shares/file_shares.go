@@ -7,6 +7,7 @@ import (
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/client/file_shares/v1/client"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
+	taskClient "github.com/G-Core/gcorelabscloud-go/client/tasks/v1/client"
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
 	cmeta "github.com/G-Core/gcorelabscloud-go/client/utils/metadata"
 	"github.com/G-Core/gcorelabscloud-go/gcore/file_share/v1/file_shares"
@@ -186,10 +187,14 @@ var fileShareCreateCommand = cli.Command{
 		if err != nil {
 			return cli.Exit(err, 1)
 		}
-		if results == nil {
+
+		tc, err := taskClient.NewTaskClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
 			return cli.Exit(err, 1)
 		}
-		return utils.WaitTaskAndShowResult(c, client, results, true, func(task tasks.TaskID) (interface{}, error) {
+
+		return utils.WaitTaskAndShowResult(c, tc, results, true, func(task tasks.TaskID) (interface{}, error) {
 			taskInfo, err := tasks.Get(client, string(task)).Extract()
 			if err != nil {
 				return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
@@ -257,7 +262,7 @@ var fileShareUpdateCommand = cli.Command{
 	Usage:     "Update file share",
 	ArgsUsage: "<share_id>",
 	Category:  "file share",
-	Flags: []cli.Flag{
+	Flags: append([]cli.Flag{
 		&cli.StringFlag{
 			Name:     "name",
 			Aliases:  []string{"n"},
@@ -300,14 +305,20 @@ var fileShareUpdateCommand = cli.Command{
 			Required: false,
 			Value:    true,
 		},
-	},
+	}, flags.WaitCommandFlags...,
+	),
 	Action: func(c *cli.Context) error {
 		fileShareID, err := flags.GetFirstStringArg(c, fileShareIDText)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.Exit(err, 1)
 		}
-		client, err := client.NewFileShareClientV1(c)
+		clientV1, err := client.NewFileShareClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.Exit(err, 1)
+		}
+		clientV3, err := client.NewFileShareClientV3(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.Exit(err, 1)
@@ -351,15 +362,25 @@ var fileShareUpdateCommand = cli.Command{
 			}
 			opts.ShareSettings = &shareSettingsOpts
 		}
-		fileShare, err := file_shares.UpdateWithTags(client, fileShareID, opts).Extract()
+		results, err := file_shares.UpdateWithTags(clientV3, fileShareID, opts).Extract()
 		if err != nil {
 			return cli.Exit(err, 1)
 		}
-		if fileShare == nil {
+
+		tc, err := taskClient.NewTaskClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
 			return cli.Exit(err, 1)
 		}
-		utils.ShowResults(fileShare, c.String("format"))
-		return nil
+
+		return utils.WaitTaskAndShowResult(c, tc, results, true, func(task tasks.TaskID) (interface{}, error) {
+			fileShare, err := file_shares.Get(clientV1, fileShareID).Extract()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get file share with ID: %s. Error: %w", fileShareID, err)
+			}
+			utils.ShowResults(fileShare, c.String("format"))
+			return nil, nil
+		})
 	},
 }
 
@@ -395,10 +416,13 @@ var fileShareResizeCommand = cli.Command{
 		if err != nil {
 			return cli.Exit(err, 1)
 		}
-		if results == nil {
+
+		tc, err := taskClient.NewTaskClientV1(c)
+		if err != nil {
 			return cli.Exit(err, 1)
 		}
-		return utils.WaitTaskAndShowResult(c, client, results, true, func(task tasks.TaskID) (interface{}, error) {
+
+		return utils.WaitTaskAndShowResult(c, tc, results, true, func(task tasks.TaskID) (interface{}, error) {
 			fileShare, err := file_shares.Get(client, fileShareID).Extract()
 			if err != nil {
 				return nil, fmt.Errorf("cannot get file share with ID: %s. Error: %w", fileShareID, err)
@@ -413,6 +437,7 @@ var fileShareDeleteCommand = cli.Command{
 	Usage:     "Delete file share",
 	ArgsUsage: "<share_id>",
 	Category:  "file share",
+	Flags:     flags.WaitCommandFlags,
 	Action: func(c *cli.Context) error {
 		fileShareID, err := flags.GetFirstStringArg(c, fileShareIDText)
 		if err != nil {
@@ -428,11 +453,13 @@ var fileShareDeleteCommand = cli.Command{
 		if err != nil {
 			return cli.Exit(err, 1)
 		}
-		if results == nil {
+
+		tc, err := taskClient.NewTaskClientV1(c)
+		if err != nil {
 			return cli.Exit(err, 1)
 		}
 
-		return utils.WaitTaskAndShowResult(c, client, results, false, func(task tasks.TaskID) (interface{}, error) {
+		return utils.WaitTaskAndShowResult(c, tc, results, false, func(task tasks.TaskID) (interface{}, error) {
 			_, err := file_shares.Get(client, fileShareID).Extract()
 			if err == nil {
 				return nil, fmt.Errorf("cannot delete file share with ID: %s", fileShareID)
