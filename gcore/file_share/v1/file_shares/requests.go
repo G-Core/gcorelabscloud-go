@@ -42,15 +42,26 @@ type CreateAccessRuleOpts struct {
 	AccessMode string `json:"access_mode" validate:"required,oneof=ro rw"`
 }
 
+type ShareSettingsOpts struct {
+	AllowedCharacters FileShareAllowedCharacters `json:"allowed_characters,omitempty" validate:"omitempty,oneof=LCD NPL"`
+	PathLength        FileSharePathLength        `json:"path_length,omitempty" validate:"omitempty,oneof=LCD NPL"`
+	RootSquash        *bool                      `json:"root_squash,omitempty" validate:"omitempty"`
+}
+
 // CreateOpts represents options used to create a file share.
 type CreateOpts struct {
-	Name     string                 `json:"name" required:"true" validate:"required"`
-	TypeName string                 `json:"type_name,omitempty" validate:"omitempty,oneof=standard vast"`
-	Protocol string                 `json:"protocol" required:"true" validate:"required,oneof=NFS"`
-	Size     int                    `json:"size" required:"true" validate:"required,gt=0"`
-	Network  *FileShareNetworkOpts  `json:"network,omitempty" validate:"omitempty,dive"`
-	Access   []CreateAccessRuleOpts `json:"access,omitempty" validate:"dive"`
-	Tags     map[string]string      `json:"tags,omitempty"`
+	Name     string            `json:"name" required:"true" validate:"required"`
+	TypeName string            `json:"type_name,omitempty" validate:"omitempty,oneof=standard vast"`
+	Protocol string            `json:"protocol" required:"true" validate:"required,oneof=NFS"`
+	Size     int               `json:"size" required:"true" validate:"required,gt=0"`
+	Tags     map[string]string `json:"tags,omitempty"`
+
+	// Only applicable for 'Standard' type
+	Network *FileShareNetworkOpts  `json:"network,omitempty" validate:"omitempty,dive"`
+	Access  []CreateAccessRuleOpts `json:"access,omitempty" validate:"dive"`
+
+	// Only applicable for 'Vast' type
+	ShareSettings *ShareSettingsOpts `json:"share_settings,omitempty" validate:"omitempty,dive"`
 }
 
 // ToFileShareCreateMap builds a request body from CreateOpts.
@@ -100,6 +111,9 @@ type UpdateOpts struct {
 type UpdateWithTagsOpts struct {
 	Name string             `json:"name,omitempty"`
 	Tags map[string]*string `json:"tags"`
+
+	// Only applicable for 'Vast' type
+	ShareSettings *ShareSettingsOpts `json:"share_settings,omitempty" validate:"omitempty,dive"`
 }
 
 // UpdateWithTagsOptsBuilder allows extensions to add additional parameters to the UpdateWithTags request.
@@ -344,27 +358,27 @@ func CheckLimits(c *gcorecloud.ServiceClient, opts CheckLimitsOptsBuilder) (r Ch
 // UpdateWithTags accepts a UpdateWithTagsOpts struct and updates an existing file share using the
 // values provided. For more information, see the Create function.
 // Use this method to update many properties of a file share in a single request.
-func UpdateWithTags(c *gcorecloud.ServiceClient, fileShareID string, opts UpdateWithTagsOpts) (r UpdateResult) {
+func UpdateWithTags(c *gcorecloud.ServiceClient, fileShareID string, opts UpdateWithTagsOpts) (r tasks.Result) {
 	b, err := opts.ToFileShareUpdateWithTagsMap()
 	if err != nil {
 		r.Err = err
 		return
 	}
 	_, r.Err = c.Patch(updateURL(c, fileShareID), b, &r.Body, &gcorecloud.RequestOpts{
-		OkCodes: []int{200, 201},
+		OkCodes: []int{200},
 	})
 	return
 }
 
 // Rename updates the name of an existing file share.
-func Rename(client *gcorecloud.ServiceClient, fileShareID string, newName string) (r UpdateResult) {
+func Rename(client *gcorecloud.ServiceClient, fileShareID string, newName string) (r tasks.Result) {
 	opts := UpdateWithTagsOpts{Name: newName, Tags: make(map[string]*string)}
 	r = UpdateWithTags(client, fileShareID, opts)
 	return
 }
 
 // UpdateTags updates the tags (adds or replaces) of an existing file share.
-func UpdateTags(client *gcorecloud.ServiceClient, fileShareID string, tags map[string]string) (r UpdateResult) {
+func UpdateTags(client *gcorecloud.ServiceClient, fileShareID string, tags map[string]string) (r tasks.Result) {
 	convertedTags := make(map[string]*string, len(tags))
 	for k, v := range tags {
 		val := v
@@ -376,7 +390,7 @@ func UpdateTags(client *gcorecloud.ServiceClient, fileShareID string, tags map[s
 }
 
 // RemoveTags removes specified tags from an existing file share.
-func RemoveTags(client *gcorecloud.ServiceClient, fileShareID string, tags []string) (r UpdateResult) {
+func RemoveTags(client *gcorecloud.ServiceClient, fileShareID string, tags []string) (r tasks.Result) {
 	opts := UpdateWithTagsOpts{Tags: make(map[string]*string, len(tags))}
 	for _, tag := range tags {
 		opts.Tags[tag] = nil // Setting the value to nil indicates removal of the tag
@@ -386,14 +400,14 @@ func RemoveTags(client *gcorecloud.ServiceClient, fileShareID string, tags []str
 }
 
 // RemoveAllTags removes all (custom) tags from an existing file share.
-func RemoveAllTags(client *gcorecloud.ServiceClient, fileShareID string) (r UpdateResult) {
+func RemoveAllTags(client *gcorecloud.ServiceClient, fileShareID string) (r tasks.Result) {
 	opts := UpdateWithTagsOpts{Tags: nil}
 	r = UpdateWithTags(client, fileShareID, opts)
 	return r
 }
 
 // UpdateAndRemoveTags updates existing, adds new, and removes specified tags in a single operation.
-func UpdateAndRemoveTags(client *gcorecloud.ServiceClient, fileShareID string, tags map[string]*string) (r UpdateResult) {
+func UpdateAndRemoveTags(client *gcorecloud.ServiceClient, fileShareID string, tags map[string]*string) (r tasks.Result) {
 	opts := UpdateWithTagsOpts{Tags: tags}
 	r = UpdateWithTags(client, fileShareID, opts)
 	return r

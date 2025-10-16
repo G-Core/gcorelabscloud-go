@@ -2,10 +2,12 @@ package file_shares
 
 import (
 	"fmt"
+	"strings"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/client/file_shares/v1/client"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
+	taskClient "github.com/G-Core/gcorelabscloud-go/client/tasks/v1/client"
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
 	cmeta "github.com/G-Core/gcorelabscloud-go/client/utils/metadata"
 	"github.com/G-Core/gcorelabscloud-go/gcore/file_share/v1/file_shares"
@@ -17,6 +19,9 @@ import (
 var fileShareIDText = "share_id is mandatory argument"
 
 var accessRuleIDText = "rule_id is mandatory argument"
+
+var allowedCharacters = file_shares.FileShareAllowedCharacters("").StringList()
+var pathLengths = file_shares.FileSharePathLength("").StringList()
 
 var fileShareCreateCommand = cli.Command{
 	Name:     "create",
@@ -77,6 +82,30 @@ var fileShareCreateCommand = cli.Command{
 			Usage:    "File share tags. Example: --tags one=two --tags three=four",
 			Required: false,
 		},
+		&cli.GenericFlag{
+			Name: "allowed-characters",
+			Value: &utils.EnumValue{
+				Enum: allowedCharacters,
+			},
+			Usage: fmt.Sprintf("Determines which characters are allowed in file names (%s). "+
+				"Only for 'vast' type. Example: --allowed-characters LCD", strings.Join(allowedCharacters, ", ")),
+			Required: false,
+		},
+		&cli.GenericFlag{
+			Name: "path-length",
+			Value: &utils.EnumValue{
+				Enum: allowedCharacters,
+			},
+			Usage: fmt.Sprintf("Affects the maximum limit of file path component name length (%s). "+
+				"Only for 'vast' type. Example: --path-length LCD", strings.Join(pathLengths, ", ")),
+			Required: false,
+		},
+		&cli.BoolFlag{
+			Name:     "root-squash",
+			Usage:    "Enables or disables root squash for NFS clients (true/false). Only for 'vast' type. Example: Use '--root-squash to enable and '--root-squash=false' to disable.",
+			Required: false,
+			Value:    true,
+		},
 	}, flags.WaitCommandFlags...,
 	),
 	Action: func(c *cli.Context) error {
@@ -105,10 +134,16 @@ var fileShareCreateCommand = cli.Command{
 			return cli.Exit("--type-name must be either 'standard' or 'vast'", 1)
 		}
 
-		// Validate if user provided network and subnet for vast, which are automatically set
-		// Validate if user provided network and subnet for 'vast' type, which are automatically set for 'vast', so they should not be provided by the user.
+		// Validate if user provided network and subnet for 'vast' type, which are automatically set for 'vast',
+		// so they should not be provided by the user.
 		if typeName == "vast" && (c.String("network") != "" || c.String("subnet") != "") {
 			return cli.Exit("--network and/or --subnet should not be provided for type-name=vast", 1)
+		}
+		// Validate if user provided vast-specific options for 'standard' type, which are only available for 'vast'.
+		if typeName == "standard" && (c.String("allowed-characters") != "" ||
+			c.String("path-length") != "" || c.IsSet("root-squash")) {
+			return cli.Exit("--allowed-characters, --path-length and --root-squash are only available for "+
+				"type-name=vast", 1)
 		}
 
 		opts := file_shares.CreateOpts{
@@ -131,14 +166,35 @@ var fileShareCreateCommand = cli.Command{
 			}
 		}
 
+		if typeName == "vast" {
+			if c.IsSet("allowed-characters") || c.IsSet("path-length") || c.IsSet("root-squash") {
+				opts.ShareSettings = &file_shares.ShareSettingsOpts{}
+				if c.IsSet("allowed-characters") {
+					opts.ShareSettings.AllowedCharacters = file_shares.FileShareAllowedCharacters(
+						c.String("allowed-characters"))
+				}
+				if c.IsSet("path-length") {
+					opts.ShareSettings.PathLength = file_shares.FileSharePathLength(c.String("path-length"))
+				}
+				if c.IsSet("root-squash") {
+					rootSquash := c.Bool("root-squash")
+					opts.ShareSettings.RootSquash = &rootSquash
+				}
+			}
+		}
+
 		results, err := file_shares.Create(client, opts).Extract()
 		if err != nil {
 			return cli.Exit(err, 1)
 		}
-		if results == nil {
+
+		tc, err := taskClient.NewTaskClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
 			return cli.Exit(err, 1)
 		}
-		return utils.WaitTaskAndShowResult(c, client, results, true, func(task tasks.TaskID) (interface{}, error) {
+
+		return utils.WaitTaskAndShowResult(c, tc, results, true, func(task tasks.TaskID) (interface{}, error) {
 			taskInfo, err := tasks.Get(client, string(task)).Extract()
 			if err != nil {
 				return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
@@ -206,7 +262,7 @@ var fileShareUpdateCommand = cli.Command{
 	Usage:     "Update file share",
 	ArgsUsage: "<share_id>",
 	Category:  "file share",
-	Flags: []cli.Flag{
+	Flags: append([]cli.Flag{
 		&cli.StringFlag{
 			Name:     "name",
 			Aliases:  []string{"n"},
@@ -225,14 +281,44 @@ var fileShareUpdateCommand = cli.Command{
 			Usage:    "File share tag names. Example: --remove-tags key1 --remove-tags key2",
 			Required: false,
 		},
-	},
+		&cli.GenericFlag{
+			Name: "allowed-characters",
+			Value: &utils.EnumValue{
+				Enum: allowedCharacters,
+			},
+			Usage: fmt.Sprintf("Determines which characters are allowed in file names (%s). "+
+				"Only for 'vast' type. Example: --allowed-characters LCD", strings.Join(allowedCharacters, ", ")),
+			Required: false,
+		},
+		&cli.GenericFlag{
+			Name: "path-length",
+			Value: &utils.EnumValue{
+				Enum: allowedCharacters,
+			},
+			Usage: fmt.Sprintf("Affects the maximum limit of file path component name length (%s). "+
+				"Only for 'vast' type. Example: --path-length LCD", strings.Join(pathLengths, ", ")),
+			Required: false,
+		},
+		&cli.BoolFlag{
+			Name:     "root-squash",
+			Usage:    "Enables or disables root squash for NFS clients (true/false). Only for 'vast' type. Example: Use '--root-squash to enable and '--root-squash=false' to disable.",
+			Required: false,
+			Value:    true,
+		},
+	}, flags.WaitCommandFlags...,
+	),
 	Action: func(c *cli.Context) error {
 		fileShareID, err := flags.GetFirstStringArg(c, fileShareIDText)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.Exit(err, 1)
 		}
-		client, err := client.NewFileShareClientV1(c)
+		clientV1, err := client.NewFileShareClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
+			return cli.Exit(err, 1)
+		}
+		clientV3, err := client.NewFileShareClientV3(c)
 		if err != nil {
 			_ = cli.ShowAppHelp(c)
 			return cli.Exit(err, 1)
@@ -240,9 +326,12 @@ var fileShareUpdateCommand = cli.Command{
 
 		tagsToAddOrReplace, err := utils.StringSliceToTags(c.StringSlice("tags"))
 		tagsToRemove := c.StringSlice("remove-tags")
-		if c.String("name") == "" && len(tagsToAddOrReplace) == 0 && len(tagsToRemove) == 0 {
+		if !c.IsSet("name") && len(tagsToAddOrReplace) == 0 && len(tagsToRemove) == 0 &&
+			!c.IsSet("allowed-characters") && !c.IsSet("path-length") &&
+			!c.IsSet("root-squash") {
 			_ = cli.ShowCommandHelp(c, "update")
-			return cli.Exit("At least one of the flags --name, --tags or --remove-tags must be provided", 1)
+			return cli.Exit("At least one of the flags --name, --tags, --remove-tags, --allowed-characters, "+
+				"--path-length or --root-squash must be provided", 1)
 		}
 
 		opts := file_shares.UpdateWithTagsOpts{}
@@ -257,15 +346,41 @@ var fileShareUpdateCommand = cli.Command{
 			tags[tagKey] = nil // nil value indicates removal of the tag
 		}
 		opts.Tags = tags
-		fileShare, err := file_shares.UpdateWithTags(client, fileShareID, opts).Extract()
+		// if any of these flags are set, we create a share settings opts
+		var shareSettingsOpts file_shares.ShareSettingsOpts
+		if c.IsSet("allowed-characters") || c.IsSet("path-length") || c.IsSet("root-squash") {
+			shareSettingsOpts = file_shares.ShareSettingsOpts{}
+			if c.IsSet("allowed-characters") {
+				shareSettingsOpts.AllowedCharacters = file_shares.FileShareAllowedCharacters(c.String("allowed-characters"))
+			}
+			if c.IsSet("path-length") {
+				shareSettingsOpts.PathLength = file_shares.FileSharePathLength(c.String("path-length"))
+			}
+			if c.IsSet("root-squash") {
+				rootSquash := c.Bool("root-squash")
+				shareSettingsOpts.RootSquash = &rootSquash
+			}
+			opts.ShareSettings = &shareSettingsOpts
+		}
+		results, err := file_shares.UpdateWithTags(clientV3, fileShareID, opts).Extract()
 		if err != nil {
 			return cli.Exit(err, 1)
 		}
-		if fileShare == nil {
+
+		tc, err := taskClient.NewTaskClientV1(c)
+		if err != nil {
+			_ = cli.ShowAppHelp(c)
 			return cli.Exit(err, 1)
 		}
-		utils.ShowResults(fileShare, c.String("format"))
-		return nil
+
+		return utils.WaitTaskAndShowResult(c, tc, results, true, func(task tasks.TaskID) (interface{}, error) {
+			fileShare, err := file_shares.Get(clientV1, fileShareID).Extract()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get file share with ID: %s. Error: %w", fileShareID, err)
+			}
+			utils.ShowResults(fileShare, c.String("format"))
+			return nil, nil
+		})
 	},
 }
 
@@ -301,10 +416,13 @@ var fileShareResizeCommand = cli.Command{
 		if err != nil {
 			return cli.Exit(err, 1)
 		}
-		if results == nil {
+
+		tc, err := taskClient.NewTaskClientV1(c)
+		if err != nil {
 			return cli.Exit(err, 1)
 		}
-		return utils.WaitTaskAndShowResult(c, client, results, true, func(task tasks.TaskID) (interface{}, error) {
+
+		return utils.WaitTaskAndShowResult(c, tc, results, true, func(task tasks.TaskID) (interface{}, error) {
 			fileShare, err := file_shares.Get(client, fileShareID).Extract()
 			if err != nil {
 				return nil, fmt.Errorf("cannot get file share with ID: %s. Error: %w", fileShareID, err)
@@ -319,6 +437,7 @@ var fileShareDeleteCommand = cli.Command{
 	Usage:     "Delete file share",
 	ArgsUsage: "<share_id>",
 	Category:  "file share",
+	Flags:     flags.WaitCommandFlags,
 	Action: func(c *cli.Context) error {
 		fileShareID, err := flags.GetFirstStringArg(c, fileShareIDText)
 		if err != nil {
@@ -334,11 +453,13 @@ var fileShareDeleteCommand = cli.Command{
 		if err != nil {
 			return cli.Exit(err, 1)
 		}
-		if results == nil {
+
+		tc, err := taskClient.NewTaskClientV1(c)
+		if err != nil {
 			return cli.Exit(err, 1)
 		}
 
-		return utils.WaitTaskAndShowResult(c, client, results, false, func(task tasks.TaskID) (interface{}, error) {
+		return utils.WaitTaskAndShowResult(c, tc, results, false, func(task tasks.TaskID) (interface{}, error) {
 			_, err := file_shares.Get(client, fileShareID).Extract()
 			if err == nil {
 				return nil, fmt.Errorf("cannot delete file share with ID: %s", fileShareID)
