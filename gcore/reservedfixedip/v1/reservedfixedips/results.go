@@ -58,7 +58,7 @@ type IPReservation struct {
 // for any particular ReservedFixedIP
 type AllowedAddressPairs struct {
 	IPAddress  string `json:"ip_address"`
-	MacAddress string `json:"mac_address"`
+	MacAddress string `json:"mac_address,omitempty"`
 }
 
 // ReservedFixedIP represents a ReservedFixedIP structure.
