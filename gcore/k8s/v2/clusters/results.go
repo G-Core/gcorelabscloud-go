@@ -142,6 +142,11 @@ type Certificate struct {
 // Config represents a kubeconfig structure.
 type Config struct {
 	Config string `json:"config"`
+
+	Host                 string `json:"host"`
+	ClusterCACertificate string `json:"cluster_ca_certificate"`
+	ClientCertificate    string `json:"client_certificate"`
+	ClientKey            string `json:"client_key"`
 }
 
 // Version represents a cluster version structure.
