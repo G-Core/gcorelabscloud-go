@@ -155,11 +155,11 @@ type Volume struct {
 }
 
 type ClusterServerSettings struct {
-	Interfaces     []InterfaceUnion      `json:"interfaces"`
-	SecurityGroups []gcorecloud.ItemName `json:"security_groups"`
-	Volumes        []Volume              `json:"volumes"`
-	UserData       *string               `json:"user_data"`
-	SSHKeyName     *string               `json:"ssh_key_name"`
+	Interfaces     []InterfaceUnion        `json:"interfaces"`
+	SecurityGroups []gcorecloud.ItemIDName `json:"security_groups"`
+	Volumes        []Volume                `json:"volumes"`
+	UserData       *string                 `json:"user_data"`
+	SSHKeyName     *string                 `json:"ssh_key_name"`
 }
 
 type Cluster struct {
