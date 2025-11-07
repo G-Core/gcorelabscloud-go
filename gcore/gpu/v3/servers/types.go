@@ -8,18 +8,18 @@ import (
 
 // Server represents a server in a GPU cluster
 type Server struct {
-	ID             string                `json:"id"`
-	ImageID        *string               `json:"image_id"`
-	TaskID         *string               `json:"task_id"`
-	Flavor         string                `json:"flavor"`
-	KeypairID      *string               `json:"keypair_id"`
-	Name           string                `json:"name"`
-	Status         string                `json:"status"`
-	IPAddresses    []string              `json:"ip_addresses"`
-	SecurityGroups []gcorecloud.ItemName `json:"security_groups"`
-	Tags           []Tag                 `json:"tags"`
-	CreatedAt      time.Time             `json:"created_at"`
-	UpdatedAt      time.Time             `json:"updated_at"`
+	ID             string                  `json:"id"`
+	ImageID        *string                 `json:"image_id"`
+	TaskID         *string                 `json:"task_id"`
+	Flavor         string                  `json:"flavor"`
+	KeypairID      *string                 `json:"keypair_id"`
+	Name           string                  `json:"name"`
+	Status         string                  `json:"status"`
+	IPAddresses    []string                `json:"ip_addresses"`
+	SecurityGroups []gcorecloud.ItemIDName `json:"security_groups"`
+	Tags           []Tag                   `json:"tags"`
+	CreatedAt      time.Time               `json:"created_at"`
+	UpdatedAt      time.Time               `json:"updated_at"`
 }
 
 // Tag represents a server tag
