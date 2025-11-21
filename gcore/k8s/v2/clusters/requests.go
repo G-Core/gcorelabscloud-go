@@ -21,6 +21,10 @@ type CheckLimitsOpts struct {
 	Pools []CheckLimitsPoolOpts `json:"pools,omitempty"`
 }
 
+type CheckLimitsPoolOptsBuilder interface {
+	ToCheckLimitsPoolMap() (map[string]interface{}, error)
+}
+
 type CheckLimitsPoolOpts struct {
 	Name              string                         `json:"name,omitempty" validate:"omitempty"`
 	FlavorID          string                         `json:"flavor_id" required:"true" validate:"required"`
@@ -29,6 +33,14 @@ type CheckLimitsPoolOpts struct {
 	NodeCount         int                            `json:"node_count,omitempty" validate:"omitempty"`
 	BootVolumeSize    int                            `json:"boot_volume_size,omitempty" validate:"omitempty,gt=0"`
 	ServerGroupPolicy servergroups.ServerGroupPolicy `json:"servergroup_policy,omitempty" validate:"omitempty,enum"`
+}
+
+// ToCheckLimitsPoolMap builds a request body from CheckLimitsPoolOpts.
+func (opts CheckLimitsPoolOpts) ToCheckLimitsPoolMap() (map[string]interface{}, error) {
+	if err := gcorecloud.ValidateStruct(opts); err != nil {
+		return nil, err
+	}
+	return gcorecloud.BuildRequestBody(opts, "")
 }
 
 // ToCheckLimitsMap builds a request body from CheckLimitsOpts.
@@ -171,6 +183,17 @@ func CheckLimits(c *gcorecloud.ServiceClient, opts CheckLimitsOptsBuilder) (r qu
 		return
 	}
 	_, r.Err = c.Post(checkLimitsURL(c), b, &r.Body, nil)
+	return
+}
+
+// CheckLimitsPool checks quota limits for the values provided and returns the diff for exceeded quota.
+func CheckLimitsPool(c *gcorecloud.ServiceClient, opts CheckLimitsPoolOptsBuilder) (r quotas.CommonResult) {
+	b, err := opts.ToCheckLimitsPoolMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = c.Post(checkLimitsPoolURL(c), b, &r.Body, nil)
 	return
 }
 
