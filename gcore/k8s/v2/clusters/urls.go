@@ -18,6 +18,10 @@ func checkLimitsURL(c *gcorecloud.ServiceClient) string {
 	return c.ServiceURL("check_limits")
 }
 
+func checkLimitsPoolURL(c *gcorecloud.ServiceClient) string {
+	return c.ServiceURL("pools", "check_limits")
+}
+
 func listURL(c *gcorecloud.ServiceClient) string {
 	return rootURL(c)
 }
