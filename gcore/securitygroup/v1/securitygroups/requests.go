@@ -11,6 +11,8 @@ import (
 
 // ListOpts allows the filtering and sorting of paginated collections through the API.
 type ListOpts struct {
+	Limit      int               `q:"limit" validate:"omitempty,gt=0"`
+	Offset     int               `q:"offset" validate:"omitempty,gte=0"`
 	MetadataK  string            `q:"metadata_k" validate:"omitempty"`
 	MetadataKV map[string]string `q:"metadata_kv" validate:"omitempty"`
 }

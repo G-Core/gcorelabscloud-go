@@ -31,6 +31,15 @@ func (current OffsetPageBase) NextPageURL() (string, error) {
 		return "", err
 	}
 
+	var res listResult
+	if err = current.Result.ExtractInto(&res); err != nil {
+		return "", err
+	}
+
+	if res.Count < offset+limit {
+		return "", nil
+	}
+
 	query := current.URL.Query()
 	query.Set("offset", strconv.Itoa(offset+limit))
 	query.Set("limit", strconv.Itoa(limit))
