@@ -194,7 +194,7 @@ func AddRule(c *gcorecloud.ServiceClient, securityGroupID string, opts CreateRul
 func ListInstances(c *gcorecloud.ServiceClient, securityGroupID string) pagination.Pager {
 	url := listInstancesURL(c, securityGroupID)
 	return pagination.NewPager(c, url, func(r pagination.PageResult) pagination.Page {
-		return SecurityGroupInstancesPage{pagination.OffsetPageBase{PageResult: r}}
+		return SecurityGroupInstancesPage{pagination.LinkedPageBase{PageResult: r}}
 	})
 }
 
