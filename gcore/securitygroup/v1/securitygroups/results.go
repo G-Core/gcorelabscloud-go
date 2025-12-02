@@ -105,41 +105,13 @@ type SecurityGroupRule struct {
 // SecurityGroupPage is the page returned by a pager when traversing over a
 // collection of security groups.
 type SecurityGroupPage struct {
-	pagination.LinkedPageBase
+	pagination.OffsetPageBase
 }
 
 // SecurityGroupInstancesPage is the page returned by a pager when traversing over a
 // collection of security group instances.
 type SecurityGroupInstancesPage struct {
-	pagination.LinkedPageBase
-}
-
-// NextPageURL is invoked when a paginated collection of security groups has reached
-// the end of a page and the pager seeks to traverse over a new one. In order
-// to do this, it needs to construct the next page's URL.
-func (r SecurityGroupPage) NextPageURL() (string, error) {
-	var s struct {
-		Links []gcorecloud.Link `json:"links"`
-	}
-	err := r.ExtractInto(&s)
-	if err != nil {
-		return "", err
-	}
-	return gcorecloud.ExtractNextURL(s.Links)
-}
-
-// NextPageURL is invoked when a paginated collection of security group instances has reached
-// the end of a page and the pager seeks to traverse over a new one. In order
-// to do this, it needs to construct the next page's URL.
-func (r SecurityGroupInstancesPage) NextPageURL() (string, error) {
-	var s struct {
-		Links []gcorecloud.Link `json:"links"`
-	}
-	err := r.ExtractInto(&s)
-	if err != nil {
-		return "", err
-	}
-	return gcorecloud.ExtractNextURL(s.Links)
+	pagination.OffsetPageBase
 }
 
 // IsEmpty checks whether a SecurityGroupPage struct is empty.
