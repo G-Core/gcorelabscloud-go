@@ -131,7 +131,7 @@ func (r SecurityGroupInstancesPage) IsEmpty() (bool, error) {
 // a generic collection is mapped into a relevant slice.
 func ExtractSecurityGroups(r pagination.Page) ([]SecurityGroup, error) {
 	var s []SecurityGroup
-	err := ExtractSecurityGroupsInto(r, &s)
+	err := r.(SecurityGroupPage).Result.ExtractIntoSlicePtr(&s, "results")
 	return s, err
 }
 
@@ -142,10 +142,6 @@ func ExtractSecurityGroupInstances(r pagination.Page) ([]instances.Instance, err
 	var s []instances.Instance
 	err := ExtractSecurityGroupInstancesInto(r, &s)
 	return s, err
-}
-
-func ExtractSecurityGroupsInto(r pagination.Page, v interface{}) error {
-	return r.(SecurityGroupPage).Result.ExtractIntoSlicePtr(v, "results")
 }
 
 func ExtractSecurityGroupInstancesInto(r pagination.Page, v interface{}) error {
