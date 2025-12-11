@@ -32,7 +32,7 @@ type Probes struct {
 
 type ProbeConfiguration struct {
 	Enabled bool   `json:"enabled"`
-	Probe   *Probe `json:"probe"`
+	Probe   *Probe `json:"probe,omitempty"`
 }
 
 type Probe struct {
