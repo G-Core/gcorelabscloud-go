@@ -1,6 +1,11 @@
 Gcore cloud API client
 ====================================
 
+**⚠️ This repository is deprecated. Please use [gcore-go](https://github.com/G-Core/gcore-go) instead.**
+
+Note: gcore-go does not provide a CLI.
+---
+
 Command line client to Gcore cloud API.
 
 Installation
