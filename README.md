@@ -1,6 +1,6 @@
 # ⚠️ DEPRECATION NOTICE
 
-This project has been **deprecated** and is **no longer maintained**. Please use [gcore-go](https://github.com/G-Core/gcore-go) instead.**
+This project has been **deprecated** and is **no longer maintained**. Please use [gcore-go](https://github.com/G-Core/gcore-go) instead.
 
 Note: gcore-go does not provide a CLI.
 
