@@ -52,7 +52,7 @@ type HostRoute struct {
 // GatewayIP must be null in json because an empty key creates a gateway in the neutron API.
 type CreateOpts struct {
 	Name                   string            `json:"name" required:"true"`
-	EnableDHCP             bool              `json:"enable_dhcp,omitempty"`
+	EnableDHCP             *bool             `json:"enable_dhcp,omitempty"`
 	CIDR                   gcorecloud.CIDR   `json:"cidr" required:"true"`
 	NetworkID              string            `json:"network_id" required:"true"`
 	ConnectToNetworkRouter bool              `json:"connect_to_network_router"`
@@ -114,7 +114,7 @@ type UpdateOpts struct {
 	Name           string      `json:"name,omitempty"`
 	DNSNameservers []net.IP    `json:"dns_nameservers"`
 	HostRoutes     []HostRoute `json:"host_routes"`
-	EnableDHCP     bool        `json:"enable_dhcp"`
+	EnableDHCP     *bool       `json:"enable_dhcp,omitempty"`
 	GatewayIP      *net.IP     `json:"gateway_ip"`
 }
 

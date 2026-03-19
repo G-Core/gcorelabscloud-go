@@ -163,7 +163,7 @@ func TestCreateNoGW(t *testing.T) {
 
 	options := subnets.CreateOpts{
 		Name:                   Subnet1.Name,
-		EnableDHCP:             true,
+		EnableDHCP:             boolPtr(true),
 		CIDR:                   Subnet1.CIDR,
 		NetworkID:              Subnet1.NetworkID,
 		ConnectToNetworkRouter: true,
@@ -197,7 +197,7 @@ func TestCreateGW(t *testing.T) {
 	gw := net.IP{}
 	options := subnets.CreateOpts{
 		Name:                   Subnet1.Name,
-		EnableDHCP:             true,
+		EnableDHCP:             boolPtr(true),
 		CIDR:                   Subnet1.CIDR,
 		NetworkID:              Subnet1.NetworkID,
 		ConnectToNetworkRouter: true,
@@ -297,7 +297,7 @@ func TestUpdateGW(t *testing.T) {
 	opts := subnets.UpdateOpts{
 		Name:       Subnet1.Name,
 		GatewayIP:  &gw,
-		EnableDHCP: true,
+		EnableDHCP: boolPtr(true),
 	}
 
 	ct, err := subnets.Update(client, Subnet1.ID, opts).Extract()
