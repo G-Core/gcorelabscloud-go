@@ -108,8 +108,7 @@ const UpdateRequestNoGW = `
  	"name": "subnet",
  	"gateway_ip": null,
     "dns_nameservers": null,
-    "host_routes": null,
-    "enable_dhcp": false
+    "host_routes": null
 }
 `
 
@@ -124,7 +123,6 @@ const UpdateRequestGW = `
 
 const UpdateRequestNoData = `
 {
-    "enable_dhcp": false,
     "dns_nameservers": [],
     "host_routes": [],
     "gateway_ip": null

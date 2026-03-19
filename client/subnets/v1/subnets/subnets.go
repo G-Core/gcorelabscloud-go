@@ -305,9 +305,15 @@ var subnetCreateCommand = cli.Command{
 			return cli.NewExitError(err, 1)
 		}
 
+		var enableDHCP *bool
+		if c.IsSet("enable-dhcp") {
+			v := c.Bool("enable-dhcp")
+			enableDHCP = &v
+		}
+
 		opts := subnets.CreateOpts{
 			Name:                   c.String("name"),
-			EnableDHCP:             c.Bool("enable-dhcp"),
+			EnableDHCP:             enableDHCP,
 			CIDR:                   *cidr,
 			NetworkID:              c.String("network-id"),
 			ConnectToNetworkRouter: c.Bool("connect-to-router"),

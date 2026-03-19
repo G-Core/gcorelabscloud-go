@@ -9,10 +9,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func boolPtr(v bool) *bool { return &v }
+
 func TestCreateOptsNoGW(t *testing.T) {
 	options := subnets.CreateOpts{
 		Name:                   Subnet1.Name,
-		EnableDHCP:             true,
+		EnableDHCP:             boolPtr(true),
 		CIDR:                   Subnet1.CIDR,
 		NetworkID:              Subnet1.NetworkID,
 		ConnectToNetworkRouter: true,
@@ -28,7 +30,7 @@ func TestCreateOptsGW(t *testing.T) {
 	gw := net.IP{}
 	options := subnets.CreateOpts{
 		Name:                   Subnet1.Name,
-		EnableDHCP:             true,
+		EnableDHCP:             boolPtr(true),
 		CIDR:                   Subnet1.CIDR,
 		NetworkID:              Subnet1.NetworkID,
 		ConnectToNetworkRouter: true,
