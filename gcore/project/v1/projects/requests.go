@@ -81,7 +81,7 @@ func Update(c *gcorecloud.ServiceClient, id int, opts UpdateOptsBuilder) (r Upda
 		r.Err = err
 		return
 	}
-	_, r.Err = c.Put(updateURL(c, id), b, &r.Body, &gcorecloud.RequestOpts{ // nolint
+	_, r.Err = c.Patch(updateURL(c, id), b, &r.Body, &gcorecloud.RequestOpts{ // nolint
 		OkCodes: []int{200, 201},
 	})
 	return
