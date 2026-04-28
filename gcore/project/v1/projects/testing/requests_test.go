@@ -164,7 +164,7 @@ func TestUpdate(t *testing.T) {
 	testURL := prepareGetTestURL(Project1.ID)
 
 	th.Mux.HandleFunc(testURL, func(w http.ResponseWriter, r *http.Request) {
-		th.TestMethod(t, r, "PUT")
+		th.TestMethod(t, r, "PATCH")
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 		th.TestHeader(t, r, "Content-Type", "application/json")
 		th.TestHeader(t, r, "Accept", "application/json")
