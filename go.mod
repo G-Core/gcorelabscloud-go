@@ -11,7 +11,7 @@ require (
 	github.com/imdario/mergo v0.3.9
 	github.com/json-iterator/go v1.1.9 // indirect
 	github.com/kr/pretty v0.2.0 // indirect
-	github.com/ladydascalie/currency v1.5.0
+	github.com/ladydascalie/currency v1.8.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.3.0
 	github.com/olekukonko/tablewriter v0.0.4
@@ -29,7 +29,10 @@ require (
 	k8s.io/client-go v0.18.14
 )
 
-require github.com/AlekSi/pointer v1.2.0
+require (
+	github.com/AlekSi/pointer v1.2.0
+	k8s.io/utils v0.0.0-20200324210504-a9aa75ae1b89
+)
 
 require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
@@ -53,7 +56,6 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	k8s.io/apimachinery v0.18.14 // indirect
 	k8s.io/klog v1.0.0 // indirect
-	k8s.io/utils v0.0.0-20200324210504-a9aa75ae1b89 // indirect
 	sigs.k8s.io/structured-merge-diff/v3 v3.0.0 // indirect
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )
