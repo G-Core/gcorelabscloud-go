@@ -1,6 +1,8 @@
 package servers
 
 import (
+	"net/http"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
@@ -13,8 +15,9 @@ type ListOptsBuilder interface {
 
 // ListOpts allows the filtering and sorting of paginated collections through the API.
 type ListOpts struct {
-	Limit  int `q:"limit" validate:"omitempty,gt=0"`
-	Offset int `q:"offset" validate:"omitempty,gte=0"`
+	Limit   int    `q:"limit" validate:"omitempty,gt=0"`
+	Offset  int    `q:"offset" validate:"omitempty,gte=0"`
+	OrderBy string `q:"order_by"`
 }
 
 // ToListClustersQuery formats a ListOpts into a query string.
@@ -103,5 +106,14 @@ func Delete(client *gcorecloud.ServiceClient, clusterID, serverID string, opts D
 		url += query
 	}
 	_, r.Err = client.DeleteWithResponse(url, &r.Body, nil) // nolint
+	return
+}
+
+// Rebuild triggers a rebuild of a specific server in a GPU cluster.
+func Rebuild(client *gcorecloud.ServiceClient, clusterID, serverID string) (r tasks.Result) {
+	url := ClusterServerRebuildURL(client, clusterID, serverID)
+	_, r.Err = client.Post(url, nil, &r.Body, &gcorecloud.RequestOpts{
+		OkCodes: []int{http.StatusOK},
+	})
 	return
 }
