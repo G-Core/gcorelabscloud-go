@@ -16,3 +16,8 @@ func ClusterServersURL(c *gcorecloud.ServiceClient, clusterID string) string {
 func ClusterServerURL(c *gcorecloud.ServiceClient, clusterID, serverID string) string {
 	return c.ServiceURL(clustersPath, clusterID, serversPath, serverID)
 }
+
+// ClusterServerRebuildURL returns URL for rebuilding a specific server in a GPU cluster
+func ClusterServerRebuildURL(c *gcorecloud.ServiceClient, clusterID, serverID string) string {
+	return c.ServiceURL(clustersPath, clusterID, serversPath, serverID, "rebuild")
+}

@@ -163,16 +163,19 @@ type ClusterServerSettings struct {
 }
 
 type Cluster struct {
-	ID              string                   `json:"id"`
-	Name            string                   `json:"name"`
-	Status          ClusterStatusType        `json:"status"`
-	Flavor          string                   `json:"flavor"`
-	Tags            []Tag                    `json:"tags"`
-	ServersCount    int                      `json:"servers_count"`
-	CreatedAt       gcorecloud.JSONRFC3339Z  `json:"created_at"`
-	UpdatedAt       *gcorecloud.JSONRFC3339Z `json:"updated_at"`
-	ServersIDs      *[]string                `json:"servers_ids"`
-	ServersSettings ClusterServerSettings    `json:"servers_settings"`
+	ID                string                   `json:"id"`
+	Name              string                   `json:"name"`
+	Status            ClusterStatusType        `json:"status"`
+	Flavor            string                   `json:"flavor"`
+	ImageID           string                   `json:"image_id"`
+	Tags              []Tag                    `json:"tags"`
+	ServersCount      int                      `json:"servers_count"`
+	CreatedAt         gcorecloud.JSONRFC3339Z  `json:"created_at"`
+	UpdatedAt         *gcorecloud.JSONRFC3339Z `json:"updated_at"`
+	HasPendingChanges bool                     `json:"has_pending_changes"`
+	ManagedBy         ManagedByOpt             `json:"managed_by"`
+	ServersIDs        *[]string                `json:"servers_ids"`
+	ServersSettings   ClusterServerSettings    `json:"servers_settings"`
 }
 
 // Tag represents a key-value pair used to tag resources like clusters, servers, volumes, etc.

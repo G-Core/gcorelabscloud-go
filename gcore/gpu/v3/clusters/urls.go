@@ -20,3 +20,8 @@ func ClusterURL(c *gcorecloud.ServiceClient, clusterID string) string {
 func ClusterActionURL(c *gcorecloud.ServiceClient, clusterID string) string {
 	return c.ServiceURL(clustersPath, clusterID, "action")
 }
+
+// ClusterServersSettingsURL returns URL for updating server settings of a specific GPU cluster
+func ClusterServersSettingsURL(c *gcorecloud.ServiceClient, clusterID string) string {
+	return c.ServiceURL(clustersPath, clusterID, "servers_settings")
+}

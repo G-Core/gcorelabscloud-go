@@ -392,6 +392,56 @@ func HardReboot(client *gcorecloud.ServiceClient, clusterID string) (r tasks.Res
 	return ApplyAction(client, clusterID, opts)
 }
 
+// UpdateServersSettingsOptsBuilder allows extensions to add parameters to update servers settings options.
+type UpdateServersSettingsOptsBuilder interface {
+	ToUpdateServersSettingsMap() (map[string]interface{}, error)
+}
+
+// UpdatedServerCredentials represents the credentials for patching server settings.
+type UpdatedServerCredentials struct {
+	SSHKeyName string `json:"ssh_key_name" validate:"required"`
+}
+
+// UpdatedServerSettings represents the server settings to patch.
+type UpdatedServerSettings struct {
+	Credentials *UpdatedServerCredentials `json:"credentials,omitempty"`
+	UserData    *string                 `json:"user_data,omitempty"`
+}
+
+// UpdateServersSettingsOpts specifies the parameters for the UpdateServersSettings method.
+type UpdateServersSettingsOpts struct {
+	ImageID         *string              `json:"image_id,omitempty" validate:"omitempty,uuid4"`
+	ServersSettings *UpdatedServerSettings `json:"servers_settings,omitempty"`
+}
+
+// Validate checks if the provided options are valid.
+func (opts UpdateServersSettingsOpts) Validate() error {
+	return gcorecloud.ValidateStruct(opts)
+}
+
+// ToUpdateServersSettingsMap builds a request body from UpdateServersSettingsOpts.
+func (opts UpdateServersSettingsOpts) ToUpdateServersSettingsMap() (map[string]interface{}, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, err
+	}
+	return gcorecloud.BuildRequestBody(opts, "")
+}
+
+// UpdateServersSettings updates the server settings for a GPU cluster.
+func UpdateServersSettings(client *gcorecloud.ServiceClient, clusterID string, opts UpdateServersSettingsOptsBuilder) (r GetResult) {
+	b, err := opts.ToUpdateServersSettingsMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+
+	url := ClusterServersSettingsURL(client, clusterID)
+	_, r.Err = client.Patch(url, b, &r.Body, &gcorecloud.RequestOpts{
+		OkCodes: []int{http.StatusOK},
+	})
+	return
+}
+
 func Start(client *gcorecloud.ServiceClient, clusterID string) (r tasks.Result) {
 	opts := ClusterActionsOpts{
 		Action: StartClusterAction,

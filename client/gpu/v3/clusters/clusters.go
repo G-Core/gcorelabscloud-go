@@ -282,6 +282,72 @@ func updateTagsClusterAction(c *cli.Context, newClient func(ctx *cli.Context) (*
 		waitForClusterOperation(gpuClient, clusterID))
 }
 
+func updateServersSettingsAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud.ServiceClient, error)) error {
+	clusterID := c.Args().First()
+	if clusterID == "" {
+		_ = cli.ShowCommandHelp(c, "update-settings")
+		return cli.Exit("cluster ID is required", 1)
+	}
+
+	if !c.IsSet("image-id") && !c.IsSet("ssh-key-name") && !c.IsSet("user-data") {
+		_ = cli.ShowCommandHelp(c, "update-settings")
+		return cli.Exit("at least one of `image-id`, `ssh-key-name`, or `user-data` must be specified", 1)
+	}
+
+	gpuClient, err := newClient(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.Exit(err, 1)
+	}
+
+	opts := clusters.UpdateServersSettingsOpts{
+		ImageID: StringPtrExcludeEmpty(c, "image-id"),
+	}
+	if c.IsSet("ssh-key-name") || c.IsSet("user-data") {
+		serverSettings := &clusters.UpdatedServerSettings{}
+		if c.IsSet("ssh-key-name") {
+			serverSettings.Credentials = &clusters.UpdatedServerCredentials{
+				SSHKeyName: c.String("ssh-key-name"),
+			}
+		}
+		serverSettings.UserData = StringPtrExcludeEmpty(c, "user-data")
+		opts.ServersSettings = serverSettings
+	}
+
+	result := clusters.UpdateServersSettings(gpuClient, clusterID, opts)
+	if result.Err != nil {
+		return cli.Exit(result.Err, 1)
+	}
+
+	utils.ShowResults(result.Body, c.String("format"))
+	return nil
+}
+
+func updateServersSettingsVirtualClusterAction(c *cli.Context) error {
+	return updateServersSettingsAction(c, client.NewGPUVirtualClientV3)
+}
+
+func updateServersSettingsBaremetalClusterAction(c *cli.Context) error {
+	return updateServersSettingsAction(c, client.NewGPUBaremetalClientV3)
+}
+
+func updateServersSettingsFlags() []cli.Flag {
+	return []cli.Flag{
+		&cli.StringFlag{
+			Name:  "image-id",
+			Usage: "new image ID for cluster servers",
+		},
+		&cli.StringFlag{
+			Name:  "ssh-key-name",
+			Usage: "new SSH key name for server credentials",
+		},
+		&cli.StringFlag{
+			Name:  "user-data",
+			Usage: "new user data for servers (base64 encoded)",
+		},
+	}
+}
+
 func waitForClusterOperation(gpuClient *gcorecloud.ServiceClient, clusterID string) func(task tasks.TaskID) (interface{}, error) {
 	return func(task tasks.TaskID) (interface{}, error) {
 		cluster, err := clusters.Get(gpuClient, clusterID).Extract()
@@ -804,6 +870,15 @@ func BaremetalCommands() *cli.Command {
 					},
 				}, flags.WaitCommandFlags...),
 			},
+			{
+				Name:        "update-settings",
+				Usage:       "Update server settings of baremetal GPU cluster",
+				Description: "Update server settings (image, SSH key, user data) for a baremetal GPU cluster",
+				Category:    "clusters",
+				ArgsUsage:   "<cluster_id>",
+				Flags:       updateServersSettingsFlags(),
+				Action:      updateServersSettingsBaremetalClusterAction,
+			},
 		},
 	}
 }
@@ -938,6 +1013,15 @@ func VirtualCommands() *cli.Command {
 						Required: false,
 					},
 				}, flags.WaitCommandFlags...),
+			},
+			{
+				Name:        "update-settings",
+				Usage:       "Update server settings of virtual GPU cluster",
+				Description: "Update server settings (image, SSH key, user data) for a virtual GPU cluster",
+				Category:    "clusters",
+				ArgsUsage:   "<cluster_id>",
+				Flags:       updateServersSettingsFlags(),
+				Action:      updateServersSettingsVirtualClusterAction,
 			},
 		},
 	}

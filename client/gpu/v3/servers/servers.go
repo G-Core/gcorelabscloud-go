@@ -96,6 +96,53 @@ func deleteVirtualServerAction(c *cli.Context) error {
 	return deleteServerAction(c, "virtual", client.NewGPUVirtualClientV3)
 }
 
+func rebuildServerAction(c *cli.Context, newClient func(*cli.Context) (*gcorecloud.ServiceClient, error)) error {
+	clusterID := c.Args().First()
+	if clusterID == "" {
+		_ = cli.ShowCommandHelp(c, "rebuild")
+		return cli.Exit("cluster ID is required", 1)
+	}
+
+	serverID := c.Args().Get(1)
+	if serverID == "" {
+		_ = cli.ShowCommandHelp(c, "rebuild")
+		return cli.Exit("server ID is required", 1)
+	}
+
+	gpuClient, err := newClient(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.Exit(err, 1)
+	}
+
+	results, err := servers.Rebuild(gpuClient, clusterID, serverID).Extract()
+	if err != nil {
+		return cli.Exit(err, 1)
+	}
+
+	tc, err := tasksclient.NewTaskClientV1(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.Exit(err, 1)
+	}
+
+	return utils.WaitTaskAndShowResult(c, tc, results, false, func(task tasks.TaskID) (interface{}, error) {
+		servers, err := servers.ListAll(gpuClient, clusterID, nil)
+		if err != nil {
+			return nil, err
+		}
+		return servers, nil
+	})
+}
+
+func rebuildBaremetalServerAction(c *cli.Context) error {
+	return rebuildServerAction(c, client.NewGPUBaremetalClientV3)
+}
+
+func rebuildVirtualServerAction(c *cli.Context) error {
+	return rebuildServerAction(c, client.NewGPUVirtualClientV3)
+}
+
 // BaremetalCommands returns commands for baremetal GPU servers
 func BaremetalCommands() *cli.Command {
 	return &cli.Command{
@@ -130,6 +177,15 @@ func BaremetalCommands() *cli.Command {
 					},
 				}, flags.WaitCommandFlags...),
 				Action: deleteBaremetalServerAction,
+			},
+			{
+				Name:        "rebuild",
+				Usage:       "Rebuild server in a baremetal GPU cluster",
+				Description: "Trigger a rebuild of a specific server in a baremetal GPU cluster",
+				Category:    "servers",
+				ArgsUsage:   "<cluster_id> <server_id>",
+				Flags:       flags.WaitCommandFlags,
+				Action:      rebuildBaremetalServerAction,
 			},
 		},
 	}
@@ -174,6 +230,15 @@ func VirtualCommands() *cli.Command {
 					},
 				}, flags.WaitCommandFlags...),
 				Action: deleteVirtualServerAction,
+			},
+			{
+				Name:        "rebuild",
+				Usage:       "Rebuild server in a virtual GPU cluster",
+				Description: "Trigger a rebuild of a specific server in a virtual GPU cluster",
+				Category:    "servers",
+				ArgsUsage:   "<cluster_id> <server_id>",
+				Flags:       flags.WaitCommandFlags,
+				Action:      rebuildVirtualServerAction,
 			},
 		},
 	}
