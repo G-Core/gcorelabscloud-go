@@ -19,6 +19,8 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
+	instancesV2 "github.com/G-Core/gcorelabscloud-go/gcore/instance/v2/instances"
+	typesV2 "github.com/G-Core/gcorelabscloud-go/gcore/instance/v2/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
 )
@@ -841,29 +843,49 @@ var instanceDeleteCommand = cli.Command{
 	},
 }
 
+// runInstanceActionV2 routes an instance power action through the unified v2
+// POST /v2/instances/.../action endpoint (instancesV2.Action) instead of the
+// legacy per-action v1 endpoints. The action is asynchronous and returns a
+// task, so it waits (when --wait is set) and then shows the instance, matching
+// the create/resize commands and the Terraform provider's behavior.
+func runInstanceActionV2(c *cli.Context, helpName string, action typesV2.InstanceActionType) error {
+	instanceID, err := flags.GetFirstStringArg(c, instanceIDText)
+	if err != nil {
+		_ = cli.ShowCommandHelp(c, helpName)
+		return err
+	}
+	clientV2, err := client2.NewInstanceClientV2(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.NewExitError(err, 1)
+	}
+	clientV1, err := client.NewInstanceClientV1(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
+		return cli.NewExitError(err, 1)
+	}
+
+	results, err := instancesV2.Action(clientV2, instanceID, instancesV2.ActionOpts{Action: action}).Extract()
+	if err != nil {
+		return cli.NewExitError(err, 1)
+	}
+	return utils.WaitTaskAndShowResult(c, clientV1, results, true, func(task tasks.TaskID) (interface{}, error) {
+		instance, err := instances.Get(clientV1, instanceID).Extract()
+		if err != nil {
+			return nil, fmt.Errorf("cannot get instance with ID: %s. Error: %w", instanceID, err)
+		}
+		return instance, nil
+	})
+}
+
 var instanceStartCommand = cli.Command{
 	Name:      "start",
 	Usage:     "Start instance",
 	ArgsUsage: "<instance_id>",
 	Category:  "instance",
+	Flags:     flags.WaitCommandFlags,
 	Action: func(c *cli.Context) error {
-		instanceID, err := flags.GetFirstStringArg(c, instanceIDText)
-		if err != nil {
-			_ = cli.ShowCommandHelp(c, "start")
-			return err
-		}
-		client, err := client.NewInstanceClientV1(c)
-		if err != nil {
-			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
-		}
-
-		instance, err := instances.Start(client, instanceID).Extract()
-		if err != nil {
-			return cli.NewExitError(err, 1)
-		}
-		utils.ShowResults(instance, c.String("format"))
-		return nil
+		return runInstanceActionV2(c, "start", typesV2.InstanceActionTypeStart)
 	},
 }
 
@@ -872,24 +894,9 @@ var instanceStopCommand = cli.Command{
 	Usage:     "Stop instance",
 	ArgsUsage: "<instance_id>",
 	Category:  "instance",
+	Flags:     flags.WaitCommandFlags,
 	Action: func(c *cli.Context) error {
-		instanceID, err := flags.GetFirstStringArg(c, instanceIDText)
-		if err != nil {
-			_ = cli.ShowCommandHelp(c, "stop")
-			return err
-		}
-		client, err := client.NewInstanceClientV1(c)
-		if err != nil {
-			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
-		}
-
-		instance, err := instances.Stop(client, instanceID).Extract()
-		if err != nil {
-			return cli.NewExitError(err, 1)
-		}
-		utils.ShowResults(instance, c.String("format"))
-		return nil
+		return runInstanceActionV2(c, "stop", typesV2.InstanceActionTypeStop)
 	},
 }
 
@@ -924,24 +931,9 @@ var instanceRebootCommand = cli.Command{
 	Usage:     "Reboot instance",
 	ArgsUsage: "<instance_id>",
 	Category:  "instance",
+	Flags:     flags.WaitCommandFlags,
 	Action: func(c *cli.Context) error {
-		instanceID, err := flags.GetFirstStringArg(c, instanceIDText)
-		if err != nil {
-			_ = cli.ShowCommandHelp(c, "reboot")
-			return err
-		}
-		client, err := client.NewInstanceClientV1(c)
-		if err != nil {
-			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
-		}
-
-		instance, err := instances.Reboot(client, instanceID).Extract()
-		if err != nil {
-			return cli.NewExitError(err, 1)
-		}
-		utils.ShowResults(instance, c.String("format"))
-		return nil
+		return runInstanceActionV2(c, "reboot", typesV2.InstanceActionTypeReboot)
 	},
 }
 
@@ -950,24 +942,9 @@ var instanceSuspendCommand = cli.Command{
 	Usage:     "Suspend instance",
 	ArgsUsage: "<instance_id>",
 	Category:  "instance",
+	Flags:     flags.WaitCommandFlags,
 	Action: func(c *cli.Context) error {
-		instanceID, err := flags.GetFirstStringArg(c, instanceIDText)
-		if err != nil {
-			_ = cli.ShowCommandHelp(c, "suspend")
-			return err
-		}
-		client, err := client.NewInstanceClientV1(c)
-		if err != nil {
-			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
-		}
-
-		instance, err := instances.Suspend(client, instanceID).Extract()
-		if err != nil {
-			return cli.NewExitError(err, 1)
-		}
-		utils.ShowResults(instance, c.String("format"))
-		return nil
+		return runInstanceActionV2(c, "suspend", typesV2.InstanceActionTypeSuspend)
 	},
 }
 
@@ -976,24 +953,9 @@ var instanceResumeCommand = cli.Command{
 	Usage:     "Resume instance",
 	ArgsUsage: "<instance_id>",
 	Category:  "instance",
+	Flags:     flags.WaitCommandFlags,
 	Action: func(c *cli.Context) error {
-		instanceID, err := flags.GetFirstStringArg(c, instanceIDText)
-		if err != nil {
-			_ = cli.ShowCommandHelp(c, "resume")
-			return err
-		}
-		client, err := client.NewInstanceClientV1(c)
-		if err != nil {
-			_ = cli.ShowAppHelp(c)
-			return cli.NewExitError(err, 1)
-		}
-
-		instance, err := instances.Resume(client, instanceID).Extract()
-		if err != nil {
-			return cli.NewExitError(err, 1)
-		}
-		utils.ShowResults(instance, c.String("format"))
-		return nil
+		return runInstanceActionV2(c, "resume", typesV2.InstanceActionTypeResume)
 	},
 }
 

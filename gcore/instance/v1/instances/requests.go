@@ -484,12 +484,19 @@ func Delete(client *gcorecloud.ServiceClient, instanceID string, opts DeleteOpts
 }
 
 // Start instance.
+//
+// Deprecated: the unified v2 action endpoint supersedes the per-action v1
+// endpoints. Use instance/v2/instances.Action with a v2 ServiceClient and
+// types.InstanceActionTypeStart instead.
 func Start(client *gcorecloud.ServiceClient, id string) (r UpdateResult) {
 	_, r.Err = client.Post(startInstanceURL(client, id), nil, &r.Body, nil) // nolint
 	return
 }
 
 // Stop instance.
+//
+// Deprecated: use instance/v2/instances.Action with a v2 ServiceClient and
+// types.InstanceActionTypeStop instead.
 func Stop(client *gcorecloud.ServiceClient, id string) (r UpdateResult) {
 	_, r.Err = client.Post(stopInstanceURL(client, id), nil, &r.Body, nil) // nolint
 	return
@@ -502,18 +509,27 @@ func PowerCycle(client *gcorecloud.ServiceClient, id string) (r UpdateResult) {
 }
 
 // Reboot instance.
+//
+// Deprecated: use instance/v2/instances.Action with a v2 ServiceClient and
+// types.InstanceActionTypeReboot instead.
 func Reboot(client *gcorecloud.ServiceClient, id string) (r UpdateResult) {
 	_, r.Err = client.Post(rebootInstanceURL(client, id), nil, &r.Body, nil) // nolint
 	return
 }
 
 // Suspend instance.
+//
+// Deprecated: use instance/v2/instances.Action with a v2 ServiceClient and
+// types.InstanceActionTypeSuspend instead.
 func Suspend(client *gcorecloud.ServiceClient, id string) (r UpdateResult) {
 	_, r.Err = client.Post(suspendInstanceURL(client, id), nil, &r.Body, nil) // nolint
 	return
 }
 
 // Resume instance.
+//
+// Deprecated: use instance/v2/instances.Action with a v2 ServiceClient and
+// types.InstanceActionTypeResume instead.
 func Resume(client *gcorecloud.ServiceClient, id string) (r UpdateResult) {
 	_, r.Err = client.Post(resumeInstanceURL(client, id), nil, &r.Body, nil) // nolint
 	return
