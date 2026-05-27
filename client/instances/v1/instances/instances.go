@@ -859,14 +859,22 @@ func runInstanceActionV2(c *cli.Context, helpName string, action typesV2.Instanc
 		_ = cli.ShowAppHelp(c)
 		return cli.NewExitError(err, 1)
 	}
-	clientV1, err := client.NewInstanceClientV1(c)
-	if err != nil {
-		_ = cli.ShowAppHelp(c)
-		return cli.NewExitError(err, 1)
-	}
 
 	results, err := instancesV2.Action(clientV2, instanceID, instancesV2.ActionOpts{Action: action}).Extract()
 	if err != nil {
+		return cli.NewExitError(err, 1)
+	}
+
+	// Without --wait we only print the accepted task IDs, so skip building the
+	// v1 client (used solely for task polling and the instance lookup below).
+	if !c.Bool("wait") {
+		utils.ShowResults(results, c.String("format"))
+		return nil
+	}
+
+	clientV1, err := client.NewInstanceClientV1(c)
+	if err != nil {
+		_ = cli.ShowAppHelp(c)
 		return cli.NewExitError(err, 1)
 	}
 	return utils.WaitTaskAndShowResult(c, clientV1, results, true, func(task tasks.TaskID) (interface{}, error) {
