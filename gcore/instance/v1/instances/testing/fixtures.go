@@ -360,10 +360,22 @@ const DeleteResponse = `
 }
 `
 
-const MetadataListResponse = `
+const MetadataResponse = `
 {
-  "count": 2,
-  "results": [
+  "key": "cost-center",
+  "value": "Atlanta",
+  "read_only": false
+}
+`
+
+// MetadataDetailedResponse is an instance-detail response that carries the
+// metadata_detailed field used by MetadataListAll after migrating off the
+// deprecated v1 /metadata listing endpoint.
+const MetadataDetailedResponse = `
+{
+  "instance_id": "a7e7e8d6-0bf7-4ac9-8170-831b47ee2ba9",
+  "instance_name": "Testing",
+  "metadata_detailed": [
     {
       "key": "cost-center",
       "value": "Atlanta",
@@ -378,18 +390,14 @@ const MetadataListResponse = `
 }
 `
 
-const MetadataResponse = `
+// MetadataTagsPatchRequest is the request body sent to PATCH the instance when
+// creating/updating tags via the modern instance update endpoint.
+const MetadataTagsPatchRequest = `
 {
-  "key": "cost-center",
-  "value": "Atlanta",
-  "read_only": false
-}
-`
-
-const MetadataCreateRequest = `
-{
-"test1": "test1", 
-"test2": "test2"
+  "tags": {
+    "test1": "test1",
+    "test2": "test2"
+  }
 }
 `
 

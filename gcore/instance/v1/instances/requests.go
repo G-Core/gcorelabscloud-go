@@ -3,10 +3,12 @@ package instances
 import (
 	"log"
 	"net/http"
+	"strings"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/flavor/v1/flavors"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
+	instancesV2 "github.com/G-Core/gcorelabscloud-go/gcore/instance/v2/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
@@ -563,23 +565,24 @@ func ListInstanceMetrics(client *gcorecloud.ServiceClient, id string, opts ListM
 	return
 }
 
-func MetadataList(client *gcorecloud.ServiceClient, id string) pagination.Pager {
-	url := metadataURL(client, id)
-	return pagination.NewPager(client, url, func(r pagination.PageResult) pagination.Page {
-		return MetadataPage{pagination.LinkedPageBase{PageResult: r}}
-	})
+// instanceV2Client returns a shallow copy of a v1 instances service client
+// re-pointed at the v2 instances API. It lets v1 callers transparently use the
+// modern /v2/.../metadata_item endpoints without constructing a new client.
+func instanceV2Client(client *gcorecloud.ServiceClient) *gcorecloud.ServiceClient {
+	c := *client
+	c.ResourceBase = strings.Replace(client.ResourceBaseURL(), "/v1/instances/", "/v2/instances/", 1)
+	return &c
 }
 
+// MetadataListAll returns an instance's tags. Tags are read from the instance
+// detail endpoint (the metadata_detailed field), replacing the deprecated v1
+// GET /metadata listing endpoint.
 func MetadataListAll(client *gcorecloud.ServiceClient, id string) ([]metadata.Metadata, error) {
-	pages, err := MetadataList(client, id).AllPages()
+	instance, err := Get(client, id).Extract()
 	if err != nil {
 		return nil, err
 	}
-	all, err := ExtractMetadata(pages)
-	if err != nil {
-		return nil, err
-	}
-	return all, nil
+	return instance.MetadataDetailed, nil
 }
 
 // MetadataOptsBuilder allows extensions to add additional parameters to the metadata Create and Update request.
@@ -620,44 +623,52 @@ func (opts MetadataSetOpts) ToMetadataMap() (map[string]interface{}, error) {
 	return m, nil
 }
 
-// MetadataCreate creates a metadata for an instance.
+// patchInstanceTags adds or updates an instance's tags through the instance
+// PATCH endpoint using JSON Merge Patch (RFC 7386) semantics.
+func patchInstanceTags(client *gcorecloud.ServiceClient, id string, opts MetadataSetOpts) (r MetadataActionResult) {
+	tags, err := opts.ToMetadataMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	body := map[string]interface{}{"tags": tags}
+	_, r.Err = client.Patch(resourceURL(client, id), body, nil, &gcorecloud.RequestOpts{ // nolint
+		OkCodes: []int{http.StatusOK, http.StatusNoContent},
+	})
+	return
+}
+
+// MetadataCreate creates or updates tags for an instance via the instance PATCH
+// endpoint, replacing the deprecated v1 POST /metadata endpoint.
 func MetadataCreate(client *gcorecloud.ServiceClient, id string, opts MetadataSetOpts) (r MetadataActionResult) {
-	b, err := opts.ToMetadataMap()
-	if err != nil {
-		r.Err = err
-		return
-	}
-	_, r.Err = client.Post(metadataURL(client, id), b, nil, &gcorecloud.RequestOpts{ // nolint
-		OkCodes: []int{http.StatusNoContent, http.StatusOK},
-	})
-	return
+	return patchInstanceTags(client, id, opts)
 }
 
-// MetadataUpdate updates a metadata for an instance.
+// MetadataUpdate updates tags for an instance via the instance PATCH endpoint,
+// replacing the deprecated v1 PUT /metadata endpoint.
+//
+// Behaviour change: the previous PUT /metadata implementation replaced ALL tags.
+// The instance PATCH endpoint uses JSON Merge Patch (RFC 7386): supplied keys
+// are added or updated and unspecified keys are left unchanged. It no longer
+// removes tags that are omitted from opts.
 func MetadataUpdate(client *gcorecloud.ServiceClient, id string, opts MetadataSetOpts) (r MetadataActionResult) {
-	b, err := opts.ToMetadataMap()
-	if err != nil {
-		r.Err = err
-		return
-	}
-	_, r.Err = client.Put(metadataURL(client, id), b, nil, &gcorecloud.RequestOpts{ // nolint
-		OkCodes: []int{http.StatusNoContent, http.StatusOK},
-	})
-	return
+	return patchInstanceTags(client, id, opts)
 }
 
-// MetadataDelete deletes defined metadata key for an instance.
+// MetadataDelete deletes a single tag for an instance via the v2 metadata_item
+// endpoint, replacing the deprecated v1 DELETE /metadata/{key} endpoint.
 func MetadataDelete(client *gcorecloud.ServiceClient, id string, key string) (r MetadataActionResult) {
-	_, r.Err = client.Delete(metadataDetailsURL(client, id, key), &gcorecloud.RequestOpts{ // nolint
-		OkCodes: []int{http.StatusNoContent, http.StatusOK},
-	})
+	res := instancesV2.MetadataItemDelete(instanceV2Client(client), id, instancesV2.MetadataItemOpts{Key: key})
+	r.Err = res.Err
 	return
 }
 
-// MetadataGet gets defined metadata key for an instance.
+// MetadataGet gets a single tag for an instance via the v2 metadata_item
+// endpoint, replacing the deprecated v1 GET /metadata/{key} endpoint.
 func MetadataGet(client *gcorecloud.ServiceClient, id string, key string) (r MetadataResult) {
-	url := metadataDetailsURL(client, id, key)
-	_, r.Err = client.Get(url, &r.Body, nil) // nolint
+	res := instancesV2.MetadataItemGet(instanceV2Client(client), id, instancesV2.MetadataItemOpts{Key: key})
+	r.Body = res.Body
+	r.Err = res.Err
 	return
 }
 

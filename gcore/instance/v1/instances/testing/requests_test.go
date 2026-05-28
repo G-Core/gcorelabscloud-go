@@ -39,10 +39,6 @@ func prepareGetActionTestURLParams(version string, id string, action string) str
 	return fmt.Sprintf("/%s/instances/%d/%d/%s/%s", version, fake.ProjectID, fake.RegionID, id, action)
 }
 
-func prepareGetActionDetailsTestURLParams(version string, id string, action, actionID string) string { // nolint
-	return fmt.Sprintf("/%s/instances/%d/%d/%s/%s/%s", version, fake.ProjectID, fake.RegionID, id, action, actionID)
-}
-
 func prepareListTestURL() string {
 	return prepareListTestURLParams("v1", fake.ProjectID, fake.RegionID)
 }
@@ -119,12 +115,8 @@ func prepareChangeFlavorTestURL(id string) string {
 	return prepareGetActionTestURLParams("v1", id, "changeflavor")
 }
 
-func prepareMetadataTestURL(id string) string {
-	return prepareGetActionTestURLParams("v1", id, "metadata")
-}
-
-func prepareMetadataDetailsTestURL(id, key string) string {
-	return prepareGetActionDetailsTestURLParams("v1", id, "metadata", key)
+func prepareMetadataItemTestURL(id string) string {
+	return prepareGetActionTestURLParams("v2", id, "metadata_item")
 }
 
 func prepareRenameInstanceTestURL(id string) string {
@@ -703,13 +695,13 @@ func TestMetadataListAll(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
 
-	th.Mux.HandleFunc(prepareMetadataTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
+	th.Mux.HandleFunc(prepareGetTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "GET")
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		_, err := fmt.Fprint(w, MetadataListResponse)
+		_, err := fmt.Fprint(w, MetadataDetailedResponse)
 		if err != nil {
 			log.Error(err)
 		}
@@ -728,9 +720,10 @@ func TestMetadataGet(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
 
-	th.Mux.HandleFunc(prepareMetadataDetailsTestURL(instanceID, Metadata1.Key), func(w http.ResponseWriter, r *http.Request) {
+	th.Mux.HandleFunc(prepareMetadataItemTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "GET")
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		require.Equal(t, Metadata1.Key, r.URL.Query().Get("key"))
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -751,15 +744,19 @@ func TestMetadataCreate(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
 
-	th.Mux.HandleFunc(prepareMetadataTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
-		th.TestMethod(t, r, "POST")
+	th.Mux.HandleFunc(prepareGetTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "PATCH")
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 
 		th.TestHeader(t, r, "Content-Type", "application/json")
 		th.TestHeader(t, r, "Accept", "application/json")
-		th.TestJSONRequest(t, r, MetadataCreateRequest)
+		th.TestJSONRequest(t, r, MetadataTagsPatchRequest)
 		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNoContent)
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, GetResponse)
+		if err != nil {
+			log.Error(err)
+		}
 	})
 
 	opts := instances.MetadataSetOpts{
@@ -781,15 +778,19 @@ func TestMetadataUpdate(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
 
-	th.Mux.HandleFunc(prepareMetadataTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
-		th.TestMethod(t, r, "PUT")
+	th.Mux.HandleFunc(prepareGetTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "PATCH")
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 
 		th.TestHeader(t, r, "Content-Type", "application/json")
 		th.TestHeader(t, r, "Accept", "application/json")
-		th.TestJSONRequest(t, r, MetadataCreateRequest)
+		th.TestJSONRequest(t, r, MetadataTagsPatchRequest)
 		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNoContent)
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, GetResponse)
+		if err != nil {
+			log.Error(err)
+		}
 	})
 
 	opts := instances.MetadataSetOpts{
@@ -811,10 +812,11 @@ func TestMetadataDelete(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
 
-	th.Mux.HandleFunc(prepareMetadataDetailsTestURL(instanceID, Metadata1.Key), func(w http.ResponseWriter, r *http.Request) {
+	th.Mux.HandleFunc(prepareMetadataItemTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "DELETE")
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 		th.TestHeader(t, r, "Accept", "application/json")
+		require.Equal(t, Metadata1.Key, r.URL.Query().Get("key"))
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusNoContent)
 	})

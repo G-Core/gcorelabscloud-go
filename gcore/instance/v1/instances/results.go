@@ -267,12 +267,6 @@ type InstancePage struct {
 	pagination.LinkedPageBase
 }
 
-// MetadataPage is the page returned by a pager when traversing over a
-// collection of instance metadata objects.
-type MetadataPage struct {
-	pagination.LinkedPageBase
-}
-
 // InstanceInterfacePage is the page returned by a pager when traversing over a
 // collection of instance interfaces.
 type InstanceInterfacePage struct {
@@ -347,20 +341,6 @@ func (r InstancePortsPage) NextPageURL() (string, error) {
 	return gcorecloud.ExtractNextURL(s.Links)
 }
 
-// NextPageURL is invoked when a paginated collection of instance metadata objects has reached
-// the end of a page and the pager seeks to traverse over a new one. In order
-// to do this, it needs to construct the next page's URL.
-func (r MetadataPage) NextPageURL() (string, error) {
-	var s struct {
-		Links []gcorecloud.Link `json:"links"`
-	}
-	err := r.ExtractInto(&s)
-	if err != nil {
-		return "", err
-	}
-	return gcorecloud.ExtractNextURL(s.Links)
-}
-
 // IsEmpty checks whether a InstancePage struct is empty.
 func (r InstancePage) IsEmpty() (bool, error) {
 	is, err := ExtractInstances(r)
@@ -382,12 +362,6 @@ func (r InstanceSecurityGroupPage) IsEmpty() (bool, error) {
 // IsEmpty checks whether a InstancePortsPage struct is empty.
 func (r InstancePortsPage) IsEmpty() (bool, error) {
 	is, err := ExtractInstancePorts(r)
-	return len(is) == 0, err
-}
-
-// IsEmpty checks whether a MetadataPage struct is empty.
-func (r MetadataPage) IsEmpty() (bool, error) {
-	is, err := ExtractMetadata(r)
 	return len(is) == 0, err
 }
 
@@ -427,15 +401,6 @@ func ExtractInstancePorts(r pagination.Page) ([]InstancePorts, error) {
 	return s, err
 }
 
-// ExtractMetadata accepts a Page struct, specifically a MetadataPage struct,
-// and extracts the elements into a slice of instance metadata structs. In other words,
-// a generic collection is mapped into a relevant slice.
-func ExtractMetadata(r pagination.Page) ([]metadata.Metadata, error) {
-	var s []metadata.Metadata
-	err := ExtractMetadataInto(r, &s)
-	return s, err
-}
-
 func ExtractInstancesInto(r pagination.Page, v interface{}) error {
 	return r.(InstancePage).Result.ExtractIntoSlicePtr(v, "results")
 }
@@ -450,10 +415,6 @@ func ExtractInstanceSecurityGroupInto(r pagination.Page, v interface{}) error {
 
 func ExtractInstancePortInto(r pagination.Page, v interface{}) error {
 	return r.(InstancePortsPage).Result.ExtractIntoSlicePtr(v, "results")
-}
-
-func ExtractMetadataInto(r pagination.Page, v interface{}) error {
-	return r.(MetadataPage).Result.ExtractIntoSlicePtr(v, "results")
 }
 
 // UnmarshalJSON - implements Unmarshaler interface

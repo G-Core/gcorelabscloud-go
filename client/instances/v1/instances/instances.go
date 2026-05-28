@@ -1166,7 +1166,7 @@ var metadataCreateCommand = cli.Command{
 
 var metadataUpdateCommand = cli.Command{
 	Name:      "update",
-	Usage:     "Update instance metadata. It replace existing records",
+	Usage:     "Update instance metadata. Supplied keys are added or updated; omitted keys are left unchanged (JSON Merge Patch)",
 	ArgsUsage: "<instance_id>",
 	Category:  "metadata",
 	Flags: []cli.Flag{
