@@ -644,15 +644,41 @@ func MetadataCreate(client *gcorecloud.ServiceClient, id string, opts MetadataSe
 	return patchInstanceTags(client, id, opts)
 }
 
-// MetadataUpdate updates tags for an instance via the instance PATCH endpoint,
-// replacing the deprecated v1 PUT /metadata endpoint.
+// MetadataUpdate replaces all user-managed tags of an instance with the supplied
+// set, preserving the semantics of the deprecated v1 PUT /metadata endpoint.
+// Read-only tags are always preserved by the API.
 //
-// Behaviour change: the previous PUT /metadata implementation replaced ALL tags.
-// The instance PATCH endpoint uses JSON Merge Patch (RFC 7386): supplied keys
-// are added or updated and unspecified keys are left unchanged. It no longer
-// removes tags that are omitted from opts.
+// The instance PATCH endpoint uses JSON Merge Patch (RFC 7386) and has no atomic
+// "replace all" operation, so this reads the current tags first and then sends a
+// single patch that nulls the user tags absent from opts and writes the supplied
+// tags.
 func MetadataUpdate(client *gcorecloud.ServiceClient, id string, opts MetadataSetOpts) (r MetadataActionResult) {
-	return patchInstanceTags(client, id, opts)
+	newTags, err := opts.ToMetadataMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	instance, err := Get(client, id).Extract()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	tags := make(map[string]interface{}, len(instance.MetadataDetailed)+len(newTags))
+	for _, md := range instance.MetadataDetailed {
+		if md.ReadOnly {
+			continue
+		}
+		if _, ok := newTags[md.Key]; !ok {
+			tags[md.Key] = nil
+		}
+	}
+	for k, v := range newTags {
+		tags[k] = v
+	}
+	_, r.Err = client.Patch(resourceURL(client, id), map[string]interface{}{"tags": tags}, nil, &gcorecloud.RequestOpts{ // nolint
+		OkCodes: []int{http.StatusOK, http.StatusNoContent},
+	})
+	return
 }
 
 // MetadataDelete deletes a single tag for an instance via the v2 metadata_item

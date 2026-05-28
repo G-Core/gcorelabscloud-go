@@ -391,10 +391,46 @@ const MetadataDetailedResponse = `
 `
 
 // MetadataTagsPatchRequest is the request body sent to PATCH the instance when
-// creating/updating tags via the modern instance update endpoint.
+// adding/updating tags via the modern instance update endpoint.
 const MetadataTagsPatchRequest = `
 {
   "tags": {
+    "test1": "test1",
+    "test2": "test2"
+  }
+}
+`
+
+// MetadataUpdateDetailResponse is the instance-detail response read by
+// MetadataUpdate before it builds a replace-all merge patch. It carries one
+// user tag (to be removed) and one read-only tag (must be preserved).
+const MetadataUpdateDetailResponse = `
+{
+  "instance_id": "a7e7e8d6-0bf7-4ac9-8170-831b47ee2ba9",
+  "instance_name": "Testing",
+  "metadata_detailed": [
+    {
+      "key": "old-user-tag",
+      "value": "to-be-removed",
+      "read_only": false
+    },
+    {
+      "key": "image_id",
+      "value": "f01fd9a0-9548-48ba-82dc-a8c8b2d6f2f1",
+      "read_only": true
+    }
+  ]
+}
+`
+
+// MetadataReplaceTagsPatchRequest is the merge-patch body produced by
+// MetadataUpdate's replace-all behaviour: the existing user tag absent from the
+// new set is nulled, the read-only tag is left untouched, and the new tags are
+// written.
+const MetadataReplaceTagsPatchRequest = `
+{
+  "tags": {
+    "old-user-tag": null,
     "test1": "test1",
     "test2": "test2"
   }

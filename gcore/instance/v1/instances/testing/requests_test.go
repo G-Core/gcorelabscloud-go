@@ -778,18 +778,32 @@ func TestMetadataUpdate(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
 
+	// MetadataUpdate preserves the legacy PUT replace-all behaviour: it first
+	// reads the current tags (instance detail), then sends a single merge patch
+	// that nulls user tags absent from the new set and writes the new ones,
+	// leaving read-only tags untouched.
 	th.Mux.HandleFunc(prepareGetTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
-		th.TestMethod(t, r, "PATCH")
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
-
-		th.TestHeader(t, r, "Content-Type", "application/json")
-		th.TestHeader(t, r, "Accept", "application/json")
-		th.TestJSONRequest(t, r, MetadataTagsPatchRequest)
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		_, err := fmt.Fprint(w, GetResponse)
-		if err != nil {
-			log.Error(err)
+		switch r.Method {
+		case "GET":
+			w.Header().Add("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, err := fmt.Fprint(w, MetadataUpdateDetailResponse)
+			if err != nil {
+				log.Error(err)
+			}
+		case "PATCH":
+			th.TestHeader(t, r, "Content-Type", "application/json")
+			th.TestHeader(t, r, "Accept", "application/json")
+			th.TestJSONRequest(t, r, MetadataReplaceTagsPatchRequest)
+			w.Header().Add("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, err := fmt.Fprint(w, GetResponse)
+			if err != nil {
+				log.Error(err)
+			}
+		default:
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
 	})
 
