@@ -574,6 +574,17 @@ func instanceV2Client(client *gcorecloud.ServiceClient) *gcorecloud.ServiceClien
 	return &c
 }
 
+// MetadataList lists an instance's tags via the deprecated v1 /metadata endpoint.
+//
+// Deprecated: this calls the deprecated v1 /metadata endpoint. Use
+// MetadataListAll, which reads tags from the instance detail endpoint.
+func MetadataList(client *gcorecloud.ServiceClient, id string) pagination.Pager {
+	url := metadataURL(client, id)
+	return pagination.NewPager(client, url, func(r pagination.PageResult) pagination.Page {
+		return MetadataPage{pagination.LinkedPageBase{PageResult: r}}
+	})
+}
+
 // MetadataListAll returns an instance's tags. Tags are read from the instance
 // detail endpoint (the metadata_detailed field), replacing the deprecated v1
 // GET /metadata listing endpoint.

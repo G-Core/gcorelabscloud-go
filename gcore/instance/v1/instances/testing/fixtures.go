@@ -360,6 +360,26 @@ const DeleteResponse = `
 }
 `
 
+// MetadataListResponse is the paginated body returned by the deprecated v1
+// /metadata listing endpoint, still served by the legacy MetadataList pager.
+const MetadataListResponse = `
+{
+  "count": 2,
+  "results": [
+    {
+      "key": "cost-center",
+      "value": "Atlanta",
+      "read_only": false
+    },
+    {
+      "key": "data-center",
+      "value": "A",
+      "read_only": false
+    }
+  ]
+}
+`
+
 const MetadataResponse = `
 {
   "key": "cost-center",

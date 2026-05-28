@@ -86,6 +86,10 @@ func changeFlavorInstanceURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceActionURL(c, id, "changeflavor")
 }
 
+func metadataURL(c *gcorecloud.ServiceClient, id string) string {
+	return resourceActionURL(c, id, "metadata")
+}
+
 func listAvailableFlavorsURL(c *gcorecloud.ServiceClient, id string) string {
 	return resourceActionURL(c, id, "available_flavors")
 }

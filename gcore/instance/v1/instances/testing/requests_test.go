@@ -115,6 +115,10 @@ func prepareChangeFlavorTestURL(id string) string {
 	return prepareGetActionTestURLParams("v1", id, "changeflavor")
 }
 
+func prepareMetadataTestURL(id string) string {
+	return prepareGetActionTestURLParams("v1", id, "metadata")
+}
+
 func prepareMetadataItemTestURL(id string) string {
 	return prepareGetActionTestURLParams("v2", id, "metadata_item")
 }
@@ -689,6 +693,33 @@ func TestResize(t *testing.T) {
 	tasks, err := instances.Resize(client, instanceID, opts).Extract()
 	require.NoError(t, err)
 	require.Equal(t, Tasks1, *tasks)
+}
+
+// TestMetadataList covers the deprecated MetadataList pager, retained for
+// backward compatibility, which still calls the v1 /metadata endpoint.
+func TestMetadataList(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareMetadataTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, MetadataListResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("instances", "v1")
+
+	pages, err := instances.MetadataList(client, instanceID).AllPages() //nolint:staticcheck // exercising the deprecated pager on purpose
+	require.NoError(t, err)
+	actual, err := instances.ExtractMetadata(pages) //nolint:staticcheck // exercising the deprecated helper on purpose
+	require.NoError(t, err)
+	require.Equal(t, ExpectedMetadataList, actual)
 }
 
 func TestMetadataListAll(t *testing.T) {
