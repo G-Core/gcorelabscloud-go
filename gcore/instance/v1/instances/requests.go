@@ -674,7 +674,7 @@ func MetadataUpdate(client *gcorecloud.ServiceClient, id string, opts MetadataSe
 		r.Err = err
 		return
 	}
-	tags := make(map[string]interface{}, len(instance.MetadataDetailed)+len(newTags))
+	tags := make(map[string]interface{})
 	for _, md := range instance.MetadataDetailed {
 		if md.ReadOnly {
 			continue
