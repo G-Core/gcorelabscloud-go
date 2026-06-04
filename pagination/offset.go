@@ -6,7 +6,6 @@ import (
 
 const (
 	defaultOffset = 0
-	defaultLimit  = 10
 )
 
 type listResult struct {
@@ -21,28 +20,32 @@ type OffsetPageBase struct {
 
 // NextPageURL constructs next page URL using offset / limit query parameters.
 func (current OffsetPageBase) NextPageURL() (string, error) {
+	var res listResult
+	if err := current.Result.ExtractInto(&res); err != nil {
+		return "", err
+	}
+
+	// Advance by the number of results actually returned on this page rather
+	// than by an assumed page size. When the request carried no explicit limit
+	// the API returns the whole collection in a single page, so there is no
+	// next page to fetch.
+	got := len(res.Results)
+	if got == 0 {
+		return "", nil
+	}
+
 	offset, err := current.getQueryParam("offset", defaultOffset)
 	if err != nil {
 		return "", err
 	}
 
-	limit, err := current.getQueryParam("limit", defaultLimit)
-	if err != nil {
-		return "", err
-	}
-
-	var res listResult
-	if err = current.Result.ExtractInto(&res); err != nil {
-		return "", err
-	}
-
-	if res.Count < offset+limit {
+	nextOffset := offset + got
+	if nextOffset >= res.Count {
 		return "", nil
 	}
 
 	query := current.URL.Query()
-	query.Set("offset", strconv.Itoa(offset+limit))
-	query.Set("limit", strconv.Itoa(limit))
+	query.Set("offset", strconv.Itoa(nextOffset))
 
 	nextURL := current.URL
 	nextURL.RawQuery = query.Encode()

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"reflect"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/G-Core/gcorelabscloud-go/pagination"
@@ -110,4 +112,60 @@ func TestAllPagesOffset(t *testing.T) {
 	actual, err := ExtractOffsetInts(page)
 	testhelper.AssertNoErr(t, err)
 	testhelper.CheckDeepEquals(t, expected, actual)
+}
+
+// createNoLimitOffsetPager mimics a list endpoint queried without a limit
+// query parameter: the API returns the whole collection (here 25 items, more
+// than the legacy assumed page size of 10) in a single response.
+func createNoLimitOffsetPager(t *testing.T, requestCount *int) pagination.Pager {
+	testhelper.SetupHTTP()
+
+	all := make([]string, 0, 25)
+	for i := 1; i <= 25; i++ {
+		all = append(all, strconv.Itoa(i))
+	}
+
+	testhelper.Mux.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
+		*requestCount++
+		// The whole collection is returned only when no limit is requested.
+		// Any follow-up paged request (the bug) is treated as unexpected.
+		if r.URL.Query().Get("limit") != "" || r.URL.Query().Get("offset") != "" {
+			t.Errorf("unexpected paged request: %v", r.URL.RawQuery)
+		}
+		w.Header().Add("Content-Type", "application/json")
+		fmt.Fprintf(w, `{ "count": 25, "results": [%s] }`, strings.Join(all, ", "))
+	})
+
+	client := createClient()
+
+	createPage := func(r pagination.PageResult) pagination.Page {
+		return OffsetPageResult{pagination.OffsetPageBase{PageResult: r}}
+	}
+
+	return pagination.NewPager(client, testhelper.Server.URL+"/list", createPage)
+}
+
+// TestAllPagesOffsetNoLimitSingleRequest guards against the regression where a
+// limit-less list whose full result set exceeds the default page size of 10
+// triggered redundant offset/limit follow-up requests (and duplicate results).
+func TestAllPagesOffsetNoLimitSingleRequest(t *testing.T) {
+	requestCount := 0
+	pager := createNoLimitOffsetPager(t, &requestCount)
+	defer testhelper.TeardownHTTP()
+
+	page, err := pager.AllPages()
+	testhelper.AssertNoErr(t, err)
+
+	actual, err := ExtractOffsetInts(page)
+	testhelper.AssertNoErr(t, err)
+
+	expected := make([]int, 0, 25)
+	for i := 1; i <= 25; i++ {
+		expected = append(expected, i)
+	}
+	testhelper.CheckDeepEquals(t, expected, actual)
+
+	if requestCount != 1 {
+		t.Errorf("expected exactly 1 request, but made %d", requestCount)
+	}
 }

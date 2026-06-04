@@ -2,12 +2,20 @@ package securitygroups
 
 import (
 	"net/http"
+	"net/url"
+	"strconv"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
+
+// maxListLimit is the largest page size the security groups list endpoint
+// accepts. Requesting it when the caller did not specify a limit returns the
+// whole collection in a single request instead of the API default of 10 per
+// page (which otherwise forces ListAll to make many sequential round-trips).
+const maxListLimit = 1000
 
 // ListOpts allows the filtering and sorting of paginated collections through the API.
 type ListOpts struct {
@@ -35,18 +43,35 @@ type ListOptsBuilder interface {
 }
 
 func List(c *gcorecloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
-	url := listURL(c)
+	listurl := listURL(c)
 
 	if opts != nil {
 		query, err := opts.ToSecurityGroupListQuery()
 		if err != nil {
 			return pagination.Pager{Err: err}
 		}
-		url += query
+		listurl += query
 	}
-	return pagination.NewPager(c, url, func(r pagination.PageResult) pagination.Page {
+	listurl = withDefaultLimit(listurl)
+	return pagination.NewPager(c, listurl, func(r pagination.PageResult) pagination.Page {
 		return SecurityGroupPage{pagination.OffsetPageBase{PageResult: r}}
 	})
+}
+
+// withDefaultLimit sets the limit query parameter to the API maximum when the
+// caller did not provide one, so the list is returned in a single request.
+func withDefaultLimit(rawURL string) string {
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return rawURL
+	}
+	q := u.Query()
+	if q.Get("limit") != "" {
+		return rawURL
+	}
+	q.Set("limit", strconv.Itoa(maxListLimit))
+	u.RawQuery = q.Encode()
+	return u.String()
 }
 
 // Get retrieves a specific security group based on its unique ID.
