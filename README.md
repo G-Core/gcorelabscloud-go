@@ -11,9 +11,9 @@ Note: gcore-go does not provide a CLI.
 The legacy per-action instance endpoints (`POST /v1/instances/.../{start,stop,reboot,suspend,resume}`)
 are superseded by the unified v2 action endpoint (`POST /v2/instances/.../action`).
 
-- `instance/v1/instances.Start`, `.Stop`, `.Reboot`, `.Suspend`, `.Resume` are **deprecated**.
-  Use `instance/v2/instances.Action` with a v2 `ServiceClient` and the matching
-  `instance/v2/types.InstanceActionType` instead. The CLI `instance {start,stop,reboot,suspend,resume}`
+- `gcore/instance/v1/instances.Start`, `.Stop`, `.Reboot`, `.Suspend`, `.Resume` are **deprecated**.
+  Use `gcore/instance/v2/instances.Action` with a v2 `ServiceClient` and the matching
+  `gcore/instance/v2/types.InstanceActionType` instead. The CLI `instance {start,stop,reboot,suspend,resume}`
   commands and the Terraform provider already route through the v2 endpoint.
 - `PowerCycle` (`powercycle`) and `Resize` (`changeflavor`) have no v2 `Action` equivalent yet and are
   unchanged; migrating them requires adding the actions to the v2 enum on the cloud-api side first.
