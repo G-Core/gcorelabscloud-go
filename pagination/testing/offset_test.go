@@ -169,3 +169,62 @@ func TestAllPagesOffsetNoLimitSingleRequest(t *testing.T) {
 		t.Errorf("expected exactly 1 request, but made %d", requestCount)
 	}
 }
+
+// createServerPagedOffsetPager mimics a list endpoint that does NOT request a
+// limit (like gpu/dbaas lists, which lack the securitygroups withDefaultLimit
+// helper): the server applies its own default page size (3 here) on every
+// request, and the client paginates using offset only. There are 7 items
+// total, so three pages are needed: offsets 0, 3, 6.
+func createServerPagedOffsetPager(t *testing.T, seenOffsets *[]string) pagination.Pager {
+	testhelper.SetupHTTP()
+
+	const pageSize = 7
+
+	testhelper.Mux.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
+		// The caller never sets a limit; the server defaults the page size.
+		if r.URL.Query().Get("limit") != "" {
+			t.Errorf("did not expect a limit param, got: %v", r.URL.RawQuery)
+		}
+		*seenOffsets = append(*seenOffsets, r.URL.Query().Get("offset"))
+
+		offset := 0
+		if o := r.URL.Query().Get("offset"); o != "" {
+			offset, _ = strconv.Atoi(o)
+		}
+
+		items := make([]string, 0, 3)
+		for i := offset + 1; i <= offset+3 && i <= pageSize; i++ {
+			items = append(items, strconv.Itoa(i))
+		}
+
+		w.Header().Add("Content-Type", "application/json")
+		fmt.Fprintf(w, `{ "count": %d, "results": [%s] }`, pageSize, strings.Join(items, ", "))
+	})
+
+	client := createClient()
+
+	createPage := func(r pagination.PageResult) pagination.Page {
+		return OffsetPageResult{pagination.OffsetPageBase{PageResult: r}}
+	}
+
+	return pagination.NewPager(client, testhelper.Server.URL+"/list", createPage)
+}
+
+// TestAllPagesOffsetServerPagedNoLimit covers endpoints without the
+// withDefaultLimit helper: the pager must walk every server-default page using
+// offset-only follow-up requests and collect the full collection.
+func TestAllPagesOffsetServerPagedNoLimit(t *testing.T) {
+	var seenOffsets []string
+	pager := createServerPagedOffsetPager(t, &seenOffsets)
+	defer testhelper.TeardownHTTP()
+
+	page, err := pager.AllPages()
+	testhelper.AssertNoErr(t, err)
+
+	actual, err := ExtractOffsetInts(page)
+	testhelper.AssertNoErr(t, err)
+	testhelper.CheckDeepEquals(t, []int{1, 2, 3, 4, 5, 6, 7}, actual)
+
+	// First request has no offset; follow-ups advance by the actual page size.
+	testhelper.CheckDeepEquals(t, []string{"", "3", "6"}, seenOffsets)
+}
