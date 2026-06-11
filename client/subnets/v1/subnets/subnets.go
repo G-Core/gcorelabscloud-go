@@ -3,6 +3,7 @@ package subnets
 import (
 	"fmt"
 	"net"
+	"strconv"
 
 	cmeta "github.com/G-Core/gcorelabscloud-go/client/utils/metadata"
 
@@ -250,9 +251,9 @@ var subnetCreateCommand = cli.Command{
 			Usage:    "Subnet network ID",
 			Required: true,
 		},
-		&cli.BoolFlag{
+		&cli.StringFlag{
 			Name:     "enable-dhcp",
-			Usage:    "Enable DHCP",
+			Usage:    "Enable DHCP (true/false). When omitted the API default (true) is used",
 			Required: false,
 		},
 		&cli.BoolFlag{
@@ -307,7 +308,10 @@ var subnetCreateCommand = cli.Command{
 
 		var enableDHCP *bool
 		if c.IsSet("enable-dhcp") {
-			v := c.Bool("enable-dhcp")
+			v, err := strconv.ParseBool(c.String("enable-dhcp"))
+			if err != nil {
+				return cli.NewExitError(fmt.Errorf("invalid --enable-dhcp value %q: %w", c.String("enable-dhcp"), err), 1)
+			}
 			enableDHCP = &v
 		}
 

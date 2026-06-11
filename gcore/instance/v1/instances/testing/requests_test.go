@@ -39,10 +39,6 @@ func prepareGetActionTestURLParams(version string, id string, action string) str
 	return fmt.Sprintf("/%s/instances/%d/%d/%s/%s", version, fake.ProjectID, fake.RegionID, id, action)
 }
 
-func prepareGetActionDetailsTestURLParams(version string, id string, action, actionID string) string { // nolint
-	return fmt.Sprintf("/%s/instances/%d/%d/%s/%s/%s", version, fake.ProjectID, fake.RegionID, id, action, actionID)
-}
-
 func prepareListTestURL() string {
 	return prepareListTestURLParams("v1", fake.ProjectID, fake.RegionID)
 }
@@ -123,8 +119,8 @@ func prepareMetadataTestURL(id string) string {
 	return prepareGetActionTestURLParams("v1", id, "metadata")
 }
 
-func prepareMetadataDetailsTestURL(id, key string) string {
-	return prepareGetActionDetailsTestURLParams("v1", id, "metadata", key)
+func prepareMetadataItemTestURL(id string) string {
+	return prepareGetActionTestURLParams("v2", id, "metadata_item")
 }
 
 func prepareRenameInstanceTestURL(id string) string {
@@ -699,7 +695,9 @@ func TestResize(t *testing.T) {
 	require.Equal(t, Tasks1, *tasks)
 }
 
-func TestMetadataListAll(t *testing.T) {
+// TestMetadataList covers the deprecated MetadataList pager, retained for
+// backward compatibility, which still calls the v1 /metadata endpoint.
+func TestMetadataList(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
 
@@ -710,6 +708,31 @@ func TestMetadataListAll(t *testing.T) {
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		_, err := fmt.Fprint(w, MetadataListResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("instances", "v1")
+
+	pages, err := instances.MetadataList(client, instanceID).AllPages() //nolint:staticcheck // exercising the deprecated pager on purpose
+	require.NoError(t, err)
+	actual, err := instances.ExtractMetadata(pages) //nolint:staticcheck // exercising the deprecated helper on purpose
+	require.NoError(t, err)
+	require.Equal(t, ExpectedMetadataList, actual)
+}
+
+func TestMetadataListAll(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	th.Mux.HandleFunc(prepareGetTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "GET")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, MetadataDetailedResponse)
 		if err != nil {
 			log.Error(err)
 		}
@@ -728,9 +751,10 @@ func TestMetadataGet(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
 
-	th.Mux.HandleFunc(prepareMetadataDetailsTestURL(instanceID, Metadata1.Key), func(w http.ResponseWriter, r *http.Request) {
+	th.Mux.HandleFunc(prepareMetadataItemTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "GET")
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		require.Equal(t, Metadata1.Key, r.URL.Query().Get("key"))
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -751,15 +775,19 @@ func TestMetadataCreate(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
 
-	th.Mux.HandleFunc(prepareMetadataTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
-		th.TestMethod(t, r, "POST")
+	th.Mux.HandleFunc(prepareGetTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "PATCH")
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 
 		th.TestHeader(t, r, "Content-Type", "application/json")
 		th.TestHeader(t, r, "Accept", "application/json")
-		th.TestJSONRequest(t, r, MetadataCreateRequest)
+		th.TestJSONRequest(t, r, MetadataTagsPatchRequest)
 		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNoContent)
+		w.WriteHeader(http.StatusOK)
+		_, err := fmt.Fprint(w, GetResponse)
+		if err != nil {
+			log.Error(err)
+		}
 	})
 
 	opts := instances.MetadataSetOpts{
@@ -781,15 +809,33 @@ func TestMetadataUpdate(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
 
-	th.Mux.HandleFunc(prepareMetadataTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
-		th.TestMethod(t, r, "PUT")
+	// MetadataUpdate preserves the legacy PUT replace-all behaviour: it first
+	// reads the current tags (instance detail), then sends a single merge patch
+	// that nulls user tags absent from the new set and writes the new ones,
+	// leaving read-only tags untouched.
+	th.Mux.HandleFunc(prepareGetTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
-
-		th.TestHeader(t, r, "Content-Type", "application/json")
-		th.TestHeader(t, r, "Accept", "application/json")
-		th.TestJSONRequest(t, r, MetadataCreateRequest)
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNoContent)
+		switch r.Method {
+		case "GET":
+			w.Header().Add("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, err := fmt.Fprint(w, MetadataUpdateDetailResponse)
+			if err != nil {
+				log.Error(err)
+			}
+		case "PATCH":
+			th.TestHeader(t, r, "Content-Type", "application/json")
+			th.TestHeader(t, r, "Accept", "application/json")
+			th.TestJSONRequest(t, r, MetadataReplaceTagsPatchRequest)
+			w.Header().Add("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, err := fmt.Fprint(w, GetResponse)
+			if err != nil {
+				log.Error(err)
+			}
+		default:
+			t.Fatalf("unexpected method: %s", r.Method)
+		}
 	})
 
 	opts := instances.MetadataSetOpts{
@@ -811,10 +857,11 @@ func TestMetadataDelete(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
 
-	th.Mux.HandleFunc(prepareMetadataDetailsTestURL(instanceID, Metadata1.Key), func(w http.ResponseWriter, r *http.Request) {
+	th.Mux.HandleFunc(prepareMetadataItemTestURL(instanceID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "DELETE")
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
 		th.TestHeader(t, r, "Accept", "application/json")
+		require.Equal(t, Metadata1.Key, r.URL.Query().Get("key"))
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusNoContent)
 	})
