@@ -122,7 +122,7 @@ type ServerSettingsOpts struct {
 	// Deprecated: use per-interface SecurityGroups on the InterfaceOpts instead.
 	// The cluster-wide field cannot be combined with per-interface security groups.
 	// If omitted everywhere, the project's default security group is applied.
-	SecurityGroups []gcorecloud.ItemID    `json:"security_groups" validate:"omitempty,dive,uuid4"`
+	SecurityGroups []gcorecloud.ItemID    `json:"security_groups,omitempty" validate:"omitempty,dive,uuid4"`
 	Volumes        []VolumeOpts           `json:"volumes"`
 	UserData       *string                `json:"user_data,omitempty"`
 	Credentials    *ServerCredentialsOpts `json:"credentials,omitempty"`
@@ -133,7 +133,7 @@ type BaremetalServerSettingsOpts struct {
 	// Deprecated: use per-interface SecurityGroups on the InterfaceOpts instead.
 	// The cluster-wide field cannot be combined with per-interface security groups.
 	// If omitted everywhere, the project's default security group is applied.
-	SecurityGroups []gcorecloud.ItemID    `json:"security_groups" validate:"omitempty,dive,uuid4"`
+	SecurityGroups []gcorecloud.ItemID    `json:"security_groups,omitempty" validate:"omitempty,dive,uuid4"`
 	UserData       *string                `json:"user_data,omitempty"`
 	Credentials    *ServerCredentialsOpts `json:"credentials,omitempty"`
 }
@@ -165,8 +165,11 @@ type ExternalInterfaceOpts struct {
 	IPFamily            IPFamilyType `json:"ip_family,omitempty"`
 	PortSecurityEnabled *bool        `json:"port_security_enabled,omitempty"`
 	// SecurityGroups are the security group UUIDs applied to this interface.
-	// If omitted (or empty), the cluster-wide security_groups value applies;
-	// if both are omitted, the project's default security group is applied.
+	// Per-interface and cluster-wide security_groups are mutually exclusive: the
+	// API rejects a request that sets per-interface SGs while the cluster-wide
+	// security_groups list is also set. If this list is omitted (or empty), the
+	// cluster-wide security_groups applies to this interface; if both are
+	// omitted everywhere, the project's default security group is applied.
 	SecurityGroups []gcorecloud.ItemID `json:"security_groups,omitempty" validate:"omitempty,dive,uuid4"`
 }
 
@@ -182,8 +185,11 @@ type SubnetInterfaceOpts struct {
 	FloatingIP          *FloatingIPOpts `json:"floating_ip,omitempty"`
 	PortSecurityEnabled *bool           `json:"port_security_enabled,omitempty"`
 	// SecurityGroups are the security group UUIDs applied to this interface.
-	// If omitted (or empty), the cluster-wide security_groups value applies;
-	// if both are omitted, the project's default security group is applied.
+	// Per-interface and cluster-wide security_groups are mutually exclusive: the
+	// API rejects a request that sets per-interface SGs while the cluster-wide
+	// security_groups list is also set. If this list is omitted (or empty), the
+	// cluster-wide security_groups applies to this interface; if both are
+	// omitted everywhere, the project's default security group is applied.
 	SecurityGroups []gcorecloud.ItemID `json:"security_groups,omitempty" validate:"omitempty,dive,uuid4"`
 }
 
@@ -196,8 +202,11 @@ type AnySubnetInterfaceOpts struct {
 	FloatingIP          *FloatingIPOpts `json:"floating_ip,omitempty"`
 	PortSecurityEnabled *bool           `json:"port_security_enabled,omitempty"`
 	// SecurityGroups are the security group UUIDs applied to this interface.
-	// If omitted (or empty), the cluster-wide security_groups value applies;
-	// if both are omitted, the project's default security group is applied.
+	// Per-interface and cluster-wide security_groups are mutually exclusive: the
+	// API rejects a request that sets per-interface SGs while the cluster-wide
+	// security_groups list is also set. If this list is omitted (or empty), the
+	// cluster-wide security_groups applies to this interface; if both are
+	// omitted everywhere, the project's default security group is applied.
 	SecurityGroups []gcorecloud.ItemID `json:"security_groups,omitempty" validate:"omitempty,dive,uuid4"`
 }
 
