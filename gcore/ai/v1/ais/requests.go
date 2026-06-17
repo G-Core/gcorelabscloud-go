@@ -47,18 +47,21 @@ type CreateOptsBuilder interface {
 
 // CreateOpts represents options used to create a AI Cluster.
 type CreateOpts struct {
-	Flavor         string                                  `json:"flavor" validate:"required,min=1"`
-	Name           string                                  `json:"name" validate:"required,min=3,max=63"`
-	ImageID        string                                  `json:"image_id" validate:"required,uuid4"`
-	Interfaces     []instances.InterfaceInstanceCreateOpts `json:"interfaces" validate:"required,dive"`
-	Volumes        []instances.CreateVolumeOpts            `json:"volumes,omitempty" validate:"omitempty,required,dive"`
-	SecurityGroups []gcorecloud.ItemID                     `json:"security_groups,omitempty" validate:"omitempty,dive,uuid4"`
-	Keypair        string                                  `json:"keypair_name,omitempty"`
-	Password       string                                  `json:"password" validate:"omitempty,required_with=Username"`
-	Username       string                                  `json:"username" validate:"omitempty,required_with=Password"`
-	UserData       string                                  `json:"user_data,omitempty" validate:"omitempty,base64"`
-	Metadata       map[string]string                       `json:"metadata,omitempty" validate:"omitempty"`
-	InstancesCount int                                     `json:"instances_count,omitempty" validate:"omitempty,min=1"`
+	Flavor     string                                  `json:"flavor" validate:"required,min=1"`
+	Name       string                                  `json:"name" validate:"required,min=3,max=63"`
+	ImageID    string                                  `json:"image_id" validate:"required,uuid4"`
+	Interfaces []instances.InterfaceInstanceCreateOpts `json:"interfaces" validate:"required,dive"`
+	Volumes    []instances.CreateVolumeOpts            `json:"volumes,omitempty" validate:"omitempty,required,dive"`
+	// Deprecated: use per-interface SecurityGroups on InterfaceInstanceCreateOpts instead.
+	// The top-level field cannot be combined with per-interface security groups; if omitted
+	// everywhere, the project's default security group is applied.
+	SecurityGroups []gcorecloud.ItemID `json:"security_groups,omitempty" validate:"omitempty,dive,uuid4"`
+	Keypair        string              `json:"keypair_name,omitempty"`
+	Password       string              `json:"password" validate:"omitempty,required_with=Username"`
+	Username       string              `json:"username" validate:"omitempty,required_with=Password"`
+	UserData       string              `json:"user_data,omitempty" validate:"omitempty,base64"`
+	Metadata       map[string]string   `json:"metadata,omitempty" validate:"omitempty"`
+	InstancesCount int                 `json:"instances_count,omitempty" validate:"omitempty,min=1"`
 }
 
 // Validate

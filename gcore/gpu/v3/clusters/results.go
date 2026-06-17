@@ -34,6 +34,8 @@ type ExternalInterface struct {
 	Name     *string      `json:"name"`
 	Type     string       `json:"type"`
 	IPFamily IPFamilyType `json:"ip_family"`
+	// SecurityGroups are the resolved security groups applied to this interface.
+	SecurityGroups []gcorecloud.ItemIDName `json:"security_groups"`
 }
 
 type FloatingIP struct {
@@ -46,6 +48,8 @@ type SubnetInterface struct {
 	Type       string      `json:"type"`
 	SubnetID   string      `json:"subnet_id"`
 	FloatingIP *FloatingIP `json:"floating_ip"`
+	// SecurityGroups are the resolved security groups applied to this interface.
+	SecurityGroups []gcorecloud.ItemIDName `json:"security_groups"`
 }
 
 type AnySubnetInterface struct {
@@ -55,6 +59,8 @@ type AnySubnetInterface struct {
 	IPFamily   IPFamilyType `json:"ip_family"`
 	IPAddress  *string      `json:"ip_address"`
 	FloatingIP *FloatingIP  `json:"floating_ip"`
+	// SecurityGroups are the resolved security groups applied to this interface.
+	SecurityGroups []gcorecloud.ItemIDName `json:"security_groups"`
 }
 
 type InterfaceUnion struct {

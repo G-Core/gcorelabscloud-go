@@ -146,20 +146,23 @@ func (opts InterfaceInstanceCreateOpts) Validate() error {
 
 // CreateOpts represents options used to create a instance.
 type CreateOpts struct {
-	Flavor         string                        `json:"flavor" required:"true"`
-	Names          []string                      `json:"names,omitempty" validate:"required_without=NameTemplates"`
-	NameTemplates  []string                      `json:"name_templates,omitempty" validate:"required_without=Names"`
-	Volumes        []CreateVolumeOpts            `json:"volumes" validate:"dive"`
-	Interfaces     []InterfaceInstanceCreateOpts `json:"interfaces" required:"true" validate:"required,dive"`
-	SecurityGroups []gcorecloud.ItemID           `json:"security_groups,omitempty" validate:"omitempty,dive,uuid4"`
-	Keypair        string                        `json:"keypair_name,omitempty"`
-	Password       string                        `json:"password" validate:"omitempty,required_with=Username"`
-	Username       string                        `json:"username" validate:"omitempty,required_with=Password"`
-	UserData       string                        `json:"user_data" validate:"omitempty,base64"`
-	Metadata       *MetadataSetOpts              `json:"metadata,omitempty" validate:"omitempty,dive"`
-	Configuration  *MetadataSetOpts              `json:"configuration,omitempty" validate:"omitempty,dive"`
-	AllowAppPorts  bool                          `json:"allow_app_ports,omitempty"`
-	ServerGroupID  string                        `json:"servergroup_id,omitempty" validate:"omitempty,uuid4"`
+	Flavor        string                        `json:"flavor" required:"true"`
+	Names         []string                      `json:"names,omitempty" validate:"required_without=NameTemplates"`
+	NameTemplates []string                      `json:"name_templates,omitempty" validate:"required_without=Names"`
+	Volumes       []CreateVolumeOpts            `json:"volumes" validate:"dive"`
+	Interfaces    []InterfaceInstanceCreateOpts `json:"interfaces" required:"true" validate:"required,dive"`
+	// Deprecated: use per-interface SecurityGroups on InterfaceInstanceCreateOpts instead.
+	// The top-level field cannot be combined with per-interface security groups; if omitted
+	// everywhere, the project's default security group is applied.
+	SecurityGroups []gcorecloud.ItemID `json:"security_groups,omitempty" validate:"omitempty,dive,uuid4"`
+	Keypair        string              `json:"keypair_name,omitempty"`
+	Password       string              `json:"password" validate:"omitempty,required_with=Username"`
+	Username       string              `json:"username" validate:"omitempty,required_with=Password"`
+	UserData       string              `json:"user_data" validate:"omitempty,base64"`
+	Metadata       *MetadataSetOpts    `json:"metadata,omitempty" validate:"omitempty,dive"`
+	Configuration  *MetadataSetOpts    `json:"configuration,omitempty" validate:"omitempty,dive"`
+	AllowAppPorts  bool                `json:"allow_app_ports,omitempty"`
+	ServerGroupID  string              `json:"servergroup_id,omitempty" validate:"omitempty,uuid4"`
 }
 
 // Validate
