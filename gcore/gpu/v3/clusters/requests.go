@@ -154,9 +154,10 @@ func (SubnetInterfaceOpts) implInterfaceOpts()    {}
 func (AnySubnetInterfaceOpts) implInterfaceOpts() {}
 
 type ExternalInterfaceOpts struct {
-	Name     *string      `json:"name,omitempty"`
-	Type     string       `json:"type" validate:"required"`
-	IPFamily IPFamilyType `json:"ip_family,omitempty"`
+	Name                *string      `json:"name,omitempty"`
+	Type                string       `json:"type" validate:"required"`
+	IPFamily            IPFamilyType `json:"ip_family,omitempty"`
+	PortSecurityEnabled *bool        `json:"port_security_enabled,omitempty"`
 }
 
 type FloatingIPOpts struct {
@@ -164,20 +165,22 @@ type FloatingIPOpts struct {
 }
 
 type SubnetInterfaceOpts struct {
-	NetworkID  string          `json:"network_id" validate:"required"`
-	Name       *string         `json:"name,omitempty"`
-	Type       string          `json:"type" validate:"required"`
-	SubnetID   string          `json:"subnet_id" validate:"required"`
-	FloatingIP *FloatingIPOpts `json:"floating_ip,omitempty"`
+	NetworkID           string          `json:"network_id" validate:"required"`
+	Name                *string         `json:"name,omitempty"`
+	Type                string          `json:"type" validate:"required"`
+	SubnetID            string          `json:"subnet_id" validate:"required"`
+	FloatingIP          *FloatingIPOpts `json:"floating_ip,omitempty"`
+	PortSecurityEnabled *bool           `json:"port_security_enabled,omitempty"`
 }
 
 type AnySubnetInterfaceOpts struct {
-	NetworkID  string          `json:"network_id" validate:"required"`
-	Name       *string         `json:"name,omitempty"`
-	Type       string          `json:"type" validate:"required"`
-	IPFamily   IPFamilyType    `json:"ip_family,omitempty"`
-	IPAddress  *string         `json:"ip_address,omitempty"`
-	FloatingIP *FloatingIPOpts `json:"floating_ip,omitempty"`
+	NetworkID           string          `json:"network_id" validate:"required"`
+	Name                *string         `json:"name,omitempty"`
+	Type                string          `json:"type" validate:"required"`
+	IPFamily            IPFamilyType    `json:"ip_family,omitempty"`
+	IPAddress           *string         `json:"ip_address,omitempty"`
+	FloatingIP          *FloatingIPOpts `json:"floating_ip,omitempty"`
+	PortSecurityEnabled *bool           `json:"port_security_enabled,omitempty"`
 }
 
 // CreateClusterOpts allows extensions to add parameters to create cluster options.
