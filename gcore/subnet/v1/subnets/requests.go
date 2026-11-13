@@ -116,6 +116,9 @@ type UpdateOpts struct {
 	HostRoutes     []HostRoute `json:"host_routes"`
 	EnableDHCP     *bool       `json:"enable_dhcp,omitempty"`
 	GatewayIP      *net.IP     `json:"gateway_ip"`
+	// tags use JSON Merge Patch (RFC 7386): a nil value removes the key, absent keys stay unchanged
+	// keep omitempty, because the API reads "tags": null as "remove all user tags"
+	Tags map[string]*string `json:"tags,omitempty"`
 }
 
 // ToSubnetUpdateMap builds a request body from UpdateOpts.

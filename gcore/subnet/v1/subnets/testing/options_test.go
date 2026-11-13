@@ -54,3 +54,20 @@ func TestUpdateOpts(t *testing.T) {
 	require.NoError(t, err)
 	require.JSONEq(t, UpdateRequestNoData, string(s))
 }
+
+func TestUpdateOptsTags(t *testing.T) {
+	value := "value1"
+	opts := subnets.UpdateOpts{
+		DNSNameservers: []net.IP{},
+		HostRoutes:     []subnets.HostRoute{},
+		Tags: map[string]*string{
+			"key1": &value,
+			"key2": nil,
+		},
+	}
+	mp, err := opts.ToSubnetUpdateMap()
+	require.NoError(t, err)
+	s, err := json.Marshal(mp)
+	require.NoError(t, err)
+	require.JSONEq(t, UpdateRequestTags, string(s))
+}
