@@ -2,6 +2,7 @@ package testing
 
 import (
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"sync"
@@ -355,6 +356,54 @@ func (l *requestLog) list() []string {
 	return append([]string(nil), l.methods...)
 }
 
+// closeTracker counts response bodies that the client did not close; an open
+// body keeps its connection busy
+type closeTracker struct {
+	mu   sync.Mutex
+	open int
+}
+
+type trackedBody struct {
+	io.ReadCloser
+	tracker *closeTracker
+	once    sync.Once
+}
+
+func (b *trackedBody) Close() error {
+	b.once.Do(func() {
+		b.tracker.mu.Lock()
+		defer b.tracker.mu.Unlock()
+		b.tracker.open--
+	})
+	return b.ReadCloser.Close()
+}
+
+func (c *closeTracker) RoundTrip(req *http.Request) (*http.Response, error) {
+	resp, err := http.DefaultTransport.RoundTrip(req)
+	if err != nil {
+		return nil, err
+	}
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.open++
+	resp.Body = &trackedBody{ReadCloser: resp.Body, tracker: c}
+	return resp, nil
+}
+
+// newTagsClient returns a client that fails the test if a response body
+// stays open
+func newTagsClient(t *testing.T) *gcorecloud.ServiceClient {
+	client := fake.ServiceTokenClient("subnets", "v1")
+	tracker := &closeTracker{}
+	client.HTTPClient.Transport = tracker
+	t.Cleanup(func() {
+		tracker.mu.Lock()
+		defer tracker.mu.Unlock()
+		require.Zero(t, tracker.open, "response bodies left open")
+	})
+	return client
+}
+
 // handleSubnetTags serves GET and PATCH of Subnet1 and checks that the PATCH
 // body is patchRequest; other paths, such as .../metadata, get 404
 func handleSubnetTags(t *testing.T, patchRequest string) *requestLog {
@@ -385,7 +434,7 @@ func TestMetadataListAll(t *testing.T) {
 	defer th.TeardownHTTP()
 	requests := handleSubnetTags(t, "")
 
-	client := fake.ServiceTokenClient("subnets", "v1")
+	client := newTagsClient(t)
 	actual, err := subnets.MetadataListAll(client, Subnet1.ID)
 
 	require.NoError(t, err)
@@ -398,7 +447,7 @@ func TestMetadataGet(t *testing.T) {
 	defer th.TeardownHTTP()
 	requests := handleSubnetTags(t, "")
 
-	client := fake.ServiceTokenClient("subnets", "v1")
+	client := newTagsClient(t)
 	actual, err := subnets.MetadataGet(client, Subnet1.ID, Metadata2.Key).Extract()
 
 	require.NoError(t, err)
@@ -411,7 +460,7 @@ func TestMetadataGetMissingKey(t *testing.T) {
 	defer th.TeardownHTTP()
 	handleSubnetTags(t, "")
 
-	client := fake.ServiceTokenClient("subnets", "v1")
+	client := newTagsClient(t)
 	_, err := subnets.MetadataGet(client, Subnet1.ID, "missing").Extract()
 
 	require.IsType(t, gcorecloud.ErrResourceNotFound{}, err)
@@ -422,7 +471,7 @@ func TestMetadataCreateOrUpdate(t *testing.T) {
 	defer th.TeardownHTTP()
 	requests := handleSubnetTags(t, MetadataCreateRequest)
 
-	client := fake.ServiceTokenClient("subnets", "v1")
+	client := newTagsClient(t)
 	err := subnets.MetadataCreateOrUpdate(client, Subnet1.ID, map[string]string{
 		"test1": "test1",
 		"test2": "test2",
@@ -437,7 +486,7 @@ func TestMetadataReplace(t *testing.T) {
 	defer th.TeardownHTTP()
 	requests := handleSubnetTags(t, MetadataReplaceRequest)
 
-	client := fake.ServiceTokenClient("subnets", "v1")
+	client := newTagsClient(t)
 	err := subnets.MetadataReplace(client, Subnet1.ID, map[string]string{
 		"cost-center": "Boston",
 		"test1":       "test1",
@@ -452,7 +501,7 @@ func TestMetadataDelete(t *testing.T) {
 	defer th.TeardownHTTP()
 	requests := handleSubnetTags(t, MetadataDeleteRequest)
 
-	client := fake.ServiceTokenClient("subnets", "v1")
+	client := newTagsClient(t)
 	err := subnets.MetadataDelete(client, Subnet1.ID, Metadata1.Key).ExtractErr()
 
 	require.NoError(t, err)

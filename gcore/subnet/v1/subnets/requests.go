@@ -270,7 +270,9 @@ func patchTags(c *gcorecloud.ServiceClient, id string, tags map[string]interface
 	// do not use Update: UpdateOpts always sends dns_nameservers, host_routes
 	// and gateway_ip, and the API clears them when they are null
 	body := map[string]interface{}{"tags": tags}
-	_, r.Err = c.Patch(updateURL(c, id), body, nil, &gcorecloud.RequestOpts{
+	// decode the response into r.Body: the client closes a successful
+	// response body only when it decodes it
+	_, r.Err = c.Patch(updateURL(c, id), body, &r.Body, &gcorecloud.RequestOpts{
 		OkCodes: []int{http.StatusOK},
 	})
 	return
