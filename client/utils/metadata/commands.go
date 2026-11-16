@@ -10,10 +10,53 @@ import (
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/client/flags"
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
-	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
+	v1 "github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata"
 )
 
 type ClientConstructor func(c *cli.Context) (*gcorecloud.ServiceClient, error)
+
+// Operations are the SDK calls that the metadata commands make
+type Operations struct {
+	ListAll        func(client *gcorecloud.ServiceClient, id string) ([]metadata.Metadata, error)
+	Get            func(client *gcorecloud.ServiceClient, id string, key string) metadata.MetadataResult
+	Delete         func(client *gcorecloud.ServiceClient, id string, key string) metadata.MetadataActionResult
+	CreateOrUpdate func(client *gcorecloud.ServiceClient, id string, opts map[string]string) metadata.MetadataActionResult
+	Replace        func(client *gcorecloud.ServiceClient, id string, opts map[string]string) metadata.MetadataActionResult
+}
+
+// V1 calls the /metadata and /metadata_item endpoints of a resource
+var V1 = Operations{
+	ListAll:        v1.MetadataListAll,
+	Get:            v1.MetadataGet,
+	Delete:         v1.MetadataDelete,
+	CreateOrUpdate: v1.MetadataCreateOrUpdate,
+	Replace:        v1.MetadataReplace,
+}
+
+func NewMetadataListCommand(cc ClientConstructor, usage string, argsUsage string, errorText string) *cli.Command {
+	return V1.NewListCommand(cc, usage, argsUsage, errorText)
+}
+
+func NewMetadataGetCommand(cc ClientConstructor, usage string, argsUsage string, errorText string) *cli.Command {
+	return V1.NewGetCommand(cc, usage, argsUsage, errorText)
+}
+
+func NewMetadataDeleteCommand(cc ClientConstructor, usage string, argsUsage string, errorText string) *cli.Command {
+	return V1.NewDeleteCommand(cc, usage, argsUsage, errorText)
+}
+
+func NewMetadataCreateCommand(cc ClientConstructor, usage string, argsUsage string, errorText string) *cli.Command {
+	return V1.NewCreateCommand(cc, usage, argsUsage, errorText)
+}
+
+func NewMetadataUpdateCommand(cc ClientConstructor, usage string, argsUsage string, errorText string) *cli.Command {
+	return V1.NewUpdateCommand(cc, usage, argsUsage, errorText)
+}
+
+func NewMetadataReplaceCommand(cc ClientConstructor, usage string, argsUsage string, errorText string) *cli.Command {
+	return V1.NewReplaceCommand(cc, usage, argsUsage, errorText)
+}
 
 func showResults(c *cli.Context, data interface{}) error {
 	if c.Bool("test") {
@@ -41,7 +84,7 @@ func StringSliceToMap(slice []string) (map[string]string, error) {
 	return metadata, nil
 }
 
-func NewMetadataListCommand(cc ClientConstructor, usage string, argsUsage string, errorText string) *cli.Command {
+func (ops Operations) NewListCommand(cc ClientConstructor, usage string, argsUsage string, errorText string) *cli.Command {
 	return &cli.Command{
 		Name:      "list",
 		Usage:     usage,
@@ -66,12 +109,12 @@ func NewMetadataListCommand(cc ClientConstructor, usage string, argsUsage string
 				_ = cli.ShowAppHelp(c)
 				return cli.NewExitError(err, 1)
 			}
-			metadata, err := metadata.MetadataListAll(client, resourceID)
+			items, err := ops.ListAll(client, resourceID)
 			if err != nil {
 				return cli.NewExitError(err, 1)
 			}
 
-			err = showResults(c, metadata)
+			err = showResults(c, items)
 			if err != nil {
 				return cli.NewExitError(err, 1)
 			}
@@ -81,7 +124,7 @@ func NewMetadataListCommand(cc ClientConstructor, usage string, argsUsage string
 	}
 }
 
-func NewMetadataGetCommand(cc ClientConstructor, usage string, argsUsage string, errorText string) *cli.Command {
+func (ops Operations) NewGetCommand(cc ClientConstructor, usage string, argsUsage string, errorText string) *cli.Command {
 	return &cli.Command{
 		Name:      "show",
 		Usage:     usage,
@@ -113,16 +156,16 @@ func NewMetadataGetCommand(cc ClientConstructor, usage string, argsUsage string,
 				return cli.NewExitError(err, 1)
 			}
 
-			metadata, err := metadata.MetadataGet(client, resourceID, c.String("metadata")).Extract()
+			item, err := ops.Get(client, resourceID, c.String("metadata")).Extract()
 			if err != nil {
 				return cli.NewExitError(err, 1)
 			}
 
-			return showResults(c, metadata)
+			return showResults(c, item)
 		}}
 }
 
-func NewMetadataDeleteCommand(cc ClientConstructor, usage string, argsUsage string, errorText string) *cli.Command {
+func (ops Operations) NewDeleteCommand(cc ClientConstructor, usage string, argsUsage string, errorText string) *cli.Command {
 	return &cli.Command{
 		Name:      "delete",
 		Usage:     usage,
@@ -147,7 +190,7 @@ func NewMetadataDeleteCommand(cc ClientConstructor, usage string, argsUsage stri
 				_ = cli.ShowAppHelp(c)
 				return cli.NewExitError(err, 1)
 			}
-			err = metadata.MetadataDelete(client, resourceID, c.String("metadata")).ExtractErr()
+			err = ops.Delete(client, resourceID, c.String("metadata")).ExtractErr()
 			if err != nil {
 				return cli.NewExitError(err, 1)
 			}
@@ -156,7 +199,7 @@ func NewMetadataDeleteCommand(cc ClientConstructor, usage string, argsUsage stri
 	}
 }
 
-func NewMetadataCreateCommand(cc ClientConstructor, usage string, argsUsage string, errorText string) *cli.Command {
+func (ops Operations) NewCreateCommand(cc ClientConstructor, usage string, argsUsage string, errorText string) *cli.Command {
 	return &cli.Command{
 		Name:      "create",
 		Usage:     usage,
@@ -186,7 +229,7 @@ func NewMetadataCreateCommand(cc ClientConstructor, usage string, argsUsage stri
 				_ = cli.ShowAppHelp(c)
 				return cli.NewExitError(err, 1)
 			}
-			err = metadata.MetadataCreateOrUpdate(client, resourceID, opts).ExtractErr()
+			err = ops.CreateOrUpdate(client, resourceID, opts).ExtractErr()
 			if err != nil {
 				return cli.NewExitError(err, 1)
 			}
@@ -195,7 +238,7 @@ func NewMetadataCreateCommand(cc ClientConstructor, usage string, argsUsage stri
 	}
 }
 
-func NewMetadataUpdateCommand(cc ClientConstructor, usage string, argsUsage string, errorText string) *cli.Command {
+func (ops Operations) NewUpdateCommand(cc ClientConstructor, usage string, argsUsage string, errorText string) *cli.Command {
 	return &cli.Command{
 		Name:      "update",
 		Usage:     usage,
@@ -225,7 +268,7 @@ func NewMetadataUpdateCommand(cc ClientConstructor, usage string, argsUsage stri
 				_ = cli.ShowAppHelp(c)
 				return cli.NewExitError(err, 1)
 			}
-			err = metadata.MetadataCreateOrUpdate(client, resourceID, opts).ExtractErr()
+			err = ops.CreateOrUpdate(client, resourceID, opts).ExtractErr()
 			if err != nil {
 				return cli.NewExitError(err, 1)
 			}
@@ -233,7 +276,7 @@ func NewMetadataUpdateCommand(cc ClientConstructor, usage string, argsUsage stri
 		}}
 }
 
-func NewMetadataReplaceCommand(cc ClientConstructor, usage string, argsUsage string, errorText string) *cli.Command {
+func (ops Operations) NewReplaceCommand(cc ClientConstructor, usage string, argsUsage string, errorText string) *cli.Command {
 	return &cli.Command{
 		Name:      "replace",
 		Usage:     usage,
@@ -263,7 +306,7 @@ func NewMetadataReplaceCommand(cc ClientConstructor, usage string, argsUsage str
 				_ = cli.ShowAppHelp(c)
 				return cli.NewExitError(err, 1)
 			}
-			err = metadata.MetadataReplace(client, resourceID, opts).ExtractErr()
+			err = ops.Replace(client, resourceID, opts).ExtractErr()
 			if err != nil {
 				return cli.NewExitError(err, 1)
 			}

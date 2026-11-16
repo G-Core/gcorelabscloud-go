@@ -2,12 +2,14 @@ package testing
 
 import (
 	"fmt"
+	"io"
 	"net"
 	"net/http"
+	"sync"
 	"testing"
 
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/subnet/v1/subnets"
-	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 	th "github.com/G-Core/gcorelabscloud-go/testhelper"
 	fake "github.com/G-Core/gcorelabscloud-go/testhelper/client"
@@ -30,18 +32,6 @@ func prepareListTestURL() string {
 func prepareGetTestURL(id string) string {
 	return prepareGetTestURLParams(fake.ProjectID, fake.RegionID, id)
 }
-func prepareGetActionTestURLParams(version string, id string, action string) string { // nolint
-	return fmt.Sprintf("/%s/subnets/%d/%d/%s/%s", version, fake.ProjectID, fake.RegionID, id, action)
-}
-
-func prepareMetadataTestURL(id string) string {
-	return prepareGetActionTestURLParams("v1", id, "metadata")
-}
-
-func prepareMetadataItemTestURL(id string) string {
-	return fmt.Sprintf("/%s/subnets/%d/%d/%s/%s", "v1", fake.ProjectID, fake.RegionID, id, "metadata_item")
-}
-
 func TestList(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
@@ -348,113 +338,246 @@ func TestUpdateTags(t *testing.T) {
 	require.Equal(t, Subnet1, *ct)
 }
 
-func TestMetadataListAll(t *testing.T) {
-	th.SetupHTTP()
-	defer th.TeardownHTTP()
+// requestLog records the methods of the requests that a test server gets
+type requestLog struct {
+	mu      sync.Mutex
+	methods []string
+}
 
-	th.Mux.HandleFunc(prepareMetadataTestURL(Subnet1.ID), func(w http.ResponseWriter, r *http.Request) {
-		th.TestMethod(t, r, "GET")
+func (l *requestLog) add(method string) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.methods = append(l.methods, method)
+}
+
+func (l *requestLog) list() []string {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	return append([]string(nil), l.methods...)
+}
+
+// closeTracker counts response bodies that the client did not close; an open
+// body keeps its connection busy
+type closeTracker struct {
+	mu   sync.Mutex
+	open int
+}
+
+type trackedBody struct {
+	io.ReadCloser
+	tracker *closeTracker
+	once    sync.Once
+}
+
+func (b *trackedBody) Close() error {
+	b.once.Do(func() {
+		b.tracker.mu.Lock()
+		defer b.tracker.mu.Unlock()
+		b.tracker.open--
+	})
+	return b.ReadCloser.Close()
+}
+
+func (c *closeTracker) RoundTrip(req *http.Request) (*http.Response, error) {
+	resp, err := http.DefaultTransport.RoundTrip(req)
+	if err != nil {
+		return nil, err
+	}
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.open++
+	resp.Body = &trackedBody{ReadCloser: resp.Body, tracker: c}
+	return resp, nil
+}
+
+// newTagsClient returns a client that fails the test if a response body
+// stays open
+func newTagsClient(t *testing.T) *gcorecloud.ServiceClient {
+	client := fake.ServiceTokenClient("subnets", "v1")
+	tracker := &closeTracker{}
+	client.HTTPClient.Transport = tracker
+	t.Cleanup(func() {
+		tracker.mu.Lock()
+		defer tracker.mu.Unlock()
+		require.Zero(t, tracker.open, "response bodies left open")
+	})
+	return client
+}
+
+// handleSubnetTags serves GET and PATCH of Subnet1 and checks that the PATCH
+// body is patchRequest; other paths, such as .../metadata, get 404
+func handleSubnetTags(t *testing.T, patchRequest string) *requestLog {
+	return handleSubnet(t, patchRequest, "")
+}
+
+// handleSubnet works like handleSubnetTags, but answers failMethod with 400
+func handleSubnet(t *testing.T, patchRequest string, failMethod string) *requestLog {
+	requests := &requestLog{}
+	th.Mux.HandleFunc(prepareGetTestURL(Subnet1.ID), func(w http.ResponseWriter, r *http.Request) {
 		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
-
+		requests.add(r.Method)
+		if r.Method == failMethod {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		switch r.Method {
+		case http.MethodGet:
+		case http.MethodPatch:
+			th.TestHeader(t, r, "Content-Type", "application/json")
+			th.TestJSONRequest(t, r, patchRequest)
+		default:
+			t.Errorf("unexpected method: %s", r.Method)
+		}
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		_, err := fmt.Fprint(w, MetadataListResponse)
+		_, err := fmt.Fprint(w, MetadataGetResponse)
 		if err != nil {
 			log.Error(err)
 		}
 	})
+	return requests
+}
 
-	client := fake.ServiceTokenClient("subnets", "v1")
+func TestMetadataListAll(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+	requests := handleSubnetTags(t, "")
 
-	actual, err := metadata.MetadataListAll(client, Subnet1.ID)
+	client := newTagsClient(t)
+	actual, err := subnets.MetadataListAll(client, Subnet1.ID)
+
 	require.NoError(t, err)
-	ct := actual[0]
-	require.Equal(t, Metadata1, ct)
 	require.Equal(t, ExpectedMetadataList, actual)
+	require.Equal(t, []string{http.MethodGet}, requests.list())
 }
 
 func TestMetadataGet(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
+	requests := handleSubnetTags(t, "")
 
-	th.Mux.HandleFunc(prepareMetadataItemTestURL(Subnet1.ID), func(w http.ResponseWriter, r *http.Request) {
-		th.TestMethod(t, r, "GET")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+	client := newTagsClient(t)
+	actual, err := subnets.MetadataGet(client, Subnet1.ID, Metadata2.Key).Extract()
 
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		_, err := fmt.Fprint(w, MetadataResponse)
-		if err != nil {
-			log.Error(err)
-		}
-	})
-
-	client := fake.ServiceTokenClient("subnets", "v1")
-
-	actual, err := metadata.MetadataGet(client, Subnet1.ID, ResourceMetadataReadOnly.Key).Extract()
 	require.NoError(t, err)
-	require.Equal(t, &ResourceMetadataReadOnly, actual)
+	require.Equal(t, &Metadata2, actual)
+	require.Equal(t, []string{http.MethodGet}, requests.list())
 }
 
-func TestMetadataCreate(t *testing.T) {
+func TestMetadataGetMissingKey(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
+	handleSubnetTags(t, "")
 
-	th.Mux.HandleFunc(prepareMetadataTestURL(Subnet1.ID), func(w http.ResponseWriter, r *http.Request) {
-		th.TestMethod(t, r, "POST")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+	client := newTagsClient(t)
+	_, err := subnets.MetadataGet(client, Subnet1.ID, "missing").Extract()
 
-		th.TestHeader(t, r, "Content-Type", "application/json")
-		th.TestHeader(t, r, "Accept", "application/json")
-		th.TestJSONRequest(t, r, MetadataCreateRequest)
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNoContent)
-	})
+	require.IsType(t, gcorecloud.ErrResourceNotFound{}, err)
+}
 
-	client := fake.ServiceTokenClient("subnets", "v1")
-	err := metadata.MetadataCreateOrUpdate(client, Subnet1.ID, map[string]string{
+func TestMetadataCreateOrUpdate(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+	requests := handleSubnetTags(t, MetadataCreateRequest)
+
+	client := newTagsClient(t)
+	err := subnets.MetadataCreateOrUpdate(client, Subnet1.ID, map[string]string{
 		"test1": "test1",
 		"test2": "test2",
 	}).ExtractErr()
+
 	require.NoError(t, err)
+	require.Equal(t, []string{http.MethodPatch}, requests.list())
 }
 
-func TestMetadataUpdate(t *testing.T) {
+func TestMetadataReplace(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
+	requests := handleSubnetTags(t, MetadataReplaceRequest)
 
-	th.Mux.HandleFunc(prepareMetadataTestURL(Subnet1.ID), func(w http.ResponseWriter, r *http.Request) {
-		th.TestMethod(t, r, "PUT")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
-
-		th.TestHeader(t, r, "Content-Type", "application/json")
-		th.TestHeader(t, r, "Accept", "application/json")
-		th.TestJSONRequest(t, r, MetadataCreateRequest)
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNoContent)
-	})
-
-	client := fake.ServiceTokenClient("subnets", "v1")
-	err := metadata.MetadataReplace(client, Subnet1.ID, map[string]string{
-		"test1": "test1",
-		"test2": "test2",
+	client := newTagsClient(t)
+	err := subnets.MetadataReplace(client, Subnet1.ID, map[string]string{
+		"cost-center": "Boston",
+		"test1":       "test1",
 	}).ExtractErr()
+
 	require.NoError(t, err)
+	require.Equal(t, []string{http.MethodGet, http.MethodPatch}, requests.list())
 }
 
 func TestMetadataDelete(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
+	requests := handleSubnetTags(t, MetadataDeleteRequest)
 
-	th.Mux.HandleFunc(prepareMetadataItemTestURL(Subnet1.ID), func(w http.ResponseWriter, r *http.Request) {
-		th.TestMethod(t, r, "DELETE")
-		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
-		th.TestHeader(t, r, "Accept", "application/json")
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNoContent)
-	})
+	client := newTagsClient(t)
+	err := subnets.MetadataDelete(client, Subnet1.ID, Metadata1.Key).ExtractErr()
 
-	client := fake.ServiceTokenClient("subnets", "v1")
-	err := metadata.MetadataDelete(client, Subnet1.ID, Metadata1.Key).ExtractErr()
 	require.NoError(t, err)
+	require.Equal(t, []string{http.MethodPatch}, requests.list())
+}
+
+func TestMetadataEmptyOpts(t *testing.T) {
+	// a nil map must not go as "tags": null, which removes all user tags
+	t.Run("create", func(t *testing.T) {
+		th.SetupHTTP()
+		defer th.TeardownHTTP()
+		requests := handleSubnetTags(t, `{"tags": {}}`)
+
+		err := subnets.MetadataCreateOrUpdate(newTagsClient(t), Subnet1.ID, nil).ExtractErr()
+
+		require.NoError(t, err)
+		require.Equal(t, []string{http.MethodPatch}, requests.list())
+	})
+	// like the old PUT with {}, replace removes all user tags
+	t.Run("replace", func(t *testing.T) {
+		th.SetupHTTP()
+		defer th.TeardownHTTP()
+		requests := handleSubnetTags(t, `{"tags": {"cost-center": null, "data-center": null}}`)
+
+		err := subnets.MetadataReplace(newTagsClient(t), Subnet1.ID, nil).ExtractErr()
+
+		require.NoError(t, err)
+		require.Equal(t, []string{http.MethodGet, http.MethodPatch}, requests.list())
+	})
+}
+
+func TestMetadataErrors(t *testing.T) {
+	get := func(c *gcorecloud.ServiceClient) error {
+		_, err := subnets.MetadataGet(c, Subnet1.ID, Metadata1.Key).Extract()
+		return err
+	}
+	create := func(c *gcorecloud.ServiceClient) error {
+		return subnets.MetadataCreateOrUpdate(c, Subnet1.ID, map[string]string{"test1": "test1"}).ExtractErr()
+	}
+	replace := func(c *gcorecloud.ServiceClient) error {
+		return subnets.MetadataReplace(c, Subnet1.ID, map[string]string{"test1": "test1"}).ExtractErr()
+	}
+	del := func(c *gcorecloud.ServiceClient) error {
+		return subnets.MetadataDelete(c, Subnet1.ID, Metadata1.Key).ExtractErr()
+	}
+	cases := []struct {
+		name        string
+		failMethod  string
+		call        func(*gcorecloud.ServiceClient) error
+		wantMethods []string
+	}{
+		{"get returns the GET error", http.MethodGet, get, []string{http.MethodGet}},
+		{"create returns the PATCH error", http.MethodPatch, create, []string{http.MethodPatch}},
+		{"replace stops when GET fails", http.MethodGet, replace, []string{http.MethodGet}},
+		{"replace returns the PATCH error", http.MethodPatch, replace, []string{http.MethodGet, http.MethodPatch}},
+		{"delete returns the PATCH error", http.MethodPatch, del, []string{http.MethodPatch}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			th.SetupHTTP()
+			defer th.TeardownHTTP()
+			requests := handleSubnet(t, "", tc.failMethod)
+
+			err := tc.call(newTagsClient(t))
+
+			require.IsType(t, gcorecloud.ErrDefault400{}, err)
+			require.Equal(t, tc.wantMethods, requests.list())
+		})
+	}
 }

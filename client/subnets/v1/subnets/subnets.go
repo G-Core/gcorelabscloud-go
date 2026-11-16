@@ -360,6 +360,61 @@ var subnetCreateCommand = cli.Command{
 	},
 }
 
+// metadataOperations read and change subnet tags with GET and PATCH of the
+// subnet, because the API has no /metadata endpoints for subnets
+var metadataOperations = cmeta.Operations{
+	ListAll:        subnets.MetadataListAll,
+	Get:            subnets.MetadataGet,
+	Delete:         subnets.MetadataDelete,
+	CreateOrUpdate: subnets.MetadataCreateOrUpdate,
+	Replace:        subnets.MetadataReplace,
+}
+
+func newMetadataCommand(cc cmeta.ClientConstructor) *cli.Command {
+	return &cli.Command{
+		Name:  "metadata",
+		Usage: "Subnet metadata",
+		Subcommands: []*cli.Command{
+			metadataOperations.NewListCommand(
+				cc,
+				"Get subnet metadata",
+				"<subnet_id>",
+				subnetIDText,
+			),
+			metadataOperations.NewGetCommand(
+				cc,
+				"Show subnet metadata by key",
+				"<subnet_id>",
+				subnetIDText,
+			),
+			metadataOperations.NewDeleteCommand(
+				cc,
+				"Delete subnet metadata by key",
+				"<subnet_id>",
+				subnetIDText,
+			),
+			metadataOperations.NewCreateCommand(
+				cc,
+				"Create subnet metadata. It would update existing keys",
+				"<subnet_id>",
+				subnetIDText,
+			),
+			metadataOperations.NewUpdateCommand(
+				cc,
+				"Update subnet metadata. It overriding existing records",
+				"<subnet_id>",
+				subnetIDText,
+			),
+			metadataOperations.NewReplaceCommand(
+				cc,
+				"Replace subnet metadata. It replace existing records",
+				"<subnet_id>",
+				subnetIDText,
+			),
+		},
+	}
+}
+
 var Commands = cli.Command{
 	Name:  "subnet",
 	Usage: "GCloud subnets API",
@@ -369,47 +424,6 @@ var Commands = cli.Command{
 		&subnetDeleteCommand,
 		&subnetCreateCommand,
 		&subnetUpdateCommand,
-		{
-			Name:  "metadata",
-			Usage: "Network metadata",
-			Subcommands: []*cli.Command{
-				cmeta.NewMetadataListCommand(
-					client.NewSubnetClientV1,
-					"Get subnet metadata",
-					"<subnet_id>",
-					"subnet_id is mandatory argument",
-				),
-				cmeta.NewMetadataGetCommand(
-					client.NewSubnetClientV1,
-					"Show subnet metadata by key",
-					"<subnet_id>",
-					"subnet_id is mandatory argument",
-				),
-				cmeta.NewMetadataDeleteCommand(
-					client.NewSubnetClientV1,
-					"Delete subnet metadata by key",
-					"<subnet_id>",
-					"subnet_id is mandatory argument",
-				),
-				cmeta.NewMetadataCreateCommand(
-					client.NewSubnetClientV1,
-					"Create subnet metadata. It would update existing keys",
-					"<subnet_id>",
-					"subnet_id is mandatory argument",
-				),
-				cmeta.NewMetadataUpdateCommand(
-					client.NewSubnetClientV1,
-					"Update subnet metadata. It overriding existing records",
-					"<subnet_id>",
-					"subnet_id is mandatory argument",
-				),
-				cmeta.NewMetadataReplaceCommand(
-					client.NewSubnetClientV1,
-					"Replace subnet metadata. It replace existing records",
-					"<subnet_id>",
-					"subnet_id is mandatory argument",
-				),
-			},
-		},
+		newMetadataCommand(client.NewSubnetClientV1),
 	},
 }
