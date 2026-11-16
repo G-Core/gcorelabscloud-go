@@ -2,9 +2,11 @@ package subnets
 
 import (
 	"net"
+	"net/http"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"github.com/G-Core/gcorelabscloud-go/pagination"
 )
 
@@ -192,4 +194,84 @@ func IDFromName(client *gcorecloud.ServiceClient, name string) (string, error) {
 	default:
 		return "", gcorecloud.ErrMultipleResourcesFound{Name: name, Count: count, ResourceType: "subnets"}
 	}
+}
+
+// the Metadata* functions keep the signatures of gcore/utils/metadata/v1/metadata,
+// but the API has no /metadata and /metadata_item endpoints for subnets, so they
+// read tags with Get and change them with a subnet PATCH
+
+// MetadataListAll returns all subnet tags, including read-only tags
+func MetadataListAll(c *gcorecloud.ServiceClient, id string) ([]metadata.Metadata, error) {
+	subnet, err := Get(c, id).Extract()
+	if err != nil {
+		return nil, err
+	}
+	return subnet.Metadata, nil
+}
+
+// MetadataGet returns one subnet tag, or gcorecloud.ErrResourceNotFound when
+// the key does not exist
+func MetadataGet(c *gcorecloud.ServiceClient, id string, key string) (r metadata.MetadataResult) {
+	tags, err := MetadataListAll(c, id)
+	if err != nil {
+		r.Err = err
+		return
+	}
+	for _, tag := range tags {
+		if tag.Key == key {
+			r.Body = tag
+			return
+		}
+	}
+	r.Err = gcorecloud.ErrResourceNotFound{Name: key, ResourceType: "subnet tag"}
+	return
+}
+
+// MetadataCreateOrUpdate adds or changes the given subnet tags and keeps the
+// other tags
+func MetadataCreateOrUpdate(c *gcorecloud.ServiceClient, id string, opts map[string]string) (r metadata.MetadataActionResult) {
+	tags := make(map[string]interface{})
+	for k, v := range opts {
+		tags[k] = v
+	}
+	return patchTags(c, id, tags)
+}
+
+// MetadataReplace replaces all user tags of a subnet with opts; the API keeps
+// read-only tags
+func MetadataReplace(c *gcorecloud.ServiceClient, id string, opts map[string]string) (r metadata.MetadataActionResult) {
+	current, err := MetadataListAll(c, id)
+	if err != nil {
+		r.Err = err
+		return
+	}
+	// PATCH has no "replace all" operation, so send null for each user tag
+	// that is not in opts, in the same request as the new tags
+	tags := make(map[string]interface{})
+	for _, tag := range current {
+		if _, ok := opts[tag.Key]; !ok && !tag.ReadOnly {
+			tags[tag.Key] = nil
+		}
+	}
+	for k, v := range opts {
+		tags[k] = v
+	}
+	return patchTags(c, id, tags)
+}
+
+// MetadataDelete removes one subnet tag; a missing key is not an error
+func MetadataDelete(c *gcorecloud.ServiceClient, id string, key string) (r metadata.MetadataActionResult) {
+	return patchTags(c, id, map[string]interface{}{key: nil})
+}
+
+// patchTags uses JSON Merge Patch (RFC 7386): a nil value removes the key,
+// absent keys stay unchanged
+func patchTags(c *gcorecloud.ServiceClient, id string, tags map[string]interface{}) (r metadata.MetadataActionResult) {
+	// do not use Update: UpdateOpts always sends dns_nameservers, host_routes
+	// and gateway_ip, and the API clears them when they are null
+	body := map[string]interface{}{"tags": tags}
+	_, r.Err = c.Patch(updateURL(c, id), body, nil, &gcorecloud.RequestOpts{
+		OkCodes: []int{http.StatusOK},
+	})
+	return
 }

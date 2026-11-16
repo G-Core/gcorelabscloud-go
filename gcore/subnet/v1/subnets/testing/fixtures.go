@@ -162,16 +162,11 @@ const MetadataResponse = `
 }
 `
 
-const MetadataCreateRequest = `
+// MetadataGetResponse is a subnet with two user tags and one read-only tag
+const MetadataGetResponse = `
 {
-"test1": "test1", 
-"test2": "test2"
-}
-`
-const MetadataListResponse = `
-{
-  "count": 2,
-  "results": [
+  "id": "e7944e55-f957-413d-aa56-fdc876543113",
+  "metadata": [
     {
       "key": "cost-center",
       "value": "Atlanta",
@@ -181,8 +176,42 @@ const MetadataListResponse = `
       "key": "data-center",
       "value": "A",
       "read_only": false
+    },
+    {
+      "key": "owner",
+      "value": "gcore",
+      "read_only": true
     }
   ]
+}
+`
+
+const MetadataCreateRequest = `
+{
+  "tags": {
+    "test1": "test1",
+    "test2": "test2"
+  }
+}
+`
+
+// MetadataReplaceRequest keeps cost-center with a new value, adds test1,
+// removes data-center and does not send the read-only owner
+const MetadataReplaceRequest = `
+{
+  "tags": {
+    "cost-center": "Boston",
+    "data-center": null,
+    "test1": "test1"
+  }
+}
+`
+
+const MetadataDeleteRequest = `
+{
+  "tags": {
+    "cost-center": null
+  }
 }
 `
 
@@ -247,5 +276,10 @@ var (
 		Value:    "A",
 		ReadOnly: false,
 	}
-	ExpectedMetadataList = []metadata.Metadata{Metadata1, Metadata2}
+	MetadataReadOnly = metadata.Metadata{
+		Key:      "owner",
+		Value:    "gcore",
+		ReadOnly: true,
+	}
+	ExpectedMetadataList = []metadata.Metadata{Metadata1, Metadata2, MetadataReadOnly}
 )
