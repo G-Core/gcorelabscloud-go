@@ -128,6 +128,18 @@ const UpdateRequestNoData = `
     "gateway_ip": null
 }
 `
+
+const UpdateRequestTags = `
+{
+    "dns_nameservers": [],
+    "host_routes": [],
+    "gateway_ip": null,
+    "tags": {
+        "key1": "value1",
+        "key2": null
+    }
+}
+`
 const CreateResponse = `
 {
 	"tasks": [

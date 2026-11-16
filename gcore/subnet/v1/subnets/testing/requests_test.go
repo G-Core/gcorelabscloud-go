@@ -309,6 +309,45 @@ func TestUpdateGW(t *testing.T) {
 	require.Equal(t, updatedTime, ct.UpdatedAt)
 }
 
+func TestUpdateTags(t *testing.T) {
+	th.SetupHTTP()
+	defer th.TeardownHTTP()
+
+	testURL := prepareGetTestURL(Subnet1.ID)
+
+	th.Mux.HandleFunc(testURL, func(w http.ResponseWriter, r *http.Request) {
+		th.TestMethod(t, r, "PATCH")
+		th.TestHeader(t, r, "Authorization", fmt.Sprintf("Bearer %s", fake.AccessToken))
+		th.TestHeader(t, r, "Content-Type", "application/json")
+		th.TestHeader(t, r, "Accept", "application/json")
+		th.TestJSONRequest(t, r, UpdateRequestTags)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := fmt.Fprint(w, GetResponse)
+		if err != nil {
+			log.Error(err)
+		}
+	})
+
+	client := fake.ServiceTokenClient("subnets", "v1")
+
+	value := "value1"
+	opts := subnets.UpdateOpts{
+		DNSNameservers: []net.IP{},
+		HostRoutes:     []subnets.HostRoute{},
+		Tags: map[string]*string{
+			"key1": &value,
+			"key2": nil,
+		},
+	}
+
+	ct, err := subnets.Update(client, Subnet1.ID, opts).Extract()
+
+	require.NoError(t, err)
+	require.Equal(t, Subnet1, *ct)
+}
+
 func TestMetadataListAll(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
